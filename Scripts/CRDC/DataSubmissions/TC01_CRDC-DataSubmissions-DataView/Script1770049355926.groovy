@@ -26,6 +26,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions as ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait as WebDriverWait
 import java.nio.file.Path as Path
 import java.nio.file.Paths as Paths
+import com.kms.katalon.core.configuration.RunConfiguration
 import com.kms.katalon.core.testdata.TestDataFactory
 
 /*This test script:
@@ -68,9 +69,20 @@ CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('U
 CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('ValidationResults')
 CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('DataView')
 
-//Verify Data View table
-CustomKeywords.'utilities.SubmissionRequest.verifyDataViewMatchesMetadata'('InputFiles/CRDC/MetadataData/program.tsv', 'program')
-CustomKeywords.'utilities.SubmissionRequest.verifyDataViewMatchesMetadata'('InputFiles/CRDC/MetadataData/study.tsv', 'study')
-CustomKeywords.'utilities.SubmissionRequest.verifyDataViewMatchesMetadata'('InputFiles/CRDC/MetadataData/participant.tsv', 'participant')
+//Verify Data View table: user-uploaded TSVs vs UI (or UI-exported TSVs)
+//Uses ValidateDataView + HandleValidationResult (ported from Katalon_Datahub)
+String folderPath = RunConfiguration.getProjectDir() + '/InputFiles/CRDC/MetadataData'
+String dropdownXPath = "//div[@id='mui-component-select-nodeType']"
+String tableXPath = "//table[@data-testid='generic-table']"
+String sortByColumn = '{"participant":"study_participant_id","study":"study_id","program":"program_acronym"}'
+int waitTime = 3000
+Map<String, Object> dataViewResult = CustomKeywords.'utilities.ValidateDataView.validate'(
+	folderPath,
+	dropdownXPath,
+	tableXPath,
+	sortByColumn,
+	waitTime
+)
+CustomKeywords.'utilities.HandleValidationResult.checkDataViewResult'(dataViewResult, 'Data View', true, false)
 
 WebUI.closeBrowser()
