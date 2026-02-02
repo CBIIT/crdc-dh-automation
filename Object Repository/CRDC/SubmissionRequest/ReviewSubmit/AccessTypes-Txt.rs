@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AccessTypes-Txt</name>
+   <tag></tag>
+   <elementGuidId>320ee231-d15c-477d-abc9-b386f7f1f24a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-data-access-access-types-property-value-0&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-data-access-access-types-property-value-0&quot;]</value>
+      <webElementGuid>961586be-751b-48e3-9216-c4a171bb7ad4</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

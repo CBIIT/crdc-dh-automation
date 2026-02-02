@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>EpidemilogicCohort-Txt</name>
+   <tag></tag>
+   <elementGuidId>44a4afdb-76b6-4e1d-b1c6-bace3bc7283d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-data-types-epidemiologic-or-cohort-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-data-types-epidemiologic-or-cohort-property-value&quot;]</value>
+      <webElementGuid>64aa888b-62e1-4b7a-b696-ed4d205a2023</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

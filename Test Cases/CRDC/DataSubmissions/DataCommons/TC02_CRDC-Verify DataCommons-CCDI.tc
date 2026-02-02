@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC02_CRDC-Verify DataCommons-CCDI</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>43da616c-cace-410e-a87a-09b09a097815</testCaseGuid>
+</TestCaseEntity>

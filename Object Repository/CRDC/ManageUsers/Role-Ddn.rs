@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Role-Ddn</name>
+   <tag></tag>
+   <elementGuidId>e3044be0-bb51-4705-a661-a5d3437a7717</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id='mui-component-select-role']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id='mui-component-select-role']</value>
+      <webElementGuid>d3c807de-dcb2-4d6f-98d3-9643961fe50e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubmissionName-Field</name>
+   <tag></tag>
+   <elementGuidId>24de9ad0-1b91-4dc9-94ac-c764851d1bdd</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid='create-data-submission-dialog-submission-name-input']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid='create-data-submission-dialog-submission-name-input']</value>
+      <webElementGuid>3d8efda9-866b-4ab2-b5fc-073440468700</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

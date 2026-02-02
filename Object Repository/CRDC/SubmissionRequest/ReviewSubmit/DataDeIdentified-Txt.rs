@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataDeIdentified-Txt</name>
+   <tag></tag>
+   <elementGuidId>2e11faf4-b874-4f77-b9c1-cc2f020040a3</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-subjects-data-de-identified-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-subjects-data-de-identified-property-value&quot;]</value>
+      <webElementGuid>c4f3459f-ee4e-4459-9df2-5c8950df9003</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

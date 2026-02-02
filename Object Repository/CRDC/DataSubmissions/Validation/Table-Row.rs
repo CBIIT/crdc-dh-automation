@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Table-Row</name>
+   <tag></tag>
+   <elementGuidId>b2f9e5b4-cc96-45ea-ac6a-699fe16e2253</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//tbody/tr</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//tbody/tr</value>
+      <webElementGuid>e9cbd5e6-5440-480e-b27d-429a1c0b8ff6</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

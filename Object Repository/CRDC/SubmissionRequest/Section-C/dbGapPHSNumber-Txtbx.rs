@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>dbGapPHSNumber-Txtbx</name>
+   <tag></tag>
+   <elementGuidId>c7c087c3-e778-47cf-b6cf-298dff23aec4</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;section-c-if-yes-provide-dbgap-phs-number&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;section-c-if-yes-provide-dbgap-phs-number&quot;]</value>
+      <webElementGuid>81dde5ee-9807-44a9-af29-a491fbc5aa6d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ProgAbbre-Txt</name>
+   <tag></tag>
+   <elementGuidId>4296b887-c9b1-4ff9-95ed-e87526de6e24</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-program-information-abbreviation-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-program-information-abbreviation-property-value&quot;]</value>
+      <webElementGuid>de84b915-f106-497f-b4ee-4792dc8f4057</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

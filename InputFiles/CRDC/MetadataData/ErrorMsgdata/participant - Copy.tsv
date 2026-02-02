@@ -1,0 +1,10 @@
+type	study.study_id	study_participant_id	participant_id	race	sex	ethnicity	dbGaP_subject_id	crdc_id
+participant		GC-CASE-992050	O_Tite_tute_Tati_tibi_tanta_tyranne_tulisti	Native Hawaiian or other Pacific Islander	Female	Not allowed to collect	scientia_et_labor	scientiae_et_patriae
+participant		GC-CASE-987680	haec_olim_meminisse_iuvabit	Native Hawaiian or other Pacific Islander	Unknown	Hispanic or Latino	"scientia,_aere_perennius"	faber_est_suae_quisque_fortunae
+participant		GC-CASE-985100	damnant_quod_non_intellegunt	Unknown	Male	Hispanic or Latino	scientiae_cedit_mare	barba_crescit_caput_nescit
+participant		GC-CASE-981829	a_bene_placito	White	X	Not Hispanic or Latino	haec_olim_meminisse_iuvabit	scientiae_cedit_mare
+participant		GC-CASE-977273	"scientia,_aere_perennius"	Not Reported	Don't know	Not Hispanic or Latino	Macte_animo_Generose_puer_sic_itur_ad_astra	Obedientia_civium_urbis_felicitas
+participant		GC-CASE-974840	saltus_in_demonstrando	Asian	Intersex	Unknown	damnant_quod_non_intellegunt	nanos_gigantum_humeris_insidentes
+participant		GC-CASE-965267	faber_est_suae_quisque_fortunae	Asian	None of these describe me	Not allowed to collect	salus_in_arduis	O_Tite_tute_Tati_tibi_tanta_tyranne_tulisti
+participant		GC-CASE-964709	damnant_quod_non_intellegunt	Unknown	Prefer not to answer	Unknown	scientiae_cedit_mare	faber_est_suae_quisque_fortunae
+participant		GC-CASE-962690	scientia_et_sapientia	Black or African American	Female	Not allowed to collect	sapiens_qui_prospicit	haec_olim_meminisse_iuvabit

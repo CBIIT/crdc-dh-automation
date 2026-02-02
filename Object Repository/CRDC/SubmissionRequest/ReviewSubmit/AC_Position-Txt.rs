@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AC_Position-Txt</name>
+   <tag></tag>
+   <elementGuidId>62747f52-a7d0-4dda-a636-1d31d6325fe4</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-additional-contacts-0-position-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-additional-contacts-0-position-property-value&quot;]</value>
+      <webElementGuid>ed26e858-9eb6-4446-bf5a-4fd7b414b44b</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

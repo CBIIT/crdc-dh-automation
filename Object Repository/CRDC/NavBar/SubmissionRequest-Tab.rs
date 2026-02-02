@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubmissionRequest-Tab</name>
+   <tag></tag>
+   <elementGuidId>6a044cc0-d9cc-49f4-b492-a02fb543e3a8</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;navbar-dropdown-submission-requests&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;navbar-dropdown-submission-requests&quot;]</value>
+      <webElementGuid>d7351a36-896e-413f-9fa1-8a31ca00faf4</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC07_CRDC-Verify_Error_Study name mismatch</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>4d2a5dea-3c04-4025-8384-6e3ec1a61af6</testCaseGuid>
+</TestCaseEntity>

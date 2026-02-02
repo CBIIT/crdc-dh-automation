@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC15_CRDC-PbacUncheckedPermissions-User</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>e9fd7b28-0d2a-44de-924c-a3489840a5c3</testCaseGuid>
+</TestCaseEntity>

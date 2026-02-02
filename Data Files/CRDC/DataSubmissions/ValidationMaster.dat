@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataFileEntity>
+   <description></description>
+   <name>ValidationMaster</name>
+   <tag></tag>
+   <connectionProperties/>
+   <containsHeaders>false</containsHeaders>
+   <csvSeperator></csvSeperator>
+   <dataFileGUID>a9d0feb2-bbf4-460c-994b-41cc74c433bf</dataFileGUID>
+   <dataSourceUrl>InputFiles/CRDC/DataSubmissionValidation/ValidationMaster.xlsx</dataSourceUrl>
+   <driver>ExcelFile</driver>
+   <isInternalPath>true</isInternalPath>
+   <query></query>
+   <secureUserAccount>false</secureUserAccount>
+   <sheetName>aggregated_headers</sheetName>
+   <usingGlobalDBSetting>false</usingGlobalDBSetting>
+</DataFileEntity>

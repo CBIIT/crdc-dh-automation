@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC05_CRDC-PbacDefaultPermissions-User</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>7fdfd916-d379-4281-a8b2-31ce4b523059</testCaseGuid>
+</TestCaseEntity>

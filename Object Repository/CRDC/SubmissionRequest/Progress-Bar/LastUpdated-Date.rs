@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>LastUpdated-Date</name>
+   <tag></tag>
+   <elementGuidId>154f24ed-d786-4095-ad93-cbf780a23ca4</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid='status-bar-last-updated']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid='status-bar-last-updated']</value>
+      <webElementGuid>a31d4236-ed00-435b-af25-b202276b20ef</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

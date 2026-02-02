@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PublictnTitle-Txt</name>
+   <tag></tag>
+   <elementGuidId>3f6dccd1-e954-4ead-89c0-43a33b124392</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-existing-publication-0-title-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-existing-publication-0-title-property-value&quot;]</value>
+      <webElementGuid>81aa9a6d-0a55-4a75-8fb7-1193c84e9b52</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

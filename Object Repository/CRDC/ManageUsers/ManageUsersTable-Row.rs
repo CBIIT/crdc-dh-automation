@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ManageUsersTable-Row</name>
+   <tag></tag>
+   <elementGuidId>3b0b6c34-f2fa-4578-a8fb-308d56c6e58e</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//table//tr[td]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//table//tr[td]</value>
+      <webElementGuid>0915355e-3964-4056-ae14-ff0a187425de</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

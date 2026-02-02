@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubmReqListTable-Row</name>
+   <tag></tag>
+   <elementGuidId>d70a3f9d-be5c-405e-ba9e-798513543ea9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//tbody/tr</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//tbody/tr</value>
+      <webElementGuid>7f492f9c-9951-4d82-a22b-c891e3038a4e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

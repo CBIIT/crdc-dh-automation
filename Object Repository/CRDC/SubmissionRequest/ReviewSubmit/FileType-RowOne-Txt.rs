@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FileType-RowOne-Txt</name>
+   <tag></tag>
+   <elementGuidId>4dd99eb2-a8d8-4680-9bc7-877e9556b23b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-file-type-table-file-0-file-type&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-file-type-table-file-0-file-type&quot;]</value>
+      <webElementGuid>3b0984f8-3bf9-42d0-9155-3dee55805233</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

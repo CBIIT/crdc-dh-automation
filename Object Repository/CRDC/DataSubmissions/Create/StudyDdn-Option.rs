@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>StudyDdn-Option</name>
+   <tag></tag>
+   <elementGuidId>fead700b-7b16-4926-a077-988b740dc272</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[contains(@data-testid,'study-option')]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[contains(@data-testid,'study-option')]</value>
+      <webElementGuid>3a4bda89-37a6-4000-8cc2-1b2ab985f3cc</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

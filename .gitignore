@@ -1,0 +1,16 @@
+/bin/*
+Profiles/*
+OutputFiles/*
+.DS_Store
+.cache/*
+Reports/*
+Libs/*
+.classpath
+/.cache/*
+settings/*
+.Commons_Automation.prj
+.project
+/bin/
+Commons_Automation/Keywords/utilities/
+__pycache__/
+*.pyc

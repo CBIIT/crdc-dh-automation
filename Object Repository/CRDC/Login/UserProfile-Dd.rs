@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>UserProfile-Dd</name>
+   <tag></tag>
+   <elementGuidId>b94eda03-3f52-41e9-82c1-0fde779e2477</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;navbar-dropdown-name&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;navbar-dropdown-name&quot;]</value>
+      <webElementGuid>ec5109e0-ec39-48d3-ac6b-dae2dc74e7c5</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

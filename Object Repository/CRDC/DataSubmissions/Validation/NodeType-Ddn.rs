@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>NodeType-Ddn</name>
+   <tag></tag>
+   <elementGuidId>5008d8f1-135c-46ae-9ab0-559ad18e75bf</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//div[@id='mui-component-select-nodeType']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//div[@id='mui-component-select-nodeType']</value>
+      <webElementGuid>3c307b0f-8645-444a-ad81-928264944fa1</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AdditionalComnt-Txt</name>
+   <tag></tag>
+   <elementGuidId>aed7bc0f-015d-4f23-80ea-446539abe17f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-additional-comments-submitter-comment-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-additional-comments-submitter-comment-property-value&quot;]</value>
+      <webElementGuid>802cf138-d1a8-43af-87d8-8f5e9f4fd72a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

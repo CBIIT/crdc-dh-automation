@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ExpctdPubDate-Txt</name>
+   <tag></tag>
+   <elementGuidId>b6079d03-8c00-4bd4-a4f2-8329b139bf16</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-planned-publication-0-date-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-planned-publication-0-date-property-value&quot;]</value>
+      <webElementGuid>0becccad-257a-4080-af46-f4210a294f68</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

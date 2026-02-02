@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataFileEntity>
+   <description></description>
+   <name>Headers-ValidationResults</name>
+   <tag></tag>
+   <connectionProperties/>
+   <containsHeaders>false</containsHeaders>
+   <csvSeperator></csvSeperator>
+   <dataFileGUID>619d24d4-e56e-498c-8568-ac0b27202c71</dataFileGUID>
+   <dataSourceUrl>InputFiles/CRDC/DataSubmissionValidation/DSV_TableHeaders.xlsx</dataSourceUrl>
+   <driver>ExcelFile</driver>
+   <isInternalPath>true</isInternalPath>
+   <query></query>
+   <secureUserAccount>false</secureUserAccount>
+   <sheetName>ValidationResults</sheetName>
+   <usingGlobalDBSetting>false</usingGlobalDBSetting>
+</DataFileEntity>

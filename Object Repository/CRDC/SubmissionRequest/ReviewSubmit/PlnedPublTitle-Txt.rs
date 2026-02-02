@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PlnedPublTitle-Txt</name>
+   <tag></tag>
+   <elementGuidId>a72ec83d-6401-4e86-a603-3c57a4a646c0</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-planned-publication-0-title-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-planned-publication-0-title-property-value&quot;]</value>
+      <webElementGuid>b39dcdc3-c3b1-4934-8679-04a8ff2379bf</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

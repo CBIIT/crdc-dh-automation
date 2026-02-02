@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ChooseFiles-Btn</name>
+   <tag></tag>
+   <elementGuidId>3436d285-1de6-4084-8745-4312c2ad8e85</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//input[@type='file']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//input[@type='file']</value>
+      <webElementGuid>9cdc643e-0cfc-4110-9a6b-8811939f26d1</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

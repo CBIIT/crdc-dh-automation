@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>yesNoParentTag-TogleBtn</name>
+   <tag></tag>
+   <elementGuidId>d5424749-6756-47f3-acdd-5eb0fd1839dd</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;section-b-dbGaP-registration&quot;]//parent::span</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;section-b-dbGaP-registration&quot;]//parent::span</value>
+      <webElementGuid>384f13b0-7dae-4e25-b3fd-5e992c598828</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

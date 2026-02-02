@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>TragetSubmDelivryDate-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>5e9aae59-588e-4e04-b16e-97c81e38477d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;section-d-targeted-data-submission-delivery-date&quot;]//following::button[1]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//*[@id=&quot;section-d-targeted-data-submission-delivery-date&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;section-d-targeted-data-submission-delivery-date&quot;]//following::button[1]</value>
+      <webElementGuid>8aba6d1b-de3f-4aa0-b2fa-ca4423c99aa4</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

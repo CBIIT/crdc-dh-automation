@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>LoginPageLogin-Btn</name>
+   <tag></tag>
+   <elementGuidId>5e516eae-e2a7-4bab-9d4b-d45362ab3a2a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;loginPageLoginButton&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;loginPageLoginButton&quot;]</value>
+      <webElementGuid>ca7acfe3-6213-4fe1-b1f3-30b6f2effd96</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

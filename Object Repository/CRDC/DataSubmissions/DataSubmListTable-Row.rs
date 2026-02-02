@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataSubmListTable-Row</name>
+   <tag></tag>
+   <elementGuidId>1b3a4853-76f5-4660-8e0d-f7c9f636e633</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//tbody/tr</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//tbody/tr</value>
+      <webElementGuid>5cec7585-357d-4722-ba00-370056ac601f</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

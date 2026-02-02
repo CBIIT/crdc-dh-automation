@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC05_CRDC-Verify_Error_Invalid string pattern</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>3b55fe74-80aa-4346-8d49-1f54dd1705bc</testCaseGuid>
+</TestCaseEntity>

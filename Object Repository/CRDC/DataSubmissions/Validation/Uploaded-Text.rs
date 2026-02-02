@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Uploaded-Text</name>
+   <tag></tag>
+   <elementGuidId>505d591f-2e98-4579-905f-5d3bb4df8dad</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[.='Uploaded']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[.='Uploaded']</value>
+      <webElementGuid>e933147b-9bc9-4dd3-bda6-9e14f039b179</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

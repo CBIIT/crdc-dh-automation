@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Login.gov_OneTimeCode-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>5c8534bd-93e1-4e39-904e-1fea93979c05</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[contains(@id,&quot;code-&quot;)]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[contains(@id,&quot;code-&quot;)]</value>
+      <webElementGuid>6b6215c1-b8df-41d8-ade3-048140a2e8b2</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

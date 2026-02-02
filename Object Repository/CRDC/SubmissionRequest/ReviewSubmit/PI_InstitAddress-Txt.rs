@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PI_InstitAddress-Txt</name>
+   <tag></tag>
+   <elementGuidId>3f460f7b-c8f9-4ae9-a9bd-b07d6857ce7e</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-pi-institution-address-property-label&quot;]//following::span[1]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-pi-institution-address-property-label&quot;]//following::span[1]</value>
+      <webElementGuid>24c069d2-1b92-4cf5-ad63-c7efcc175e9f</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

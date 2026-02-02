@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC01_CRDC-Verify DataCommons-GC</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>5e9714a4-8a59-421c-aa70-197652e841d4</testCaseGuid>
+</TestCaseEntity>

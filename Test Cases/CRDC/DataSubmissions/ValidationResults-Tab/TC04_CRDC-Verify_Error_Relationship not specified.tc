@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC04_CRDC-Verify_Error_Relationship not specified</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>163ef932-f884-4a76-9028-54411feca254</testCaseGuid>
+</TestCaseEntity>

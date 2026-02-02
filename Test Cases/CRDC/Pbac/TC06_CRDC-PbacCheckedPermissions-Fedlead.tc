@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC06_CRDC-PbacCheckedPermissions-Fedlead</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>1dc6048d-f348-4963-a589-4c0c8f411655</testCaseGuid>
+</TestCaseEntity>

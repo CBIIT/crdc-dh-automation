@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CalendarTodayDate-Btn</name>
+   <tag></tag>
+   <elementGuidId>bfdaa6aa-7987-4601-bebb-23a5aa4b2f61</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[contains(@class,'MuiPickersDay-today')]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//button[contains(@class,'MuiPickersDay-today')]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[contains(@class,'MuiPickersDay-today')]</value>
+      <webElementGuid>90186f91-6f5c-4e82-a649-3e49a31f20e0</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AddRepository-Btn</name>
+   <tag></tag>
+   <elementGuidId>abc77f47-8a1c-4e8a-9fa7-5accf7dc20c8</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;section-b-add-repository-button&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;section-b-add-repository-button&quot;]</value>
+      <webElementGuid>bd8d9ccc-72d3-475f-8333-edbac5eaae35</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

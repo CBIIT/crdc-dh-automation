@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Genomics-Txt</name>
+   <tag></tag>
+   <elementGuidId>acf0e047-f21b-46ec-a71c-8aedec83bd1c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-data-types-genomics-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-data-types-genomics-property-value&quot;]</value>
+      <webElementGuid>73fd648d-5cee-43dc-9e28-f57eb5ba4cb8</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

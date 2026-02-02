@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataExplorer-Tab</name>
+   <tag></tag>
+   <elementGuidId>59008f7e-8cf6-4155-897d-f3a4aed219f5</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;navbar-dropdown-data-explorer&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;navbar-dropdown-data-explorer&quot;]</value>
+      <webElementGuid>31ac9e19-f07b-4aac-9c18-a825105a7a44</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Review-Btn</name>
+   <tag></tag>
+   <elementGuidId>841130ab-1ccf-434c-af23-22461fa2ec6d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[.='Review']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[.='Review']</value>
+      <webElementGuid>76289715-c30c-4b8a-81fa-50047eaac111</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

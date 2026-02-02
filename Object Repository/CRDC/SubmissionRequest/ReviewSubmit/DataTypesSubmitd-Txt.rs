@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataTypesSubmitd-Txt</name>
+   <tag></tag>
+   <elementGuidId>53ce32c0-a5bb-4f93-ad09-2bff2e52118e</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-repository-0-data-types-submitted-property-value-0&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-repository-0-data-types-submitted-property-value-0&quot;]</value>
+      <webElementGuid>b9803221-0b71-48b1-b5fc-092b14867493</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

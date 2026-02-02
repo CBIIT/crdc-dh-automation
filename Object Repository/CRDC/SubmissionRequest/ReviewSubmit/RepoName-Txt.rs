@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>RepoName-Txt</name>
+   <tag></tag>
+   <elementGuidId>716baa94-0028-4462-b304-0f1178ff2daf</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-repository-0-name-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-repository-0-name-property-value&quot;]</value>
+      <webElementGuid>6ae80cef-53f5-413b-aa20-4b7a8e0009f0</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

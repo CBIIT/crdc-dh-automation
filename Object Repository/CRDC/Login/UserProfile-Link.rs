@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>UserProfile-Link</name>
+   <tag></tag>
+   <elementGuidId>d33667c9-4feb-41f5-ad31-149dcef2c94a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;navbar-dropdown-item-user-profile&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;navbar-dropdown-item-user-profile&quot;]</value>
+      <webElementGuid>7d61e795-edde-4478-bf26-bc8d2c953f47</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

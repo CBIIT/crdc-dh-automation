@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>TragetSubmDelivryDate-Txt</name>
+   <tag></tag>
+   <elementGuidId>e788aa17-285e-401c-871b-007aa01d6249</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-data-delivery-targeted-data-submission-delivery-date-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-data-delivery-targeted-data-submission-delivery-date-property-value&quot;]</value>
+      <webElementGuid>ff077358-8b17-4065-b8bf-e3ec7cfa93f9</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

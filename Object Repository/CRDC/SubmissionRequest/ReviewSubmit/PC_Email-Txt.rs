@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PC_Email-Txt</name>
+   <tag></tag>
+   <elementGuidId>e5a6dbc5-b506-4a90-ad42-f9a938506b97</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-primary-contact-email-address-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-primary-contact-email-address-property-value&quot;]</value>
+      <webElementGuid>a3667642-0a44-43b3-bdca-99bf3da52943</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

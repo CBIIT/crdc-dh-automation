@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PreCancerTypes-Txt</name>
+   <tag></tag>
+   <elementGuidId>20341bc4-e87a-4951-85d2-bd389e225c0f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-cancer-types-pre-cancer-types-property-value-0&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-cancer-types-pre-cancer-types-property-value-0&quot;]</value>
+      <webElementGuid>ae3fda13-2e8a-4d4e-bd66-20705566ab92</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

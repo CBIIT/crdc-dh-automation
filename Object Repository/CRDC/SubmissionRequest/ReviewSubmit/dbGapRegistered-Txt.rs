@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>dbGapRegistered-Txt</name>
+   <tag></tag>
+   <elementGuidId>1bc323cc-3c48-41cb-82ff-9b3432b55e4a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-dbGaP-registration-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-dbGaP-registration-property-value&quot;]</value>
+      <webElementGuid>e3a8574d-24d7-433a-8b71-b76617c0b3f5</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

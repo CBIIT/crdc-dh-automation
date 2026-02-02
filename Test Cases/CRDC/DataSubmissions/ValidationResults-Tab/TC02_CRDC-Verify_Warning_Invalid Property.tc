@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC02_CRDC-Verify_Warning_Invalid Property</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>08717631-c760-489d-9c94-b366c561a1d1</testCaseGuid>
+</TestCaseEntity>

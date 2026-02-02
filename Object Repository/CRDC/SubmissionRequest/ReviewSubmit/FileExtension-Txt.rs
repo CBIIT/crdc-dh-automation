@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FileExtension-Txt</name>
+   <tag></tag>
+   <elementGuidId>3fa7c6c6-bd05-4427-883e-290572f72ee2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-file-type-table-file-0-file-extension&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-file-type-table-file-0-file-extension&quot;]</value>
+      <webElementGuid>0984f054-0422-4245-b650-3400d449f1ca</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

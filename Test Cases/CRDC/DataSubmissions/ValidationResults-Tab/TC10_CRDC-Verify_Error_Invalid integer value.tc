@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC10_CRDC-Verify_Error_Invalid integer value</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>f81e3265-4693-41ca-9846-07691c082eca</testCaseGuid>
+</TestCaseEntity>

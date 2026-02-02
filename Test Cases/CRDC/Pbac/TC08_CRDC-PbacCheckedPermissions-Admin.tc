@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC08_CRDC-PbacCheckedPermissions-Admin</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>7c2488ec-7091-469b-8382-d875ef29a551</testCaseGuid>
+</TestCaseEntity>

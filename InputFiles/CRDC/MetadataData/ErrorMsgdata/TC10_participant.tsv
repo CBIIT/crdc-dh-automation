@@ -1,0 +1,3 @@
+type	study.study_id	study_participant_id	participant_id	race	sex	ethnicity	dbGaP_subject_id	crdc_id
+participant	abc13567	GC-CASE-987680	a_bene_placito	Native Hawaiian or other Pacific Islander	Female	Hispanic or Latino	"scientia,_aere_perennius"	faber_est_suae_quisque_fortunae
+participant	abc13567	GC-CASE-985100	saltus_in_demonstrando	Unknown	Male	Hispanic or Latino	scientiae_cedit_mare	barba_crescit_caput_nescit

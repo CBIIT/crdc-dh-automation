@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>toggle-input</name>
+   <tag></tag>
+   <elementGuidId>47379beb-e953-496b-92a6-e41c49e72176</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid='toggle-input']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid='toggle-input']</value>
+      <webElementGuid>1bf64710-06dd-49e8-9f9f-1f65366c15fe</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC02_CRDC-PbacDefaultPermissions-Dcp</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>13bddc5c-98d5-4d74-bd49-24229bd5f05d</testCaseGuid>
+</TestCaseEntity>

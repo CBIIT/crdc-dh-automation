@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC09_CRDC-PbacCheckedPermissions-Submitter</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>ea38fb9c-effa-4233-b746-34ce9b92670a</testCaseGuid>
+</TestCaseEntity>

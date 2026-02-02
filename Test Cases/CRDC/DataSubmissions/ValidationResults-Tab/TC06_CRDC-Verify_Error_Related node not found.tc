@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC06_CRDC-Verify_Error_Related node not found</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>bc4e1698-893a-4ac6-874a-eb5c46930fe6</testCaseGuid>
+</TestCaseEntity>

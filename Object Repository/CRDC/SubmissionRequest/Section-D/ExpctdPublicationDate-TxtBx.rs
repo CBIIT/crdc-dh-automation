@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ExpctdPublicationDate-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>4054a749-372e-4f1c-ad2a-f1d06e0685ec</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;section-d-expected-publication-date&quot;]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//*[@id=&quot;section-d-expected-publication-date&quot;]//following::button[1]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;section-d-expected-publication-date&quot;]</value>
+      <webElementGuid>7ba27d32-9ecb-435f-be29-12a8ab2c4766</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

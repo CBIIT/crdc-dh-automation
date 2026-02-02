@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>error-details-close-icon</name>
+   <tag></tag>
+   <elementGuidId>aeca799b-b23d-4b3f-81a7-a57c623264fd</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[@data-testid='error-details-close-icon']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[@data-testid='error-details-close-icon']</value>
+      <webElementGuid>d41953d1-6bfb-48c7-8407-eb19e87ca9d9</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

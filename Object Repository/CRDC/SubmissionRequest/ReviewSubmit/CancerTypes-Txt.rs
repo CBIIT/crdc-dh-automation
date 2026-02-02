@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CancerTypes-Txt</name>
+   <tag></tag>
+   <elementGuidId>b0bb8e04-d784-4aa8-98d4-a0d053791de2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-cancer-types-cancer-types-property-value-0&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-cancer-types-cancer-types-property-value-0&quot;]</value>
+      <webElementGuid>39912edc-5132-4f85-a3bd-58b4290a5417</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

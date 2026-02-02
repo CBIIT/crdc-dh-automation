@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AC_Email-Txt</name>
+   <tag></tag>
+   <elementGuidId>910c75fa-0f96-434f-9a4b-e57600ca4004</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-additional-contacts-0-email-address-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-additional-contacts-0-email-address-property-value&quot;]</value>
+      <webElementGuid>65516395-a37d-403d-ae5b-34ddbc79d625</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

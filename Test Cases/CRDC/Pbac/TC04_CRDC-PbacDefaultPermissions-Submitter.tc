@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC04_CRDC-PbacDefaultPermissions-Submitter</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>3c47d888-0325-4f2a-9f79-59e9dfee5092</testCaseGuid>
+</TestCaseEntity>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PC_InstitName-Txt</name>
+   <tag></tag>
+   <elementGuidId>d6142914-012c-488f-ab5b-9fad00953b64</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-primary-contact-institution-name-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-primary-contact-institution-name-property-value&quot;]</value>
+      <webElementGuid>fcf2d75e-6a33-465d-ace4-11e1c87ec972</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

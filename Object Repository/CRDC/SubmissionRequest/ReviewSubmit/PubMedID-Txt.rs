@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PubMedID-Txt</name>
+   <tag></tag>
+   <elementGuidId>cd2671df-9abe-4afc-85bb-493a15033ea1</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-existing-publication-0-pubmed-id-pmid-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-existing-publication-0-pubmed-id-pmid-property-value&quot;]</value>
+      <webElementGuid>90bc58d2-02ed-4634-9020-b2e5a8e233a4</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

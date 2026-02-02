@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Logout-Link</name>
+   <tag></tag>
+   <elementGuidId>ac302327-1e10-41b5-adac-19fb3ad128c6</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[@id='navbar-dropdown-item-logout']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[@id='navbar-dropdown-item-logout']</value>
+      <webElementGuid>7a4e3511-e7a6-417a-9e10-34f0c8a067e3</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

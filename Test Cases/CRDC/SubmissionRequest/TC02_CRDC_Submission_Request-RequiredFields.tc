@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC02_CRDC_Submission_Request-RequiredFields</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>c538296b-b784-48d6-90d6-438fb737c6db</testCaseGuid>
+</TestCaseEntity>

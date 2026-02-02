@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PC_Phone-Txt</name>
+   <tag></tag>
+   <elementGuidId>6409e4a2-7643-42a1-9f39-b767c1e2b9b5</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-primary-contact-phone-number-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-primary-contact-phone-number-property-value&quot;]</value>
+      <webElementGuid>9e2e242a-ace8-4163-aeb8-b03a9bada0a8</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

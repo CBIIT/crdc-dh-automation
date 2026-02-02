@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Program-Field</name>
+   <tag></tag>
+   <elementGuidId>08c9b70c-6d7b-4c09-a88f-ddd8c6c33c67</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;section-b-program&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;section-b-program&quot;]</value>
+      <webElementGuid>8fc4e1e3-10e8-47bb-b32b-7c0ca92d868e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Imunology-Txt</name>
+   <tag></tag>
+   <elementGuidId>25d6d3d5-a296-47d0-a411-14a5fef5a063</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-data-types-immunology-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-data-types-immunology-property-value&quot;]</value>
+      <webElementGuid>2c090f49-7048-4a4a-8a3f-051c3e641c08</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

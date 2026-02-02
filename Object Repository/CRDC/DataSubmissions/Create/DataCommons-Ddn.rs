@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataCommons-Ddn</name>
+   <tag></tag>
+   <elementGuidId>c1a5e32b-c496-4a26-b1f1-f7c48efffcdb</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value></value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id='mui-component-select-dataCommons']</value>
+      <webElementGuid>3152ebdd-ab1b-45d4-9f92-c89af3d6ffa2</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

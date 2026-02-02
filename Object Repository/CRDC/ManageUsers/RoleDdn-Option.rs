@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>RoleDdn-Option</name>
+   <tag></tag>
+   <elementGuidId>d9b302bd-604d-4e71-8682-e3e7e2375bac</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//li[text()='${role}']
+</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//li[text()='${role}']
+</value>
+      <webElementGuid>b6acb7d0-ffe2-4f37-9e1a-0249a11c6770</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

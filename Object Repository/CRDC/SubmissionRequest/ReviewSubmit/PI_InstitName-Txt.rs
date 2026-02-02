@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PI_InstitName-Txt</name>
+   <tag></tag>
+   <elementGuidId>72c5be08-b85a-4175-8437-e3e18bc19e6f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-pi-institution-name-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-pi-institution-name-property-value&quot;]</value>
+      <webElementGuid>9ed7fc2b-d805-49ff-a9b6-769e39f73c93</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

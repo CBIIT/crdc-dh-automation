@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CrdcDdValue</name>
+   <tag></tag>
+   <elementGuidId>305e90b5-ba5a-43ae-aa1b-5d6d1debe76d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[contains(text(),'${GlobalVariable.CrdcUiElement}')]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[contains(text(),'${GlobalVariable.CrdcUiElement}')]</value>
+      <webElementGuid>69364d83-9e47-4624-8779-7e30824936a6</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

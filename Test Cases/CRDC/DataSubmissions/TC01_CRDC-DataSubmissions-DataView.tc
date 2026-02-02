@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC01_CRDC-DataSubmissions-DataView</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a94e27cf-fe33-4e1d-a770-fcbacce29187</testCaseGuid>
+</TestCaseEntity>

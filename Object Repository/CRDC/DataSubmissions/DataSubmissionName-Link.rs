@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataSubmissionName-Link</name>
+   <tag></tag>
+   <elementGuidId>055afb0c-15ec-451d-9d30-ddbc72edd9d6</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//a[contains(@href,'/upload-activity')]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//a[contains(@href,'/upload-activity')]</value>
+      <webElementGuid>faebfecd-6d64-4dc5-9c17-a55f9fe0c26c</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

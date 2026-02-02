@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>RequestAccess-Btn</name>
+   <tag></tag>
+   <elementGuidId>cad251f3-3cc2-4d85-89b7-79dd632e0fe7</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[@data-testid='request-access-button']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[@data-testid='request-access-button']</value>
+      <webElementGuid>1babfa0e-4055-4b3c-b260-132d0303ff02</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

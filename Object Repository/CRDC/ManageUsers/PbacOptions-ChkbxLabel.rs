@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PbacOptions-ChkbxLabel</name>
+   <tag></tag>
+   <elementGuidId>646b9be4-9d68-4325-b34d-2d979acbdb41</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//input[@type='checkbox']/../following::span[1]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//input[@type='checkbox']/../following::span[1]</value>
+      <webElementGuid>5f1a57af-aa5b-4b1d-a7e9-9153d3f958fb</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

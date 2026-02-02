@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Login.gov_SignIn-Btn</name>
+   <tag></tag>
+   <elementGuidId>13f94233-7e93-438a-8178-a191e18bd5ba</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[text()='Submit']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[text()='Submit']</value>
+      <webElementGuid>59b941b5-d2f0-49cd-b361-1cb7e34ee7fd</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

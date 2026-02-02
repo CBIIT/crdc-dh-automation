@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>OthrDtaTyp-Txt</name>
+   <tag></tag>
+   <elementGuidId>f7866fb0-6caf-407b-a9c0-599cfe1d615c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-data-types-other-data-types-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-data-types-other-data-types-property-value&quot;]</value>
+      <webElementGuid>ac535ed7-3434-4db3-a75d-bc017e198ade</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

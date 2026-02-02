@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ValidationResults-Warning</name>
+   <tag></tag>
+   <elementGuidId>67dcbb4f-7ffa-451e-b2b6-3d3a894da011</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>(//*[contains(text(),'Warning')])[2]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value></value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>(//*[contains(text(),'Warning')])[2]</value>
+      <webElementGuid>d69a83e9-5577-4af4-96d8-1093d1b0217c</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

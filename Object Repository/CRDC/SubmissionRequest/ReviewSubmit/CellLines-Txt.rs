@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CellLines-Txt</name>
+   <tag></tag>
+   <elementGuidId>fcb3a419-0ce9-4051-9053-40a374dea445</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-subjects-cell-lines-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-subjects-cell-lines-property-value&quot;]</value>
+      <webElementGuid>a9eb8e90-00da-407c-a26f-e6de095962bc</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

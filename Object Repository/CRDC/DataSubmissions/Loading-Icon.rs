@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Loading-Icon</name>
+   <tag></tag>
+   <elementGuidId>ce50e90d-c815-41f7-98ac-ad39d52099f5</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[contains(@class,'Circular')]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[contains(@class,'Circular')]</value>
+      <webElementGuid>447b59e1-c575-4d16-b726-934165d00256</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

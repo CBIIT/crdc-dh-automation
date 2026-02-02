@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>StudyAbbre-Txt</name>
+   <tag></tag>
+   <elementGuidId>ec7a0a9f-d029-48a4-95fa-6e819ace75b5</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-study-information-abbreviation-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-study-information-abbreviation-property-value&quot;]</value>
+      <webElementGuid>11c33f1f-f239-4834-be72-445b81c114f7</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

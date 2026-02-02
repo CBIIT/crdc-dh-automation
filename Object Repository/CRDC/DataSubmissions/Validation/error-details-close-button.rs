@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>error-details-close-button</name>
+   <tag></tag>
+   <elementGuidId>40ce3787-ab55-480f-a4b7-33687fd5f4fc</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[@data-testid='error-details-close-button']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[@data-testid='error-details-close-button']</value>
+      <webElementGuid>532eb6ec-2a7d-4cc5-b6d1-1e6477f0a25b</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

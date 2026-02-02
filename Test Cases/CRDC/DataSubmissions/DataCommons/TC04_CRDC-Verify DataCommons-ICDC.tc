@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC04_CRDC-Verify DataCommons-ICDC</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a986b891-5871-4783-ba06-d55de3a6121c</testCaseGuid>
+</TestCaseEntity>

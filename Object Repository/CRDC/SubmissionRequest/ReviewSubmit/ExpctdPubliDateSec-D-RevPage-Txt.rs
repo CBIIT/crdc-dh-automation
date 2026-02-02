@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ExpctdPubliDateSec-D-RevPage-Txt</name>
+   <tag></tag>
+   <elementGuidId>85bc7a75-af76-46fe-bae4-6ad65ac2a901</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-data-delivery-expected-publication-date-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-data-delivery-expected-publication-date-property-value&quot;]</value>
+      <webElementGuid>dc9cc898-72fb-4312-8121-992161a579f7</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

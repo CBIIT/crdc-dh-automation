@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Create-Btn</name>
+   <tag></tag>
+   <elementGuidId>b6318fa5-1961-4156-a546-0ae52ae01bfe</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid='create-data-submission-dialog-create-button']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid='create-data-submission-dialog-create-button']</value>
+      <webElementGuid>a2cfdab1-0d71-4d84-b60c-202cab901623</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>NotificationsPanel-Ddn</name>
+   <tag></tag>
+   <elementGuidId>32ece932-40c7-40c5-a9e2-4a1783856516</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//div[@data-testid='notifications-accordion']/div[1]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//div[@data-testid='notifications-accordion']/div[1]</value>
+      <webElementGuid>9a70483a-5ec8-4307-89fb-289b53aeb9bb</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

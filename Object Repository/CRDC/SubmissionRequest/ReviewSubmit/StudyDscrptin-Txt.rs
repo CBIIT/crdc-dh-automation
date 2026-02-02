@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>StudyDscrptin-Txt</name>
+   <tag></tag>
+   <elementGuidId>9bbe3385-a159-4239-b1b5-aacead48ed4d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-study-information-description-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-study-information-description-property-value&quot;]</value>
+      <webElementGuid>a4ecfcb7-e08d-44ce-a276-4d9e1b44123b</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

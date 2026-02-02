@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ManageInstitutions-Btn</name>
+   <tag></tag>
+   <elementGuidId>3220d184-361d-4714-b1bc-e0f5b1436d1a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;navbar-dropdown-item-institution-manage&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;navbar-dropdown-item-institution-manage&quot;]</value>
+      <webElementGuid>9f68b53a-8f87-460f-94f2-f70abf4e422c</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

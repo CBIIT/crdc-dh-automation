@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>StudyID-Txt</name>
+   <tag></tag>
+   <elementGuidId>5144b43d-c9ef-4593-b3bd-ca1ad4eac383</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-repository-0-study-id-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-repository-0-study-id-property-value&quot;]</value>
+      <webElementGuid>9bad0125-e53a-45b2-b1cd-cf4f8e0be971</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

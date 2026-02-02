@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FundingAgency-Dd</name>
+   <tag></tag>
+   <elementGuidId>ff422df4-059b-4448-bcbf-432c9ffb55b2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;section-b-funding-agency-0-organization&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;section-b-funding-agency-0-organization&quot;]</value>
+      <webElementGuid>4757be6d-ff0d-49db-90f1-4f019e7bdc7f</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

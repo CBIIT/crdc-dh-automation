@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC09_CRDC-Verify_Error_Value not permitted</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>57c72867-b111-4797-aabe-ebe39989c844</testCaseGuid>
+</TestCaseEntity>

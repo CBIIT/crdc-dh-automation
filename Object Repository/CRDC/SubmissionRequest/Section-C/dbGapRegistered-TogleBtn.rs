@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>dbGapRegistered-TogleBtn</name>
+   <tag></tag>
+   <elementGuidId>12e6585c-813d-4187-9eac-2106f65d467b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;section-c-dbGaP-registration&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;section-c-dbGaP-registration&quot;]</value>
+      <webElementGuid>5fcdfb17-82b7-4c28-b9dc-4f464bcf6079</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

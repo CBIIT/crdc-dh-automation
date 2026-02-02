@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>StatusBar-Stutus</name>
+   <tag></tag>
+   <elementGuidId>daf70179-cace-454b-8bc0-ed2f75c78d31</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid='status-bar-status']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid='status-bar-status']</value>
+      <webElementGuid>7a964f83-504f-4781-a5fd-c4906ed9bfc2</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

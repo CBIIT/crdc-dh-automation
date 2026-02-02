@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ProgramTitle-Txt</name>
+   <tag></tag>
+   <elementGuidId>5d3a3ec7-9ffc-41d6-8036-860d1c2dd5ae</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-program-information-title-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-program-information-title-property-value&quot;]</value>
+      <webElementGuid>f46abc35-b60c-45ec-a4a1-e29cf7fcacf8</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

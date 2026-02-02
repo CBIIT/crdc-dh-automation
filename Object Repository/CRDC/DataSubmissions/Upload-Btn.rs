@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Upload-Btn</name>
+   <tag></tag>
+   <elementGuidId>e72be3ac-31a2-44ac-a99e-653572d629ad</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[.='Upload']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[.='Upload']</value>
+      <webElementGuid>5be53a8f-3cac-4b92-a2b6-adc7f7242c9b</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

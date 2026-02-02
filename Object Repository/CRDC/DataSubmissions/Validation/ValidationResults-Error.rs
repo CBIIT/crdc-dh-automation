@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ValidationResults-Error</name>
+   <tag></tag>
+   <elementGuidId>44799677-dce2-4ff0-8bdf-56b140dc0ad2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>(//*[contains(text(),'Error')])[2]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value></value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>(//*[contains(text(),'Error')])[2]</value>
+      <webElementGuid>015293d8-ff67-404e-98ce-42d55dc64cf9</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

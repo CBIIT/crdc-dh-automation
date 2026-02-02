@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>GrantContractNumber-Txtbx</name>
+   <tag></tag>
+   <elementGuidId>fd0d83d5-009c-4bf0-b19b-4e9401a90549</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;section-b-funding-agency-0-grant-or-contract-numbers&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;section-b-funding-agency-0-grant-or-contract-numbers&quot;]</value>
+      <webElementGuid>54d3835c-367e-4df9-a5b9-754c734a184e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

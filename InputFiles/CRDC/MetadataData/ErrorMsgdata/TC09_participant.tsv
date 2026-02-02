@@ -1,0 +1,5 @@
+type	study.study_id	study_participant_id	participant_id	race	sex	ethnicity	dbGaP_subject_id	crdc_id
+participant	abc13567	GC-CASE-992050	O_Tite_tute_Tati_tibi_tanta_tyranne_tulisti	Native Hawaiian or other Pacific Islander	Female	Not allowed to collect	scientia_et_labor	scientiae_et_patriae
+participant	abc13567	GC-CASE-987680	haec_olim_meminisse_iuvabit	Native Hawaiian or other Pacific Islander	Unknown	Hispanic or Latino	"scientia,_aere_perennius"	faber_est_suae_quisque_fortunae
+participant	abc13567	GC-CASE-985100	damnant_quod_non_intellegunt	Unknown	M	Hispanic or Latino	scientiae_cedit_mare	barba_crescit_caput_nescit
+participant	abc13567	GC-CASE-981829	a_bene_placito	White	X	Not Hispanic or Latino	haec_olim_meminisse_iuvabit	scientiae_cedit_mare

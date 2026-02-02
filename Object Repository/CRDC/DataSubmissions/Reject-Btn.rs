@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Reject-Btn</name>
+   <tag></tag>
+   <elementGuidId>5cf6ec33-fef8-4ac1-8985-7753637297f8</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[.='Reject']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[.='Reject']</value>
+      <webElementGuid>a07b7abc-3eac-4da1-8771-f532834cd1f5</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

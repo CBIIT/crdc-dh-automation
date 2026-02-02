@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC05_CRDC-Verify DataCommons-Test MDF</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>f09c14d6-5c60-4874-b259-a5ff208580ce</testCaseGuid>
+</TestCaseEntity>

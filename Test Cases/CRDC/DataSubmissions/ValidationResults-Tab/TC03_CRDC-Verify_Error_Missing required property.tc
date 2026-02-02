@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC03_CRDC-Verify_Error_Missing required property</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>811fa8d8-2e79-449a-bbf3-a22e3602e2d9</testCaseGuid>
+</TestCaseEntity>

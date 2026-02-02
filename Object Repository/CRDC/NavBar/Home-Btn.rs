@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Home-Btn</name>
+   <tag></tag>
+   <elementGuidId>3d6c03c3-d2c5-4428-a09c-62daee32fb56</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;header-logo-home-link&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;header-logo-home-link&quot;]</value>
+      <webElementGuid>ed5bad21-f758-4da5-8fdc-e432780fc026</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

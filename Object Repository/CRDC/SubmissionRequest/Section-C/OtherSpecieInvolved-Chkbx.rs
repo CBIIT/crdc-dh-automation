@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>OtherSpecieInvolved-Chkbx</name>
+   <tag></tag>
+   <elementGuidId>cc291543-211f-4ed5-991f-4a1bba5d59d3</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;section-c-other-cancer-types-enabled-label-checkbox&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;section-c-other-cancer-types-enabled-label-checkbox&quot;]</value>
+      <webElementGuid>8e4d448e-75c6-4c93-b350-a7e18d38e1ee</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

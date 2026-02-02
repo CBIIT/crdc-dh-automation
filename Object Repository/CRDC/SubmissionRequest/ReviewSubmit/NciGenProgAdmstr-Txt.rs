@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>NciGenProgAdmstr-Txt</name>
+   <tag></tag>
+   <elementGuidId>f21fe283-c09f-4ea3-8ca8-f782e9033f1f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-funding-agency-0-nci-genomic-program-administrator-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-funding-agency-0-nci-genomic-program-administrator-property-value&quot;]</value>
+      <webElementGuid>045f56dd-bde8-4dc8-93ec-c90782e64ce8</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

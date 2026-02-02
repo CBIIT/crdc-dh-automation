@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC03_CRDC-DataSubmissions-UploadActivities</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>26bcc2da-571b-4d3d-ab71-a16466f3d75e</testCaseGuid>
+</TestCaseEntity>

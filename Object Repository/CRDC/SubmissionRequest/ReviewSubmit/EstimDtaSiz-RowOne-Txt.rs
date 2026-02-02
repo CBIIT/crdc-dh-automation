@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>EstimDtaSiz-RowOne-Txt</name>
+   <tag></tag>
+   <elementGuidId>80562020-0e8c-4b23-9817-43794e676599</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-file-type-table-file-0-file-amount&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-file-type-table-file-0-file-amount&quot;]</value>
+      <webElementGuid>8881eab6-6b5f-4375-a84a-c6019571c1ba</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

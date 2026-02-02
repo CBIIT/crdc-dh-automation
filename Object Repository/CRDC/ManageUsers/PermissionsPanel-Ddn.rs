@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PermissionsPanel-Ddn</name>
+   <tag></tag>
+   <elementGuidId>d66e25fd-092d-451f-8210-c42812a924af</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//div[@data-testid='permissions-accordion']/div[1]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//div[@data-testid='permissions-accordion']/div[1]</value>
+      <webElementGuid>b181f14f-87b3-4418-8cc9-f4872278af3f</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

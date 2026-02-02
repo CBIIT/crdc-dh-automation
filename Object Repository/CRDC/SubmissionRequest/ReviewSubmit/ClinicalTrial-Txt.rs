@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ClinicalTrial-Txt</name>
+   <tag></tag>
+   <elementGuidId>7a1561db-45aa-4c51-be4d-8593e7332321</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-data-types-clinical-trial-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-data-types-clinical-trial-property-value&quot;]</value>
+      <webElementGuid>d96fb573-0f28-4c23-a5c6-79cbdd5855cb</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

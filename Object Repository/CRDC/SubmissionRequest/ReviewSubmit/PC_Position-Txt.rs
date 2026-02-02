@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PC_Position-Txt</name>
+   <tag></tag>
+   <elementGuidId>7df5e7ea-368c-4480-b9c7-62f0e17c17ae</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-primary-contact-position-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-primary-contact-position-property-value&quot;]</value>
+      <webElementGuid>3d640df5-4f4d-4edf-82d2-fb3eee7ccc82</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

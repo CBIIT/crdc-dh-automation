@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AC_Phone-Txt</name>
+   <tag></tag>
+   <elementGuidId>37d251d2-d10e-4189-832d-297acf0a3999</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-additional-contacts-0-phone-number-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-additional-contacts-0-phone-number-property-value&quot;]</value>
+      <webElementGuid>266a9dd7-2213-40b2-bb53-ae773ca15d7d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ProgDescrptn-Txt</name>
+   <tag></tag>
+   <elementGuidId>d97239a4-dc05-4746-9ca9-97cd6ac82cdf</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-program-information-description-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-program-information-description-property-value&quot;]</value>
+      <webElementGuid>a190d439-269e-45a0-b88a-949b2c05166c</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

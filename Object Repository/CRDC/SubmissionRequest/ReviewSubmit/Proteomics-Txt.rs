@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Proteomics-Txt</name>
+   <tag></tag>
+   <elementGuidId>f32a2644-8757-452d-9ea0-544746588043</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;review-data-types-proteomics-property-value&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;review-data-types-proteomics-property-value&quot;]</value>
+      <webElementGuid>a8987b4b-c3a6-49e7-8015-cfadb46d1d21</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
