@@ -87,6 +87,30 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 	public static WebDriver driver
 
+	/** In-memory collector for validation report: section name -> list of [label, expected, actual, status] */
+	private static Map<String, List<Map<String, String>>> validationReportCollector = new LinkedHashMap<>()
+
+	static void addValidationReportItem(String section, String label, String expected, String actual, String status) {
+		if (!validationReportCollector.containsKey(section)) validationReportCollector.put(section, new ArrayList<>())
+		String s = (status == "Pass" || status == "Fail") ? status : "Fail"
+		validationReportCollector.get(section).add([
+			label: label ?: "",
+			expected: expected ?: "",
+			actual: actual ?: "",
+			status: s
+		])
+		// Also log to console so original logging is visible alongside the HTML report
+		String exp = expected != null ? (expected.length() > 120 ? expected.take(120) + "..." : expected) : ""
+		String act = actual != null ? (actual.length() > 120 ? actual.take(120) + "..." : actual) : ""
+		KeywordUtil.logInfo("[${section}] ${label} -> ${s} | expected: ${exp} | actual: ${act}")
+	}
+
+	/** Clear the report collector (e.g. before a new test run). */
+	@Keyword
+	static void clearValidationReportCollector() {
+		validationReportCollector.clear()
+	}
+
 	//*************** Input functions start here ****************
 	/**
 	 * This function creates an instance of webdriver
@@ -1310,6 +1334,13 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		clickTab('CRDC/Login/UserProfile-Dd')
 	}
 
+	private static String tabToSectionName(String tab) {
+		if (tab == "UploadActivities") return "Upload Activities"
+		if (tab == "ValidationResults") return "Validation Results"
+		if (tab == "DataView") return "Data View"
+		return tab
+	}
+
 	/**
 	 * This function verifies the headers of the data submission dashboard's tabs: Upload Activities, Validation Results, Data View
 	 */
@@ -1327,11 +1358,19 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 				actualHeaders.add(header.getText().trim());
 			}
 
-			//Verify headers
-			if (!actualHeaders.equals(expectedHeaders)) {
-				KeywordUtil.markFailed("Header mismatch. Expected: " + expectedHeaders + ", Actual: " + actualHeaders);
+			String sectionName = tabToSectionName(tab)
+			boolean anyFail = false
+			int maxLen = Math.max(expectedHeaders.size(), actualHeaders.size())
+			for (int i = 0; i < maxLen; i++) {
+				String exp = i < expectedHeaders.size() ? expectedHeaders.get(i) : "(missing)"
+				String act = i < actualHeaders.size() ? actualHeaders.get(i) : "(missing)"
+				String status = (i < expectedHeaders.size() && i < actualHeaders.size() && exp.equals(act)) ? "Pass" : "Fail"
+				if (status == "Fail") anyFail = true
+				addValidationReportItem(sectionName, "Header " + (i + 1), exp, act, status)
 			}
-			else {
+			if (anyFail) {
+				KeywordUtil.markFailed("Header mismatch. Expected: " + expectedHeaders + ", Actual: " + actualHeaders);
+			} else {
 				KeywordUtil.markPassed("Headers match: " + actualHeaders);
 			}
 		} catch (Exception e) {
@@ -1396,7 +1435,9 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 				KeywordUtil.markFailed("Row count mismatch: UI has " + actualRowElements.size() + ", but file has " + expectedRows.size());
 			}
 
-			// Step 6: Compare row by row
+			// Step 6: Compare row by row and collect for report
+			String sectionName = "Data View"
+			boolean anyFail = false
 			for (int i = 0; i < actualRowElements.size(); i++) {
 				WebElement row = actualRowElements.get(i);
 				List<WebElement> cells = row.findElements(By.tagName("td"));
@@ -1429,28 +1470,29 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 					uiColIndex++;
 				}
 
-				List<String> expectedValues = expectedRows.get(i);
+				List<String> expectedValues = i < expectedRows.size() ? expectedRows.get(i) : new ArrayList<>()
 				if (actualValues.size() != expectedValues.size()) {
-					KeywordUtil.markFailed("Column count mismatch on row " + (i + 1) + ": Expected " + expectedValues.size() + ", Found " + actualValues.size());
-					continue;
+					anyFail = true
+					addValidationReportItem(sectionName, "Row " + (i + 1), "columns=" + expectedValues.size(), "columns=" + actualValues.size(), "Fail")
+					continue
 				}
 
 				for (int j = 0; j < expectedValues.size(); j++) {
-					String expected = expectedValues.get(j);
-					String actual = actualValues.get(j);
-					String actualUi = uiValues.get(j);
-					String cleanedUi = actualUi.replace("...", "").trim();
-
-					KeywordUtil.logInfo("Expected: " + expected + " | Actual: " + actual + " | Actual UI: " + actualUi + " | Cleaned UI: " + cleanedUi);
-
-					if (!actual.equals(expected) || !expected.contains(cleanedUi)) {
-						KeywordUtil.markFailed("Mismatch in row " + (i + 1) + ", column " + (j + 1) +
-								": Expected to find '" + cleanedUi + "' but actual was '" + expected + "'");
-					}
+					String expected = expectedValues.get(j)
+					String actual = actualValues.get(j)
+					String actualUi = uiValues.get(j)
+					String cleanedUi = actualUi.replace("...", "").trim()
+					boolean match = actual.equals(expected) || expected.contains(cleanedUi)
+					if (!match) anyFail = true
+					addValidationReportItem(sectionName, "Row " + (i + 1) + " Col " + (j + 1), expected, actual, match ? "Pass" : "Fail")
 				}
 			}
 
-			KeywordUtil.logInfo("Finished verifying-- Data View tab in UI matches the contents of the TSV (ignoring type and reference columns).");
+			if (anyFail) {
+				KeywordUtil.markFailed("Data View: one or more row/column mismatches. See validation report.")
+			} else {
+				KeywordUtil.logInfo("Finished verifying-- Data View tab in UI matches the contents of the TSV (ignoring type and reference columns).");
+			}
 		} catch (Exception e) {
 			KeywordUtil.markFailed("Exception in verifyDataViewMatchesMetadata(): " + e.getMessage());
 		}
@@ -1525,15 +1567,21 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		List<String> expLines = Files.readAllLines(expPath)
 		List<String> actLines = Files.readAllLines(actPath)
 		List<String> errors = new ArrayList<>()
+		String sectionName = "Data View (Expected vs Downloaded)"
 		if (expLines.size() != actLines.size()) {
 			errors.add("TSV row count mismatch: expected ${expLines.size()}, actual ${actLines.size()} (${actualPath})")
+			addValidationReportItem(sectionName, "Row count", String.valueOf(expLines.size()), String.valueOf(actLines.size()), "Fail")
 		}
 		int maxRows = Math.min(expLines.size(), actLines.size())
 		for (int i = 0; i < maxRows; i++) {
-			String[] expCells = expLines.get(i).split("\t", -1)
-			String[] actCells = actLines.get(i).split("\t", -1)
+			String expLine = expLines.get(i)
+			String actLine = actLines.get(i)
+			String[] expCells = expLine.split("\t", -1)
+			String[] actCells = actLine.split("\t", -1)
+			boolean lineOk = true
 			if (expCells.length != actCells.length) {
 				errors.add("Line ${i + 1}: column count expected ${expCells.length}, actual ${actCells.length}")
+				lineOk = false
 			}
 			int maxCols = Math.min(expCells.length, actCells.length)
 			for (int j = 0; j < maxCols; j++) {
@@ -1541,15 +1589,20 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 				String actVal = actCells[j].trim()
 				if (expVal != actVal) {
 					errors.add("Line ${i + 1}, column ${j + 1}: expected '${expVal}', actual '${actVal}'")
+					lineOk = false
 				}
 			}
-			if (expCells.length != actCells.length && (expCells.length > maxCols || actCells.length > maxCols)) {
+			if (expCells.length != actCells.length) {
 				for (int j = maxCols; j < Math.max(expCells.length, actCells.length); j++) {
 					String expVal = j < expCells.length ? expCells[j].trim() : "(missing)"
 					String actVal = j < actCells.length ? actCells[j].trim() : "(missing)"
 					errors.add("Line ${i + 1}, column ${j + 1}: expected '${expVal}', actual '${actVal}'")
 				}
+				lineOk = false
 			}
+			String expShort = expLine.length() > 120 ? expLine.substring(0, 120) + "..." : expLine
+			String actShort = actLine.length() > 120 ? actLine.substring(0, 120) + "..." : actLine
+			addValidationReportItem(sectionName, "Line " + (i + 1), expShort, actShort, lineOk ? "Pass" : "Fail")
 		}
 		if (!errors.isEmpty()) {
 			KeywordUtil.logInfo("--- TSV comparison output for ${actualPath} (${errors.size()} issue(s)) ---")
@@ -1796,22 +1849,34 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			if (row.size() >= 1 && !row.get(0).isEmpty()) actualBySubmittedId.put(row.get(0).trim(), row)
 		}
 		List<String> errors = new ArrayList<>()
+		String sectionName = "Validation Results"
 		for (List<String> exp : expectedRows) {
 			String submittedId = exp.get(0)
 			List<String> act = actualBySubmittedId.get(submittedId)
 			if (act == null) {
 				errors.add("Submitted Identifier '" + submittedId + "': expected in UI but not found")
+				addValidationReportItem(sectionName, "Submitted ID " + submittedId, "Issue=" + exp.get(1) + ", Severity=" + exp.get(2), "(not found in UI)", "Fail")
 				continue
 			}
 			String expIssue = exp.get(1), expSev = exp.get(2)
 			String actIssue = act.size() >= 2 ? act.get(1) : ""
 			String actSev = act.size() >= 3 ? act.get(2) : ""
-			if (!actIssue.equals(expIssue)) errors.add("Submitted Identifier '" + submittedId + "': Issue Type expected '" + expIssue + "', actual '" + actIssue + "'")
-			if (!actSev.equalsIgnoreCase(expSev)) errors.add("Submitted Identifier '" + submittedId + "': Severity expected '" + expSev + "', actual '" + actSev + "'")
+			boolean issueOk = actIssue.equals(expIssue)
+			boolean sevOk = actSev.equalsIgnoreCase(expSev)
+			if (!issueOk) errors.add("Submitted Identifier '" + submittedId + "': Issue Type expected '" + expIssue + "', actual '" + actIssue + "'")
+			if (!sevOk) errors.add("Submitted Identifier '" + submittedId + "': Severity expected '" + expSev + "', actual '" + actSev + "'")
+			String status = (issueOk && sevOk) ? "Pass" : "Fail"
+			addValidationReportItem(sectionName, "Submitted ID " + submittedId, "Issue=" + expIssue + ", Severity=" + expSev, "Issue=" + actIssue + ", Severity=" + actSev, status)
 		}
 		for (String submittedId : actualBySubmittedId.keySet()) {
 			boolean found = expectedRows.any { it.get(0).equals(submittedId) }
-			if (!found) errors.add("Submitted Identifier '" + submittedId + "': present in UI but not in expected TSV")
+			if (!found) {
+				errors.add("Submitted Identifier '" + submittedId + "': present in UI but not in expected TSV")
+				List<String> act = actualBySubmittedId.get(submittedId)
+				String actIssue = act.size() >= 2 ? act.get(1) : ""
+				String actSev = act.size() >= 3 ? act.get(2) : ""
+				addValidationReportItem(sectionName, "Submitted ID " + submittedId, "(not in expected)", "Issue=" + actIssue + ", Severity=" + actSev, "Fail")
+			}
 		}
 		if (!errors.isEmpty()) {
 			KeywordUtil.logInfo("--- Validation Results vs Expected (" + node + ", " + severity + ", " + issueType + ") - " + errors.size() + " issue(s) ---")
@@ -1821,6 +1886,58 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		} else {
 			KeywordUtil.logInfo("Validation Results match expected for node=" + node + ", severity=" + severity + ", issueType=" + issueType)
 		}
+	}
+
+	// ------------------------------- Validation Report HTML (collapsible by tab) -------------------------------
+
+	private static String escapeHtml(String s) {
+		if (s == null) return ""
+		return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
+	}
+
+	private static String buildValidationReportHtml() {
+		StringBuilder sb = new StringBuilder()
+		sb.append("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Validation Report</title>")
+		sb.append("<style>table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ccc;padding:6px;text-align:left;} th{background:#f5f5f5;} .pass{background:#e8f5e9;} .fail{background:#ffebee;} details{margin:12px 0;} summary{cursor:pointer;font-weight:bold;padding:8px;background:#e3f2fd;}</style>")
+		sb.append("</head><body>")
+		sb.append("<h1>Validation Report</h1>")
+		sb.append("<p>Generated: ").append(escapeHtml(new Date().format("yyyy-MM-dd HH:mm:ss"))).append("</p>")
+		for (Map.Entry<String, List<Map<String, String>>> entry : validationReportCollector.entrySet()) {
+			String sectionName = entry.getKey()
+			List<Map<String, String>> items = entry.getValue()
+			sb.append("<details open><summary>").append(escapeHtml(sectionName)).append(" (").append(items.size()).append(" items)</summary>")
+			sb.append("<table><thead><tr><th>Item / Line</th><th>Expected</th><th>Actual</th><th>Status</th></tr></thead><tbody>")
+			for (Map<String, String> item : items) {
+				String status = item.get("status") ?: "Fail"
+				String rowClass = status == "Pass" ? "pass" : "fail"
+				sb.append("<tr class=\"").append(rowClass).append("\">")
+				sb.append("<td>").append(escapeHtml(item.get("label"))).append("</td>")
+				sb.append("<td>").append(escapeHtml(item.get("expected"))).append("</td>")
+				sb.append("<td>").append(escapeHtml(item.get("actual"))).append("</td>")
+				sb.append("<td>").append(escapeHtml(status)).append("</td></tr>")
+			}
+			sb.append("</tbody></table></details>")
+		}
+		sb.append("</body></html>")
+		return sb.toString()
+	}
+
+	/**
+	 * Build HTML report from collected validation results (all three tabs), write to Reports/ folder, then clear the collector.
+	 * Call this at the end of the test. Report is collapsible by tab (Option 1: &lt;details&gt;/&lt;summary&gt;).
+	 */
+	@Keyword
+	static String generateValidationReport() {
+		String projectDir = RunConfiguration.getProjectDir()
+		File reportsDir = new File(projectDir, "Reports")
+		if (!reportsDir.exists()) reportsDir.mkdirs()
+		String filename = "ValidationReport_" + new Date().format("yyyyMMdd_HHmmss") + ".html"
+		File outFile = new File(reportsDir, filename)
+		String html = buildValidationReportHtml()
+		outFile.setText(html, "UTF-8")
+		KeywordUtil.logInfo("Validation report written to: " + outFile.absolutePath)
+		validationReportCollector.clear()
+		return outFile.absolutePath
 	}
 
 	// ===============================
