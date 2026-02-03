@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ValidationResults_IssueType-Ddn</name>
+   <tag></tag>
+   <elementGuidId>b8729140-996c-4eea-af6d-7f70a759acc6</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//div[@id='mui-component-select-issueType']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//div[@id='mui-component-select-issueType']</value>
+      <webElementGuid>9d729231-ef3a-4984-ab82-1ed9005df0cc</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

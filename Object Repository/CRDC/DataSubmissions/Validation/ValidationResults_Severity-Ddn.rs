@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ValidationResults_Severity-Ddn</name>
+   <tag></tag>
+   <elementGuidId>171a90d6-e10b-475c-8107-1732550d0391</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//div[@id='mui-component-select-severity']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//div[@id='mui-component-select-severity']</value>
+      <webElementGuid>093c5fa3-2d8b-49ab-92cc-dc280210bda9</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
