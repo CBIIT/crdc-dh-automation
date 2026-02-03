@@ -601,6 +601,63 @@ class Pbac extends TestRunner {
 	}
 
 	/**
+	 * Extract node name from a TSV filename.
+	 * Supports patterns like GC_consent_group_v9.0.0.tsv, ICDC_participant_v10.0.0.tsv (any prefix).
+	 * Node is the part between the first underscore and _vX.Y.Z
+	 */
+	private static String nodeFromFilename(String filename) {
+		if (!filename.endsWith('.tsv')) return filename.replaceFirst(~/\.[^.]+$/, '')
+		String base = filename - ~/\.tsv$/
+		base = base.replaceFirst(/_v\d+\.\d+\.\d+$/, '')
+		return base.contains('_') ? base.substring(base.indexOf('_') + 1) : base
+	}
+
+	/**
+	 * Upload all TSV files in InputFiles/CRDC/MetadataData/&lt;tcName&gt;/ and verify Data View for each node.
+	 * Filenames can start with any prefix (GC_, ICDC_, CTDC_, etc.); node is extracted from the name.
+	 * Validate remains the responsibility of the test script (call after uploadFolder).
+	 */
+	@Keyword
+	static void uploadFolder(String tcName) {
+		String baseDir = RunConfiguration.getProjectDir()
+		String folderPath = "InputFiles/CRDC/MetadataData/${tcName}"
+		File folder = new File(baseDir, folderPath)
+		if (!folder.exists() || !folder.isDirectory()) {
+			KeywordUtil.markFailed("uploadFolder: folder not found or not a directory: ${folder.absolutePath}")
+			return
+		}
+		List<File> fileList = folder.listFiles()?.findAll { it.isFile() && it.name.endsWith('.tsv') } ?: []
+		if (fileList.isEmpty()) {
+			KeywordUtil.markFailed("uploadFolder: no .tsv files in ${folder.absolutePath}")
+			return
+		}
+		List<String> relativePaths = new ArrayList<>()
+		List<String> nodes = new ArrayList<>()
+		List<String> absolutePaths = new ArrayList<>()
+		for (File f in fileList) {
+			String node = nodeFromFilename(f.name)
+			relativePaths.add("${folderPath}/${f.name}")
+			nodes.add(node)
+			absolutePaths.add(new File(baseDir, "${folderPath}/${f.name}").absolutePath)
+		}
+		// Upload entire folder in one go (multiple paths separated by newline)
+		String allPaths = absolutePaths.join('\n')
+		WebUI.delay(2)
+		WebUI.uploadFile(findTestObject('CRDC/DataSubmissions/ChooseFiles-Btn'), allPaths)
+		WebUI.delay(5)
+		TestRunner.clickTab('CRDC/DataSubmissions/Upload-Btn')
+		WebUI.delay(10)
+		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
+		
+		clickTab('CRDC/DataSubmissions/Validation/DataView-Tab')
+		
+		SubmissionRequest sr = new SubmissionRequest()
+		for (int i = 0; i < relativePaths.size(); i++) {
+			sr.verifyDataViewMatchesMetadata(relativePaths.get(i), nodes.get(i))
+		}
+	}
+
+	/**
 	 * Upload a unique metadata file (by editing existing file) in the data submission via the UI
 	 */
 	@Keyword

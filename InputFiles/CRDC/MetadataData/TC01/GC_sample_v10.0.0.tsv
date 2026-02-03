@@ -1,0 +1,6 @@
+type	 participant.study_participant_id	 pdx.pdx_id	sample_id	sample_type	sample_description	sample_type_category	sample_tumor_status	sample_anatomic_site	sample_age_at_collection	derived_from_specimen	biosample_accession	tumor_classification	Status
+sample	Key_1	pdxkey_1	CDS2016_DNA	Cells	samdescription	Cell Line	Normal	Vulva|Wrist|Venous	35	derived from speci		Premalignant	Passed
+sample	Key_2	pdxkey_1	CDS2014_DNA	Cells	samdescription	Skin	Peritumoral	Vulva|Wrist|Venous	36	derived from speci		Metastatic	Warning
+sample	Key_3	pdxkey_1	CDS2008_DNA	Cells	samdescription	Skin	Peritumoral	Vulva|Wrist|Venous	37	derived from speci		Progression	Warning
+sample	Key_2	pdxkey_1	CDS2009_DNA	Cells	samdescription	Skin	Peritumoral	Vulva|Wrist|Venous	39	derived from speci		Recurrent	Warning
+sample	Key_2	pdxkey_1	CDS2011_DNA	Cells	samdescription	Skin	Peritumoral	Vulva|Wrist|Venous	38	derived from speci		Recurrent	Warning
