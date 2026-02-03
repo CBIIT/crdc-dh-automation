@@ -92,12 +92,17 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 	static void addValidationReportItem(String section, String label, String expected, String actual, String status) {
 		if (!validationReportCollector.containsKey(section)) validationReportCollector.put(section, new ArrayList<>())
+		String s = (status == "Pass" || status == "Fail") ? status : "Fail"
 		validationReportCollector.get(section).add([
 			label: label ?: "",
 			expected: expected ?: "",
 			actual: actual ?: "",
-			status: (status == "Pass" || status == "Fail") ? status : "Fail"
+			status: s
 		])
+		// Also log to console so original logging is visible alongside the HTML report
+		String exp = expected != null ? (expected.length() > 120 ? expected.take(120) + "..." : expected) : ""
+		String act = actual != null ? (actual.length() > 120 ? actual.take(120) + "..." : actual) : ""
+		KeywordUtil.logInfo("[${section}] ${label} -> ${s} | expected: ${exp} | actual: ${act}")
 	}
 
 	/** Clear the report collector (e.g. before a new test run). */
