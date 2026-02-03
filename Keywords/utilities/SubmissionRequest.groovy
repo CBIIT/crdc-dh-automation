@@ -33,6 +33,8 @@ import com.kms.katalon.core.webui.exception.WebElementNotFoundException
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -1453,6 +1455,158 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			KeywordUtil.markFailed("Exception in verifyDataViewMatchesMetadata(): " + e.getMessage());
 		}
 	}
+
+	/**
+	 * Resolve the user's system Downloads folder (cross-platform).
+	 */
+	private static File getUserDownloadsDir() {
+		return new File(System.getProperty("user.home"), "Downloads");
+	}
+
+	/**
+	 * Extract node name from an expected TSV filename.
+	 * e.g. GC_consent_group_v9.0.0_expected.tsv -> consent_group
+	 */
+	private static String nodeFromExpectedFilename(String filename) {
+		if (!filename.endsWith("_expected.tsv")) return filename.replaceFirst(~/\.[^.]+$/, "").replaceFirst(/^[^_]+_/, "")
+		String base = filename - ~/_expected\.tsv$/
+		base = base.replaceFirst(/_v\d+\.\d+\.\d+$/, "")
+		return base.contains("_") ? base.substring(base.indexOf("_") + 1) : base
+	}
+
+	/**
+	 * List expected TSV files in InputFiles/CRDC/MetadataData/&lt;tcName&gt;/expected/
+	 * Returns list of [node, expectedFile] (node = extracted from filename).
+	 */
+	private List<List<?>> listExpectedFilesForTC(String tcName) {
+		String baseDir = RunConfiguration.getProjectDir()
+		File expectedDir = new File(baseDir, "InputFiles/CRDC/MetadataData/${tcName}/expected")
+		if (!expectedDir.exists() || !expectedDir.isDirectory()) {
+			KeywordUtil.markFailed("downloadAndCompareExpectedForTC: expected folder not found: ${expectedDir.absolutePath}")
+			return []
+		}
+		List<File> fileList = expectedDir.listFiles()?.findAll { it.isFile() && it.name.endsWith("_expected.tsv") } ?: []
+		if (fileList.isEmpty()) {
+			KeywordUtil.markFailed("downloadAndCompareExpectedForTC: no *_expected.tsv files in ${expectedDir.absolutePath}")
+			return []
+		}
+		List<List<?>> out = []
+		for (File f in fileList) {
+			String node = nodeFromExpectedFilename(f.name)
+			out.add([node, f.absolutePath])
+		}
+		return out
+	}
+
+	/**
+	 * Find the most recently modified file in a directory.
+	 */
+	private static File findLatestFile(File dir) {
+		List<File> files = dir.listFiles()?.findAll { it.isFile() } ?: []
+		if (files.isEmpty()) return null
+		return files.sort { -it.lastModified() }.get(0)
+	}
+
+	/**
+	 * Compare two TSV files in full: headers and all data rows, cell-by-cell (trimmed).
+	 * Collects all mismatches, logs them, then fails once at the end with the full output (no fail on first mismatch).
+	 */
+	private void compareTsvFullContent(String expectedPath, String actualPath) {
+		Path expPath = Paths.get(expectedPath)
+		Path actPath = Paths.get(actualPath)
+		if (!Files.exists(expPath)) {
+			KeywordUtil.markFailed("Expected file not found: " + expectedPath)
+			return
+		}
+		if (!Files.exists(actPath)) {
+			KeywordUtil.markFailed("Downloaded file not found: " + actualPath)
+			return
+		}
+		List<String> expLines = Files.readAllLines(expPath)
+		List<String> actLines = Files.readAllLines(actPath)
+		List<String> errors = new ArrayList<>()
+		if (expLines.size() != actLines.size()) {
+			errors.add("TSV row count mismatch: expected ${expLines.size()}, actual ${actLines.size()} (${actualPath})")
+		}
+		int maxRows = Math.min(expLines.size(), actLines.size())
+		for (int i = 0; i < maxRows; i++) {
+			String[] expCells = expLines.get(i).split("\t", -1)
+			String[] actCells = actLines.get(i).split("\t", -1)
+			if (expCells.length != actCells.length) {
+				errors.add("Line ${i + 1}: column count expected ${expCells.length}, actual ${actCells.length}")
+			}
+			int maxCols = Math.min(expCells.length, actCells.length)
+			for (int j = 0; j < maxCols; j++) {
+				String expVal = expCells[j].trim()
+				String actVal = actCells[j].trim()
+				if (expVal != actVal) {
+					errors.add("Line ${i + 1}, column ${j + 1}: expected '${expVal}', actual '${actVal}'")
+				}
+			}
+			if (expCells.length != actCells.length && (expCells.length > maxCols || actCells.length > maxCols)) {
+				for (int j = maxCols; j < Math.max(expCells.length, actCells.length); j++) {
+					String expVal = j < expCells.length ? expCells[j].trim() : "(missing)"
+					String actVal = j < actCells.length ? actCells[j].trim() : "(missing)"
+					errors.add("Line ${i + 1}, column ${j + 1}: expected '${expVal}', actual '${actVal}'")
+				}
+			}
+		}
+		if (!errors.isEmpty()) {
+			KeywordUtil.logInfo("--- TSV comparison output for ${actualPath} (${errors.size()} issue(s)) ---")
+			for (String err in errors) {
+				KeywordUtil.logInfo(err)
+			}
+			KeywordUtil.logInfo("--- end comparison output ---")
+			KeywordUtil.markFailed("TSV comparison failed with ${errors.size()} mismatch(es). See log output above for full details.")
+		} else {
+			KeywordUtil.logInfo("TSV full content match: ${actualPath}")
+		}
+	}
+
+	/**
+	 * For a given TC (e.g. TC01): for each node with an expected file, select node, click Download,
+	 * move the latest file from user's Downloads to Downloads/&lt;tcName&gt;, then compare expected vs downloaded TSV (headers + full content).
+	 */
+	@Keyword
+	void downloadAndCompareExpectedForTC(String tcName) {
+		WebDriver driver = DriverFactory.getWebDriver()
+		String projectDir = RunConfiguration.getProjectDir()
+		File userDownloads = getUserDownloadsDir()
+		File downloadsDir = new File(projectDir, "Downloads/${tcName}")
+		if (!downloadsDir.exists()) {
+			downloadsDir.mkdirs()
+			KeywordUtil.logInfo("Created downloads folder: ${downloadsDir.absolutePath}")
+		}
+		List<List<?>> expectedList = listExpectedFilesForTC(tcName)
+		if (expectedList.isEmpty()) return
+		for (List<?> pair in expectedList) {
+			String node = (String) pair.get(0)
+			String expectedPath = (String) pair.get(1)
+			WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/NodeType-Ddn"), 30)
+			WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/NodeType-Ddn"))
+			WebUI.delay(1)
+			WebElement option = driver.findElement(By.xpath("//li[normalize-space(text())='" + node + "']"))
+			option.click()
+			WebUI.delay(1)
+			WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/Download-Btn"), 10)
+			WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/Download-Btn"))
+			WebUI.delay(5)
+			File latest = findLatestFile(userDownloads)
+			if (latest == null) {
+				KeywordUtil.markFailed("downloadAndCompareExpectedForTC: no file found in user Downloads (${userDownloads.absolutePath}) after downloading node ${node}")
+				return
+			}
+			File destFile = new File(downloadsDir, latest.name)
+			try {
+				FileUtils.moveFile(latest, destFile)
+			} catch (Exception e) {
+				KeywordUtil.markFailed("downloadAndCompareExpectedForTC: failed to move file to ${destFile.absolutePath}: " + e.getMessage())
+				return
+			}
+			compareTsvFullContent(expectedPath, destFile.absolutePath)
+		}
+	}
+
 	// ===============================
 	//   FULL MEGA-WRAPPER TEMPLATE
 	//   Paste into your CrdcDH.groovy

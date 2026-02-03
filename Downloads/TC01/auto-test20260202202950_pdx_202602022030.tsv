@@ -1,0 +1,6 @@
+type	pdx_id	model_id	implantation_type	implantation_site	mouse_strain	sample_type_for_implantation	tumor_not_mus_or_ebv_origin	study.study_id	sample.sample_id	status
+pdx	pdxkey_1	2	Orthotopic|Trocar|Injection	left cerebrum	mousestrn	implant		phs769076	CDS2014_DNA	Warning
+pdx	pdxkey_2	2	Surgical	left cerebrum	mousestrn	implant		phs769076	CDS2016_DNA	Warning
+pdx	pdxkey_3	4	Orthotopic	ankle joint	tre	imp1		phs769076	CDS2008_DNA	Passed
+pdx	pdxkey_4	1	Intravenous	adrenal cortex	trt	imp2		phs769076	CDS2009_DNA	Passed
+pdx	pdxkey_5	3	Unknown	inferior surface of tongue	kio	imp3		phs769076	CDS2011_DNA	Passed
