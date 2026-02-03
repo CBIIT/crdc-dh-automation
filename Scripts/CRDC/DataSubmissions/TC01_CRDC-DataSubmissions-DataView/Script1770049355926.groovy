@@ -48,35 +48,23 @@ CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/DataSubmissions-Tab'
 CustomKeywords.'utilities.Pbac.createDataSubmission'()
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
-//Upload data
-//CustomKeywords.'utilities.Pbac.uploadMetadataUI'('InputFiles/CRDC/MetadataData/program.tsv')
-//CustomKeywords.'utilities.Utils.waitForElementToDisappear'('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
-//CustomKeywords.'utilities.Pbac.uploadMetadataUI'('InputFiles/CRDC/MetadataData/study.tsv')
-//CustomKeywords.'utilities.Utils.waitForElementToDisappear'('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
-//CustomKeywords.'utilities.Pbac.uploadMetadataUI'('InputFiles/CRDC/MetadataData/participant.tsv')
-
+//Upload data via folder and verify Data View table in the UI matches the uploaded input files for each node
 CustomKeywords.'utilities.Pbac.uploadFolder'('TC01')
+
+//Verify table headers for all tabs
+CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('UploadActivities')
+CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('ValidationResults')
+CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('DataView')
 
 //Validate data
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/Validate-Btn')
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
 
+//Wait for uploading to finish
+CustomKeywords.'utilities.Utils.waitForElementToDisappear'('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
+
+//Download Data View export TSV files for each node and compare to expected TSVs
 CustomKeywords.'utilities.SubmissionRequest.downloadAndCompareExpectedForTC'('TC01')
-
-////Wait for uploading to finish
-//CustomKeywords.'utilities.Utils.waitForElementToDisappear'('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
-
-
-
-////Verify table headers
-//CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('UploadActivities')
-//CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('ValidationResults')
-//CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('DataView')
-//
-////Verify Data View table
-//CustomKeywords.'utilities.SubmissionRequest.verifyDataViewMatchesMetadata'('InputFiles/CRDC/MetadataData/program.tsv', 'program')
-//CustomKeywords.'utilities.SubmissionRequest.verifyDataViewMatchesMetadata'('InputFiles/CRDC/MetadataData/study.tsv', 'study')
-//CustomKeywords.'utilities.SubmissionRequest.verifyDataViewMatchesMetadata'('InputFiles/CRDC/MetadataData/participant.tsv', 'participant')
 
 WebUI.closeBrowser()

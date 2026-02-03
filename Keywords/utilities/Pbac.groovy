@@ -584,7 +584,7 @@ class Pbac extends TestRunner {
 
 		//Create
 		TestRunner.clickTab('CRDC/DataSubmissions/Create/Create-Btn')
-		WebUI.delay(1)
+		WebUI.delay(5)
 	}
 
 	/**
