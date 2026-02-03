@@ -51,7 +51,7 @@ CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmiss
 //Upload data via folder and verify Data View table in the UI matches the uploaded input files for each node
 CustomKeywords.'utilities.Pbac.uploadFolder'('TC01')
 
-//Verify table headers
+//Verify table headers for all tabs
 CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('UploadActivities')
 CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('ValidationResults')
 CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('DataView')
