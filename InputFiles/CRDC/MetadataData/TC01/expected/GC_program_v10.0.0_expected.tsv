@@ -1,2 +1,2 @@
-type	program_name	program_acronym	program_short_description	program_full_description	program_external_url	program_short_name	institution	Status	expected_status
-program	CCDI	CCDI	tes	sdf	https://program	test	tf	Error	Error
+type	program_name	program_acronym	program_short_description	program_full_description	program_external_url	program_short_name	institution	status
+program	CCDI	CCDI	tes	sdf	https://program	test	tf	Error

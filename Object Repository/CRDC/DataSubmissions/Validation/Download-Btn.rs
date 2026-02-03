@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Download-Btn</name>
+   <tag></tag>
+   <elementGuidId>d2995a8e-555d-4066-9882-07b2dbb74338</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[@data-testid='export-node-data-button']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[@data-testid='export-node-data-button']</value>
+      <webElementGuid>b895c109-60a2-4f5c-813f-c459cdb5be33</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

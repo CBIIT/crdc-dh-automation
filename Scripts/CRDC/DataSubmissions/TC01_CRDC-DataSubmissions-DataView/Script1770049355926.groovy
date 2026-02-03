@@ -57,13 +57,17 @@ CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmiss
 
 CustomKeywords.'utilities.Pbac.uploadFolder'('TC01')
 
+//Validate data
+WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
+CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/Validate-Btn')
+WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
+
+CustomKeywords.'utilities.SubmissionRequest.downloadAndCompareExpectedForTC'('TC01')
+
 ////Wait for uploading to finish
 //CustomKeywords.'utilities.Utils.waitForElementToDisappear'('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
 
-////Validate data
-//WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
-//CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/Validate-Btn')
-//WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
+
 
 ////Verify table headers
 //CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('UploadActivities')
