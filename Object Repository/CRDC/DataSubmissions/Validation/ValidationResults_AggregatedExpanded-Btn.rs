@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ValidationResults_AggregatedExpanded-Btn</name>
+   <tag></tag>
+   <elementGuidId>51fc04ab-ba4a-4fc0-b03c-c3bea4bccf71</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//input[@id='table-state-switch']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//input[@id='table-state-switch']</value>
+      <webElementGuid>ff253815-0bc6-44bc-9373-63916b7dc029</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

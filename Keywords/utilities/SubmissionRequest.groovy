@@ -1607,6 +1607,222 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		}
 	}
 
+	// ------------------------------- Validation Results vs expected TSV (by node, severity, issue type) -------------------------------
+
+	private static String nodeFromExpectedValidationResultsFilename(String filename) {
+		if (!filename.endsWith("_expected-ValidationResults.tsv")) return ""
+		String base = filename - ~/_expected-ValidationResults\.tsv$/
+		base = base.replaceFirst(/_v\d+\.\d+\.\d+$/, "")
+		return base.contains("_") ? base.substring(base.indexOf("_") + 1) : base
+	}
+
+	/** Load node -> submitted-identifier column name from Data File (Data Files/CRDC/DataSubmissions/ValidationResults-Mappings). */
+	private Map<String, String> loadValidationResultsMappings() {
+		Map<String, String> nodeToColumn = new HashMap<>()
+		try {
+			def data = findTestData("Data Files/CRDC/DataSubmissions/ValidationResults-Mappings")
+			int rows = data.getRowNumbers()
+			String[] colNames = data.getColumnNames()
+			String nodeCol = (colNames != null && colNames.length >= 1) ? colNames[0] : null
+			String columnCol = (colNames != null && colNames.length >= 2) ? colNames[1] : null
+			for (int i = 1; i <= rows; i++) {
+				String nodeVal = nodeCol ? data.getValue(nodeCol, i) : data.getValue(1, i)
+				String colVal = columnCol ? data.getValue(columnCol, i) : data.getValue(2, i)
+				if (nodeVal != null && colVal != null) nodeToColumn.put(nodeVal.trim(), colVal.trim())
+			}
+		} catch (Exception e) {
+			KeywordUtil.logInfo("Loading ValidationResults-Mappings from Excel fallback: " + e.getMessage())
+			String path = RunConfiguration.getProjectDir() + "/InputFiles/CRDC/DataSubmissionValidation/DSV_ValidationResults-mappings.xlsx"
+			File f = new File(path)
+			if (f.exists()) {
+				Workbook wb = WorkbookFactory.create(f)
+				Sheet sh = wb.getSheet("GC")
+				if (sh != null) {
+					for (Row r : sh) {
+						if (r.getCell(0) != null && r.getCell(1) != null) {
+							String nodeVal = r.getCell(0).toString().trim()
+							String colVal = r.getCell(1).toString().trim()
+							if (!nodeVal.isEmpty() && !colVal.isEmpty()) nodeToColumn.put(nodeVal, colVal)
+						}
+					}
+				}
+				wb.close()
+			}
+		}
+		return nodeToColumn
+	}
+
+	/** Find expected TSV file path for the given node in InputFiles/CRDC/MetadataData/&lt;tcName&gt;/expected-ValidationResults/ */
+	private String findExpectedValidationResultsTsv(String tcName, String node) {
+		String baseDir = RunConfiguration.getProjectDir()
+		File dir = new File(baseDir, "InputFiles/CRDC/MetadataData/${tcName}/expected-ValidationResults")
+		if (!dir.exists() || !dir.isDirectory()) return null
+		List<File> files = dir.listFiles()?.findAll { it.isFile() && it.name.endsWith("_expected-ValidationResults.tsv") } ?: []
+		for (File f in files) {
+			if (nodeFromExpectedValidationResultsFilename(f.name) == node) return f.absolutePath
+		}
+		return null
+	}
+
+	/** Load expected rows from TSV filtered by severity and issue type. Returns list of [submittedId, issueType, severity]. */
+	private List<List<String>> loadExpectedValidationResultsTsv(String tsvPath, String submittedIdentifierColumn, String severity, String issueType) {
+		List<List<String>> out = new ArrayList<>()
+		Path path = Paths.get(tsvPath)
+		if (!Files.exists(path)) return out
+		List<String> lines = Files.readAllLines(path)
+		if (lines.size() < 2) return out
+		String[] headers = lines.get(0).split("\t", -1)
+		int idxId = -1, idxIssue = -1, idxSev = -1
+		for (int i = 0; i < headers.length; i++) {
+			String h = headers[i].trim()
+			if (h.equalsIgnoreCase(submittedIdentifierColumn)) idxId = i
+			if (h.equals("Issue_Type")) idxIssue = i
+			if (h.equals("Expected_Severity")) idxSev = i
+		}
+		if (idxId < 0 || idxIssue < 0 || idxSev < 0) return out
+		for (int i = 1; i < lines.size(); i++) {
+			String[] cells = lines.get(i).split("\t", -1)
+			String rowIssue = idxIssue < cells.length ? cells[idxIssue].trim() : ""
+			String rowSev = idxSev < cells.length ? cells[idxSev].trim() : ""
+			if (!rowIssue.equals(issueType) || !rowSev.equalsIgnoreCase(severity)) continue
+			String id = idxId < cells.length ? cells[idxId].trim() : ""
+			out.add(Arrays.asList(id, rowIssue, rowSev))
+		}
+		return out
+	}
+
+	/** Apply Validation Results filters (node, severity, issue type) and read table rows: [submittedId, issueType, severity]. */
+	private List<List<String>> readValidationResultsTableFromUI(String node, String severity, String issueType) {
+		WebDriver driver = DriverFactory.getWebDriver()
+		clickTab("CRDC/DataSubmissions/Validation/ValidationResults-Tab")
+		clickTab("Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn")
+		WebUI.delay(1)
+		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"), 15)
+		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"))
+		WebUI.delay(1)
+		WebElement nodeOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + node + "']"))
+		nodeOpt.click()
+		WebUI.delay(1)
+		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn"), 10)
+		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn"))
+		WebUI.delay(1)
+		WebElement sevOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + severity + "']"))
+		sevOpt.click()
+		WebUI.delay(1)
+		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn"), 10)
+		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn"))
+		WebUI.delay(1)
+		WebElement issueOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + issueType + "']"))
+		issueOpt.click()
+		WebUI.delay(2)
+		List<WebElement> headerEls = Utils.getListWebElements("CRDC/DataSubmissions/Validation/Table-Headers")
+		List<String> headerNames = new ArrayList<>()
+		for (WebElement h : headerEls) headerNames.add(h.getText().trim())
+		int idxSubmitted = headerNames.findIndexOf { it.equalsIgnoreCase("Submitted Identifier") }
+		int idxIssue = headerNames.findIndexOf { it.equalsIgnoreCase("Issue Type") }
+		if (idxIssue < 0) idxIssue = headerNames.findIndexOf { it.equalsIgnoreCase("Issue(s)") }
+		if (idxIssue < 0) idxIssue = headerNames.findIndexOf { it.toLowerCase().contains("issue") }
+		int idxSev = headerNames.findIndexOf { it.equalsIgnoreCase("Severity") }
+		if (idxSubmitted < 0 || idxSev < 0) {
+			KeywordUtil.markFailed("Validation Results table missing required columns (Submitted Identifier, Severity). Headers: " + headerNames)
+			return Collections.emptyList()
+		}
+		if (idxIssue < 0) idxIssue = -1
+		List<WebElement> rows = Utils.getListWebElements("CRDC/DataSubmissions/Validation/Table-Row")
+		List<List<String>> out = new ArrayList<>()
+		for (WebElement row : rows) {
+			List<WebElement> cells = row.findElements(By.tagName("td"))
+			String submitted = getCellText(cells, idxSubmitted, true)
+			String issue = getCellText(cells, idxIssue, false)
+			String sev = getCellText(cells, idxSev, false)
+			out.add(Arrays.asList(submitted, issue, sev))
+		}
+		return out
+	}
+
+	private static String getCellText(List<WebElement> cells, int index, boolean debug) {
+		if (index < 0 || index >= cells.size()) return ""
+		try {
+			WebElement cell = cells.get(index)
+			String cellRawText = cell.getText().trim()
+			List<WebElement> truncatedWrappers = cell.findElements(By.cssSelector("[data-testid='truncated-text-wrapper']"))
+			if (debug) {
+				KeywordUtil.logInfo("[getCellText] cell index=" + index + ", raw cell.getText()='" + cellRawText + "', truncated-text-wrapper count=" + truncatedWrappers.size())
+			}
+			if (truncatedWrappers != null && !truncatedWrappers.isEmpty()) {
+				WebElement first = truncatedWrappers.get(0)
+				String aria = first.getAttribute("aria-label")
+				if (debug) KeywordUtil.logInfo("[getCellText] using truncated-text-wrapper aria-label='" + (aria != null ? aria : "null") + "'")
+				if (aria != null && !aria.isEmpty()) return aria.trim()
+			}
+			try {
+				WebElement span = cell.findElement(By.tagName("span"))
+				String aria = span.getAttribute("aria-label")
+				if (debug) KeywordUtil.logInfo("[getCellText] fallback: span aria-label='" + (aria != null ? aria : "null") + "', span.getText()='" + span.getText().trim() + "'")
+				if (aria != null && !aria.isEmpty()) return aria.trim()
+				return span.getText().trim()
+			} catch (Exception e) {
+				if (debug) KeywordUtil.logInfo("[getCellText] fallback: no span, using cell text='" + cellRawText + "'")
+				return cellRawText
+			}
+		} catch (Exception e) {
+			if (debug) KeywordUtil.logInfo("[getCellText] exception: " + e.getMessage())
+			return ""
+		}
+	}
+
+	/**
+	 * Compare Validation Results UI (filtered by node, severity, issue type) to expected TSV for that node.
+	 * Expected TSV: InputFiles/CRDC/MetadataData/&lt;tcName&gt;/expected-ValidationResults/GC_*_node_*_expected-ValidationResults.tsv.
+	 * Matching by Submitted Identifier (column per node from Data Files/CRDC/DataSubmissions/ValidationResults-Mappings).
+	 */
+	@Keyword
+	void verifyValidationResultsVsExpected(String tcName, String node, String severity, String issueType) {
+		Map<String, String> mappings = loadValidationResultsMappings()
+		String submittedIdColumn = mappings.get(node)
+		if (submittedIdColumn == null || submittedIdColumn.isEmpty()) {
+			KeywordUtil.markFailed("verifyValidationResultsVsExpected: no mapping for node '" + node + "' in ValidationResults-Mappings")
+			return
+		}
+		String tsvPath = findExpectedValidationResultsTsv(tcName, node)
+		if (tsvPath == null) {
+			KeywordUtil.markFailed("verifyValidationResultsVsExpected: no expected TSV for node '" + node + "' in expected-ValidationResults folder")
+			return
+		}
+		List<List<String>> expectedRows = loadExpectedValidationResultsTsv(tsvPath, submittedIdColumn, severity, issueType)
+		List<List<String>> actualRows = readValidationResultsTableFromUI(node, severity, issueType)
+		Map<String, List<String>> actualBySubmittedId = new LinkedHashMap<>()
+		for (List<String> row : actualRows) {
+			if (row.size() >= 1 && !row.get(0).isEmpty()) actualBySubmittedId.put(row.get(0).trim(), row)
+		}
+		List<String> errors = new ArrayList<>()
+		for (List<String> exp : expectedRows) {
+			String submittedId = exp.get(0)
+			List<String> act = actualBySubmittedId.get(submittedId)
+			if (act == null) {
+				errors.add("Submitted Identifier '" + submittedId + "': expected in UI but not found")
+				continue
+			}
+			String expIssue = exp.get(1), expSev = exp.get(2)
+			String actIssue = act.size() >= 2 ? act.get(1) : ""
+			String actSev = act.size() >= 3 ? act.get(2) : ""
+			if (!actIssue.equals(expIssue)) errors.add("Submitted Identifier '" + submittedId + "': Issue Type expected '" + expIssue + "', actual '" + actIssue + "'")
+			if (!actSev.equalsIgnoreCase(expSev)) errors.add("Submitted Identifier '" + submittedId + "': Severity expected '" + expSev + "', actual '" + actSev + "'")
+		}
+		for (String submittedId : actualBySubmittedId.keySet()) {
+			boolean found = expectedRows.any { it.get(0).equals(submittedId) }
+			if (!found) errors.add("Submitted Identifier '" + submittedId + "': present in UI but not in expected TSV")
+		}
+		if (!errors.isEmpty()) {
+			KeywordUtil.logInfo("--- Validation Results vs Expected (" + node + ", " + severity + ", " + issueType + ") - " + errors.size() + " issue(s) ---")
+			for (String err : errors) KeywordUtil.logInfo(err)
+			KeywordUtil.logInfo("--- end ---")
+			KeywordUtil.markFailed("verifyValidationResultsVsExpected: " + errors.size() + " mismatch(es). See log above.")
+		} else {
+			KeywordUtil.logInfo("Validation Results match expected for node=" + node + ", severity=" + severity + ", issueType=" + issueType)
+		}
+	}
+
 	// ===============================
 	//   FULL MEGA-WRAPPER TEMPLATE
 	//   Paste into your CrdcDH.groovy

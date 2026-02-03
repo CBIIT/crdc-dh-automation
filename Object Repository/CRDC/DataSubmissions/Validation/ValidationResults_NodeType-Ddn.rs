@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ValidationResults_NodeType-Ddn</name>
+   <tag></tag>
+   <elementGuidId>22261016-14d8-498a-8c3a-07b3d18e3ccf</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//div[@id='mui-component-select-nodeType']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//div[@id='mui-component-select-nodeType']</value>
+      <webElementGuid>b72041a0-6733-4f8a-a056-7dad4e27e6de</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
