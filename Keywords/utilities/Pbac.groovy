@@ -613,26 +613,24 @@ class Pbac extends TestRunner {
 	}
 
 	/**
-	 * Upload all TSV files in InputFiles/CRDC/MetadataData/&lt;tcName&gt;/ and verify Data View for each node.
-	 * Filenames can start with any prefix (GC_, ICDC_, CTDC_, etc.); node is extracted from the name.
-	 * Validate remains the responsibility of the test script (call after uploadFolder).
+	 * Upload all TSV files from InputFiles/CRDC/MetadataData/tcName/ (choose files, click Upload, wait for Uploading to disappear).
+	 * Returns [relativePaths, nodes] for use by verifyDataViewMatchesMetadataForTC; empty lists if folder missing or no TSV files.
 	 */
-	@Keyword
-	static void uploadFolder(String tcName) {
+	private static List<List<String>> uploadFolder(String tcName) {
 		String baseDir = RunConfiguration.getProjectDir()
 		String folderPath = "InputFiles/CRDC/MetadataData/${tcName}"
 		File folder = new File(baseDir, folderPath)
+		List<String> relativePaths = new ArrayList<>()
+		List<String> nodes = new ArrayList<>()
 		if (!folder.exists() || !folder.isDirectory()) {
 			KeywordUtil.markFailed("uploadFolder: folder not found or not a directory: ${folder.absolutePath}")
-			return
+			return [relativePaths, nodes]
 		}
 		List<File> fileList = folder.listFiles()?.findAll { it.isFile() && it.name.endsWith('.tsv') } ?: []
 		if (fileList.isEmpty()) {
 			KeywordUtil.markFailed("uploadFolder: no .tsv files in ${folder.absolutePath}")
-			return
+			return [relativePaths, nodes]
 		}
-		List<String> relativePaths = new ArrayList<>()
-		List<String> nodes = new ArrayList<>()
 		List<String> absolutePaths = new ArrayList<>()
 		for (File f in fileList) {
 			String node = nodeFromFilename(f.name)
@@ -640,7 +638,6 @@ class Pbac extends TestRunner {
 			nodes.add(node)
 			absolutePaths.add(new File(baseDir, "${folderPath}/${f.name}").absolutePath)
 		}
-		// Upload entire folder in one go (multiple paths separated by newline)
 		String allPaths = absolutePaths.join('\n')
 		WebUI.delay(2)
 		WebUI.uploadFile(findTestObject('CRDC/DataSubmissions/ChooseFiles-Btn'), allPaths)
@@ -648,9 +645,19 @@ class Pbac extends TestRunner {
 		TestRunner.clickTab('CRDC/DataSubmissions/Upload-Btn')
 		WebUI.delay(10)
 		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
-		
+		return [relativePaths, nodes]
+	}
+
+	/**
+	 * Upload all TSV files from InputFiles/CRDC/MetadataData/tcName/, open Data View tab, then verify Data View matches metadata for each node.
+	 */
+	@Keyword
+	static void verifyDataViewMatchesMetadataForTC(String tcName) {
+		List<List<String>> uploadResult = uploadFolder(tcName)
+		List<String> relativePaths = uploadResult.get(0)
+		List<String> nodes = uploadResult.get(1)
+		if (relativePaths.isEmpty()) return
 		clickTab('CRDC/DataSubmissions/Validation/DataView-Tab')
-		
 		SubmissionRequest sr = new SubmissionRequest()
 		for (int i = 0; i < relativePaths.size(); i++) {
 			sr.verifyDataViewMatchesMetadata(relativePaths.get(i), nodes.get(i))
