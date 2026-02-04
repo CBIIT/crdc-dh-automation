@@ -1796,6 +1796,9 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		WebElement issueOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + issueType + "']"))
 		issueOpt.click()
 		WebUI.delay(2)
+		// Wait for table to finish loading after filter change; then a short delay so content can settle.
+		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
+		WebUI.delay(1)
 		// Stabilize table: after changing node/severity/issueType the UI re-renders the table. If we read rows
 		// before the DOM has settled, we can get StaleElementReferenceException when using row/cell references.
 		// Wait until row count is unchanged across two samples 0.5s apart (up to 5 tries).
@@ -1931,8 +1934,6 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		}
 		List<String> errors = new ArrayList<>()
 		String sectionName = "Validation Results"
-		
-		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
 		
 		for (List<String> exp : expectedRows) {
 			String submittedId = exp.get(0)
