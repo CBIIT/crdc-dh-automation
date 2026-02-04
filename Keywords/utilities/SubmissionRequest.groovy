@@ -1797,7 +1797,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		issueOpt.click()
 		WebUI.delay(2)
 		// Wait for table to finish loading after filter change; then a short delay so content can settle.
-		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
+		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
 		WebUI.delay(1)
 		// Stabilize table: after changing node/severity/issueType the UI re-renders the table. If we read rows
 		// before the DOM has settled, we can get StaleElementReferenceException when using row/cell references.
