@@ -21,6 +21,7 @@ import internal.GlobalVariable
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.By
+import org.openqa.selenium.StaleElementReferenceException
 import com.kms.katalon.core.mobile.keyword.internal.MobileDriverFactory
 import com.kms.katalon.core.webui.driver.DriverFactory
 import com.kms.katalon.core.testobject.RequestObject
@@ -86,30 +87,6 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	}
 
 	public static WebDriver driver
-
-	/** In-memory collector for validation report: section name -> list of [label, expected, actual, status] */
-	private static Map<String, List<Map<String, String>>> validationReportCollector = new LinkedHashMap<>()
-
-	static void addValidationReportItem(String section, String label, String expected, String actual, String status) {
-		if (!validationReportCollector.containsKey(section)) validationReportCollector.put(section, new ArrayList<>())
-		String s = (status == "Pass" || status == "Fail") ? status : "Fail"
-		validationReportCollector.get(section).add([
-			label: label ?: "",
-			expected: expected ?: "",
-			actual: actual ?: "",
-			status: s
-		])
-		// Also log to console so original logging is visible alongside the HTML report
-		String exp = expected != null ? (expected.length() > 120 ? expected.take(120) + "..." : expected) : ""
-		String act = actual != null ? (actual.length() > 120 ? actual.take(120) + "..." : actual) : ""
-		KeywordUtil.logInfo("[${section}] ${label} -> ${s} | expected: ${exp} | actual: ${act}")
-	}
-
-	/** Clear the report collector (e.g. before a new test run). */
-	@Keyword
-	static void clearValidationReportCollector() {
-		validationReportCollector.clear()
-	}
 
 	//*************** Input functions start here ****************
 	/**
@@ -1366,7 +1343,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 				String act = i < actualHeaders.size() ? actualHeaders.get(i) : "(missing)"
 				String status = (i < expectedHeaders.size() && i < actualHeaders.size() && exp.equals(act)) ? "Pass" : "Fail"
 				if (status == "Fail") anyFail = true
-				addValidationReportItem(sectionName, "Header " + (i + 1), exp, act, status)
+				ValidationReport.addValidationReportItem(sectionName, "Header " + (i + 1), exp, act, status)
 			}
 			if (anyFail) {
 				KeywordUtil.markFailed("Header mismatch. Expected: " + expectedHeaders + ", Actual: " + actualHeaders);
@@ -1474,7 +1451,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 				List<String> expectedValues = i < expectedRows.size() ? expectedRows.get(i) : new ArrayList<>()
 				if (actualValues.size() != expectedValues.size()) {
 					anyFail = true
-					addValidationReportItem(sectionName, "Row " + (i + 1), "columns=" + expectedValues.size(), "columns=" + actualValues.size(), "Fail")
+					ValidationReport.addValidationReportItem(sectionName, "Row " + (i + 1), "columns=" + expectedValues.size(), "columns=" + actualValues.size(), "Fail")
 					continue
 				}
 
@@ -1485,7 +1462,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 					String cleanedUi = actualUi.replace("...", "").trim()
 					boolean match = actual.equals(expected) || expected.contains(cleanedUi)
 					if (!match) anyFail = true
-					addValidationReportItem(sectionName, "Row " + (i + 1) + " Col " + (j + 1), expected, actual, match ? "Pass" : "Fail")
+					ValidationReport.addValidationReportItem(sectionName, "Row " + (i + 1) + " Col " + (j + 1), expected, actual, match ? "Pass" : "Fail")
 				}
 			}
 
@@ -1571,7 +1548,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		String sectionName = "Data View (Expected vs Downloaded)"
 		if (expLines.size() != actLines.size()) {
 			errors.add("TSV row count mismatch: expected ${expLines.size()}, actual ${actLines.size()} (${actualPath})")
-			addValidationReportItem(sectionName, "Row count", String.valueOf(expLines.size()), String.valueOf(actLines.size()), "Fail")
+			ValidationReport.addValidationReportItem(sectionName, "Row count", String.valueOf(expLines.size()), String.valueOf(actLines.size()), "Fail")
 		}
 		int maxRows = Math.min(expLines.size(), actLines.size())
 		for (int i = 0; i < maxRows; i++) {
@@ -1603,7 +1580,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			}
 			String expShort = expLine.length() > 120 ? expLine.substring(0, 120) + "..." : expLine
 			String actShort = actLine.length() > 120 ? actLine.substring(0, 120) + "..." : actLine
-			addValidationReportItem(sectionName, "Line " + (i + 1), expShort, actShort, lineOk ? "Pass" : "Fail")
+			ValidationReport.addValidationReportItem(sectionName, "Line " + (i + 1), expShort, actShort, lineOk ? "Pass" : "Fail")
 		}
 		if (!errors.isEmpty()) {
 			KeywordUtil.logInfo("--- TSV comparison output for ${actualPath} (${errors.size()} issue(s)) ---")
@@ -1633,32 +1610,32 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		}
 		List<List<?>> expectedList = listExpectedFilesForTC(tcName)
 		if (expectedList.isEmpty()) return
-		for (List<?> pair in expectedList) {
-			String node = (String) pair.get(0)
-			String expectedPath = (String) pair.get(1)
-			WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/NodeType-Ddn"), 30)
-			WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/NodeType-Ddn"))
-			WebUI.delay(1)
-			WebElement option = driver.findElement(By.xpath("//li[normalize-space(text())='" + node + "']"))
-			option.click()
-			WebUI.delay(1)
-			WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/Download-Btn"), 10)
-			WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/Download-Btn"))
-			WebUI.delay(5)
-			File latest = findLatestFile(userDownloads)
-			if (latest == null) {
-				KeywordUtil.markFailed("downloadAndCompareExpectedForTC: no file found in user Downloads (${userDownloads.absolutePath}) after downloading node ${node}")
-				return
+			for (List<?> pair in expectedList) {
+				String node = (String) pair.get(0)
+				String expectedPath = (String) pair.get(1)
+				WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/NodeType-Ddn"), 30)
+				WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/NodeType-Ddn"))
+				WebUI.delay(1)
+				WebElement option = driver.findElement(By.xpath("//li[normalize-space(text())='" + node + "']"))
+				option.click()
+				WebUI.delay(1)
+				WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/Download-Btn"), 10)
+				WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/Download-Btn"))
+				WebUI.delay(5)
+				File latest = findLatestFile(userDownloads)
+				if (latest == null) {
+					KeywordUtil.markFailed("downloadAndCompareExpectedForTC: no file found in user Downloads (${userDownloads.absolutePath}) after downloading node ${node}")
+					return
+				}
+				File destFile = new File(downloadsDir, latest.name)
+				try {
+					FileUtils.moveFile(latest, destFile)
+				} catch (Exception e) {
+					KeywordUtil.markFailed("downloadAndCompareExpectedForTC: failed to move file to ${destFile.absolutePath}: " + e.getMessage())
+					return
+				}
+				compareTsvFullContent(expectedPath, destFile.absolutePath)
 			}
-			File destFile = new File(downloadsDir, latest.name)
-			try {
-				FileUtils.moveFile(latest, destFile)
-			} catch (Exception e) {
-				KeywordUtil.markFailed("downloadAndCompareExpectedForTC: failed to move file to ${destFile.absolutePath}: " + e.getMessage())
-				return
-			}
-			compareTsvFullContent(expectedPath, destFile.absolutePath)
-		}
 	}
 
 	// ------------------------------- Validation Results vs expected TSV (by node, severity, issue type) -------------------------------
@@ -1758,7 +1735,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			String rowIssue = idxIssue < cells.length ? cells[idxIssue].trim() : ""
 			String rowSev = idxSev < cells.length ? cells[idxSev].trim() : ""
 			if (rowSev.isEmpty() || rowIssue.isEmpty()) continue
-			String key = rowSev + "\t" + rowIssue
+				String key = rowSev + "\t" + rowIssue
 			if (seen.add(key)) out.add(Arrays.asList(rowSev, rowIssue))
 		}
 		return out
@@ -1785,7 +1762,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			String rowIssue = idxIssue < cells.length ? cells[idxIssue].trim() : ""
 			String rowSev = idxSev < cells.length ? cells[idxSev].trim() : ""
 			if (!rowIssue.equals(issueType) || !rowSev.equalsIgnoreCase(severity)) continue
-			String id = idxId < cells.length ? cells[idxId].trim() : ""
+				String id = idxId < cells.length ? cells[idxId].trim() : ""
 			out.add(Arrays.asList(id, rowIssue, rowSev))
 		}
 		return out
@@ -1813,6 +1790,21 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		WebElement issueOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + issueType + "']"))
 		issueOpt.click()
 		WebUI.delay(2)
+		// Stabilize table: after changing node/severity/issueType the UI re-renders the table. If we read rows
+		// before the DOM has settled, we can get StaleElementReferenceException when using row/cell references.
+		// Wait until row count is unchanged across two samples 0.5s apart (up to 5 tries).
+		int rowCount = 0
+		for (int w = 0; w < 5; w++) {
+			List<WebElement> waitRows = Utils.getListWebElements("CRDC/DataSubmissions/Validation/Table-Row")
+			int n = waitRows != null ? waitRows.size() : 0
+			WebUI.delay(0.5)
+			waitRows = Utils.getListWebElements("CRDC/DataSubmissions/Validation/Table-Row")
+			int n2 = waitRows != null ? waitRows.size() : 0
+			if (n == n2) {
+				rowCount = n
+				break
+			}
+		}
 		List<WebElement> headerEls = Utils.getListWebElements("CRDC/DataSubmissions/Validation/Table-Headers")
 		List<String> headerNames = new ArrayList<>()
 		for (WebElement h : headerEls) headerNames.add(h.getText().trim())
@@ -1827,13 +1819,31 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		}
 		if (idxIssue < 0) idxIssue = -1
 		List<WebElement> rows = Utils.getListWebElements("CRDC/DataSubmissions/Validation/Table-Row")
+		// If stabilization loop never saw a stable count (e.g. table kept changing), use current row count
+		if (rowCount <= 0 && rows != null) rowCount = rows.size()
 		List<List<String>> out = new ArrayList<>()
-		for (WebElement row : rows) {
-			List<WebElement> cells = row.findElements(By.tagName("td"))
-			String submitted = getCellText(cells, idxSubmitted, true)
-			String issue = getCellText(cells, idxIssue, false)
-			String sev = getCellText(cells, idxSev, false)
-			out.add(Arrays.asList(submitted, issue, sev))
+		// Iterate by index and re-fetch the row list each time. Holding a single list of WebElement rows and
+		// iterating over it can cause stale refs if the table re-renders (e.g. virtualization or delayed update).
+		// Re-querying rows for each index gives us a fresh reference for that row.
+		for (int i = 0; i < rowCount; i++) {
+			boolean done = false
+			// Retry up to 3 times on StaleElementReferenceException: the DOM may update while we read this row.
+			for (int attempt = 1; attempt <= 3 && !done; attempt++) {
+				try {
+					List<WebElement> currentRows = Utils.getListWebElements("CRDC/DataSubmissions/Validation/Table-Row")
+					if (i >= (currentRows != null ? currentRows.size() : 0)) break
+					WebElement row = currentRows.get(i)
+					List<WebElement> cells = row.findElements(By.tagName("td"))
+					String submitted = getCellText(cells, idxSubmitted, true)
+					String issue = getCellText(cells, idxIssue, false)
+					String sev = getCellText(cells, idxSev, false)
+					out.add(Arrays.asList(submitted, issue, sev))
+					done = true
+				} catch (StaleElementReferenceException e) {
+					if (attempt == 3) throw e
+					WebUI.delay(0.5)
+				}
+			}
 		}
 		return out
 	}
@@ -1909,7 +1919,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			List<String> act = actualBySubmittedId.get(submittedId)
 			if (act == null) {
 				errors.add("Submitted Identifier '" + submittedId + "': expected in UI but not found")
-				addValidationReportItem(sectionName, "Submitted ID " + submittedId, "Issue=" + exp.get(1) + ", Severity=" + exp.get(2), "(not found in UI)", "Fail")
+				ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + submittedId, "Issue=" + exp.get(1) + ", Severity=" + exp.get(2), "(not found in UI)", "Fail")
 				continue
 			}
 			String expIssue = exp.get(1), expSev = exp.get(2)
@@ -1920,7 +1930,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			if (!issueOk) errors.add("Submitted Identifier '" + submittedId + "': Issue Type expected '" + expIssue + "', actual '" + actIssue + "'")
 			if (!sevOk) errors.add("Submitted Identifier '" + submittedId + "': Severity expected '" + expSev + "', actual '" + actSev + "'")
 			String status = (issueOk && sevOk) ? "Pass" : "Fail"
-			addValidationReportItem(sectionName, "Submitted ID " + submittedId, "Issue=" + expIssue + ", Severity=" + expSev, "Issue=" + actIssue + ", Severity=" + actSev, status)
+			ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + submittedId, "Issue=" + expIssue + ", Severity=" + expSev, "Issue=" + actIssue + ", Severity=" + actSev, status)
 		}
 		for (String submittedId : actualBySubmittedId.keySet()) {
 			boolean found = expectedRows.any { it.get(0).equals(submittedId) }
@@ -1929,7 +1939,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 				List<String> act = actualBySubmittedId.get(submittedId)
 				String actIssue = act.size() >= 2 ? act.get(1) : ""
 				String actSev = act.size() >= 3 ? act.get(2) : ""
-				addValidationReportItem(sectionName, "Submitted ID " + submittedId, "(not in expected)", "Issue=" + actIssue + ", Severity=" + actSev, "Fail")
+				ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + submittedId, "(not in expected)", "Issue=" + actIssue + ", Severity=" + actSev, "Fail")
 			}
 		}
 		if (!errors.isEmpty()) {
@@ -1950,10 +1960,10 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	 */
 	@Keyword
 	void verifyValidationResultsVsExpectedForTC(String tcName) {
-		
+
 		clickTab("CRDC/DataSubmissions/Validation/ValidationResults-Tab")
 		clickTab("Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn")
-		
+
 		List<String> nodes = listNodesFromExpectedValidationResultsFolder(tcName)
 		if (nodes.isEmpty()) {
 			KeywordUtil.logInfo("verifyValidationResultsVsExpectedForTC: No expected Validation Results files for TC '" + tcName + "'; skipping.")
@@ -1972,58 +1982,6 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 				verifyValidationResultsVsExpected(tcName, node, severity, issueType)
 			}
 		}
-	}
-
-	// ------------------------------- Validation Report HTML (collapsible by tab) -------------------------------
-
-	private static String escapeHtml(String s) {
-		if (s == null) return ""
-		return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
-	}
-
-	private static String buildValidationReportHtml() {
-		StringBuilder sb = new StringBuilder()
-		sb.append("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Validation Report</title>")
-		sb.append("<style>table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ccc;padding:6px;text-align:left;} th{background:#f5f5f5;} .pass{background:#e8f5e9;} .fail{background:#ffebee;} details{margin:12px 0;} summary{cursor:pointer;font-weight:bold;padding:8px;background:#e3f2fd;}</style>")
-		sb.append("</head><body>")
-		sb.append("<h1>Validation Report</h1>")
-		sb.append("<p>Generated: ").append(escapeHtml(new Date().format("yyyy-MM-dd HH:mm:ss"))).append("</p>")
-		for (Map.Entry<String, List<Map<String, String>>> entry : validationReportCollector.entrySet()) {
-			String sectionName = entry.getKey()
-			List<Map<String, String>> items = entry.getValue()
-			sb.append("<details open><summary>").append(escapeHtml(sectionName)).append(" (").append(items.size()).append(" items)</summary>")
-			sb.append("<table><thead><tr><th>Item / Line</th><th>Expected</th><th>Actual</th><th>Status</th></tr></thead><tbody>")
-			for (Map<String, String> item : items) {
-				String status = item.get("status") ?: "Fail"
-				String rowClass = status == "Pass" ? "pass" : "fail"
-				sb.append("<tr class=\"").append(rowClass).append("\">")
-				sb.append("<td>").append(escapeHtml(item.get("label"))).append("</td>")
-				sb.append("<td>").append(escapeHtml(item.get("expected"))).append("</td>")
-				sb.append("<td>").append(escapeHtml(item.get("actual"))).append("</td>")
-				sb.append("<td>").append(escapeHtml(status)).append("</td></tr>")
-			}
-			sb.append("</tbody></table></details>")
-		}
-		sb.append("</body></html>")
-		return sb.toString()
-	}
-
-	/**
-	 * Build HTML report from collected validation results (all three tabs), write to Reports/ folder, then clear the collector.
-	 * Call this at the end of the test. Report is collapsible by tab (Option 1: &lt;details&gt;/&lt;summary&gt;).
-	 */
-	@Keyword
-	static String generateValidationReport() {
-		String projectDir = RunConfiguration.getProjectDir()
-		File reportsDir = new File(projectDir, "Reports")
-		if (!reportsDir.exists()) reportsDir.mkdirs()
-		String filename = "ValidationReport_" + new Date().format("yyyyMMdd_HHmmss") + ".html"
-		File outFile = new File(reportsDir, filename)
-		String html = buildValidationReportHtml()
-		outFile.setText(html, "UTF-8")
-		KeywordUtil.logInfo("Validation report written to: " + outFile.absolutePath)
-		validationReportCollector.clear()
-		return outFile.absolutePath
 	}
 
 	// ===============================

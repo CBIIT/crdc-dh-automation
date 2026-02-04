@@ -67,6 +67,6 @@ CustomKeywords.'utilities.Utils.waitForElementToDisappear'('CRDC/DataSubmissions
 //Download Data View export TSV files for each node and compare to expected TSVs
 CustomKeywords.'utilities.SubmissionRequest.downloadAndCompareExpectedForTC'('TC01')
 
-CustomKeywords.'utilities.SubmissionRequest.generateValidationReport'()
+CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
 WebUI.closeBrowser()

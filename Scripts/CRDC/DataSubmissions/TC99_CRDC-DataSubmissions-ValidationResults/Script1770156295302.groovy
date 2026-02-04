@@ -58,6 +58,6 @@ WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'
 
 CustomKeywords.'utilities.SubmissionRequest.verifyValidationResultsVsExpectedForTC'("TC99")
 
-CustomKeywords.'utilities.SubmissionRequest.generateValidationReport'()
+CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
 WebUI.closeBrowser()
