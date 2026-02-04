@@ -55,9 +55,10 @@ CustomKeywords.'utilities.Pbac.uploadFolder'('TC99')
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/Validate-Btn')
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
+CustomKeywords.'utilities.Utils.waitForElementToDisappear'('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
 
 CustomKeywords.'utilities.SubmissionRequest.verifyValidationResultsVsExpectedForTC'("TC99")
 
-CustomKeywords.'utilities.SubmissionRequest.generateValidationReport'()
+CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
 WebUI.closeBrowser()

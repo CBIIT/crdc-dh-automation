@@ -4,6 +4,7 @@ OutputFiles/*
 .DS_Store
 .cache/*
 Reports/*
+Downloads/
 Libs/*
 .classpath
 /.cache/*
@@ -14,3 +15,4 @@ settings/*
 Commons_Automation/Keywords/utilities/
 __pycache__/
 *.pyc
+Downloads/
