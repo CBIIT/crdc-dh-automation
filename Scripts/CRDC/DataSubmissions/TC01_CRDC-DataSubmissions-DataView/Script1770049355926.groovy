@@ -38,9 +38,9 @@ import com.kms.katalon.core.testdata.TestDataFactory
 WebUI.closeBrowser()
 
 //Login as Submitter
-CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
+CustomKeywords.'utilities.Login.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
-CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Submitter')
+CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
 WebUI.delay(2)
 
 //Create DS
@@ -49,12 +49,12 @@ CustomKeywords.'utilities.Pbac.createDataSubmission'()
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 //Upload data via folder and verify Data View table in the UI matches the uploaded input files for each node
-CustomKeywords.'utilities.Pbac.verifyDataViewMatchesMetadataForTC'('TC01')
+CustomKeywords.'utilities.DataSubmissions.verifyDataViewMatchesMetadataForTC'('TC01')
 
 //Verify table headers for all tabs
-CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('UploadActivities')
-CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('ValidationResults')
-CustomKeywords.'utilities.SubmissionRequest.verifyDataSubmissionTableHeaders'('DataView')
+CustomKeywords.'utilities.DataSubmissions.verifyDataSubmissionTableHeaders'('UploadActivities')
+CustomKeywords.'utilities.DataSubmissions.verifyDataSubmissionTableHeaders'('ValidationResults')
+CustomKeywords.'utilities.DataSubmissions.verifyDataSubmissionTableHeaders'('DataView')
 
 //Validate data
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
@@ -62,7 +62,7 @@ CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/Validate-Bt
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
 
 //Download Data View export TSV files for each node and compare to expected TSVs
-CustomKeywords.'utilities.SubmissionRequest.downloadAndCompareExpectedForTC'('TC01')
+CustomKeywords.'utilities.DataSubmissions.downloadAndCompareExpectedForTC'('TC01')
 
 //Generate HTML report
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
