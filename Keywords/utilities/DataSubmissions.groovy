@@ -804,4 +804,15 @@ class DataSubmissions extends TestRunner {
 		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
 		return [relativePaths, nodes]
 	}
+	
+	/**
+	 * Click on Validate button to validate data uploaded
+	 */
+	@Keyword
+	private static clickValidateButton() {
+		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
+		TestRunner.clickTab('CRDC/DataSubmissions/Validate-Btn')
+		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
+	}
+	
 }

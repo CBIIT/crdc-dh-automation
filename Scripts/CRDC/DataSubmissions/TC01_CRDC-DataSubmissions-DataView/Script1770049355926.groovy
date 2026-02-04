@@ -57,9 +57,7 @@ CustomKeywords.'utilities.DataSubmissions.verifyDataSubmissionTableHeaders'('Val
 CustomKeywords.'utilities.DataSubmissions.verifyDataSubmissionTableHeaders'('DataView')
 
 //Validate data
-WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/Validate-Btn')
-WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
+CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
 //Download Data View export TSV files for each node and compare to expected TSVs
 CustomKeywords.'utilities.DataSubmissions.downloadAndCompareExpectedForTC'('TC01')

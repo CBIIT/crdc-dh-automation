@@ -52,9 +52,7 @@ CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmiss
 CustomKeywords.'utilities.DataSubmissions.verifyDataViewMatchesMetadataForTC'('TC99')
 
 //Validate data
-WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/Validate-Btn')
-WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
+CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
 //Verify Validation Results table in the UI matches the expected TSV files for each node with error(s) or warning(s)
 CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsVsExpectedForTC'("TC99")
