@@ -44,8 +44,10 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.Keys as Keys
 
+import com.kms.katalon.core.model.FailureHandling
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.poi.ss.usermodel.Cell;
@@ -391,5 +393,80 @@ class Login extends TestRunner implements Comparator<List<XSSFCell>>{
 		//		}else {
 		//			KeywordUtil.markFailed("Landed on the wrong page!")
 		//		}
+	}
+
+	/**
+	 * Creates web driver and navigates to CRDC application.
+	 * Same behavior as SubmissionRequest.navigateToCrdc (delegate target).
+	 */
+	@Keyword
+	void navigateToCrdc() {
+		driver = CustomBrowserDriver.createWebDriver();
+		driver.manage().window().maximize();
+		driver.get(GlobalVariable.G_Urlname);
+		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+		WebUI.waitForPageLoad(30)
+		WebUI.verifyMatch(GlobalVariable.G_Urlname, WebUI.getUrl(), false)
+	}
+
+	/**
+	 * Logs in to CRDC via Login.gov 2FA / OTP using a dynamic TOTP secret.
+	 * @param pbacUser One of: Admin, Fedlead, Dcp, Submitter, User
+	 */
+	@Keyword
+	void loginToCrdcOtp(String pbacUser) {
+		clickTab('CRDC/NavBar/WarningBanner_Continue-Btn')
+
+		clickTab('CRDC/Login/LoginPageLogin-Btn')
+		clickTab('CRDC/Login/Login.gov-Btn')
+
+		String userEmail = GlobalVariable."${pbacUser}Email"
+		String userPassword = GlobalVariable."${pbacUser}Password"
+		String userSecret = GlobalVariable."${pbacUser}Secret"
+
+		WebUI.setText(findTestObject('CRDC/Login/Login.gov_UserEmail-TxtBx'), userEmail)
+		WebUI.setText(findTestObject('CRDC/Login/Login.gov_UserPass-TxtBx'), userPassword)
+		clickTab('CRDC/Login/Login.gov_SignIn-Btn')
+
+		String pythonPath = Utils.getPythonExecutablePath();
+		String scriptPath = "${System.getProperty('user.dir')}/PythonFiles/CRDC/GenerateOtp.py"
+
+		// Generate OTP
+		Closure<String> generateTotp = { String secretArg ->
+			ProcessBuilder pb = new ProcessBuilder(pythonPath, scriptPath, secretArg)
+			pb.redirectErrorStream(true)
+			Process proc = pb.start()
+			proc.waitFor()
+			return proc.inputStream.text.trim()
+		}
+
+		int otpAttempts = 0
+		boolean loggedIn = false
+
+		while (otpAttempts < 2 && !loggedIn) {
+			String totpCode = generateTotp(userSecret)
+			println("Attempt ${otpAttempts + 1} - TOTP Code: ${totpCode}")
+
+			WebUI.setText(findTestObject('CRDC/Login/Login.gov_OneTimeCode-TxtBx'), totpCode)
+			clickTab('CRDC/Login/Login.gov_OneTimeCode_Submit-Btn')
+
+			// Wait for Grant button
+			TestObject consentBtn = findTestObject('CRDC/Login/Login.gov_ConsentGrant-Btn')
+			println("Waiting for 'Grant' button...")
+
+			if (WebUI.waitForElementVisible(consentBtn, 5, FailureHandling.OPTIONAL)) {
+				println("OTP accepted. Proceeding to consent...")
+				clickTab('CRDC/Login/Login.gov_ConsentGrant-Btn')
+				loggedIn = true
+			} else {
+				println("Grant button not found — likely OTP failed. Retrying in 30s...")
+				WebUI.delay(30)
+				otpAttempts++
+			}
+		}
+
+		if (!loggedIn) {
+			KeywordUtil.markFailed("OTP failed after 2 attempts.")
+		}
 	}
 }//class ends
