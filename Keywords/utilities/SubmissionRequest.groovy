@@ -1640,6 +1640,12 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 	// ------------------------------- Validation Results vs expected TSV (by node, severity, issue type) -------------------------------
 
+	/**
+	 * Extracts the node name from an expected Validation Results TSV filename.
+	 * Example: "GC_consent_group_v9.0.0_expected-ValidationResults.tsv" -> "consent_group".
+	 * Strips the "_expected-ValidationResults.tsv" suffix, then the version (_vX.Y.Z), then returns the part after the first underscore (prefix like "GC_" is dropped).
+	 * Returns empty string if filename does not end with "_expected-ValidationResults.tsv".
+	 */
 	private static String nodeFromExpectedValidationResultsFilename(String filename) {
 		if (!filename.endsWith("_expected-ValidationResults.tsv")) return ""
 		String base = filename - ~/_expected-ValidationResults\.tsv$/
@@ -1848,8 +1854,19 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		return out
 	}
 
+	/** If the cell's visible text is this many characters or less, we use it as-is and skip DOM lookups for full value (truncated-text-wrapper / span). */
 	private static final int TRUNCATED_CHECK_THRESHOLD = 15
 
+	/**
+	 * Returns the text to use for a table cell at the given column index. Used when reading Validation Results (and similar) tables from the UI.
+	 * The UI may show truncated values (e.g. "auto_CDS2016_DN..."); the full value is in a [data-testid='truncated-text-wrapper'] element's aria-label, or in a span's aria-label/text.
+	 * For short values (length <= TRUNCATED_CHECK_THRESHOLD), returns the cell's getText() to avoid extra findElements. For longer values, tries truncated-text-wrapper aria-label, then span aria-label/text, then cell text.
+	 * Uses findElements (not findElement) so we never block on implicit wait when the element is absent.
+	 * @param cells list of td WebElements for one row
+	 * @param index column index (0-based)
+	 * @param debug if true, log which path was used to the console
+	 * @return trimmed string for the cell, or "" if index invalid or on exception
+	 */
 	private static String getCellText(List<WebElement> cells, int index, boolean debug) {
 		if (index < 0 || index >= cells.size()) return ""
 		try {
@@ -1914,6 +1931,9 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		}
 		List<String> errors = new ArrayList<>()
 		String sectionName = "Validation Results"
+		
+		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
+		
 		for (List<String> exp : expectedRows) {
 			String submittedId = exp.get(0)
 			List<String> act = actualBySubmittedId.get(submittedId)
