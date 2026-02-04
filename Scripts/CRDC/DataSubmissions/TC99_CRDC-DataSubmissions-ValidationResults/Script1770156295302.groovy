@@ -49,16 +49,17 @@ CustomKeywords.'utilities.Pbac.createDataSubmission'()
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 //Upload data via folder and verify Data View table in the UI matches the uploaded input files for each node
-CustomKeywords.'utilities.Pbac.uploadFolder'('TC99')
+CustomKeywords.'utilities.Pbac.verifyDataViewMatchesMetadataForTC'('TC99')
 
 //Validate data
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/Validate-Btn')
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
-CustomKeywords.'utilities.Utils.waitForElementToDisappear'('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
 
+//Verify Validation Results table in the UI matches the expected TSV files for each node with error(s) or warning(s)
 CustomKeywords.'utilities.SubmissionRequest.verifyValidationResultsVsExpectedForTC'("TC99")
 
+//Generate HTML report
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
 WebUI.closeBrowser()
