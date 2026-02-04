@@ -56,9 +56,8 @@ WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/Validate-Btn')
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
 
-CustomKeywords.'utilities.SubmissionRequest.verifyValidationResultsVsExpected'('TC99', 'sample', 'Error', 'Value not permitted')
+CustomKeywords.'utilities.SubmissionRequest.verifyValidationResultsVsExpectedForTC'("TC99")
 
 CustomKeywords.'utilities.SubmissionRequest.generateValidationReport'()
 
-
-//WebUI.closeBrowser()
+WebUI.closeBrowser()

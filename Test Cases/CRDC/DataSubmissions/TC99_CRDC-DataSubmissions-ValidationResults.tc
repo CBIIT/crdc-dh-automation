@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description></description>
-   <name>TC99_CRDC-DataSubmissions-DataView</name>
+   <name>TC99_CRDC-DataSubmissions-ValidationResults</name>
    <tag>Filter</tag>
    <comment></comment>
    <recordOption>OTHER</recordOption>

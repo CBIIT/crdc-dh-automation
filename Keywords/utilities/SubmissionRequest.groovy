@@ -1383,6 +1383,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	 */
 	@Keyword
 	public void verifyDataViewMatchesMetadata(String metadataFile, String node) {
+		KeywordUtil.logInfo("--- Verifying Data View for node: " + node + " ---")
 		try {
 			WebDriver driver = DriverFactory.getWebDriver();
 
@@ -1717,6 +1718,52 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		return null
 	}
 
+	/** List unique node names from expected-ValidationResults folder for the given TC. Returns empty list if folder missing or no files. */
+	private List<String> listNodesFromExpectedValidationResultsFolder(String tcName) {
+		String baseDir = RunConfiguration.getProjectDir()
+		File dir = new File(baseDir, "InputFiles/CRDC/MetadataData/${tcName}/expected-ValidationResults")
+		KeywordUtil.logInfo("verifyValidationResultsVsExpectedForTC: looking in " + dir.absolutePath)
+		if (!dir.exists() || !dir.isDirectory()) {
+			KeywordUtil.logInfo("verifyValidationResultsVsExpectedForTC: folder does not exist or is not a directory.")
+			return Collections.emptyList()
+		}
+		List<File> files = dir.listFiles()?.findAll { it.isFile() && it.name.endsWith("_expected-ValidationResults.tsv") } ?: []
+		if (files.isEmpty()) KeywordUtil.logInfo("verifyValidationResultsVsExpectedForTC: no *_expected-ValidationResults.tsv files found.")
+		Set<String> nodes = new LinkedHashSet<>()
+		for (File f in files) {
+			String node = nodeFromExpectedValidationResultsFilename(f.name)
+			if (!node.isEmpty()) nodes.add(node)
+		}
+		return new ArrayList<>(nodes)
+	}
+
+	/** Get unique (severity, issueType) pairs from an expected Validation Results TSV. Returns list of [severity, issueType]. */
+	private List<List<String>> getUniqueSeverityIssueTypePairsFromExpectedTsv(String tsvPath) {
+		List<List<String>> out = new ArrayList<>()
+		Path path = Paths.get(tsvPath)
+		if (!Files.exists(path)) return out
+		List<String> lines = Files.readAllLines(path)
+		if (lines.size() < 2) return out
+		String[] headers = lines.get(0).split("\t", -1)
+		int idxIssue = -1, idxSev = -1
+		for (int i = 0; i < headers.length; i++) {
+			String h = headers[i].trim()
+			if (h.equals("Issue_Type")) idxIssue = i
+			if (h.equals("Expected_Severity")) idxSev = i
+		}
+		if (idxIssue < 0 || idxSev < 0) return out
+		Set<String> seen = new LinkedHashSet<>()
+		for (int i = 1; i < lines.size(); i++) {
+			String[] cells = lines.get(i).split("\t", -1)
+			String rowIssue = idxIssue < cells.length ? cells[idxIssue].trim() : ""
+			String rowSev = idxSev < cells.length ? cells[idxSev].trim() : ""
+			if (rowSev.isEmpty() || rowIssue.isEmpty()) continue
+			String key = rowSev + "\t" + rowIssue
+			if (seen.add(key)) out.add(Arrays.asList(rowSev, rowIssue))
+		}
+		return out
+	}
+
 	/** Load expected rows from TSV filtered by severity and issue type. Returns list of [submittedId, issueType, severity]. */
 	private List<List<String>> loadExpectedValidationResultsTsv(String tsvPath, String submittedIdentifierColumn, String severity, String issueType) {
 		List<List<String>> out = new ArrayList<>()
@@ -1747,8 +1794,6 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	/** Apply Validation Results filters (node, severity, issue type) and read table rows: [submittedId, issueType, severity]. */
 	private List<List<String>> readValidationResultsTableFromUI(String node, String severity, String issueType) {
 		WebDriver driver = DriverFactory.getWebDriver()
-		clickTab("CRDC/DataSubmissions/Validation/ValidationResults-Tab")
-		clickTab("Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn")
 		WebUI.delay(1)
 		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"), 15)
 		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"))
@@ -1793,11 +1838,18 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		return out
 	}
 
+	private static final int TRUNCATED_CHECK_THRESHOLD = 15
+
 	private static String getCellText(List<WebElement> cells, int index, boolean debug) {
 		if (index < 0 || index >= cells.size()) return ""
 		try {
 			WebElement cell = cells.get(index)
 			String cellRawText = cell.getText().trim()
+			// If value is short enough, no need to look for truncated wrapper or span—use table text as-is
+			if (cellRawText != null && cellRawText.length() <= TRUNCATED_CHECK_THRESHOLD) {
+				if (debug) KeywordUtil.logInfo("[getCellText] cell index=" + index + ", short value (" + cellRawText.length() + " chars), using as-is='" + cellRawText + "'")
+				return cellRawText
+			}
 			List<WebElement> truncatedWrappers = cell.findElements(By.cssSelector("[data-testid='truncated-text-wrapper']"))
 			if (debug) {
 				KeywordUtil.logInfo("[getCellText] cell index=" + index + ", raw cell.getText()='" + cellRawText + "', truncated-text-wrapper count=" + truncatedWrappers.size())
@@ -1808,16 +1860,17 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 				if (debug) KeywordUtil.logInfo("[getCellText] using truncated-text-wrapper aria-label='" + (aria != null ? aria : "null") + "'")
 				if (aria != null && !aria.isEmpty()) return aria.trim()
 			}
-			try {
-				WebElement span = cell.findElement(By.tagName("span"))
+			// Use findElements (not findElement) so we never block for implicit wait when cell has no span
+			List<WebElement> spans = cell.findElements(By.tagName("span"))
+			if (spans != null && !spans.isEmpty()) {
+				WebElement span = spans.get(0)
 				String aria = span.getAttribute("aria-label")
 				if (debug) KeywordUtil.logInfo("[getCellText] fallback: span aria-label='" + (aria != null ? aria : "null") + "', span.getText()='" + span.getText().trim() + "'")
 				if (aria != null && !aria.isEmpty()) return aria.trim()
 				return span.getText().trim()
-			} catch (Exception e) {
-				if (debug) KeywordUtil.logInfo("[getCellText] fallback: no span, using cell text='" + cellRawText + "'")
-				return cellRawText
 			}
+			if (debug) KeywordUtil.logInfo("[getCellText] fallback: no span, using cell text='" + cellRawText + "'")
+			return cellRawText
 		} catch (Exception e) {
 			if (debug) KeywordUtil.logInfo("[getCellText] exception: " + e.getMessage())
 			return ""
@@ -1831,6 +1884,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	 */
 	@Keyword
 	void verifyValidationResultsVsExpected(String tcName, String node, String severity, String issueType) {
+		KeywordUtil.logInfo("--- Verifying Validation Results for node: " + node + ", severity: " + severity + ", issueType: " + issueType + " ---")
 		Map<String, String> mappings = loadValidationResultsMappings()
 		String submittedIdColumn = mappings.get(node)
 		if (submittedIdColumn == null || submittedIdColumn.isEmpty()) {
@@ -1885,6 +1939,38 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			KeywordUtil.markFailed("verifyValidationResultsVsExpected: " + errors.size() + " mismatch(es). See log above.")
 		} else {
 			KeywordUtil.logInfo("Validation Results match expected for node=" + node + ", severity=" + severity + ", issueType=" + issueType)
+		}
+	}
+
+	/**
+	 * One-call Validation Results verification for a test case: discovers all expected-ValidationResults TSV files
+	 * under InputFiles/CRDC/MetadataData/&lt;tcName&gt;/expected-ValidationResults/, derives nodes and (severity, issueType)
+	 * pairs from those files, and runs verifyValidationResultsVsExpected for each (node, severity, issueType).
+	 * Use this in the test case instead of multiple 4-arg calls.
+	 */
+	@Keyword
+	void verifyValidationResultsVsExpectedForTC(String tcName) {
+		
+		clickTab("CRDC/DataSubmissions/Validation/ValidationResults-Tab")
+		clickTab("Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn")
+		
+		List<String> nodes = listNodesFromExpectedValidationResultsFolder(tcName)
+		if (nodes.isEmpty()) {
+			KeywordUtil.logInfo("verifyValidationResultsVsExpectedForTC: No expected Validation Results files for TC '" + tcName + "'; skipping.")
+			return
+		}
+		for (String node : nodes) {
+			String tsvPath = findExpectedValidationResultsTsv(tcName, node)
+			if (tsvPath == null) {
+				KeywordUtil.logInfo("verifyValidationResultsVsExpectedForTC: No expected TSV for node '" + node + "'; skipping.")
+				continue
+			}
+			List<List<String>> pairs = getUniqueSeverityIssueTypePairsFromExpectedTsv(tsvPath)
+			for (List<String> pair : pairs) {
+				String severity = pair.get(0)
+				String issueType = pair.get(1)
+				verifyValidationResultsVsExpected(tcName, node, severity, issueType)
+			}
 		}
 	}
 
