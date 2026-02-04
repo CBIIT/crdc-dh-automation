@@ -38,9 +38,9 @@ import com.kms.katalon.core.testdata.TestDataFactory
 WebUI.closeBrowser()
 
 //Login as Submitter
-CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
+CustomKeywords.'utilities.Login.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
-CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Submitter')
+CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
 WebUI.delay(2)
 
 //Create DS
@@ -49,7 +49,7 @@ CustomKeywords.'utilities.Pbac.createDataSubmission'()
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 //Upload data via folder and verify Data View table in the UI matches the uploaded input files for each node
-CustomKeywords.'utilities.Pbac.verifyDataViewMatchesMetadataForTC'('TC99')
+CustomKeywords.'utilities.DataSubmissions.verifyDataViewMatchesMetadataForTC'('TC99')
 
 //Validate data
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
@@ -57,7 +57,7 @@ CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/Validate-Bt
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
 
 //Verify Validation Results table in the UI matches the expected TSV files for each node with error(s) or warning(s)
-CustomKeywords.'utilities.SubmissionRequest.verifyValidationResultsVsExpectedForTC'("TC99")
+CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsVsExpectedForTC'("TC99")
 
 //Generate HTML report
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
