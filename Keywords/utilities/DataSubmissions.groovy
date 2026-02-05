@@ -29,12 +29,15 @@ import java.util.LinkedHashSet
 import java.util.List
 import java.util.Map
 import java.util.Set
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.interactions.Action;
+import com.kms.katalon.core.testobject.TestObject
 
 /**
  * Data Submissions: Data View and Validation Results verification keywords.
  * Contains all keywords for verifying Data View tab (headers, row content vs metadata, download vs expected TSV)
  * and Validation Results tab (headers, UI vs expected TSV by node/severity/issue type).
- * Also handles upload + verify flow for a test case (verifyDataViewMatchesMetadataForTC).
+ * Verify-only and upload-only are separate: use uploadFolder(tcName) then verifyDataViewMatchesMetadataForTC(tcName) for a two-step flow.
  * Moved from SubmissionRequest and Pbac.
  */
 class DataSubmissions extends TestRunner {
@@ -336,11 +339,11 @@ class DataSubmissions extends TestRunner {
 		}
 		List<List<?>> expectedList = listExpectedFilesForTC(tcName)
 		if (expectedList.isEmpty()) return
-		for (List<?> pair in expectedList) {
-			String node = (String) pair.get(0)
-			String expectedPath = (String) pair.get(1)
-			// Select node, click Download, move latest file from Downloads, then compare
-			WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/NodeType-Ddn"), 30)
+			for (List<?> pair in expectedList) {
+				String node = (String) pair.get(0)
+				String expectedPath = (String) pair.get(1)
+				// Select node, click Download, move latest file from Downloads, then compare
+				WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/NodeType-Ddn"), 30)
 				WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/NodeType-Ddn"))
 				WebUI.delay(1)
 				WebElement option = driver.findElement(By.xpath("//li[normalize-space(text())='" + node + "']"))
@@ -753,26 +756,10 @@ class DataSubmissions extends TestRunner {
 	}
 
 	/**
-	 * Upload all TSV files from InputFiles/CRDC/MetadataData/tcName/, open Data View tab, then verify Data View matches metadata for each node.
-	 * @param tcName Test case name (e.g. TC01); folder path is InputFiles/CRDC/MetadataData/&lt;tcName&gt;
+	 * List TSV files in InputFiles/CRDC/MetadataData/&lt;tcName&gt;/ and return [relativePaths, nodes].
+	 * Empty lists if folder missing or no TSV files. Used by uploadFolder and verifyDataViewMatchesMetadataForTC.
 	 */
-	@Keyword
-	void verifyDataViewMatchesMetadataForTC(String tcName) {
-		List<List<String>> uploadResult = uploadFolder(tcName)
-		List<String> relativePaths = uploadResult.get(0)
-		List<String> nodes = uploadResult.get(1)
-		if (relativePaths.isEmpty()) return
-			TestRunner.clickTab('CRDC/DataSubmissions/Validation/DataView-Tab')
-		for (int i = 0; i < relativePaths.size(); i++) {
-			verifyDataViewMatchesMetadata(relativePaths.get(i), nodes.get(i))
-		}
-	}
-
-	/**
-	 * Upload all TSV files from InputFiles/CRDC/MetadataData/tcName/ (choose files, click Upload, wait for Uploading to disappear).
-	 * Returns [relativePaths, nodes] for use by verifyDataViewMatchesMetadataForTC; empty lists if folder missing or no TSV files.
-	 */
-	private List<List<String>> uploadFolder(String tcName) {
+	private List<List<String>> listTsvFilesAndNodesForTC(String tcName) {
 		String baseDir = RunConfiguration.getProjectDir()
 		String folderPath = "InputFiles/CRDC/MetadataData/${tcName}"
 		File folder = new File(baseDir, folderPath)
@@ -787,12 +774,30 @@ class DataSubmissions extends TestRunner {
 			KeywordUtil.markFailed("uploadFolder: no .tsv files in ${folder.absolutePath}")
 			return [relativePaths, nodes]
 		}
-		List<String> absolutePaths = new ArrayList<>()
 		for (File f in fileList) {
 			String node = nodeFromFilename(f.name)
 			relativePaths.add("${folderPath}/${f.name}")
 			nodes.add(node)
-			absolutePaths.add(new File(baseDir, "${folderPath}/${f.name}").absolutePath)
+		}
+		return [relativePaths, nodes]
+	}
+
+	/**
+	 * Upload all TSV files from InputFiles/CRDC/MetadataData/&lt;tcName&gt;/ (choose files, click Upload, wait for Uploading to disappear).
+	 * Does not open Data View or verify. Call verifyDataViewMatchesMetadataForTC(tcName) after this if you want to verify.
+	 * @param tcName Test case name (e.g. TC02)
+	 */
+	@Keyword
+	void uploadFolder(String tcName) {
+		List<List<String>> listResult = listTsvFilesAndNodesForTC(tcName)
+		List<String> relativePaths = listResult.get(0)
+		List<String> nodes = listResult.get(1)
+		if (relativePaths.isEmpty()) return
+		String baseDir = RunConfiguration.getProjectDir()
+		String folderPath = "InputFiles/CRDC/MetadataData/${tcName}"
+		List<String> absolutePaths = new ArrayList<>()
+		for (int i = 0; i < relativePaths.size(); i++) {
+			absolutePaths.add(new File(baseDir, relativePaths.get(i)).absolutePath)
 		}
 		// Upload entire folder in one go (multiple paths separated by newline)
 		String allPaths = absolutePaths.join('\n')
@@ -802,6 +807,100 @@ class DataSubmissions extends TestRunner {
 		TestRunner.clickTab('CRDC/DataSubmissions/Upload-Btn')
 		WebUI.delay(10)
 		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Validation/Uploading-Text', 15)
-		return [relativePaths, nodes]
+	}
+
+	/**
+	 * Verify Data View tab matches metadata for each node in InputFiles/CRDC/MetadataData/&lt;tcName&gt;/.
+	 * Assumes data has already been uploaded (e.g. via uploadFolder(tcName)). Does not perform upload.
+	 * @param tcName Test case name (e.g. TC02)
+	 */
+	@Keyword
+	void verifyDataViewMatchesMetadataForTC(String tcName) {
+		List<List<String>> listResult = listTsvFilesAndNodesForTC(tcName)
+		List<String> relativePaths = listResult.get(0)
+		List<String> nodes = listResult.get(1)
+		if (relativePaths.isEmpty()) return
+		TestRunner.clickTab('CRDC/DataSubmissions/Validation/DataView-Tab')
+		for (int i = 0; i < relativePaths.size(); i++) {
+			verifyDataViewMatchesMetadata(relativePaths.get(i), nodes.get(i))
+		}
+	}
+
+	/**
+	 * Click on Validate button to validate data uploaded
+	 */
+	@Keyword
+	private static clickValidateButton() {
+		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
+		TestRunner.clickTab('CRDC/DataSubmissions/Validate-Btn')
+		//WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
+		KeywordUtil.logInfo("Waiting for Validation to finish - waiting up to 3 minutes")
+		WebUI.waitForElementNotHasAttribute(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 'disabled', 180)
+	}
+	
+	/**
+	 * Create a data submission for a specific data model
+	 */
+	@Keyword
+	public static void createDataSubmission(String dataModel, String study) {
+		TestRunner.clickTab('CRDC/DataSubmissions/Create/CreateADataSubmission-Btn')
+		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/MetadataOnly-Btn'))
+		WebUI.delay(5)
+
+		//Select the Data Commons
+		WebDriver driver = DriverFactory.getWebDriver()
+		WebUI.click(findTestObject('Object Repository/CRDC/DataSubmissions/Create/DataCommons-Ddn'))
+		List<WebElement> commonsDropdownOptions = WebUI.findWebElements(findTestObject('Object Repository/CRDC/DataSubmissions/Create/DataCommonsDdn-Option'), 10)
+		WebElement matchDataCommons = commonsDropdownOptions.find {it.getAttribute("innerText")?.trim() == dataModel}
+		if (matchDataCommons != null) {
+			try {
+				new Actions(driver).moveToElement(matchDataCommons).click().perform()
+			} catch (Exception e) {
+				KeywordUtil.logInfo("Click blocked, retrying after overlay removal...")
+				WebUI.executeJavaScript("""document.querySelectorAll('.MuiBackdrop-root, .MuiDialog-container').forEach(e => e.remove())""", null)
+				WebUI.delay(1)
+				new Actions(driver).moveToElement(matchDataCommons).click().perform()
+			}
+		} else {
+			KeywordUtil.markFailed("Study option "+dataModel+" not found in dropdown.")
+		}
+
+		//Select the study
+		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/Study-Ddn'))
+		WebUI.delay(1)
+		List<WebElement> studyDropdownOptions = WebUI.findWebElements(findTestObject('Object Repository/CRDC/DataSubmissions/Create/StudyDdn-Option'), 10)
+		for (WebElement option : studyDropdownOptions) {
+			String studyName = option.getAttribute("innerText")?.trim()
+			KeywordUtil.logInfo("Dropdown option is: " + studyName)
+		}
+		KeywordUtil.logInfo("Number of study options in dropdown: " + studyDropdownOptions.size())
+
+		WebElement matchStudy = studyDropdownOptions.find {it.getAttribute("innerText")?.trim() == study}
+		if (matchStudy != null) {
+			try {
+				new Actions(driver).moveToElement(matchStudy).click().perform()
+			} catch (Exception e) {
+				KeywordUtil.logInfo("Click blocked, retrying after overlay removal...")
+				WebUI.executeJavaScript("""document.querySelectorAll('.MuiBackdrop-root, .MuiDialog-container').forEach(e => e.remove())""", null)
+				WebUI.delay(1)
+				new Actions(driver).moveToElement(matchStudy).click().perform()
+			}
+		} else {
+			KeywordUtil.markFailed("Study option '${study}' not found in dropdown.")
+		}
+
+		//Enter the submission name -- setText() is not working, need to use Actions class
+		String timestamp = new Date().format("yyyyMMdd_HHmmss")
+		String submissionName = "auto-test_" + timestamp
+		KeywordUtil.logInfo("Creating data submission with name " + submissionName)
+		
+		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/SubmissionName-Field'))
+		Actions actions = new Actions(DriverFactory.getWebDriver())
+		WebElement el = WebUI.findWebElement(findTestObject('CRDC/DataSubmissions/Create/SubmissionName-Field'), 10)
+		actions.moveToElement(el).click().sendKeys(submissionName).perform()
+
+		//Create
+		TestRunner.clickTab('CRDC/DataSubmissions/Create/Create-Btn')
+		WebUI.delay(1)
 	}
 }
