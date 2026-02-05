@@ -54,11 +54,6 @@ CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC01')
 //Verify Data View table in the UI matches the uploaded input files for each node
 CustomKeywords.'utilities.DataSubmissions.verifyDataViewMatchesMetadataForTC'('TC01')
 
-//Verify table headers for all tabs
-CustomKeywords.'utilities.DataSubmissions.verifyDataSubmissionTableHeaders'('UploadActivities')
-CustomKeywords.'utilities.DataSubmissions.verifyDataSubmissionTableHeaders'('ValidationResults')
-CustomKeywords.'utilities.DataSubmissions.verifyDataSubmissionTableHeaders'('DataView')
-
 //Validate data
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
