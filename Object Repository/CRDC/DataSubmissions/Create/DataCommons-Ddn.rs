@@ -7,6 +7,10 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
+         <value>//div[@aria-describedby='submission-data-commons-helper-text']</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
          <value></value>
       </entry>
    </selectorCollection>
@@ -14,11 +18,11 @@
    <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>false</useRalativeImagePath>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//*[@id='mui-component-select-dataCommons']</value>
-      <webElementGuid>3152ebdd-ab1b-45d4-9f92-c89af3d6ffa2</webElementGuid>
+      <value>//div[@aria-describedby='submission-data-commons-helper-text']</value>
+      <webElementGuid>b1d6cbdb-1cc1-4ee4-844c-45faa4a33295</webElementGuid>
    </webElementProperties>
 </WebElementEntity>

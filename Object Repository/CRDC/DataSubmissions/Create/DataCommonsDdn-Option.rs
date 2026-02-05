@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataCommonsDdn-Option</name>
+   <tag></tag>
+   <elementGuidId>52169401-5244-4115-bfd4-3c15ffb7eebd</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[contains(@role,'option')]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[contains(@role,'option')]</value>
+      <webElementGuid>93fffea0-7785-4356-b44d-193a5e5dcf49</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

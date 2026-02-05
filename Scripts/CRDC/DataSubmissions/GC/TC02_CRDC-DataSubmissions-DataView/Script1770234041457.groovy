@@ -45,17 +45,20 @@ WebUI.delay(2)
 
 //Create DS
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
-CustomKeywords.'utilities.Pbac.createDataSubmission'()
+CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('GC','autoQA - AutomationQA_Study')
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
-//Upload data via folder and verify Data View table in the UI matches the uploaded input files for each node
-CustomKeywords.'utilities.DataSubmissions.verifyDataViewMatchesMetadataForTC'('TC99')
+//Upload data via folder
+CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC02')
+
+//Verify Data View table in the UI matches the uploaded input files for each node
+CustomKeywords.'utilities.DataSubmissions.verifyDataViewMatchesMetadataForTC'('TC02')
 
 //Validate data
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
-//Verify Validation Results table in the UI matches the expected TSV files for each node with error(s) or warning(s)
-CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsVsExpectedForTC'("TC99")
+//Download Data View export TSV files for each node and compare to expected TSVs
+CustomKeywords.'utilities.DataSubmissions.downloadAndCompareExpectedForTC'('TC02')
 
 //Generate HTML report
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
