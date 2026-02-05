@@ -833,7 +833,9 @@ class DataSubmissions extends TestRunner {
 	private static clickValidateButton() {
 		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
 		TestRunner.clickTab('CRDC/DataSubmissions/Validate-Btn')
-		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
+		//WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
+		KeywordUtil.logInfo("Waiting for Validation to finish - waiting up to 3 minutes")
+		WebUI.waitForElementNotHasAttribute(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 'disabled', 180)
 	}
 	
 	/**

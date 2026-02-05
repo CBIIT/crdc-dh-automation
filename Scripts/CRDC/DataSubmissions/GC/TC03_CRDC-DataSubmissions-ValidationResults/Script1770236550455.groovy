@@ -45,7 +45,7 @@ WebUI.delay(2)
 
 //Create DS
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
-CustomKeywords.'utilities.DataSubmissions.createDataSubmission'()
+CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('GC','autoQA - AutomationQA_Study')
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 //Upload data via folder
