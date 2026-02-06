@@ -30,6 +30,7 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.WebElement as WebElement
 import java.nio.file.Paths
 import java.nio.file.Path
+import com.kms.katalon.core.configuration.RunConfiguration
 import internal.GlobalVariable
 import java.io.File;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -62,8 +63,12 @@ public class CustomBrowserDriver {
 			case 'CHROME_DRIVER':
 				System.setProperty("webdriver.chrome.driver", DriverFactory.getChromeDriverPath())
 				ChromeOptions options = new ChromeOptions()
+				File projectDownloadsDir = new File(RunConfiguration.getProjectDir(), "Downloads")
+				projectDownloadsDir.mkdirs()
 				Map<String, Object> chromePrefs = new HashMap<String, Object>()
 				chromePrefs.put("download.prompt_for_download", false)
+				chromePrefs.put("download.default_directory", projectDownloadsDir.getAbsolutePath())
+				options.setExperimentalOption("prefs", chromePrefs)
 				options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/18.1.1");
 				options.setExperimentalOption("useAutomationExtension", false);
 				options.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
@@ -75,6 +80,8 @@ public class CustomBrowserDriver {
 			case 'HEADLESS_DRIVER':  //This is for headless Chrome driver
 				System.setProperty("webdriver.chrome.driver", DriverFactory.getChromeDriverPath())
 				ChromeOptions options = new ChromeOptions();
+				File projectDownloadsDir = new File(RunConfiguration.getProjectDir(), "Downloads")
+				projectDownloadsDir.mkdirs()
 				options.addArguments("--headless");
 				options.addArguments("--disable-dev-shm-usage");
 				options.addArguments("--no-sandbox");
@@ -86,6 +93,7 @@ public class CustomBrowserDriver {
 				dc.setCapability(ChromeOptions.CAPABILITY, options);
 				Map<String, Object> chromePrefs = new HashMap<String, Object>()
 				chromePrefs.put("download.prompt_for_download", false)
+				chromePrefs.put("download.default_directory", projectDownloadsDir.getAbsolutePath())
 				options.setExperimentalOption("prefs", chromePrefs)
 				options.addArguments("--force-time-zone=America/Chicago");
 				options.merge(dc);
