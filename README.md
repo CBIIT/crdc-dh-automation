@@ -1,69 +1,61 @@
-# Commons\_Automation
+# CRDC Data Hub Automation
 
-This repository contains automated test scripts for **Data Commons** applications. It provides a cross-language automation framework designed to validate data accuracy and consistency between UI and backend reference files using **Groovy**, **Java**, **Python**, and **Selenium**.
+Automated test framework for the **Cancer Research Data Commons (CRDC) Data Hub**. This repository provides a Katalon Studio–based test suite for UI validation of CRDC workflows, including authentication, policy-based access control (PBAC), data submissions, submission requests, and validation reporting.
 
 ---
 
 ## Overview
 
-The framework automates the comparison of:
+The framework automates end-to-end validation of CRDC Data Hub functionality using **Katalon Studio**, **Groovy**, and **Selenium**. Test data is managed through Katalon data files and Excel/TSV inputs; optional Python utilities (e.g., OTP generation) are supported via the included Python scripts.
 
-* **UI data** extracted via Katalon Studio and Selenium.
-* **Reference data** loaded from TSV files using Python’s pandas library.
+### Capabilities
 
-### Execution Flow
+- **Login** — Authentication flows, including OTP-based login via Python integration  
+- **PBAC** — Policy-based access control scenarios and permission validation  
+- **Data Submissions** — Data submission workflows and related UI validation  
+- **Submission Request** — Submission request creation and validation (all fields and required-fields variants)  
+- **Validation Reporting** — Validation results and mapping checks against reference data  
 
-1. **Query File Input**
-
-   * Test execution begins by reading an Excel file containing query definitions.
-
-2. **UI Interaction**
-
-   * Filters are applied using Selenium-based actions.
-   * Resulting UI data is captured and saved to an output Excel file.
-
-3. **Reference Data Load**
-
-   * TSV source files are read into pandas DataFrames.
-   * Data is processed and transformed according to the query schema.
-   * Output is saved to a second Excel file.
-
-4. **Data Comparison**
-
-   * The two result sets are compared.
-   * A test passes if all data matches; discrepancies result in test failure.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
-| Path                     | Description                                    |
-| ------------------------ | ---------------------------------------------- |
-| `.settings/`             | IDE and project configuration settings         |
-| `Drivers/`               | Web drivers for browser automation             |
-| `Include/config/`        | Environment and test configuration files       |
-| `InputFiles/`            | Source files (Query, TSV, CSV, Excel)                 |
-| `Keywords/utilities/`    | Custom Groovy keywords for automation tasks    |
-| `Libs/internal/`         | Internal support libraries                     |
-| `Object Repository/`     | UI object definitions for Selenium             |
-| `Plugins/`               | Katalon plugin components                      |
-| `Profiles/`              | Environment profiles (e.g., QA, Stage)         |
-| `PythonFiles/`           | Python scripts for data processing and merging |
-| `Scripts/`               | Core automation logic                          |
-| `Test Cases/`            | Test implementations using Groovy/Java         |
-| `Test Listeners/`        | Hooks for test lifecycle events                |
-| `Test Suites/`           | Collections of related test cases              |
-| `jenkins/`               | Jenkins integration scripts                    |
-| `requirements.txt`       | Python dependency list                         |
-| `Commons_Automation.prj` | Katalon Studio project descriptor              |
+| Path | Description |
+| ---- | ----------- |
+| `Commons_Automation.prj` | Katalon Studio project descriptor |
+| `Data Files/` | Test data (CRDC: Login, PBAC, DataSubmissions, SubmissionRequest, ValidationResults, etc.) |
+| `Include/config/` | Configuration (e.g., logging) |
+| `InputFiles/` | Input assets (TSV, Excel, etc.) used by tests |
+| `Keywords/utilities/` | Custom Groovy keywords (Login, Pbac, DataSubmissions, SubmissionRequest, ValidationReport, Utils, etc.) |
+| `Object Repository/` | UI object definitions for Selenium/Katalon |
+| `Plugins/` | Katalon plugin components |
+| `PythonFiles/CRDC/` | Python utilities (e.g., OTP generation for login) |
+| `Scripts/CRDC/` | Groovy scripts for CRDC test logic |
+| `Test Cases/CRDC/` | Test case definitions (Login, PBAC, DataSubmissions, SubmissionRequest) |
+| `Test Listeners/` | Test lifecycle hooks (e.g., API_Listener, ICDC_Listener) |
+| `Test Suites/` | Suite definitions (`.ts` and `.groovy`) |
+| `jenkins/` | Jenkins pipeline and test schedule |
+| `requirements.txt` | Python dependencies for utilities |
+
+---
+
+## Prerequisites
+
+- **Katalon Studio** (compatible with project version; see `Commons_Automation.prj`)  
+- **Python 3.x** — Required if using Python utilities (e.g., OTP generation)  
+- **Browser drivers** — As required by Katalon (Chrome, Firefox, etc.)  
+- Access to CRDC environments and any shared configuration (e.g., profiles, credentials) as used by your organization  
 
 ---
 
 ## Getting Started
 
-### Prerequisites
-
-* [Katalon Studio](https://www.katalon.com/)
-* [Python 3.x](https://www.python.org/)
-* Access to shared configuration profiles (via SharePoint)
-
+1. **Clone the repository** and open the project in Katalon Studio via `Commons_Automation.prj`.  
+2. **Configure the environment** using the appropriate profile and `Include/config` (and any shared config) as needed.  
+3. **Install Python dependencies** (if using Python utilities):
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. **Select a test suite** (e.g., CRDC_Smoke, CRDC_Regression) and run from Katalon Studio or via the command line/Gradle.  
+5. **CI/CD** — Use the Jenkins pipeline and `jenkins/Test-Schedule.csv` for scheduled runs; adjust branch, suite, profile, and job parameters to match your Jenkins setup.

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC08_CRDC-DataSubmissions-ValidationResults</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>18fdd454-8d3a-4465-b977-7b0a66ee6bef</testCaseGuid>
+</TestCaseEntity>
