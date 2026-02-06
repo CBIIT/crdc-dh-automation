@@ -11,7 +11,6 @@ import org.openqa.selenium.By
 import org.openqa.selenium.StaleElementReferenceException
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
-import org.apache.commons.io.FileUtils
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
@@ -203,10 +202,13 @@ class DataSubmissions extends TestRunner {
 	}
 
 	/**
-	 * Resolve the user's system Downloads folder (cross-platform).
+	 * Project Downloads folder. Chrome is configured to save downloads here (see CustomBrowserDriver).
+	 * Same path on local and CI so no move is needed.
 	 */
-	private static File getUserDownloadsDir() {
-		return new File(System.getProperty("user.home"), "Downloads")
+	private static File getProjectDownloadsDir() {
+		File dir = new File(RunConfiguration.getProjectDir(), "Downloads")
+		if (!dir.exists()) dir.mkdirs()
+		return dir
 	}
 
 	/**
@@ -324,25 +326,20 @@ class DataSubmissions extends TestRunner {
 
 	/**
 	 * For a given TC (e.g. TC01): for each node with an expected file, select node, click Download,
-	 * move the latest file from user's Downloads to project Downloads/&lt;tcName&gt;, then compare expected vs downloaded TSV (headers + full content).
-	 * @param tcName Test case name used to find InputFiles/CRDC/MetadataData/&lt;tcName&gt;/expected/ and to create Downloads/&lt;tcName&gt;
+	 * then compare expected vs downloaded TSV (headers + full content). Chrome is configured to
+	 * download to project Downloads folder, so no move is needed.
+	 * @param tcName Test case name used to find InputFiles/CRDC/MetadataData/&lt;tcName&gt;/expected/
 	 */
 	@Keyword
 	void downloadAndCompareExpectedForTC(String tcName) {
 		WebDriver driver = DriverFactory.getWebDriver()
-		String projectDir = RunConfiguration.getProjectDir()
-		File userDownloads = getUserDownloadsDir()
-		File downloadsDir = new File(projectDir, "Downloads/${tcName}")
-		if (!downloadsDir.exists()) {
-			downloadsDir.mkdirs()
-			KeywordUtil.logInfo("Created downloads folder: ${downloadsDir.absolutePath}")
-		}
+		File projectDownloads = getProjectDownloadsDir()
 		List<List<?>> expectedList = listExpectedFilesForTC(tcName)
 		if (expectedList.isEmpty()) return
 			for (List<?> pair in expectedList) {
 				String node = (String) pair.get(0)
 				String expectedPath = (String) pair.get(1)
-				// Select node, click Download, move latest file from Downloads, then compare
+				// Select node, click Download; file lands in project Downloads (Chrome prefs)
 				WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/NodeType-Ddn"), 30)
 				WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/NodeType-Ddn"))
 				WebUI.delay(1)
@@ -352,19 +349,12 @@ class DataSubmissions extends TestRunner {
 				WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/Download-Btn"), 10)
 				WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/Download-Btn"))
 				WebUI.delay(5)
-				File latest = findLatestFile(userDownloads)
+				File latest = findLatestFile(projectDownloads)
 				if (latest == null) {
-					KeywordUtil.markFailed("downloadAndCompareExpectedForTC: no file found in user Downloads (${userDownloads.absolutePath}) after downloading node ${node}")
+					KeywordUtil.markFailed("downloadAndCompareExpectedForTC: no file found in project Downloads (${projectDownloads.absolutePath}) after downloading node ${node}")
 					return
 				}
-				File destFile = new File(downloadsDir, latest.name)
-				try {
-					FileUtils.moveFile(latest, destFile)
-				} catch (Exception e) {
-					KeywordUtil.markFailed("downloadAndCompareExpectedForTC: failed to move file to ${destFile.absolutePath}: " + e.getMessage())
-					return
-				}
-				compareTsvFullContent(expectedPath, destFile.absolutePath)
+				compareTsvFullContent(expectedPath, latest.absolutePath)
 			}
 	}
 
@@ -793,7 +783,7 @@ class DataSubmissions extends TestRunner {
 		List<String> relativePaths = listResult.get(0)
 		List<String> nodes = listResult.get(1)
 		if (relativePaths.isEmpty()) return
-		String baseDir = RunConfiguration.getProjectDir()
+			String baseDir = RunConfiguration.getProjectDir()
 		String folderPath = "InputFiles/CRDC/MetadataData/${tcName}"
 		List<String> absolutePaths = new ArrayList<>()
 		for (int i = 0; i < relativePaths.size(); i++) {
@@ -820,7 +810,7 @@ class DataSubmissions extends TestRunner {
 		List<String> relativePaths = listResult.get(0)
 		List<String> nodes = listResult.get(1)
 		if (relativePaths.isEmpty()) return
-		TestRunner.clickTab('CRDC/DataSubmissions/Validation/DataView-Tab')
+			TestRunner.clickTab('CRDC/DataSubmissions/Validation/DataView-Tab')
 		for (int i = 0; i < relativePaths.size(); i++) {
 			verifyDataViewMatchesMetadata(relativePaths.get(i), nodes.get(i))
 		}
@@ -834,10 +824,10 @@ class DataSubmissions extends TestRunner {
 		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
 		TestRunner.clickTab('CRDC/DataSubmissions/Validate-Btn')
 		//WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
-		KeywordUtil.logInfo("Waiting for Validation to finish - waiting up to 3 minutes")
-		WebUI.waitForElementNotHasAttribute(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 'disabled', 180)
+		KeywordUtil.logInfo("Waiting for Validation to finish - waiting up to 5 minutes")
+		WebUI.waitForElementNotHasAttribute(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 'disabled', 300)
 	}
-	
+
 	/**
 	 * Create a data submission for a specific data model
 	 */
@@ -893,7 +883,7 @@ class DataSubmissions extends TestRunner {
 		String timestamp = new Date().format("yyyyMMdd_HHmmss")
 		String submissionName = "auto-test_" + timestamp
 		KeywordUtil.logInfo("Creating data submission with name " + submissionName)
-		
+
 		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/SubmissionName-Field'))
 		Actions actions = new Actions(DriverFactory.getWebDriver())
 		WebElement el = WebUI.findWebElement(findTestObject('CRDC/DataSubmissions/Create/SubmissionName-Field'), 10)
