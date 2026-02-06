@@ -44,10 +44,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.Keys as Keys
-
-import com.kms.katalon.core.model.FailureHandling
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.poi.ss.usermodel.Cell;
