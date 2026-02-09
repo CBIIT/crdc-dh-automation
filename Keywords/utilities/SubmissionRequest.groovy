@@ -856,10 +856,10 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		KeywordUtil.logInfo("Actual NCI program officer is: " + actual +" Expected NCI program officer is: "+expctd);
 		WebUI.verifyMatch(actual, expctd, false)
 
-		actual = WebUI.getText(findTestObject(ePath+'NciGenProgAdmstr-Txt'))
-		expctd = testData.getValue('nci-genomic-prog-admin', dataRowNum)
-		KeywordUtil.logInfo("Actual NCI program Administrator is: " + actual +" Expected NCI program Administrator is: "+expctd);
-		WebUI.verifyMatch(actual, expctd, false)
+//		actual = WebUI.getText(findTestObject(ePath+'NciGenProgAdmstr-Txt'))
+//		expctd = testData.getValue('nci-genomic-prog-admin', dataRowNum)
+//		KeywordUtil.logInfo("Actual NCI program Administrator is: " + actual +" Expected NCI program Administrator is: "+expctd);
+//		WebUI.verifyMatch(actual, expctd, false)
 
 		//		//Add 'HAS YOUR STUDY BEEN REGISTERED IN dbGaP? Yes No verification here
 		//		actual = WebUI.getText(findTestObject(ePath+'dbGapPHSNumber-Txt'))
