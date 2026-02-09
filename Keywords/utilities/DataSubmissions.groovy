@@ -388,13 +388,32 @@ class DataSubmissions extends TestRunner {
 				if (nodeVal != null && colVal != null) nodeToColumn.put(nodeVal.trim(), colVal.trim())
 			}
 		} catch (Exception e) {
+
+			String testCaseId = RunConfiguration.getExecutionSourceId()
+			String sheetName = "GC" // default
+
+			if (testCaseId != null) {
+				String idUpper = testCaseId.toUpperCase()
+				if (idUpper.contains("GC")) {
+					sheetName = "GC"
+				} else if (idUpper.contains("CTDC")) {
+					sheetName = "CTDC"
+				} else if (idUpper.contains("ICDC")) {
+					sheetName = "ICDC"
+				}else if (idUpper.contains("PSDC")) {
+					sheetName = "PSDC"
+				}
+			}
+
+			KeywordUtil.logInfo("Loading ValidationResults-Mappings from Excel fallback. Sheet: " + sheetName)
+			KeywordUtil.logInfo("Test Case ID: " + testCaseId)
+			
 			// Fallback to Excel if Data File not available
-			KeywordUtil.logInfo("Loading ValidationResults-Mappings from Excel fallback: " + e.getMessage())
 			String path = RunConfiguration.getProjectDir() + "/InputFiles/CRDC/DataSubmissionValidation/DSV_ValidationResults-mappings.xlsx"
 			File f = new File(path)
 			if (f.exists()) {
 				Workbook wb = WorkbookFactory.create(f)
-				Sheet sh = wb.getSheet("GC")
+				Sheet sh = wb.getSheet(sheetName)
 				if (sh != null) {
 					for (Row r : sh) {
 						if (r.getCell(0) != null && r.getCell(1) != null) {
@@ -403,6 +422,8 @@ class DataSubmissions extends TestRunner {
 							if (!nodeVal.isEmpty() && !colVal.isEmpty()) nodeToColumn.put(nodeVal, colVal)
 						}
 					}
+				}else {
+					KeywordUtil.markWarning("Sheet not found: " + sheetName)
 				}
 				wb.close()
 			}
