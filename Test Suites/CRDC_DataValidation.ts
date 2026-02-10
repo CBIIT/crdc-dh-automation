@@ -39,4 +39,46 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC99_CRDC-DataSubmissions-ValidationResults</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>f896094b-f914-4625-9502-19c94b5b9ad7</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC04_CRDC-DataSubmissions-ValidationResults</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>bcfde643-be55-49d6-8eb3-074c5a5a92e5</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC05_CRDC-DataSubmissions-ValidationResults</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>883c723b-a94a-46b8-a71c-34c8db6d05e3</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC06_CRDC-DataSubmissions-ValidationResults</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>7e8d9df5-2dc2-4c08-a314-7a47f527cf7d</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC07_CRDC-DataSubmissions-ValidationResults</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>6495a82a-a5a0-4217-897c-8af4a438f2d5</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC08_CRDC-DataSubmissions-ValidationResults</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>6272d092-61a4-427c-873d-d0909a78dc14</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC09_CRDC-DataSubmissions-ValidationResults</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>
