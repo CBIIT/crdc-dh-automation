@@ -407,7 +407,7 @@ class DataSubmissions extends TestRunner {
 
 			KeywordUtil.logInfo("Loading ValidationResults-Mappings from Excel fallback. Sheet: " + sheetName)
 			KeywordUtil.logInfo("Test Case ID: " + testCaseId)
-			
+
 			// Fallback to Excel if Data File not available
 			String path = RunConfiguration.getProjectDir() + "/InputFiles/CRDC/DataSubmissionValidation/DSV_ValidationResults-mappings.xlsx"
 			File f = new File(path)
@@ -850,12 +850,30 @@ class DataSubmissions extends TestRunner {
 	}
 
 	/**
-	 * Create a data submission for a specific data model
+	 * Creates a Data Submission in the CRDC application based on the
+	 * specified submission type, data type, data model, and study.
+	 *
+	 * @param submiType  Type of submission (e.g., "New", "Update", "Delete")
+	 * @param dataType   Type of data being submitted (e.g., "Metadata Only", "Metadata and Data files")
+	 * @param dataModel  Target data model for the submission (GC, ICDC, CTDC)
+	 * @param study      Study identifier associated with the submission
+	 * 
+	 * Usage Example:
+	 * createDataSubmission("New", "Metadata Only", "GC", "phs002504")
 	 */
 	@Keyword
-	public static void createDataSubmission(String dataModel, String study) {
+	public static void createDataSubmission(String submiType, String dataType, String dataModel, String study) {
+
 		TestRunner.clickTab('CRDC/DataSubmissions/Create/CreateADataSubmission-Btn')
-		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/MetadataOnly-Btn'))
+
+		if (submiType.equalsIgnoreCase("Delete")) {
+			WebUI.click(findTestObject('CRDC/DataSubmissions/Create/SubTypeDelete-Btn'))
+		}
+
+		if(dataType.containsIgnoreCase("only")) {
+			WebUI.click(findTestObject('CRDC/DataSubmissions/Create/MetadataOnly-Btn'))
+		}
+
 		WebUI.delay(5)
 
 		//Select the Data Commons

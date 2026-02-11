@@ -16,3 +16,5 @@ Commons_Automation/Keywords/utilities/
 __pycache__/
 *.pyc
 Downloads/
+Tools/CRDC-CLI/configs/
+Tools/CRDC-CLI/tmp/
