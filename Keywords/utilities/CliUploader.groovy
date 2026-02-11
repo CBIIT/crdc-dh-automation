@@ -135,18 +135,24 @@ class CliUploader {
 		String safeToken = escapeYamlString(token)
 
 		return """Config:
-    api-url: ${apiUrl}
-    token: ${safeToken}
-    submission: ${submissionId}
-    type: data file
-    data: ${dataAbs}
-    manifest: ${manifestAbs}
-${archiveLine}${idFieldLine}    retries: ${retries}
-    overwrite: ${overwrite}
-    dryrun: ${dryrun}
-"""
+               api-url: ${apiUrl}
+               token: ${safeToken}
+               submission: ${submissionId}
+               type: data file
+               data: ${dataAbs}
+               manifest: ${manifestAbs} ${archiveLine}${idFieldLine}    
+               retries: ${retries}
+               overwrite: ${overwrite}
+               dryrun: ${dryrun}
+               """
 	}
 
+	/**
+	 * Converts a file path to an absolute path.
+	 * Returns the original value if null/empty.
+	 * If already absolute, returns as-is.
+	 * If relative, resolves it against the Katalon project directory.
+	 */
 	private static String toAbsolutePath(String path) {
 		if (path == null || path.trim().isEmpty()) return path
 		String p = path.trim()
@@ -161,10 +167,14 @@ ${archiveLine}${idFieldLine}    retries: ${retries}
 		return '"' + s.replace('\\', '\\\\').replace('"', '\\"') + '"'
 	}
 
-	// -------------------------------------------------------------------------
-	// Config file write
-	// -------------------------------------------------------------------------
 
+	/**
+	 * Creates a temporary YAML config file with the provided content.
+	 * The file is written in UTF-8 encoding and marked for deletion on JVM exit.
+	 *
+	 * @param yamlContent  YAML configuration content to write
+	 * @return Temporary File containing the config
+	 */
 	private static File writeConfigFile(String yamlContent) {
 		File tmp = File.createTempFile("crdc-cli-config-", ".yml")
 		tmp.deleteOnExit()
@@ -172,9 +182,12 @@ ${archiveLine}${idFieldLine}    retries: ${retries}
 		return tmp
 	}
 
-	// -------------------------------------------------------------------------
-	// Process execution
-	// -------------------------------------------------------------------------
+	/**
+	 * Executes the CRDC CLI uploader using the provided config file.
+	 * Validates the uploader binary, runs the process, captures combined output,
+	 * waits up to the specified timeout, and returns [exitCode, outputText].
+	 * Fails the test if the binary is missing or the process times out.
+	 */
 
 	private static List<Object> runUploaderProcess(File configFile, File workingDir, long timeoutMinutes) {
 		String osName = System.getProperty("os.name", "").toLowerCase()
@@ -207,7 +220,7 @@ ${archiveLine}${idFieldLine}    retries: ${retries}
 		boolean finished = process.waitFor(timeoutMinutes, TimeUnit.MINUTES)
 		if (!finished) {
 			process.destroyForcibly()
-			KeywordUtil.markFailed("CrdcCliUpload: uploader timed out after " + timeoutMinutes + " minutes. Output: " + outputText)
+			KeywordUtil.markFailed("CliUploader: uploader timed out after " + timeoutMinutes + " minutes. Output: " + outputText)
 			return [-1, outputText]
 		}
 		return [
@@ -216,9 +229,6 @@ ${archiveLine}${idFieldLine}    retries: ${retries}
 		]
 	}
 
-	// -------------------------------------------------------------------------
-	// Public keywords
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Extract submission ID from the current Data Hub upload-activity URL.
