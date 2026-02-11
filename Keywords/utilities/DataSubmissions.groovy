@@ -532,6 +532,30 @@ class DataSubmissions extends TestRunner {
 		return out
 	}
 
+	/** Load unique non-empty submitted identifier values from a TSV column. Returns List<String>. */
+	private List<String> loadSubmittedIdentifiersFromTsv(String tsvPath, String submittedIdentifierColumn) {
+		Set<String> seen = new LinkedHashSet<>()
+		Path path = Paths.get(tsvPath)
+		if (!Files.exists(path)) return new ArrayList<>(seen)
+		List<String> lines = Files.readAllLines(path)
+		if (lines.size() < 2) return new ArrayList<>(seen)
+		String[] headers = lines.get(0).split("\t", -1)
+		int idxId = -1
+		for (int i = 0; i < headers.length; i++) {
+			if (headers[i].trim().equalsIgnoreCase(submittedIdentifierColumn)) {
+				idxId = i
+				break
+			}
+		}
+		if (idxId < 0) return new ArrayList<>(seen)
+		for (int i = 1; i < lines.size(); i++) {
+			String[] cells = lines.get(i).split("\t", -1)
+			String id = idxId < cells.length ? cells[idxId].trim() : ""
+			if (!id.isEmpty()) seen.add(id)
+		}
+		return new ArrayList<>(seen)
+	}
+
 	/** If the cell's visible text is this many characters or less, we use it as-is and skip DOM lookups for full value (truncated-text-wrapper / span). */
 	private static final int TRUNCATED_CHECK_THRESHOLD = 15
 
@@ -947,5 +971,81 @@ class DataSubmissions extends TestRunner {
 		//Create
 		TestRunner.clickTab('CRDC/DataSubmissions/Create/Create-Btn')
 		WebUI.delay(1)
+	}
+
+	/**
+	 * Verify records in MongoDB for each node from the given test case.
+	 * Gets submissionID from CliUploader.getSubmissionIdFromUploadActivityUrl(), derives nodes from
+	 * listTsvFilesAndNodesForTC(tcName), uses loadValidationResultsMappings to get the submitted-identifier
+	 * column per node, reads metadata TSV to extract submitted IDs, then queries MongoDB for each
+	 * (submissionID, nodeID) where nodeID is the Submitted Identifier value.
+	 * @param tcName Test case name (e.g. TC09) - used to derive nodes and metadata paths from InputFiles/CRDC/MetadataData/&lt;tcName&gt;/
+	 * @param queryKey Query key in DBQueries data file (e.g. "released")
+	 * @param expectedStatus Expected value for the "status" field (e.g. "Deleted")
+	 */
+	@Keyword
+	void verifyRecordsInMongo(String tcName, String queryKey, String expectedStatus) {
+		// Get submission ID from Upload Activity URL
+		String submissionID = DataSubmissions.getSubmissionIdFromUploadActivityUrl()
+		if (submissionID == null || submissionID.isEmpty()) {
+			KeywordUtil.markFailed("verifyRecordsInMongo: Could not get submissionID from Upload Activity URL.")
+			return
+		}
+		// Get metadata TSV paths and node names for this test case
+		List<List<String>> listResult = listTsvFilesAndNodesForTC(tcName)
+		List<String> relativePaths = listResult.get(0)
+		List<String> nodes = listResult.get(1)
+		if (nodes.isEmpty()) {
+			KeywordUtil.markFailed("verifyRecordsInMongo: No nodes found for tcName '${tcName}'.")
+			return
+		}
+		// Load node -> submitted-identifier column mapping from ValidationResults-Mappings
+		Map<String, String> mappings = loadValidationResultsMappings()
+		String baseDir = RunConfiguration.getProjectDir()
+		// Connect to MongoDB
+		DatabaseUtils.connectFromGlobalVariable()
+		List<String> errors = new ArrayList<>()
+		String sectionName = "MongoDB"
+		try {
+			for (int i = 0; i < nodes.size(); i++) {
+				String node = nodes.get(i)
+				String relativePath = relativePaths.get(i)
+				// Resolve submitted-identifier column for this node
+				String submittedIdColumn = mappings.get(node)
+				if (submittedIdColumn == null || submittedIdColumn.isEmpty()) {
+					KeywordUtil.logInfo("[WARNING] verifyRecordsInMongo: no mapping for node '${node}' in ValidationResults-Mappings; skipping.")
+					continue
+				}
+				// Read metadata TSV and extract unique submitted identifier values
+				String tsvPath = new File(baseDir, relativePath).absolutePath
+				List<String> submittedIds = loadSubmittedIdentifiersFromTsv(tsvPath, submittedIdColumn)
+				if (submittedIds.isEmpty()) {
+					KeywordUtil.logInfo("[WARNING] verifyRecordsInMongo: no submitted identifiers for node '${node}' in ${relativePath}; skipping.")
+					continue
+				}
+				// For each submitted ID, query MongoDB, verify record, and log to ValidationReport
+				for (String submittedId : submittedIds) {
+					Map params = [status: expectedStatus, submissionID: submissionID, nodeID: submittedId]
+					def doc = DatabaseUtils.findRecordFromDataFile(
+						"Data Files/CRDC/DataSubmissions/DBQueries", queryKey, params)
+					String actualStatus = doc != null ? doc.get("status")?.toString() : null
+					boolean recordOk = doc != null
+					boolean statusOk = expectedStatus.equals(actualStatus)
+					String status = (recordOk && statusOk) ? "Pass" : "Fail"
+					String actualDisplay = actualStatus != null ? actualStatus : "(not found)"
+					ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + submittedId, expectedStatus, actualDisplay, status)
+					if (status == "Fail") {
+						errors.add("Submitted ID '${submittedId}': expected status '${expectedStatus}', actual '${actualDisplay}'")
+					}
+				}
+			}
+		} finally {
+			DatabaseUtils.close()
+		}
+		if (!errors.isEmpty()) {
+			KeywordUtil.logInfo("--- MongoDB verification - " + errors.size() + " mismatch(es) ---")
+			for (String err : errors) KeywordUtil.logInfo(err)
+			KeywordUtil.markFailed("verifyRecordsInMongo: " + errors.size() + " record(s) failed. See ValidationReport and log above.")
+		}
 	}
 }
