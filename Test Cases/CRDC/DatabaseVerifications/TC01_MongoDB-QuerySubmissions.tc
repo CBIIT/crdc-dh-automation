@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
-   <description>POC: Connect to MongoDB, query submissions collection for names matching auto-test, log count and sample.</description>
+   <description>Query MongoDB using query from data file (key 'released'), verify record returned. Connection from profile; params in script.</description>
    <name>TC01_MongoDB-QuerySubmissions</name>
    <tag>MongoDB</tag>
    <comment>Substitute connectionUri and databaseName (and credentials in URI) before running.</comment>
