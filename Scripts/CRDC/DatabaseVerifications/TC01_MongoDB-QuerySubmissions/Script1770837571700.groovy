@@ -20,3 +20,6 @@ def doc = CustomKeywords.'utilities.DatabaseUtils.findRecordFromDataFile'(
 CustomKeywords.'utilities.DatabaseUtils.verifyRecordReturned'(doc)
 
 CustomKeywords.'utilities.DatabaseUtils.close'()
+
+// After create, upload, validate, release & complete, then validate in Mongo, for example:
+// CustomKeywords.'utilities.DataSubmissions.verifyRecordsInMongo'('TC09', 'released', 'Deleted')

@@ -178,6 +178,32 @@ public class DatabaseUtils {
 	}
 
 	/**
+	 * Verify that a document has a field with the expected value. Fails the test if missing or different.
+	 * @param doc Document from findOne or findRecordFromDataFile
+	 * @param fieldName Field name (e.g. "status")
+	 * @param expectedValue Expected value (e.g. "Deleted")
+	 */
+	@Keyword
+	public static void verifyRecordFieldValue(Document doc, String fieldName, Object expectedValue) {
+		if (doc == null) {
+			KeywordUtil.markFailed("Cannot verify field '${fieldName}': document is null.")
+			return
+		}
+		Object actual = doc.get(fieldName)
+		boolean actualNull = (actual == null)
+		boolean expectedNull = (expectedValue == null)
+		if (actualNull && !expectedNull) {
+			KeywordUtil.markFailed("Field '${fieldName}' missing or null. Expected: ${expectedValue}")
+		} else if (!actualNull && expectedNull) {
+			KeywordUtil.markFailed("Field '${fieldName}' expected null but got: ${actual}")
+		} else if (!actualNull && !expectedNull && !actual.toString().equals(expectedValue.toString())) {
+			KeywordUtil.markFailed("Field '${fieldName}' mismatch. Expected: ${expectedValue}, Actual: ${actual}")
+		} else {
+			KeywordUtil.markPassed("Field '${fieldName}' verified: ${expectedValue}")
+		}
+	}
+
+	/**
 	 * Verify that at least one record was returned. Fails the test if null or empty.
 	 * @param doc Document from findOne (or findRecordFromDataFile)
 	 */

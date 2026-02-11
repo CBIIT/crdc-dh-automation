@@ -407,7 +407,7 @@ class DataSubmissions extends TestRunner {
 
 			KeywordUtil.logInfo("Loading ValidationResults-Mappings from Excel fallback. Sheet: " + sheetName)
 			KeywordUtil.logInfo("Test Case ID: " + testCaseId)
-			
+
 			// Fallback to Excel if Data File not available
 			String path = RunConfiguration.getProjectDir() + "/InputFiles/CRDC/DataSubmissionValidation/DSV_ValidationResults-mappings.xlsx"
 			File f = new File(path)
@@ -913,5 +913,41 @@ class DataSubmissions extends TestRunner {
 		//Create
 		TestRunner.clickTab('CRDC/DataSubmissions/Create/Create-Btn')
 		WebUI.delay(1)
+	}
+
+	/**
+	 * Verify records in MongoDB for each node from the given test case.
+	 * Gets submissionID from CliUploader.getSubmissionIdFromUploadActivityUrl(), derives nodes from
+	 * listTsvFilesAndNodesForTC(tcName), connects to MongoDB, queries each record, verifies it exists
+	 * and has the expected field value, then closes.
+	 * @param tcName Test case name (e.g. TC09) - used to derive node IDs from InputFiles/CRDC/MetadataData/&lt;tcName&gt;/
+	 * @param queryKey Query key in DBQueries data file (e.g. "released")
+	 * @param expectedStatus Expected value for the "status" field (e.g. "Deleted")
+	 */
+	@Keyword
+	void verifyRecordsInMongo(String tcName, String queryKey, String expectedStatus) {
+		String submissionID = CliUploader.getSubmissionIdFromUploadActivityUrl()
+		if (submissionID == null || submissionID.isEmpty()) {
+			KeywordUtil.markFailed("verifyRecordsInMongo: Could not get submissionID from Upload Activity URL.")
+			return
+		}
+		List<List<String>> listResult = listTsvFilesAndNodesForTC(tcName)
+		List<String> nodes = listResult.get(1)
+		if (nodes.isEmpty()) {
+			KeywordUtil.markFailed("verifyRecordsInMongo: No nodes found for tcName '${tcName}'.")
+			return
+		}
+		DatabaseUtils.connectFromGlobalVariable()
+		try {
+			for (String nodeID : nodes) {
+				Map params = [status: expectedStatus, submissionID: submissionID, nodeID: nodeID]
+				def doc = DatabaseUtils.findRecordFromDataFile(
+					"Data Files/CRDC/DataSubmissions/DBQueries", queryKey, params)
+				DatabaseUtils.verifyRecordReturned(doc)
+				DatabaseUtils.verifyRecordFieldValue(doc, "status", expectedStatus)
+			}
+		} finally {
+			DatabaseUtils.close()
+		}
 	}
 }
