@@ -44,7 +44,7 @@ class CliUploader {
 	}
 
 	private static String getSubmissionId() {
-		return getSubmissionIdFromUploadActivityUrl();
+		return DataSubmissions.getSubmissionIdFromUploadActivityUrl();
 	}
 
 	private static String getDataFilesPath(String testName) {
@@ -418,22 +418,6 @@ class CliUploader {
 			return
 		}
 		KeywordUtil.logInfo("CliUploader: Upload report verified: " + dataRows + " row(s), all succeeded=true in " + latest.getName())
-	}
-
-	/**
-	 * Extract submission ID from the current Data Hub upload-activity URL.
-	 * Use this when you want to set CRDC_SUBMISSION_ID from the browser URL (e.g. in a script).
-	 *
-	 * @param url full URL (e.g. WebUI.getUrl())
-	 * @return submission ID (UUID string) or null if not found
-	 */
-	@Keyword
-	static String getSubmissionIdFromUploadActivityUrl() {
-		String url = WebUI.getUrl()
-		if (url == null || WebUI.getUrl().trim().isEmpty()) return null
-		java.util.regex.Pattern p = ~/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
-		java.util.regex.Matcher m = p.matcher(url)
-		return m.find() ? m.group(0) : null
 	}
 
 	/**

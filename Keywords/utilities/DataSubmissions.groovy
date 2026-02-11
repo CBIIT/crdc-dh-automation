@@ -48,6 +48,22 @@ class DataSubmissions extends TestRunner {
 		if (tab == "DataView") return "Data View"
 		return tab
 	}
+	
+	/**
+	 * Extract submission ID from the current Data Hub upload-activity URL.
+	 * Use this when you want to set CRDC_SUBMISSION_ID from the browser URL (e.g. in a script).
+	 *
+	 * @param url full URL (e.g. WebUI.getUrl())
+	 * @return submission ID (UUID string) or null if not found
+	 */
+	@Keyword
+	static String getSubmissionIdFromUploadActivityUrl() {
+		String url = WebUI.getUrl()
+		if (url == null || WebUI.getUrl().trim().isEmpty()) return null
+		java.util.regex.Pattern p = ~/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
+		java.util.regex.Matcher m = p.matcher(url)
+		return m.find() ? m.group(0) : null
+	}
 
 	/**
 	 * This function verifies the headers of the data submission dashboard's tabs: Upload Activities, Validation Results, Data View.
