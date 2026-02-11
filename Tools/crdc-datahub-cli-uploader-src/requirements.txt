@@ -3,5 +3,6 @@ boto3
 requests
 requests_aws4auth
 rich
-pandas
+numpy>=1.21,<1.24
+pandas==1.5.3
 pytest
