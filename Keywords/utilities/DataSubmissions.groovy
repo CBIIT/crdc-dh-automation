@@ -870,7 +870,7 @@ class DataSubmissions extends TestRunner {
 			WebUI.click(findTestObject('CRDC/DataSubmissions/Create/SubTypeDelete-Btn'))
 		}
 
-		if(dataType.containsIgnoreCase("only")) {
+		if(dataType?.toLowerCase()?.contains("only")) {
 			WebUI.click(findTestObject('CRDC/DataSubmissions/Create/MetadataOnly-Btn'))
 		}
 
