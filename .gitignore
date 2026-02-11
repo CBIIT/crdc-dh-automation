@@ -16,3 +16,6 @@ Commons_Automation/Keywords/utilities/
 __pycache__/
 *.pyc
 Downloads/
+# CRDC CLI (binary or source): ignore runtime configs and uploader output
+Tools/crdc-datahub-cli-uploader-src/configs/
+Tools/crdc-datahub-cli-uploader-src/tmp/

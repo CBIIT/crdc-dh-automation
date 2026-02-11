@@ -1,0 +1,6 @@
+type	consent_group_id	consent_group_name	consent_group_number	 study.study_id	status
+consent_group	consent_1	gp name1	10	phs769076	Warning
+consent_group	consent_2	gp name2	3	phs769076	Warning
+consent_group	consent_3	gp name3	2	phs769076	Warning
+consent_group	consent_4	gp name4	11	phs769076	Warning
+consent_group	consent_5	gp name5	12	phs769076	Warning
