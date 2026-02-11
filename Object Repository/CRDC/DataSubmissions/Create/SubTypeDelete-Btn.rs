@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubTypeDelete-Btn</name>
+   <tag></tag>
+   <elementGuidId>72105ad9-9ce5-4834-9c52-bc6ea83c64a0</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;create-data-submission-dialog-submission-type-Delete-radio-button&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;create-data-submission-dialog-submission-type-Delete-radio-button&quot;]</value>
+      <webElementGuid>9ade0ab3-cedd-4f71-abdf-495e582b69a7</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
