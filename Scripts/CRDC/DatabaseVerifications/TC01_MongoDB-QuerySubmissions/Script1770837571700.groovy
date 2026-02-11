@@ -7,7 +7,7 @@ CustomKeywords.'utilities.DatabaseUtils.connectFromGlobalVariable'()
 
 // POC test
 
-// Substitute with actual values for your test
+// Substitute with actual values for your test -- below values are for QA environment
 Map params = [
 	status       : "Deleted",
 	submissionID : "79cca77d-f313-4ab5-9f02-eb259f12d43e",
