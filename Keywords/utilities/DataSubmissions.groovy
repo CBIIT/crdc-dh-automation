@@ -970,6 +970,8 @@ class DataSubmissions extends TestRunner {
 		String baseDir = RunConfiguration.getProjectDir()
 		// Connect to MongoDB
 		DatabaseUtils.connectFromGlobalVariable()
+		List<String> errors = new ArrayList<>()
+		String sectionName = "MongoDB"
 		try {
 			for (int i = 0; i < nodes.size(); i++) {
 				String node = nodes.get(i)
@@ -987,17 +989,29 @@ class DataSubmissions extends TestRunner {
 					KeywordUtil.logInfo("[WARNING] verifyRecordsInMongo: no submitted identifiers for node '${node}' in ${relativePath}; skipping.")
 					continue
 				}
-				// For each submitted ID, query MongoDB and verify record
+				// For each submitted ID, query MongoDB, verify record, and log to ValidationReport
 				for (String submittedId : submittedIds) {
 					Map params = [status: expectedStatus, submissionID: submissionID, nodeID: submittedId]
 					def doc = DatabaseUtils.findRecordFromDataFile(
 						"Data Files/CRDC/DataSubmissions/DBQueries", queryKey, params)
-					DatabaseUtils.verifyRecordReturned(doc)
-					DatabaseUtils.verifyRecordFieldValue(doc, "status", expectedStatus)
+					String actualStatus = doc != null ? doc.get("status")?.toString() : null
+					boolean recordOk = doc != null
+					boolean statusOk = expectedStatus.equals(actualStatus)
+					String status = (recordOk && statusOk) ? "Pass" : "Fail"
+					String actualDisplay = actualStatus != null ? actualStatus : "(not found)"
+					ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + submittedId, expectedStatus, actualDisplay, status)
+					if (status == "Fail") {
+						errors.add("Submitted ID '${submittedId}': expected status '${expectedStatus}', actual '${actualDisplay}'")
+					}
 				}
 			}
 		} finally {
 			DatabaseUtils.close()
+		}
+		if (!errors.isEmpty()) {
+			KeywordUtil.logInfo("--- MongoDB verification - " + errors.size() + " mismatch(es) ---")
+			for (String err : errors) KeywordUtil.logInfo(err)
+			KeywordUtil.markFailed("verifyRecordsInMongo: " + errors.size() + " record(s) failed. See ValidationReport and log above.")
 		}
 	}
 }
