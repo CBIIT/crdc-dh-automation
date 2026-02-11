@@ -206,8 +206,11 @@ class CliUploader {
 		KeywordUtil.logInfo("CliUploader: installing CLI dependencies from " + reqFile.getAbsolutePath() + " ...")
 		List<String> pipCmd = [
 			pythonExe,
-			"-m", "pip", "install",
-			"-r", reqFile.getAbsolutePath(),
+			"-m",
+			"pip",
+			"install",
+			"-r",
+			reqFile.getAbsolutePath(),
 			"--quiet"
 		]
 		ProcessBuilder pb = new ProcessBuilder(pipCmd)
