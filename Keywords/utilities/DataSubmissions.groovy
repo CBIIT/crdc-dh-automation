@@ -952,7 +952,7 @@ class DataSubmissions extends TestRunner {
 	@Keyword
 	void verifyRecordsInMongo(String tcName, String queryKey, String expectedStatus) {
 		// Get submission ID from Upload Activity URL
-		String submissionID = CliUploader.getSubmissionIdFromUploadActivityUrl()
+		String submissionID = DataSubmissions.getSubmissionIdFromUploadActivityUrl()
 		if (submissionID == null || submissionID.isEmpty()) {
 			KeywordUtil.markFailed("verifyRecordsInMongo: Could not get submissionID from Upload Activity URL.")
 			return
