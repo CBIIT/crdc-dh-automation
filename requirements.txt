@@ -1,3 +1,10 @@
 openpyxl
 xlsxwriter
 pyotp
+pyyaml
+boto3
+requests
+requests_aws4auth
+rich
+pandas
+pytest
