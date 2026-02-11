@@ -52,4 +52,6 @@ CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC11')
 
 CustomKeywords.'utilities.CliUploader.uploadDataFiles'('TC11')
 
-//WebUI.closeBrowser()
+WebUI.delay(5)
+
+WebUI.closeBrowser()

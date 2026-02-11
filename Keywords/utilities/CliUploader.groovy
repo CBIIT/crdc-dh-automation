@@ -5,6 +5,7 @@ import com.kms.katalon.core.configuration.RunConfiguration
 import com.kms.katalon.core.util.KeywordUtil
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import internal.GlobalVariable
+import java.io.FileFilter
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.concurrent.TimeUnit
@@ -229,6 +230,101 @@ class CliUploader {
 		]
 	}
 
+	/**
+	 * Verifies the CLI output string contains expected success indicators.
+	 * Fails the test if any required pattern is missing.
+	 */
+	private static void verifyCliUploadOutput(String output) {
+		if (output == null || output.isEmpty()) {
+			KeywordUtil.markFailed("CliUploader: CLI output is empty; cannot verify.")
+			return
+		}
+		List<String> errors = []
+		if (!output.contains("Files failed: 0")) {
+			errors.add("CLI output does not contain 'Files failed: 0'")
+		}
+		if (!output.contains("File uploading completed!")) {
+			errors.add("CLI output does not contain 'File uploading completed!'")
+		}
+		if (!output.contains("Files processed:")) {
+			errors.add("CLI output does not contain 'Files processed:'")
+		}
+		if (!output.contains("Files copied:")) {
+			errors.add("CLI output does not contain 'Files copied:'")
+		}
+		// Optional: ensure validation completed for all files (e.g. "5 out of 5 file(s) have been validated")
+		if (output.contains("out of") && output.contains("file(s) have been validated")) {
+			java.util.regex.Matcher m = (output =~ /(\d+) out of (\d+) file\(s\) have been validated/)
+			boolean lastMatchEqual = false
+			while (m.find()) {
+				int x = Integer.parseInt(m.group(1))
+				int y = Integer.parseInt(m.group(2))
+				if (x == y) lastMatchEqual = true
+			}
+			if (!lastMatchEqual) {
+				errors.add("CLI output did not show all files validated (X out of Y with X < Y in last line)")
+			}
+		}
+		if (!errors.isEmpty()) {
+			KeywordUtil.logInfo("CliUploader verification failed:\n" + output)
+			KeywordUtil.markFailed("CliUploader: CLI log verification failed: " + errors.join("; "))
+		} else {
+			KeywordUtil.logInfo("CliUploader: CLI output verification passed (Files failed: 0, File uploading completed!, Files processed/copied present).")
+		}
+	}
+
+	/**
+	 * Finds the latest upload-report-*.tsv in cliDir/tmp and verifies all rows have succeeded=true.
+	 * If output contains "Files processed: N", also verifies the report has N data rows.
+	 */
+	private static void verifyCliUploadReport(File cliDir, String output) {
+		File tmpDir = new File(cliDir, "tmp")
+		if (!tmpDir.exists() || !tmpDir.isDirectory()) {
+			KeywordUtil.logInfo("CliUploader: tmp folder not found; skipping upload report verification.")
+			return
+		}
+		File[] reports = tmpDir.listFiles({ File f -> f.isFile() && f.name.startsWith("upload-report-") && f.name.endsWith(".tsv") } as FileFilter)
+		if (reports == null || reports.length == 0) {
+			KeywordUtil.markFailed("CliUploader: No upload-report-*.tsv found in " + tmpDir.getAbsolutePath())
+			return
+		}
+		File latest = reports.toList().sort { -it.lastModified() }.get(0)
+		List<String> lines = Files.readAllLines(latest.toPath(), StandardCharsets.UTF_8)
+		if (lines.size() < 2) {
+			KeywordUtil.markFailed("CliUploader: Upload report has no data rows: " + latest.getAbsolutePath())
+			return
+		}
+		String header = lines.get(0)
+		int succeededIdx = header.split("\t", -1).findIndexOf { it.equalsIgnoreCase("succeeded") }
+		if (succeededIdx < 0) {
+			KeywordUtil.logInfo("CliUploader: Report has no 'succeeded' column; skipping row-level verification.")
+			return
+		}
+		int expectedCount = -1
+		java.util.regex.Matcher m = (output =~ /Files processed:\s*(\d+)/)
+		if (m.find()) {
+			expectedCount = Integer.parseInt(m.group(1))
+		}
+		int dataRows = lines.size() - 1
+		if (expectedCount >= 0 && dataRows != expectedCount) {
+			KeywordUtil.markFailed("CliUploader: Upload report row count " + dataRows + " does not match Files processed: " + expectedCount + " in " + latest.getName())
+			return
+		}
+		List<String> failed = []
+		for (int i = 1; i < lines.size(); i++) {
+			String[] cols = lines.get(i).split("\t", -1)
+			String val = succeededIdx < cols.length ? cols[succeededIdx].trim() : ""
+			if (!"true".equalsIgnoreCase(val)) {
+				String fileName = cols.length > 1 ? cols[1] : "row " + (i + 1)
+				failed.add(fileName + " (succeeded=" + val + ")")
+			}
+		}
+		if (!failed.isEmpty()) {
+			KeywordUtil.markFailed("CliUploader: Upload report has failed/skipped rows: " + failed.join(", "))
+			return
+		}
+		KeywordUtil.logInfo("CliUploader: Upload report verified: " + dataRows + " row(s), all succeeded=true in " + latest.getName())
+	}
 
 	/**
 	 * Extract submission ID from the current Data Hub upload-activity URL.
@@ -320,6 +416,8 @@ class CliUploader {
 				KeywordUtil.markFailed("CrdcCliUpload: data file upload failed (exit code " + exitCode + "). See log for output.")
 				return
 			}
+			verifyCliUploadOutput(output)
+			verifyCliUploadReport(cliDir, output)
 			WebUI.refresh()
 			KeywordUtil.logInfo("CrdcCliUpload: data file upload completed successfully.\n" + output)
 		} finally {
