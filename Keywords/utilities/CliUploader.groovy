@@ -12,24 +12,27 @@ import java.util.concurrent.TimeUnit
 
 /**
  * CRDC Data Hub CLI Uploader integration for Katalon.
- * Self-contained: builds config, runs the uploader binary, parses submission ID from URL.
- * Does not modify any existing keyword files.
+ * Builds YAML config from profile (API URL and token from GlobalVariable.ApiUrl / SubmitterApiToken),
+ * runs either the uploader binary or the Python source (src/uploader.py), and verifies output and report.
  *
- * All inputs (submission ID, data folder, manifest path, token, etc.) are read from the
- * Katalon execution profile. Update profile variables as needed; no parameters required.
+ * CLI location: By default uses Tools/crdc-datahub-cli-uploader-src (Python source). If a binary
+ * (uploader or uploader.exe) is present there, it is used; otherwise runs python3 src/uploader.py.
+ * Override via profile variable CRDC_CLI_DIR if needed.
  *
- * Profile variables (add/update in Katalon execution profile):
- *   Required:
- *   - CRDC_API_TOKEN
- *   - CRDC_API_URL
- *   - CRDC_SUBMISSION_ID
- *   - CRDC_DATA_FOLDER_PATH
- *   - CRDC_MANIFEST_PATH 
+ * Required profile/GlobalVariable: ApiUrl, SubmitterApiToken. Submission ID is taken from the
+ * current Data Hub upload-activity URL. Data and manifest paths are derived from test case name.
  */
 class CliUploader {
 
-	private static final String DEFAULT_CLI_SUBDIR = "Tools/CRDC-CLI"
+	/** Default CLI root: Python source tree (Tools/crdc-datahub-cli-uploader-src). Binary is optional. */
+	private static final String DEFAULT_CLI_SUBDIR = "Tools/crdc-datahub-cli-uploader-src"
 	private static final long DEFAULT_TIMEOUT_MINUTES = 30L
+
+	/** Relative path to Python entry point when using source. */
+	private static final String UPLOADER_SCRIPT_PATH = "src/uploader.py"
+
+	/** Max time (minutes) to wait for pip install of CLI dependencies when using Python source. */
+	private static final long PIP_INSTALL_TIMEOUT_MINUTES = 3L
 
 
 	private static String getApiToken() {
@@ -56,7 +59,10 @@ class CliUploader {
 		return safeGlobal("CRDC_ARCHIVE_MANIFEST_PATH", null)?.toString()?.trim()
 	}
 
-	/** Get CLI root directory (contains uploader binary). Default: projectDir/Tools/CRDC-CLI */
+	/**
+	 * Resolves CLI root directory (binary or Python source). Used as process working directory.
+	 * Default: projectDir/Tools/crdc-datahub-cli-uploader-src. Override with profile CRDC_CLI_DIR.
+	 */
 	private static File getCliDir() {
 		String dir = safeGlobal("CRDC_CLI_DIR", null)?.toString()?.trim()
 		if (dir != null && !dir.isEmpty()) {
@@ -184,28 +190,79 @@ class CliUploader {
 	}
 
 	/**
-	 * Executes the CRDC CLI uploader using the provided config file.
-	 * Validates the uploader binary, runs the process, captures combined output,
-	 * waits up to the specified timeout, and returns [exitCode, outputText].
-	 * Fails the test if the binary is missing or the process times out.
+	 * Installs CLI Python dependencies from requirements.txt in cliRoot using the given Python executable.
+	 * Called automatically when running from Python source so that rich, pyyaml, boto3, etc. are available.
+	 *
+	 * @param cliRoot   CLI root directory (must contain requirements.txt).
+	 * @param pythonExe Path to python or python3 executable.
+	 * @return true if install succeeded or requirements.txt is missing; false if pip install failed.
 	 */
+	private static boolean ensureCliDependenciesInstalled(File cliRoot, String pythonExe) {
+		File reqFile = new File(cliRoot, "requirements.txt")
+		if (!reqFile.exists() || !reqFile.isFile()) {
+			KeywordUtil.logInfo("CliUploader: no requirements.txt in CLI root; skipping dependency install.")
+			return true
+		}
+		KeywordUtil.logInfo("CliUploader: installing CLI dependencies from " + reqFile.getAbsolutePath() + " ...")
+		List<String> pipCmd = [
+			pythonExe,
+			"-m", "pip", "install",
+			"-r", reqFile.getAbsolutePath(),
+			"--quiet"
+		]
+		ProcessBuilder pb = new ProcessBuilder(pipCmd)
+		pb.directory(cliRoot)
+		pb.redirectErrorStream(true)
+		Process process = pb.start()
+		StringBuilder sb = new StringBuilder()
+		byte[] buf = new byte[4096]
+		int n
+		InputStream stream = process.getInputStream()
+		while ((n = stream.read(buf)) != -1) {
+			sb.append(new String(buf, 0, n, StandardCharsets.UTF_8))
+		}
+		boolean finished = process.waitFor(PIP_INSTALL_TIMEOUT_MINUTES, TimeUnit.MINUTES)
+		String output = sb.toString()
+		if (!finished) {
+			process.destroyForcibly()
+			KeywordUtil.markFailed("CliUploader: pip install timed out after " + PIP_INSTALL_TIMEOUT_MINUTES + " minutes. Output: " + output)
+			return false
+		}
+		if (process.exitValue() != 0) {
+			KeywordUtil.markFailed("CliUploader: pip install failed (exit " + process.exitValue() + "). Output: " + output)
+			return false
+		}
+		KeywordUtil.logInfo("CliUploader: CLI dependencies installed successfully.")
+		return true
+	}
 
+	/**
+	 * Resolves the uploader command and runs it. Prefers binary (uploader/uploader.exe) if present
+	 * and executable; otherwise runs Python source (src/uploader.py) using Utils.getPythonExecutablePath().
+	 * Working directory is always cliDir so that tmp/upload-report-*.tsv is created under cliDir.
+	 *
+	 * @param configFile      Temporary YAML config file (absolute path).
+	 * @param workingDir      CLI root directory (must contain binary or src/uploader.py).
+	 * @param timeoutMinutes  Max wait for process completion.
+	 * @return [exitCode, outputText]; exitCode -1 on failure to start or timeout.
+	 */
 	private static List<Object> runUploaderProcess(File configFile, File workingDir, long timeoutMinutes) {
-		String osName = System.getProperty("os.name", "").toLowerCase()
-		String exeName = osName.contains("windows") ? "uploader.exe" : "uploader"
-		File exe = new File(workingDir, exeName)
-		if (!exe.exists() || !exe.canExecute()) {
-			KeywordUtil.markFailed("CrdcCliUpload: uploader binary not found or not executable: " + exe.getAbsolutePath())
+		File cliRoot = workingDir.getAbsoluteFile()
+		List<String> command = resolveUploaderCommand(cliRoot, configFile)
+		if (command == null || command.isEmpty()) {
 			return [-1, ""]
 		}
 
-		List<String> command = [
-			exe.getAbsolutePath(),
-			"--config",
-			configFile.getAbsolutePath()
-		]
+		// When using Python source, ensure CLI dependencies are installed before running.
+		if (command.size() >= 2 && UPLOADER_SCRIPT_PATH.equals(command.get(1))) {
+			String pythonExe = command.get(0)
+			if (!ensureCliDependenciesInstalled(cliRoot, pythonExe)) {
+				return [-1, ""]
+			}
+		}
+
 		ProcessBuilder pb = new ProcessBuilder(command)
-		pb.directory(workingDir)
+		pb.directory(cliRoot)
 		pb.redirectErrorStream(true)
 		Process process = pb.start()
 
@@ -228,6 +285,40 @@ class CliUploader {
 			process.exitValue(),
 			outputText
 		]
+	}
+
+	/**
+	 * Builds the command list to run the uploader: either binary (uploader/uploader.exe) or
+	 * Python source (pythonExe src/uploader.py --config &lt;path&gt;). Fails the test and returns null if neither is available.
+	 */
+	private static List<String> resolveUploaderCommand(File cliRoot, File configFile) {
+		String osName = System.getProperty("os.name", "").toLowerCase()
+		String exeName = osName.contains("windows") ? "uploader.exe" : "uploader"
+		File binary = new File(cliRoot, exeName)
+
+		if (binary.exists() && binary.canExecute()) {
+			KeywordUtil.logInfo("CliUploader: using binary " + binary.getAbsolutePath())
+			return [
+				binary.getAbsolutePath(),
+				"--config",
+				configFile.getAbsolutePath()
+			]
+		}
+
+		File script = new File(cliRoot, UPLOADER_SCRIPT_PATH)
+		if (script.exists() && script.isFile()) {
+			String pythonExe = Utils.getPythonExecutablePath()
+			KeywordUtil.logInfo("CliUploader: using Python source " + script.getAbsolutePath() + " with " + pythonExe)
+			return [
+				pythonExe,
+				UPLOADER_SCRIPT_PATH,
+				"--config",
+				configFile.getAbsolutePath()
+			]
+		}
+
+		KeywordUtil.markFailed("CliUploader: neither uploader binary (" + binary.getAbsolutePath() + ") nor Python script (" + script.getAbsolutePath() + ") found. Ensure CLI is at " + cliRoot.getAbsolutePath())
+		return null
 	}
 
 	/**
@@ -343,9 +434,9 @@ class CliUploader {
 	}
 
 	/**
-	 * Upload data files to CRDC Data Hub using the CLI.
-	 * All values are read from the execution profile (no parameters).
-	 * Set in profile: CRDC_API_TOKEN, CRDC_API_URL, CRDC_SUBMISSION_ID, CRDC_DATA_FOLDER_PATH, CRDC_MANIFEST_PATH.
+	 * Upload data files to CRDC Data Hub using the CLI (binary or Python source under Tools/crdc-datahub-cli-uploader-src).
+	 * Uses GlobalVariable.ApiUrl and GlobalVariable.SubmitterApiToken; submission ID from current upload-activity URL;
+	 * data and manifest paths derived from test case name. No extra profile variables required if defaults are used.
 	 */
 	@Keyword
 	static void uploadDataFiles(String testCaseName) {
@@ -372,7 +463,7 @@ class CliUploader {
 			return
 		}
 		if (manifestPath == null || manifestPath.isEmpty()) {
-			KeywordUtil.markFailed("CCliUploader: CRDC_MANIFEST_PATH is not set in getManifestPath().")
+			KeywordUtil.markFailed("CliUploader: CRDC_MANIFEST_PATH is not set in getManifestPath().")
 			return
 		}
 
