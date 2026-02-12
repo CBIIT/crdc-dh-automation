@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Download-Btn-DataViewTooltip</name>
+   <tag></tag>
+   <elementGuidId>a00ec58a-1f83-4215-becc-d957ccd23605</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//span[@data-testid='export-node-data-tooltip']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//span[@data-testid='export-node-data-tooltip']</value>
+      <webElementGuid>b09556b5-af48-4e59-8b0c-6968ea013929</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
