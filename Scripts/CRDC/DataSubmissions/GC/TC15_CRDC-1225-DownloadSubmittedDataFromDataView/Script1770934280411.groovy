@@ -43,27 +43,27 @@ CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
 WebUI.delay(2)
 
 //Create DS
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
 CustomKeywords.'utilities.Pbac.createDataSubmission'()
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 //Click Data View tab
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/Validation/DataView-Tab')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Validation/DataView-Tab')
 
 //In the Data View tab, an Export button will be present, along with pagination controls above the table. The Export button will be on the right of the pagination controls - at the top and bottom of the table.
-CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('Object Repository/CRDC/General/Pagination-Toolbar'), 10)
-CustomKeywords.'utilities.WebUIUtils.verifyElementCount'(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/Download-Btn'), 2, 10)
+CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('Object Repository/CRDC/General/Pagination-Toolbar'))
+CustomKeywords.'utilities.WebUIUtils.verifyElementCount'(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/Download-Btn'), 2)
 
 //A tooltip will be present that reads “Export submitted Metadata for selected node type”
-CustomKeywords.'utilities.WebUIUtils.verifyTooltipByAriaLabel'(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/Download-Btn-DataViewTooltip'), 'Export submitted metadata for selected node type', 10)
+CustomKeywords.'utilities.WebUIUtils.verifyTooltipByAriaLabel'(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/Download-Btn-DataViewTooltip'), 'Export submitted metadata for selected node type')
 
 //Click Validation Results tab
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/Validation/ValidationResults-Tab')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Validation/ValidationResults-Tab')
 
-CustomKeywords.'utilities.WebUIUtils.verifyElementCount'(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), 2, 10)
+CustomKeywords.'utilities.WebUIUtils.verifyElementCount'(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), 2)
 
 //A tooltip will be displayed that reads, “Export all validation issues for this data submission to a CSV file.”
-CustomKeywords.'utilities.WebUIUtils.verifyTooltipOnHover'(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/Download-Btn-ValidationResultsTooltip'), 'Export all validation issues for this data submission to a CSV file', 'Export all validation issues', 10)
+CustomKeywords.'utilities.WebUIUtils.verifyTooltipOnHover'(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/Download-Btn-ValidationResultsTooltip'), 'Export all validation issues for this data submission to a CSV file', 'Export all validation issues')
 
 //Generate HTML report
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()

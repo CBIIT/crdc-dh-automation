@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description></description>
-   <name>TC01_CRDC-1225-DownloadSubmittedDataFromDataView</name>
+   <name>TC17_CRDC-1163-DCPValidationAfterSubmissionSubmittedDataFiles</name>
    <tag>Filter</tag>
    <comment></comment>
    <recordOption>OTHER</recordOption>
-   <testCaseGuid>e5151626-73c5-4c63-87f8-e6aae74f6f82</testCaseGuid>
+   <testCaseGuid>af611a97-6d0b-4013-8d5a-95f185305045</testCaseGuid>
 </TestCaseEntity>

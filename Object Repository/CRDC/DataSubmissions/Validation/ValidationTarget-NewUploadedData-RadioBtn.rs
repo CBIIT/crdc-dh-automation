@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ValidationTarget-NewUploadedData-RadioBtn</name>
+   <tag></tag>
+   <elementGuidId>2cdb9d32-ba2f-4267-a442-c8fbffd67601</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//input[@value='New']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//input[@value='New']</value>
+      <webElementGuid>8fde5f06-6d74-43c6-b320-8d57ce7792b3</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
