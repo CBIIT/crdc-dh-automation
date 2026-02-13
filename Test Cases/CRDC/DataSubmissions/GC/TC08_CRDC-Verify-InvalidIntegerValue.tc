@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description></description>
-   <name>TC08_CRDC-DataSubmissions-ValidationResults</name>
+   <name>TC08_CRDC-Verify-InvalidIntegerValue</name>
    <tag>Filter</tag>
    <comment></comment>
    <recordOption>OTHER</recordOption>

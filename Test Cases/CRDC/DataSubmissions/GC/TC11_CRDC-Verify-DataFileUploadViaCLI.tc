@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description></description>
-   <name>TC09_CRDC-DataSubmissions-ValidationResults</name>
+   <name>TC11_CRDC-Verify-DataFileUploadViaCLI</name>
    <tag>Filter</tag>
    <comment></comment>
    <recordOption>OTHER</recordOption>
-   <testCaseGuid>854da2c0-7458-4c8f-a2f1-7575074b0b48</testCaseGuid>
+   <testCaseGuid>e081bc07-1211-49ba-a332-5cae4d0d5d65</testCaseGuid>
 </TestCaseEntity>

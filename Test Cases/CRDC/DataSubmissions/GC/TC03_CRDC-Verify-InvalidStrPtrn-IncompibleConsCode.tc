@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC03_CRDC-Verify-InvalidStrPtrn-IncompibleConsCode</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>9e90f83a-3a7c-463d-986b-878e02b7900c</testCaseGuid>
+</TestCaseEntity>

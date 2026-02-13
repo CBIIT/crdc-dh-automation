@@ -15,7 +15,7 @@
       <guid>b9e35980-6b1c-4587-b035-db9fac20ac65</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC11_CRDC-DataSubmissions-CliUpload</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC11_CRDC-Verify-DataFileUploadViaCLI</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>

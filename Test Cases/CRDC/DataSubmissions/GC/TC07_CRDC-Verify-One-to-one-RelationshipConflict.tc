@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description></description>
-   <name>TC04_CRDC-DataSubmissions-ValidationResults</name>
+   <name>TC07_CRDC-Verify-One-to-one-RelationshipConflict</name>
    <tag>Filter</tag>
    <comment></comment>
    <recordOption>OTHER</recordOption>
-   <testCaseGuid>9f45709e-b460-4d88-b41d-a6a87d18cede</testCaseGuid>
+   <testCaseGuid>7046c2e1-4c8d-46ce-a2b9-13d028610ebd</testCaseGuid>
 </TestCaseEntity>

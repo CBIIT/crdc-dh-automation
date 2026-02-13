@@ -29,28 +29,28 @@
       <guid>7f41c0c1-7088-4697-9e0c-67391feb5288</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC03_CRDC-DataSubmissions-ValidationResults</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC03_CRDC-Verify-InvalidStrPtrn-IncompibleConsCode</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>01eb96af-8c63-499d-bed7-b198dab6c95d</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC99_CRDC-DataSubmissions-ValidationResults</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC10_CRDC-Verify-StdyNamMism_ProgNamMism_VluNotPerm</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>f896094b-f914-4625-9502-19c94b5b9ad7</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC04_CRDC-DataSubmissions-ValidationResults</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC04_CRDC-699_Verify-MissingRequiredProperty</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>bcfde643-be55-49d6-8eb3-074c5a5a92e5</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC05_CRDC-DataSubmissions-ValidationResults</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC05_CRDC-699_Verify-RelationshipNotSpecified</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
@@ -64,21 +64,21 @@
       <guid>7e8d9df5-2dc2-4c08-a314-7a47f527cf7d</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC07_CRDC-DataSubmissions-ValidationResults</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC07_CRDC-Verify-One-to-one-RelationshipConflict</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>6495a82a-a5a0-4217-897c-8af4a438f2d5</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC08_CRDC-DataSubmissions-ValidationResults</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC08_CRDC-Verify-InvalidIntegerValue</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>6272d092-61a4-427c-873d-d0909a78dc14</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC09_CRDC-DataSubmissions-ValidationResults</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/TC09_CRDC-Verify-InvalidNumberValue</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>

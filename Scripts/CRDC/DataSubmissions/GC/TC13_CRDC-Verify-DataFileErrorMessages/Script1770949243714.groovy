@@ -32,8 +32,10 @@ import com.kms.katalon.core.testdata.TestDataFactory
  - Opens the browser of choice: Chrome, Firefox or Edge
  - Driver opened by Katalon is used in Selenium.
  - Logs in as Submitter
- - Creates DS, uploads, and validates
- - Verifies data submission dashboard
+ - Creates Data submission and uploads data filesverifying following error messages:
+ - ['Real file size 8442 of file demo1.xlsx does not match with that in manifest 844!']
+ - ['Real file md5 12bc9449f61b60385fcb98ff3d1f7c85 of file demo2.pdf does not match with that in manifest 112bc9449f61b60385fcb98ff3d1f7c85!']
+ - ['File does not exist in the path']
  */
 WebUI.closeBrowser()
 
@@ -48,8 +50,10 @@ CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/DataSubmissions-Tab'
 CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'both','GC','autoQA - AutomationQA_Study')
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
-CustomKeywords.'utilities.CliUploader.uploadDataFiles'('TC12')
+CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC13', 'datafile')
+
+CustomKeywords.'utilities.CliUploader.verifyCliErrorMessages'('TC13')
 
 WebUI.delay(5)
 
-//WebUI.closeBrowser()
+WebUI.closeBrowser()

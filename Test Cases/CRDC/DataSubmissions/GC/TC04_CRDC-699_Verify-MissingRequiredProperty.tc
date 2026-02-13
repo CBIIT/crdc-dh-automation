@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description></description>
-   <name>TC05_CRDC-DataSubmissions-ValidationResults</name>
+   <name>TC04_CRDC-699_Verify-MissingRequiredProperty</name>
    <tag>Filter</tag>
    <comment></comment>
    <recordOption>OTHER</recordOption>
-   <testCaseGuid>13529d2a-a3ca-4485-9fa8-4b64766c15f1</testCaseGuid>
+   <testCaseGuid>9f45709e-b460-4d88-b41d-a6a87d18cede</testCaseGuid>
 </TestCaseEntity>

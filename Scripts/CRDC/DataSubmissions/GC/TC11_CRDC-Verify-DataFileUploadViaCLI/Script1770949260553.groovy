@@ -48,7 +48,7 @@ CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/DataSubmissions-Tab'
 CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'both','GC','autoQA - AutomationQA_Study')
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
-CustomKeywords.'utilities.CliUploader.uploadDataFiles'('TC11')
+CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC11', 'datafile')
 
 WebUI.delay(5)
 
