@@ -48,7 +48,7 @@ class DataSubmissions extends TestRunner {
 		if (tab == "DataView") return "Data View"
 		return tab
 	}
-	
+
 	/**
 	 * Extract submission ID from the current Data Hub upload-activity URL.
 	 * Use this when you want to set CRDC_SUBMISSION_ID from the browser URL (e.g. in a script).
@@ -62,7 +62,9 @@ class DataSubmissions extends TestRunner {
 		if (url == null || WebUI.getUrl().trim().isEmpty()) return null
 		java.util.regex.Pattern p = ~/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
 		java.util.regex.Matcher m = p.matcher(url)
-		return m.find() ? m.group(0) : null
+		String submissionId = m.find() ? m.group(0) : null
+		KeywordUtil.logInfo("Submission ID: ${submissionId}")
+		return submissionId
 	}
 
 	/**
@@ -970,7 +972,7 @@ class DataSubmissions extends TestRunner {
 
 		//Create
 		TestRunner.clickTab('CRDC/DataSubmissions/Create/Create-Btn')
-		WebUI.delay(1)
+		WebUI.delay(3)
 	}
 
 	/**
@@ -1027,7 +1029,7 @@ class DataSubmissions extends TestRunner {
 				for (String submittedId : submittedIds) {
 					Map params = [status: expectedStatus, submissionID: submissionID, nodeID: submittedId]
 					def doc = DatabaseUtils.findRecordFromDataFile(
-						"Data Files/CRDC/DataSubmissions/DBQueries", queryKey, params)
+							"Data Files/CRDC/DataSubmissions/DBQueries", queryKey, params)
 					String actualStatus = doc != null ? doc.get("status")?.toString() : null
 					boolean recordOk = doc != null
 					boolean statusOk = expectedStatus.equals(actualStatus)
