@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC17_CRDC-1163-DCPValidationAfterSubmissionSubmittedDataFiles</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>af611a97-6d0b-4013-8d5a-95f185305045</testCaseGuid>
+</TestCaseEntity>

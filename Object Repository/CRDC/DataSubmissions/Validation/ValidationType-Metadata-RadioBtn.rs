@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ValidationType-Metadata-RadioBtn</name>
+   <tag></tag>
+   <elementGuidId>07ab3bf9-a4ee-453c-b597-5cb6344d6d77</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//input[@value='metadata']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//input[@value='metadata']</value>
+      <webElementGuid>0a808f3b-7de8-469e-91cc-1a6af2fbedeb</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

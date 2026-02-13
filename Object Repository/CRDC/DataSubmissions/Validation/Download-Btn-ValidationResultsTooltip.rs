@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Download-Btn-ValidationResultsTooltip</name>
+   <tag></tag>
+   <elementGuidId>dbc6acee-38f2-4588-999b-d675d7207630</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//span[@data-testid='export-validation-tooltip']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//span[@data-testid='export-validation-tooltip']</value>
+      <webElementGuid>399d0a66-3d3c-473c-9ac6-08a7d1d6c913</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
