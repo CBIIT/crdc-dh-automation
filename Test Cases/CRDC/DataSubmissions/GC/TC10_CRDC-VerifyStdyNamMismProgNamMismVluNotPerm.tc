@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description></description>
-   <name>TC99_CRDC-DataSubmissions-ValidationResults</name>
+   <name>TC10_CRDC-VerifyStdyNamMismProgNamMismVluNotPerm</name>
    <tag>Filter</tag>
    <comment></comment>
    <recordOption>OTHER</recordOption>

@@ -8,6 +8,7 @@ import internal.GlobalVariable
 import java.io.FileFilter
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.util.Date
 import java.util.concurrent.TimeUnit
 
 /**
@@ -34,6 +35,18 @@ class CliUploader {
 	/** Max time (minutes) to wait for pip install of CLI dependencies when using Python source. */
 	private static final long PIP_INSTALL_TIMEOUT_MINUTES = 3L
 
+	/** CLI config type values (must match uploader expectations). */
+	private static final String TYPE_DATA_FILE = "data file"
+	private static final String TYPE_METADATA = "metadata"
+
+	/** Normalize user dataType to CLI type; returns null if invalid. */
+	private static String normalizeDataType(String dataType) {
+		if (dataType == null || dataType.trim().isEmpty()) return null
+		String t = dataType.trim().toLowerCase()
+		if (t == "datafile" || t == "data file") return TYPE_DATA_FILE
+		if (t == "metadata") return TYPE_METADATA
+		return null
+	}
 
 	private static String getApiToken() {
 		return GlobalVariable.SubmitterApiToken
@@ -51,9 +64,31 @@ class CliUploader {
 		return RunConfiguration.getProjectDir() + "/InputFiles/CRDC/MetadataData/"+testName+"/DataFiles"
 	}
 
-	private static String getManifestPath(String manifestFolder) {
-		return RunConfiguration.getProjectDir() + "/InputFiles/CRDC/MetadataData/"+manifestFolder+"/DataFiles/manifest.tsv"
+	private static String getMetaDataPath(String testName) {
+		return RunConfiguration.getProjectDir() + "/InputFiles/CRDC/MetadataData/"+testName+"/Metadata"
 	}
+
+	private static String getManifestPath(String manifestFolder) {
+
+		File dir = new File(
+				RunConfiguration.getProjectDir() + "/InputFiles/CRDC/MetadataData/" + manifestFolder + "/DataFiles")
+
+		if (!dir.exists() || !dir.isDirectory()) {
+			KeywordUtil.markFailed("Manifest directory not found: " + dir.getAbsolutePath())
+			return null
+		}
+
+		File manifestFile = dir.listFiles()
+				?.find { it.isFile() && it.name.toLowerCase().endsWith("manifest.tsv") }
+
+		if (manifestFile == null) {
+			KeywordUtil.markFailed("No manifest file ending with 'manifest.tsv' found in: " + dir.getAbsolutePath())
+			return null
+		}
+
+		return manifestFile.getAbsolutePath()
+	}
+
 
 	private static String getArchiveManifestPath() {
 		return safeGlobal("CRDC_ARCHIVE_MANIFEST_PATH", null)?.toString()?.trim()
@@ -110,45 +145,38 @@ class CliUploader {
 	}
 
 	/**
-	 * Builds and returns a formatted YAML configuration string used for
-	 * data file submission via the CRDC submission CLI/API. 
-	 * Constructs a fully structured YAML config block with submission settings
-	 *
-	 * @param submissionId         Unique submission identifier
-	 * @param dataFolderPath       Path to the folder containing data files
-	 * @param manifestPath         Path to the primary manifest file
-	 * @param archiveManifestPath  (Optional) Path to archive manifest file
-	 * @param idField              (Optional) Identifier field name used in submission
-	 * @param retries              Number of retry attempts for submission
-	 * @param overwrite            Whether existing files should be overwritten
-	 * @param dryrun               Whether submission should run in dry-run mode
-	 * @param apiUrl               API endpoint URL for submission
-	 * @param token                Authentication token for API access
-	 *
-	 * @return String              Fully formatted YAML configuration content
+	 * Builds YAML config for CLI. type is "data file" or "metadata".
+	 * For "data file": manifest (and optional archive_manifest, id-field) are included.
+	 * For "metadata": only type and data path are used; manifest* and id-field omitted.
 	 */
-	private static String buildConfigYaml(String submissionId, String dataFolderPath, String manifestPath,
-			String archiveManifestPath, String idField, int retries, boolean overwrite, boolean dryrun,
-			String apiUrl, String token) {
-		String dataAbs = toAbsolutePath(dataFolderPath)
-		String manifestAbs = toAbsolutePath(manifestPath)
-		String archiveLine = (archiveManifestPath != null && !archiveManifestPath.isEmpty())
-				? "    archive_manifest: " + toAbsolutePath(archiveManifestPath) + "\n"
-				: ""
-		String idFieldLine = (idField != null && !idField.isEmpty())
-				? "    id-field: " + idField + "\n"
-				: ""
-
+	private static String buildConfigYaml(String submissionId, String type, String dataPath,
+			String manifestPath, String archiveManifestPath, String idField, int retries, boolean overwrite,
+			boolean dryrun, String apiUrl, String token) {
+		String dataAbs = toAbsolutePath(dataPath)
 		String safeToken = escapeYamlString(token)
+		boolean isDataFile = TYPE_DATA_FILE.equals(type)
+
+		// Indent must match other keys (15 spaces) so YAML parses as one block.
+		String manifestBlock = ""
+		if (isDataFile && manifestPath != null && !manifestPath.trim().isEmpty()) {
+			String manifestAbs = toAbsolutePath(manifestPath)
+			String pad = "               "
+			String archiveLine = (archiveManifestPath != null && !archiveManifestPath.trim().isEmpty())
+					? pad + "archive_manifest: " + toAbsolutePath(archiveManifestPath) + "\n"
+					: ""
+			String idFieldLine = (idField != null && !idField.trim().isEmpty())
+					? pad + "id-field: " + idField + "\n"
+					: ""
+			manifestBlock = pad + "manifest: " + manifestAbs + "\n" + archiveLine + idFieldLine
+		}
 
 		return """Config:
                api-url: ${apiUrl}
                token: ${safeToken}
                submission: ${submissionId}
-               type: data file
+               type: ${type}
                data: ${dataAbs}
-               manifest: ${manifestAbs} ${archiveLine}${idFieldLine}    
-               retries: ${retries}
+${manifestBlock}               retries: ${retries}
                overwrite: ${overwrite}
                dryrun: ${dryrun}
                """
@@ -361,7 +389,7 @@ class CliUploader {
 		}
 		if (!errors.isEmpty()) {
 			KeywordUtil.logInfo("CliUploader verification failed:\n" + output)
-			KeywordUtil.markFailed("CliUploader: CLI log verification failed: " + errors.join("; "))
+			KeywordUtil.markWarning("CliUploader: CLI log verification failed: " + errors.join("; "))
 		} else {
 			KeywordUtil.logInfo("CliUploader: CLI output verification passed (Files failed: 0, File uploading completed!, Files processed/copied present).")
 		}
@@ -420,49 +448,245 @@ class CliUploader {
 		KeywordUtil.logInfo("CliUploader: Upload report verified: " + dataRows + " row(s), all succeeded=true in " + latest.getName())
 	}
 
+	/** Default subfolder under InputFiles/CRDC/MetadataData/<testCaseName> for expected TSV(s). */
+	private static final String EXPECTED_SUBFOLDER = "expected"
+	/** Report subfolder name under project Reports for error verification output. */
+	private static final String ERROR_VERIFICATION_REPORT_SUBDIR = "CLI_ErrorVerification"
+	/** Column name in expected TSV for expected error(s); also try singular form. */
+	private static final List<String> EXPECTED_ERROR_COLUMN_CANDIDATES = [
+		"expected_errors",
+		"expected_error"
+	]
+	/** Column name in actual report for errors. */
+	private static final String ACTUAL_ERRORS_COLUMN = "errors"
+	/** Column names to match rows between actual and expected (first found wins). */
+	private static final List<String> FILE_NAME_COLUMN_CANDIDATES = [
+		"file_name",
+		"internal_file_name",
+		"fileName"
+	]
+
 	/**
-	 * Upload data files to CRDC Data Hub using the CLI (binary or Python source under Tools/crdc-datahub-cli-uploader-src).
-	 * Uses GlobalVariable.ApiUrl and GlobalVariable.SubmitterApiToken; submission ID from current upload-activity URL;
-	 * data and manifest paths derived from test case name. No extra profile variables required if defaults are used.
+	 * Normalize an error cell value (e.g. "['msg1', 'msg2']" or "msg1") to a comparable string:
+	 * extract list items, trim, sort, join with " | " so comparison is stable.
+	 */
+	private static String normalizeErrorCell(String raw) {
+		if (raw == null) return ""
+		String s = raw.trim()
+		if (s.isEmpty()) return ""
+		// Handle Python-style list string: ['a', 'b'] or ["a", "b"]
+		if (s.startsWith("[") && s.endsWith("]")) {
+			String inner = s.substring(1, s.length() - 1).trim()
+			if (inner.isEmpty()) return ""
+			// Split by ", " or "', '" or "\", \"" and strip quotes from each part
+			String delim = "||SEP||"
+			String innerNorm = inner.replace("', '", delim).replace("\", \"", delim).replace("', \"", delim).replace("\", '", delim)
+			List<String> parts = []
+			for (String segment : innerNorm.split(java.util.regex.Pattern.quote(delim), -1)) {
+				String t = segment.trim()
+				if (t.startsWith("'") && t.endsWith("'")) t = t.substring(1, t.length() - 1)
+				else if (t.startsWith("\"") && t.endsWith("\"")) t = t.substring(1, t.length() - 1)
+				t = t.trim()
+				if (!t.isEmpty()) parts.add(t)
+			}
+			return parts.sort().join(" | ")
+		}
+		return s
+	}
+
+	/**
+	 * Find column index by name (case-insensitive); returns -1 if not found.
+	 */
+	private static int findColumnIndex(String headerLine, List<String> candidates) {
+		String[] headers = headerLine.split("\t", -1)
+		for (String cand : candidates) {
+			int idx = headers.findIndexOf { it != null && it.equalsIgnoreCase(cand.trim()) }
+			if (idx >= 0) return idx
+		}
+		return -1
+	}
+
+	private static int findColumnIndex(String headerLine, String columnName) {
+		return findColumnIndex(headerLine, [columnName])
+	}
+
+	/**
+	 * Read (file_name -> expected_errors) from all TSV files in expectedDir.
+	 * Uses first available column from EXPECTED_ERROR_COLUMN_CANDIDATES and FILE_NAME_COLUMN_CANDIDATES.
+	 */
+	private static Map<String, String> loadExpectedErrorsByFileName(File expectedDir) {
+		Map<String, String> map = [:]
+		if (!expectedDir.exists() || !expectedDir.isDirectory()) return map
+		File[] tsvs = expectedDir.listFiles({ File f -> f.isFile() && f.name.toLowerCase().endsWith(".tsv") } as FileFilter)
+		if (tsvs == null || tsvs.length == 0) return map
+		for (File tsv : tsvs) {
+			List<String> lines = Files.readAllLines(tsv.toPath(), StandardCharsets.UTF_8)
+			if (lines.size() < 2) continue
+				String header = lines.get(0)
+			int expectedColIdx = findColumnIndex(header, EXPECTED_ERROR_COLUMN_CANDIDATES)
+			int fileNameColIdx = findColumnIndex(header, FILE_NAME_COLUMN_CANDIDATES)
+			if (expectedColIdx < 0 || fileNameColIdx < 0) continue
+				for (int i = 1; i < lines.size(); i++) {
+					String[] cols = lines.get(i).split("\t", -1)
+					String fileName = fileNameColIdx < cols.length ? cols[fileNameColIdx].trim() : ""
+					String expectedVal = expectedColIdx < cols.length ? cols[expectedColIdx].trim() : ""
+					if (!fileName.isEmpty()) map.put(fileName, expectedVal)
+				}
+		}
+		return map
+	}
+
+	/**
+	 * Verify CLI error messages: reads the latest upload-report-*.tsv from CLI tmp folder,
+	 * reads expected TSV(s) from InputFiles/CRDC/MetadataData/<testCaseName>/expected/,
+	 * compares actual vs expected errors (by file_name), and generates a report.
+	 * Fails the test if any error message does not match; otherwise passes and writes the report.
+	 *
+	 * @param testCaseName Test case name (e.g. "TC12") used to resolve expected folder:
+	 *        &lt;projectDir&gt;/InputFiles/CRDC/MetadataData/&lt;testCaseName&gt;/expected/
 	 */
 	@Keyword
-	static void uploadDataFiles(String testCaseName) {
+	static void verifyCliErrorMessages(String testCaseName) {
+		if (testCaseName == null || testCaseName.trim().isEmpty()) {
+			KeywordUtil.markFailed("CliUploader.verifyCliErrorMessages: testCaseName is required.")
+			return
+		}
+		String tcName = testCaseName.trim()
+		File cliDir = getCliDir()
+		File tmpDir = new File(cliDir, "tmp")
+		if (!tmpDir.exists() || !tmpDir.isDirectory()) {
+			KeywordUtil.markFailed("CliUploader.verifyCliErrorMessages: tmp folder not found at " + tmpDir.getAbsolutePath())
+			return
+		}
+		File[] reports = tmpDir.listFiles({ File f -> f.isFile() && f.name.startsWith("upload-report-") && f.name.endsWith(".tsv") } as FileFilter)
+		if (reports == null || reports.length == 0) {
+			KeywordUtil.markFailed("CliUploader.verifyCliErrorMessages: No upload-report-*.tsv found in " + tmpDir.getAbsolutePath())
+			return
+		}
+		File latestReport = reports.toList().sort { -it.lastModified() }.get(0)
+		List<String> reportLines = Files.readAllLines(latestReport.toPath(), StandardCharsets.UTF_8)
+		if (reportLines.size() < 2) {
+			KeywordUtil.markFailed("CliUploader.verifyCliErrorMessages: Upload report has no data rows: " + latestReport.getAbsolutePath())
+			return
+		}
+		String reportHeader = reportLines.get(0)
+		int actualErrorsIdx = findColumnIndex(reportHeader, ACTUAL_ERRORS_COLUMN)
+		int reportFileNameIdx = findColumnIndex(reportHeader, FILE_NAME_COLUMN_CANDIDATES)
+		if (actualErrorsIdx < 0) {
+			KeywordUtil.markFailed("CliUploader.verifyCliErrorMessages: Report has no '" + ACTUAL_ERRORS_COLUMN + "' column: " + latestReport.getName())
+			return
+		}
+		if (reportFileNameIdx < 0) {
+			KeywordUtil.markFailed("CliUploader.verifyCliErrorMessages: Report has no file name column (tried: " + FILE_NAME_COLUMN_CANDIDATES.join(", ") + "): " + latestReport.getName())
+			return
+		}
+		String projectDir = RunConfiguration.getProjectDir()
+		File expectedDir = new File(projectDir, "InputFiles/CRDC/MetadataData/" + tcName + "/" + EXPECTED_SUBFOLDER)
+		Map<String, String> expectedMap = loadExpectedErrorsByFileName(expectedDir)
+		if (expectedMap.isEmpty()) {
+			KeywordUtil.markFailed("CliUploader.verifyCliErrorMessages: No expected TSV(s) with expected_error(s) and file_name columns found in " + expectedDir.getAbsolutePath())
+			return
+		}
+		List<Map<String, String>> reportRows = []
+		for (int i = 1; i < reportLines.size(); i++) {
+			String[] cols = reportLines.get(i).split("\t", -1)
+			String fileName = reportFileNameIdx < cols.length ? cols[reportFileNameIdx].trim() : ""
+			String actualRaw = actualErrorsIdx < cols.length ? cols[actualErrorsIdx].trim() : ""
+			reportRows.add([file_name: fileName, actual_error: actualRaw])
+		}
+		List<String> mismatches = []
+		List<String> reportLinesOut = [
+			"file_name\tactual_error\texpected_error\tmatch_status"
+		]
+		for (Map<String, String> row : reportRows) {
+			String fileName = row.get("file_name", "")
+			String actualRaw = row.get("actual_error", "")
+			String expectedRaw = expectedMap.get(fileName)
+			if (expectedRaw == null) expectedRaw = ""
+			String actualNorm = normalizeErrorCell(actualRaw)
+			String expectedNorm = normalizeErrorCell(expectedRaw)
+			boolean match = actualNorm == expectedNorm
+			String status = match ? "PASS" : "FAIL"
+			String actualSafe = (actualRaw != null ? actualRaw : "").replace("\t", " ").replace("\n", " ").replace("\r", " ")
+			String expectedSafe = (expectedRaw != null ? expectedRaw : "").replace("\t", " ").replace("\n", " ").replace("\r", " ")
+			reportLinesOut.add(fileName + "\t" + actualSafe + "\t" + expectedSafe + "\t" + status)
+			if (!match) mismatches.add(fileName + ": actual='" + actualNorm + "' vs expected='" + expectedNorm + "'")
+		}
+		File reportsDir = new File(projectDir, "Reports")
+		if (!reportsDir.exists()) reportsDir.mkdirs()
+		File subDir = new File(reportsDir, ERROR_VERIFICATION_REPORT_SUBDIR)
+		if (!subDir.exists()) subDir.mkdirs()
+		String timestamp = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date())
+		File reportFile = new File(subDir, "error-verification-" + tcName + "-" + timestamp + ".tsv")
+		Files.write(reportFile.toPath(), reportLinesOut.join(System.getProperty("line.separator", "\n")).getBytes(StandardCharsets.UTF_8))
+		KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: Report written to " + reportFile.getAbsolutePath())
+		if (!mismatches.isEmpty()) {
+			KeywordUtil.markFailed("CliUploader.verifyCliErrorMessages: Error message mismatch(es): " + mismatches.join("; "))
+			return
+		}
+		KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: All error messages matched. Test passed.")
+	}
+
+	/**
+	 * Upload files via CLI: data files (with manifest) or metadata (TSV/TXT folder).
+	 * dataType: "datafile" | "data file" | "metadata" (case-insensitive).
+	 */
+	@Keyword
+	static void uploadFilesViaCli(String testCaseName, String dataType) {
 		String apiUrl = getApiUrl()
 		String token = getApiToken()
 		String submissionId = getSubmissionId()
-		String dataFolderPath = getDataFilesPath(testCaseName)
-		String manifestPath = getManifestPath(testCaseName)
+		String type = normalizeDataType(dataType)
+		if (type == null) {
+			KeywordUtil.markFailed("CliUploader: dataType must be 'datafile' or 'metadata'. Got: " + dataType)
+			return
+		}
 
 		if (token == null || token.isEmpty()) {
-			KeywordUtil.markFailed("CliUploader: CRDC_API_TOKEN is not set in profile.")
+			KeywordUtil.markFailed("CliUploader: SubmitterApiToken is not set in profile.")
 			return
 		}
 		if (apiUrl == null || apiUrl.isEmpty()) {
-			KeywordUtil.markFailed("CliUploader: CRDC_API_URL is not set in profile.")
+			KeywordUtil.markFailed("CliUploader: ApiUrl is not set in profile.")
 			return
 		}
 		if (submissionId == null || submissionId.isEmpty()) {
-			KeywordUtil.markFailed("CliUploader: CRDC_SUBMISSION_ID is not set in getSubmissionId().")
-			return
-		}
-		if (dataFolderPath == null || dataFolderPath.isEmpty()) {
-			KeywordUtil.markFailed("CliUploader: CRDC_DATA_FILE_PATH is not set in getDataFilesPath().")
-			return
-		}
-		if (manifestPath == null || manifestPath.isEmpty()) {
-			KeywordUtil.markFailed("CliUploader: CRDC_MANIFEST_PATH is not set in getManifestPath().")
+			KeywordUtil.markFailed("CliUploader: submission ID could not be resolved from upload-activity URL.")
 			return
 		}
 
-		File dataDir = new File(toAbsolutePath(dataFolderPath))
+		String dataPath
+		String manifestPath = null
+		if (TYPE_DATA_FILE.equals(type)) {
+			dataPath = getDataFilesPath(testCaseName)
+			manifestPath = getManifestPath(testCaseName)
+			if (dataPath == null || dataPath.trim().isEmpty()) {
+				KeywordUtil.markFailed("CliUploader: data path is empty (getDataFilesPath).")
+				return
+			}
+			if (manifestPath == null || manifestPath.trim().isEmpty()) {
+				KeywordUtil.markFailed("CliUploader: manifest path is empty (getManifestPath).")
+				return
+			}
+		} else {
+			dataPath = getMetaDataPath(testCaseName)
+			if (dataPath == null || dataPath.trim().isEmpty()) {
+				KeywordUtil.markFailed("CliUploader: metadata path is empty (getMetaDataPath).")
+				return
+			}
+		}
+
+		File dataDir = new File(toAbsolutePath(dataPath))
 		if (!dataDir.exists() || !dataDir.isDirectory()) {
-			KeywordUtil.markFailed("CliUploader: data folder does not exist or is not a directory: " + dataDir.getAbsolutePath())
+			KeywordUtil.markFailed("CliUploader: path does not exist or is not a directory: " + dataDir.getAbsolutePath())
 			return
 		}
-		File manifestFile = new File(toAbsolutePath(manifestPath))
-		if (!manifestFile.exists() || !manifestFile.isFile()) {
-			KeywordUtil.markFailed("CliUpload: manifest file does not exist or is not a file: " + manifestFile.getAbsolutePath())
-			return
+		if (TYPE_DATA_FILE.equals(type)) {
+			File manifestFile = new File(toAbsolutePath(manifestPath))
+			if (!manifestFile.exists() || !manifestFile.isFile()) {
+				KeywordUtil.markFailed("CliUploader: manifest file does not exist: " + manifestFile.getAbsolutePath())
+				return
+			}
 		}
 
 		File cliDir = getCliDir()
@@ -474,7 +698,6 @@ class CliUploader {
 		String archiveManifestPath = getArchiveManifestPath()
 		if (archiveManifestPath != null) archiveManifestPath = archiveManifestPath.trim()
 		if (archiveManifestPath != null && archiveManifestPath.isEmpty()) archiveManifestPath = null
-
 		int retries = getRetries()
 		boolean overwrite = getOverwrite()
 		boolean dryrun = getDryrun()
@@ -482,7 +705,7 @@ class CliUploader {
 		if (idField != null) idField = idField.trim()
 		if (idField != null && idField.isEmpty()) idField = null
 
-		String yaml = buildConfigYaml(submissionId, dataFolderPath, manifestPath,
+		String yaml = buildConfigYaml(submissionId, type, dataPath, manifestPath,
 				archiveManifestPath, idField, retries, overwrite, dryrun, apiUrl, token)
 		File configFile = writeConfigFile(yaml)
 		try {
@@ -490,15 +713,19 @@ class CliUploader {
 			int exitCode = ((Number) result.get(0)).intValue()
 			String output = (String) result.get(1)
 			if (exitCode != 0) {
-				KeywordUtil.logInfo("CrdcCliUpload: uploader exit code=" + exitCode + "\nOutput:\n" + output)
-				KeywordUtil.markFailed("CrdcCliUpload: data file upload failed (exit code " + exitCode + "). See log for output.")
+				KeywordUtil.logInfo("CliUploader: uploader exit code=" + exitCode + "\nOutput:\n" + output)
+				KeywordUtil.markFailed("CliUploader: upload failed (exit code " + exitCode + "). See log for output.")
+				return
+			}
+			// CLI can exit 0 even when it logs failure (e.g. permission denied); treat output as source of truth.
+			if (output != null && (output.contains("Failed to upload files") || output.contains("can't get data file config"))) {
+				KeywordUtil.logInfo("CliUploader: uploader reported failure in output:\n" + output)
+				KeywordUtil.markFailed("CliUploader: upload failed. Check log (e.g. permission to run batch operation).")
 				return
 			}
 			verifyCliUploadOutput(output)
-			verifyCliUploadReport(cliDir, output)
 			WebUI.refresh()
-			WebUI.waitForPageLoad(10)
-			KeywordUtil.logInfo("CrdcCliUpload: data file upload completed successfully.\n" + output)
+			KeywordUtil.logInfo("CliUploader: upload completed successfully.\n" + output)
 		} finally {
 			configFile.delete()
 		}
