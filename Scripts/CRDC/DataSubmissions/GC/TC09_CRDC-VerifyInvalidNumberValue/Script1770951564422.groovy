@@ -44,18 +44,18 @@ CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
 WebUI.delay(2)
 
 //Create DS
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
+CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
 CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata only', 'GC','autoQA - AutomationQA_Study')
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
+CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 //Upload data via folder
-CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC08')
+CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC09')
 
 //Validate data
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
 //Verify Validation Results table in the UI matches the expected TSV files for each node with error(s) or warning(s)
-CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsVsExpectedForTC'("TC08")
+CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsVsExpectedForTC'("TC09")
 
 //Generate HTML report
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
