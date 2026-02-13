@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Pagination-Toolbar</name>
+   <tag></tag>
+   <elementGuidId>faa5e21a-d622-4283-ad21-004450ef707c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//div[contains(@class,'Pagination-toolbar')]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//div[contains(@class,'Pagination-toolbar')]</value>
+      <webElementGuid>96bf46de-ab84-4143-bd5f-6bb586fccf19</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

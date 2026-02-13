@@ -497,6 +497,7 @@ class CliUploader {
 			verifyCliUploadOutput(output)
 			verifyCliUploadReport(cliDir, output)
 			WebUI.refresh()
+			WebUI.waitForPageLoad(10)
 			KeywordUtil.logInfo("CrdcCliUpload: data file upload completed successfully.\n" + output)
 		} finally {
 			configFile.delete()

@@ -833,7 +833,7 @@ class Pbac extends TestRunner {
 					Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 30)
 
 					//Upload metadata file
-					prepareUniqueMetadataAndUpload('InputFiles/CRDC/MetadataData/program.tsv', "program_acronym")
+					prepareUniqueMetadataAndUpload('InputFiles/CRDC/MetadataData/PBAC/program.tsv', "program_acronym")
 
 					//Validate
 					WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
@@ -871,7 +871,7 @@ class Pbac extends TestRunner {
 					Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 30)
 
 					//Upload invalid metadata file
-					uploadMetadataUI('InputFiles/CRDC/MetadataData/program_invalid.tsv')
+					uploadMetadataUI('InputFiles/CRDC/MetadataData/PBAC/program_invalid.tsv')
 
 					//Validate
 					WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
@@ -901,7 +901,7 @@ class Pbac extends TestRunner {
 					Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 30)
 
 					//Upload metadata file
-					prepareUniqueMetadataAndUpload('InputFiles/CRDC/MetadataData/program.tsv', "program_acronym")
+					prepareUniqueMetadataAndUpload('InputFiles/CRDC/MetadataData/PBAC/program.tsv', "program_acronym")
 
 					//Validate
 					WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
@@ -1044,5 +1044,4 @@ class Pbac extends TestRunner {
 			}
 		}
 	}
-
 }

@@ -1674,36 +1674,13 @@ public class TestRunner implements Comparator<List<XSSFCell>>{
 
 
 	/**
-	 * This function is used to click on any element
-	 * @param TabName
-	 * @return
+	 * This function is used to click on any element.
+	 * Delegates to WebUIUtils.clickTab.
+	 * @param tabName Object Repository path (e.g. 'CRDC/DataSubmissions/Submit-Btn')
 	 */
 	@Keyword
 	public static void clickTab(String tabName) {
-		WebDriver driver = DriverFactory.getWebDriver()
-		WebDriverWait wait = new WebDriverWait(driver, 10)
-		JavascriptExecutor js = (JavascriptExecutor) driver
-
-		String tabXpath = givexpath(tabName)
-		println("Resolved XPath: " + tabXpath)
-
-		for (int i = 0; i < 3; i++) {
-			try {
-				WebElement resultTab = wait.until(
-						ExpectedConditions.presenceOfElementLocated(By.xpath(tabXpath))
-						)
-				js.executeScript("arguments[0].scrollIntoView(true);", resultTab)
-				js.executeScript("arguments[0].click();", resultTab)
-				println("Successfully clicked element")
-				break
-			} catch (StaleElementReferenceException e) {
-				println("️StaleElementReferenceException. Retrying... Attempt: " + (i + 1))
-				Thread.sleep(1000)
-			} catch (Exception e) {
-				println("Unexpected error: " + e.getMessage())
-				throw e
-			}
-		}
+		WebUIUtils.clickTab(tabName)
 	}
 
 
