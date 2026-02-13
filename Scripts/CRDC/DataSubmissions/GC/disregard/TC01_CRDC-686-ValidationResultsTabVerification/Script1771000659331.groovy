@@ -28,28 +28,47 @@ import java.nio.file.Path as Path
 import java.nio.file.Paths as Paths
 import com.kms.katalon.core.testdata.TestDataFactory
 
-/*This test script:
- - Opens the browser of choice: Chrome, Firefox or Edge
- - Driver opened by Katalon is used in Selenium.
- - Logs in as Submitter
- - Creates DS, uploads, and validates
- - Verifies data submission dashboard
+/* CRDCDH-686: Validation Results Tab Verification (one-to-one mapping from Jira)
+ * Jira Row 1: Navigate, Login as Submitter, Data Submission tab
+ * Jira Row 2: Verify User can access Data Submission Dashboard, Validation Results tab
+ * Jira Row 3: PBAC - Verify role visibility (Admin, Fed Lead, DCP, Submitter, General User)
+ * Jira Row 4: Verify Validation Table columns
+ * Jira Row 5: Verify column sorting (all sortable except Reasons; default Batch ID desc, Type asc)
+ * Jira Row 6: Verify pagination (Rows Per Page: 5, 10, 20, 50; default 20)
+ * Jira Row 7: Verify multiple rows per Node ID (same record, multiple errors)
  */
 WebUI.closeBrowser()
 
-//Login as Submitter
+// ----- Jira Row 1: Setup - Navigate, Login, Data Submission tab -----
 CustomKeywords.'utilities.Login.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
 WebUI.delay(2)
 
-//Create DS
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
-CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metada only','GC','autoQA - AutomationQA_Study')
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
+CustomKeywords.'utilities.Pbac.createDataSubmission'()
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
+CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC04')
+CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
-CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC12', 'metadata')
+// ----- Jira Row 2: Verify access to Validation Results tab -----
+//CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsTabDisplayed'()
 
-WebUI.delay(5)
+// ----- Jira Row 3: PBAC - skipped -----
+
+// ----- Jira Row 4: Validation Table columns -----
+//CustomKeywords.'utilities.DataSubmissions.verifyDataSubmissionTableHeaders'('ValidationResults')
+
+// ----- Jira Row 5: Column sorting -----
+CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsColumnSorting'()
+
+// ----- Jira Row 6: Pagination options -----
+CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsPaginationOptions'()
+
+// ----- Jira Row 7: Multiple rows per Node ID -----
+CustomKeywords.'utilities.DataSubmissions.verifyMultipleRowsPerNodeIdInValidationResults'()
+
+// Generate HTML report
+CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
 //WebUI.closeBrowser()
