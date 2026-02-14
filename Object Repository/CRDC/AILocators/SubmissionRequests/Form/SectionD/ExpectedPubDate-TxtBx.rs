@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ExpectedPubDate-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>35f5a866-46f2-41ef-b636-4f0777b5e106</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-expected-publication-date&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-expected-publication-date&apos;]</value>
+      <webElementGuid>22dd493a-d9b8-4480-9cb9-36320be50b10</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>BatchID-Ddn</name>
+   <tag></tag>
+   <elementGuidId>fc940397-2465-431d-8239-1d21f374f551</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;cross-validation-batchID-filter&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;cross-validation-batchID-filter&apos;]</value>
+      <webElementGuid>b0cd2f88-de22-4666-8e5a-3816c5ae70ab</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

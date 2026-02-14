@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DbGaPPHSNumber-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>db83eb2a-b389-4385-8289-08a361661d47</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-c-if-yes-provide-dbgap-phs-number&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-c-if-yes-provide-dbgap-phs-number&apos;]</value>
+      <webElementGuid>fb0c3ad2-3700-4f8f-8e8c-bc13179e0caa</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

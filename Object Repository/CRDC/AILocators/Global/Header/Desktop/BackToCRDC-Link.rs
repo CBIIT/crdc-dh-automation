@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>BackToCRDC-Link</name>
+   <tag></tag>
+   <elementGuidId>6a80b258-4879-48f1-85a3-3eb92344ba99</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;navbar-dropdown-join-crdc-data-hub&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;navbar-dropdown-join-crdc-data-hub&apos;]</value>
+      <webElementGuid>5b826654-3bbb-4da9-8e90-54187909dd61</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>UserFilter-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>14e70f16-b16f-4cd5-9cf4-56d8a4f7b3c2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;user-filter&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;user-filter&apos;]</value>
+      <webElementGuid>144c8e3b-6777-4874-b128-e3c0643326c6</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

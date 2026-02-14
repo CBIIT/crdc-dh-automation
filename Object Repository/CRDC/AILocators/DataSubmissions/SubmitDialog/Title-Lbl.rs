@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Title-Lbl</name>
+   <tag></tag>
+   <elementGuidId>66b7d9a4-d2e2-4e4c-abb6-39b72454922b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;submit-dialog-title&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;submit-dialog-title&apos;]</value>
+      <webElementGuid>a2bdd403-dad6-4f65-bd3f-7f43f5bbfa68</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

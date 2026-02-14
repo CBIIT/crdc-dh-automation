@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>UserNameContainer</name>
+   <tag></tag>
+   <elementGuidId>7ded505f-abbd-4b95-8b17-7a5f04fb04aa</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;navbar-dropdown-name-container&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;navbar-dropdown-name-container&apos;]</value>
+      <webElementGuid>70f246e2-9414-49ee-8e68-5c4dec28035a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ManagePrograms-Link</name>
+   <tag></tag>
+   <elementGuidId>b6dbc11c-bf56-431e-983c-f80b234f40f3</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;navbar-dropdown-item-program-manage&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;navbar-dropdown-item-program-manage&apos;]</value>
+      <webElementGuid>15410f0a-6f9d-44ee-a2ab-1b892f251e7d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

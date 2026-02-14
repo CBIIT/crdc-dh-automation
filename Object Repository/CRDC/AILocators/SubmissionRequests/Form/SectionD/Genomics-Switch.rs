@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Genomics-Switch</name>
+   <tag></tag>
+   <elementGuidId>b98f4793-9286-4550-9ad6-463eb60453de</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-genomics&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-genomics&apos;]</value>
+      <webElementGuid>c99275b0-7e41-40fc-a7e8-7a5516e1f0ae</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

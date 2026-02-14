@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>NodeType-Ddn</name>
+   <tag></tag>
+   <elementGuidId>e33f4f30-211f-4375-82aa-d538063f0874</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;quality-control-nodeType-filter&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;quality-control-nodeType-filter&apos;]</value>
+      <webElementGuid>804a2598-d7a6-4766-b7ee-114a796e2256</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

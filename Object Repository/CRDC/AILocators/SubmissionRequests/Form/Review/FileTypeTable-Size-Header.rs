@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FileTypeTable-Size-Header</name>
+   <tag></tag>
+   <elementGuidId>705ec283-0c5c-4ab5-9f59-96dde7980356</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;review-file-type-table-estimated-data-size&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;review-file-type-table-estimated-data-size&apos;]</value>
+      <webElementGuid>4ea34353-7ce2-4e22-bb10-136e08bbd32a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

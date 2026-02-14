@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AddCollaborator-Btn</name>
+   <tag></tag>
+   <elementGuidId>3f0bf21d-b998-4170-bf64-b1320abac07f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;add-collaborator-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;add-collaborator-button&apos;]</value>
+      <webElementGuid>be548501-2081-48e1-8bc9-ae8065e6db1d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

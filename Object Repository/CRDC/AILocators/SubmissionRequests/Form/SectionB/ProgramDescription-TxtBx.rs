@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ProgramDescription-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>68ea6c3d-2572-4060-804f-414024911fdf</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-b-program-description&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-b-program-description&apos;]</value>
+      <webElementGuid>23b702c6-69ee-4cf9-9aca-76f27c7392d6</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

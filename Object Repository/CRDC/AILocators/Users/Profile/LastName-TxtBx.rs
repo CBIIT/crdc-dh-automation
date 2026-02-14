@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>LastName-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>c6743226-de90-4362-8774-73f45a1d2a0f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@aria-labelledby=&apos;lastNameLabel&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@aria-labelledby=&apos;lastNameLabel&apos;]</value>
+      <webElementGuid>af152242-a82c-4182-b515-c9f2acc64334</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

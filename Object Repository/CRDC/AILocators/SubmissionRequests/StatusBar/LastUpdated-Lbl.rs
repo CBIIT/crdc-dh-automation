@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>LastUpdated-Lbl</name>
+   <tag></tag>
+   <elementGuidId>89943b68-0bd6-460e-9c3b-06252016879f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;status-bar-last-updated&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;status-bar-last-updated&apos;]</value>
+      <webElementGuid>1d17f3e3-4825-4ba9-ac97-0297459348a6</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

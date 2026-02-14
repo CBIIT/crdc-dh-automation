@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Logout-Btn</name>
+   <tag></tag>
+   <elementGuidId>6dde3435-84cf-4313-8f00-57668d59d0b5</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[.=&apos;LOGOUT&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[.=&apos;LOGOUT&apos;]</value>
+      <webElementGuid>5b14d1b8-e5e6-4ac4-9050-04bd60394b88</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

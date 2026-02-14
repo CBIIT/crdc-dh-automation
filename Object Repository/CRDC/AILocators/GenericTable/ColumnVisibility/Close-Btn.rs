@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Close-Btn</name>
+   <tag></tag>
+   <elementGuidId>b2577b5c-517e-4434-8916-663d4967a2c2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;column-visibility-popper-close-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;column-visibility-popper-close-button&apos;]</value>
+      <webElementGuid>bebd9f88-96a4-41c5-a043-8ec637c6dbb2</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

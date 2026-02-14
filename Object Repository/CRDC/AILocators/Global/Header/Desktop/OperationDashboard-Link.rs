@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>OperationDashboard-Link</name>
+   <tag></tag>
+   <elementGuidId>9e53dd8f-d6fe-4e92-9d3e-f760e7d0c555</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;navbar-dropdown-operation-dashboard&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;navbar-dropdown-operation-dashboard&apos;]</value>
+      <webElementGuid>93e8a3d1-13ba-474a-9d98-ba6c5f1e6b52</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataCommons-Ddn</name>
+   <tag></tag>
+   <elementGuidId>efcd7550-5db9-4917-9929-873e27931911</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;create-data-submission-dialog-data-commons-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;create-data-submission-dialog-data-commons-input&apos;]</value>
+      <webElementGuid>1d2703b3-cd78-4d93-b2f0-3422f0b92e94</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

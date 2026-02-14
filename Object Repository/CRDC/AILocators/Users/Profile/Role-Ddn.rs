@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Role-Ddn</name>
+   <tag></tag>
+   <elementGuidId>68022d24-767c-4e68-8857-6e18b3d4b22b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@aria-labelledby=&apos;userRoleLabel&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@aria-labelledby=&apos;userRoleLabel&apos;]</value>
+      <webElementGuid>c7ceabe3-d078-4ad9-aaf2-cc988ef4819e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

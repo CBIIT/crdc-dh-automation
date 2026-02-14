@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Submit-Btn</name>
+   <tag></tag>
+   <elementGuidId>02edfa53-e19d-4768-8f35-ab6e7a93bca2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[.=&apos;Submit&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[.=&apos;Submit&apos;]</value>
+      <webElementGuid>ed0b97c6-71c2-4cb4-a643-e01038ae29eb</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

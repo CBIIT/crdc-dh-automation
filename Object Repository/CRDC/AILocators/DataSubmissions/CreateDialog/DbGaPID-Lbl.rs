@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DbGaPID-Lbl</name>
+   <tag></tag>
+   <elementGuidId>657d6476-4a3c-42c0-8614-073c71813de8</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;dbGaP-id-label&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;dbGaP-id-label&apos;]</value>
+      <webElementGuid>d5002248-3346-4dc4-86c1-ede8903ab65c</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

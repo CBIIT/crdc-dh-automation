@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>StudyTitle-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>689d9f0b-3947-4a11-b306-c0b31c47e7ea</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-b-study-title&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-b-study-title&apos;]</value>
+      <webElementGuid>30a959ad-80b8-48b4-b84a-c57c91a45758</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

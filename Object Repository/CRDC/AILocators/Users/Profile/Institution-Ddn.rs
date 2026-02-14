@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Institution-Ddn</name>
+   <tag></tag>
+   <elementGuidId>5e2fb149-4436-4b41-93d3-8a76f68db576</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;institution-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;institution-input&apos;]</value>
+      <webElementGuid>349f5b35-e6d9-4a33-83da-c3ad13fd10e0</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

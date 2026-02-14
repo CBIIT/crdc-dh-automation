@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DbGaPID-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>edf0e8ba-5ff5-4cd2-8320-69827d73991b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;dbGaPID-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;dbGaPID-input&apos;]</value>
+      <webElementGuid>fcb58006-7b10-4759-8b03-87625692a66c</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

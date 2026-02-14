@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PendingConditions-Icon</name>
+   <tag></tag>
+   <elementGuidId>cae1b738-95be-4783-9cb8-d4cf1324ac78</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;pending-conditions-icon&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;pending-conditions-icon&apos;]</value>
+      <webElementGuid>c76c2dc3-43a7-4549-94e5-794032bc61ac</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

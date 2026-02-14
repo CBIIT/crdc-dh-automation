@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Charts-Container</name>
+   <tag></tag>
+   <elementGuidId>bad8943b-94ed-4d7c-aad1-ba1eb0407cb2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;statistics-charts-container&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;statistics-charts-container&apos;]</value>
+      <webElementGuid>a535391a-372d-449d-83db-cf829faa78d1</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

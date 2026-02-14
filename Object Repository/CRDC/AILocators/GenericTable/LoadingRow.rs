@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>LoadingRow</name>
+   <tag></tag>
+   <elementGuidId>3f91153a-d59b-4b20-a3fb-d6a7d1f6657c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;loading-row&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;loading-row&apos;]</value>
+      <webElementGuid>7188a6f9-54a7-4eeb-939c-bbd38f170db0</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

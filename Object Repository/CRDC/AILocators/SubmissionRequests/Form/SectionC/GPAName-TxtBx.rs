@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>GPAName-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>2541ec59-6a7e-4323-9c8d-0cf25e00ece9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-c-genomic-program-administrator-name&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-c-genomic-program-administrator-name&apos;]</value>
+      <webElementGuid>9e2cee1f-12e3-466c-a425-ab846e83a04c</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

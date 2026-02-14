@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ExportCrossValidation-Btn</name>
+   <tag></tag>
+   <elementGuidId>de04791d-e5c5-44e2-a1c8-2e11fc48749e</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;export-cross-validation-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;export-cross-validation-button&apos;]</value>
+      <webElementGuid>1cd97560-7729-4dfc-8c04-098f64ef7023</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

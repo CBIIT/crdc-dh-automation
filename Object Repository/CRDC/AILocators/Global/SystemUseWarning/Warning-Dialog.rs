@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Warning-Dialog</name>
+   <tag></tag>
+   <elementGuidId>562f6b1f-2d73-4ab0-9e03-e8e376b429ec</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;system-use-warning-dialog&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;system-use-warning-dialog&apos;]</value>
+      <webElementGuid>0f8f3623-8173-4ab5-9aee-e87a06139c23</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

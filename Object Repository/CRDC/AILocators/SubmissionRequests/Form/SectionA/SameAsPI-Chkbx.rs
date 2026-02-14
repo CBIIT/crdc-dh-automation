@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SameAsPI-Chkbx</name>
+   <tag></tag>
+   <elementGuidId>214997a6-3a3f-4738-b62e-93bc909a8d27</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-a-primary-contact-same-as-pi-checkbox&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-a-primary-contact-same-as-pi-checkbox&apos;]</value>
+      <webElementGuid>2d40d926-4d48-43f1-bf1c-b642131a1b17</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

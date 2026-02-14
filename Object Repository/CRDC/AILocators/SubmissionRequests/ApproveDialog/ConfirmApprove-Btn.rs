@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ConfirmApprove-Btn</name>
+   <tag></tag>
+   <elementGuidId>90f85096-cf45-4f97-8324-bed641ecf268</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;confirm-to-approve-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;confirm-to-approve-button&apos;]</value>
+      <webElementGuid>310940b7-bdc6-489d-9869-12a2381649c4</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

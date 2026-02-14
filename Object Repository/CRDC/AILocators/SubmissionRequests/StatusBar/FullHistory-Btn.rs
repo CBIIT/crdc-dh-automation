@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FullHistory-Btn</name>
+   <tag></tag>
+   <elementGuidId>7e724b89-3b36-4c8d-84a6-fb0cea51261f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;status-bar-full-history-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;status-bar-full-history-button&apos;]</value>
+      <webElementGuid>f8af9296-4ef0-4959-aa02-e4ea07faf380</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

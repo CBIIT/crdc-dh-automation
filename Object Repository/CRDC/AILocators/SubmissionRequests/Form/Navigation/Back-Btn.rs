@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Back-Btn</name>
+   <tag></tag>
+   <elementGuidId>de9fdaa3-06a0-4536-812e-4d6d450859f6</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;submission-form-back-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;submission-form-back-button&apos;]</value>
+      <webElementGuid>6e73b3b1-d374-4411-9d87-2c9d64d74167</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

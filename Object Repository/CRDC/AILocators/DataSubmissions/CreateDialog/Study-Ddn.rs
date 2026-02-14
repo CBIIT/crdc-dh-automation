@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Study-Ddn</name>
+   <tag></tag>
+   <elementGuidId>306d1156-d964-4b68-a040-dfc37c6899a2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;create-data-submission-dialog-study-id-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;create-data-submission-dialog-study-id-input&apos;]</value>
+      <webElementGuid>32159f45-69da-4bee-8c2d-535ab6e9fc31</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

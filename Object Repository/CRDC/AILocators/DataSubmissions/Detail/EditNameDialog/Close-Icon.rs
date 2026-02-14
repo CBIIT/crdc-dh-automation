@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Close-Icon</name>
+   <tag></tag>
+   <elementGuidId>20b9db34-8f17-4aeb-a4eb-bcafb6de4b28</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;edit-submission-name-dialog-close-icon&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;edit-submission-name-dialog-close-icon&apos;]</value>
+      <webElementGuid>41abb460-4bfe-4bdf-8381-4755aafc611a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

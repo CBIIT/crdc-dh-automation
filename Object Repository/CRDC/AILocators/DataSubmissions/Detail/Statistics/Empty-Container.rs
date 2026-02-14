@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Empty-Container</name>
+   <tag></tag>
+   <elementGuidId>caae8e22-18bb-42c7-84db-64f42e047f86</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;statistics-empty-container&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;statistics-empty-container&apos;]</value>
+      <webElementGuid>0417954e-e856-494d-bf87-febd15739f66</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

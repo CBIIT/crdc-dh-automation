@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Download-Btn</name>
+   <tag></tag>
+   <elementGuidId>f7eaf02f-dacf-47eb-bc50-30bbaeaa40f4</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;uploader-config-dialog-download-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;uploader-config-dialog-download-button&apos;]</value>
+      <webElementGuid>2d9d733c-cb88-4193-835e-3bba3984190e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

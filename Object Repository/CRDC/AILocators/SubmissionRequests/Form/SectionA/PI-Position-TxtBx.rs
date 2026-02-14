@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PI-Position-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>582256e1-b703-4740-b246-7bdf7ed3c312</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-a-pi-position&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-a-pi-position&apos;]</value>
+      <webElementGuid>6058bbe5-61cb-4cd6-8cc6-151255e9fcd8</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

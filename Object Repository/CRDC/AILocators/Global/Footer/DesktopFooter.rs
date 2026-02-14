@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DesktopFooter</name>
+   <tag></tag>
+   <elementGuidId>9cbfbe41-3639-4e50-91d7-d06daa577793</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;desktop-footer&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;desktop-footer&apos;]</value>
+      <webElementGuid>14b8bbb0-ace6-44e6-9716-c46dfe6c5803</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

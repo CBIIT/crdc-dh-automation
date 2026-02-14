@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubmissionName-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>00d8ac85-a8b4-4cc3-8701-de6a88b96bbf</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;create-data-submission-dialog-submission-name-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;create-data-submission-dialog-submission-name-input&apos;]</value>
+      <webElementGuid>3807611a-f20e-4838-b52d-10ce69155d4a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

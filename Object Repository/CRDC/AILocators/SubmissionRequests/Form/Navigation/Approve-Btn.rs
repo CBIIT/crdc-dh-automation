@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Approve-Btn</name>
+   <tag></tag>
+   <elementGuidId>674c6e34-4e6a-4fdb-a876-373716cb8caf</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;submission-form-approve-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;submission-form-approve-button&apos;]</value>
+      <webElementGuid>ae1dc41f-34d6-4590-95fb-165544b54e7b</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

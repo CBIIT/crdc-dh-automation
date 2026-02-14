@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PrimaryContact-LastName-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>e00774fb-526c-4c70-ab68-dbb8959ab12a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-a-primary-contact-last-name&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-a-primary-contact-last-name&apos;]</value>
+      <webElementGuid>c694a9c0-e612-4466-a7bc-be60999f7bdb</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

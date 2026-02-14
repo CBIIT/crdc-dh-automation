@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>UploadedDate-Lbl</name>
+   <tag></tag>
+   <elementGuidId>5112f4b9-090f-46a9-b47a-e9446bc022a9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[starts-with(@data-testid,&apos;activity-uploaded-date-&apos;)]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[starts-with(@data-testid,&apos;activity-uploaded-date-&apos;)]</value>
+      <webElementGuid>7905ec42-66a4-4b37-9bc5-7733b5d01e62</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

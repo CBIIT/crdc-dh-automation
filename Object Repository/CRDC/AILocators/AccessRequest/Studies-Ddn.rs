@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Studies-Ddn</name>
+   <tag></tag>
+   <elementGuidId>928bb987-d44a-47e6-a044-1a668b1b0d8f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;access-request-studies-field&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;access-request-studies-field&apos;]</value>
+      <webElementGuid>5ab9f9be-70ea-4768-b3d2-4f9f0def00be</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PageLogin-Btn</name>
+   <tag></tag>
+   <elementGuidId>8c6f7794-8383-44ee-ae65-1efaedec09f8</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;loginPageLoginButton&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;loginPageLoginButton&apos;]</value>
+      <webElementGuid>b5d4b2fe-a7ee-4898-88be-ccb6c78cc5b9</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

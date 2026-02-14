@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FileType-0-Type-Ddn</name>
+   <tag></tag>
+   <elementGuidId>c21596d0-e568-44cb-b4c3-d6fba8b25e8b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-file-type-0-file-type&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-file-type-0-file-type&apos;]</value>
+      <webElementGuid>7ce910bb-0f40-46cf-bd0a-689d2fbc5f83</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ManageStudies-Link</name>
+   <tag></tag>
+   <elementGuidId>d57b07e3-0860-4fec-bdc0-1a2b0224ec78</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;navbar-dropdown-item-studies-manage&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;navbar-dropdown-item-studies-manage&apos;]</value>
+      <webElementGuid>8cd57d4f-6d32-4705-bcf7-15240c7255dc</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

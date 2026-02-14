@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>BackToTop-Btn</name>
+   <tag></tag>
+   <elementGuidId>6c123170-2e8b-4b74-9921-eed96d001102</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;scroll-top-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;scroll-top-button&apos;]</value>
+      <webElementGuid>57600840-f215-4e3f-a3ac-b658f91fb290</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PendingConditions-Chkbx</name>
+   <tag></tag>
+   <elementGuidId>c31b2981-6e51-49c8-a902-e9913b5d7d09</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;pendingConditions-checkbox&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;pendingConditions-checkbox&apos;]</value>
+      <webElementGuid>99b4e60e-19e3-4877-a7d6-b6500859c76f</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

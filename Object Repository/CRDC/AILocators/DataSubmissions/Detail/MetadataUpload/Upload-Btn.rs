@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Upload-Btn</name>
+   <tag></tag>
+   <elementGuidId>6fa95598-d599-482b-aa7f-fc1cb0999e09</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;metadata-upload-file-upload-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;metadata-upload-file-upload-button&apos;]</value>
+      <webElementGuid>ea03f4bb-cf22-452a-8acc-1b285de63aa3</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

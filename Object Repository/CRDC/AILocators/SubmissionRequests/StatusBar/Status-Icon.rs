@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Status-Icon</name>
+   <tag></tag>
+   <elementGuidId>02d03e1d-5a34-444d-8460-9d8a103c0185</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;status-bar-icon&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;status-bar-icon&apos;]</value>
+      <webElementGuid>ec922b97-225c-45cb-8b0e-945d3d76bf04</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

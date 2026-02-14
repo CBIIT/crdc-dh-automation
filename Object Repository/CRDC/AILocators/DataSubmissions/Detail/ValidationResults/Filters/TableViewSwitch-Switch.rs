@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>TableViewSwitch-Switch</name>
+   <tag></tag>
+   <elementGuidId>af78b3b4-a073-4217-be42-9e1f370bf7e1</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;table-view-switch&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;table-view-switch&apos;]</value>
+      <webElementGuid>448529cf-970f-49b1-9227-6b930880a7ec</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

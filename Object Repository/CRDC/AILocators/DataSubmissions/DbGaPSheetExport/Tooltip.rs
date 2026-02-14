@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Tooltip</name>
+   <tag></tag>
+   <elementGuidId>e6663445-a71c-4af6-bfe8-87645b2da0f9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;dbGaP-sheet-export-tooltip&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;dbGaP-sheet-export-tooltip&apos;]</value>
+      <webElementGuid>3e6f9e91-cc33-4e2e-bbd9-3da810945a8b</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

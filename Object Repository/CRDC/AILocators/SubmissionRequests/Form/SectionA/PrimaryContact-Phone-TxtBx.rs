@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PrimaryContact-Phone-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>a8b3aeba-abe1-45bb-8a2b-68941c3ed03a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-a-primary-contact-phone-number&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-a-primary-contact-phone-number&apos;]</value>
+      <webElementGuid>4b36c646-5761-4b15-8022-4ebc302064c9</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

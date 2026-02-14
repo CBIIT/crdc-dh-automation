@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>LoginDialogLogin-Btn</name>
+   <tag></tag>
+   <elementGuidId>e1203879-d945-446e-85a8-0c9938209d68</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;loginDialogLoginButton&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;loginDialogLoginButton&apos;]</value>
+      <webElementGuid>adac7dc1-fc41-40ca-aff7-f45f00e3a7c4</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

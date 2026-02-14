@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ModelNavigator-Tab</name>
+   <tag></tag>
+   <elementGuidId>11b4c344-ccab-4079-a900-3e16eaedc82f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;navbar-dropdown-model-navigator&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;navbar-dropdown-model-navigator&apos;]</value>
+      <webElementGuid>e4260f91-f362-43ef-9df5-b179cb5d8c53</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

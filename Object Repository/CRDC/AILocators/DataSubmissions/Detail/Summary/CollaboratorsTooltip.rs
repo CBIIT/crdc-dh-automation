@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CollaboratorsTooltip</name>
+   <tag></tag>
+   <elementGuidId>b9fa5144-5831-471b-b7b7-5f5f328bbfe9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;collaborators-button-tooltip&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;collaborators-button-tooltip&apos;]</value>
+      <webElementGuid>f0c4efd0-9afc-444e-8239-f665d82a8f57</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

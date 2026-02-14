@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DbGaPRegistered-Switch</name>
+   <tag></tag>
+   <elementGuidId>9bcb07fa-40f8-4a19-ab57-62780e52d3f2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-c-dbGaP-registration&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-c-dbGaP-registration&apos;]</value>
+      <webElementGuid>e40d3759-5ef6-435e-9290-673bc7b8bc60</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

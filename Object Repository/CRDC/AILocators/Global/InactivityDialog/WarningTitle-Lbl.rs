@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>WarningTitle-Lbl</name>
+   <tag></tag>
+   <elementGuidId>fc58af37-c281-4252-93de-f6656707986c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;customized-dialog-title&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;customized-dialog-title&apos;]</value>
+      <webElementGuid>350010ef-a015-4486-8c5d-923195983b69</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

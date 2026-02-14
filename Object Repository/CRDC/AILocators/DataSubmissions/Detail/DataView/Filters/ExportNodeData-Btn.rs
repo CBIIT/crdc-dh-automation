@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ExportNodeData-Btn</name>
+   <tag></tag>
+   <elementGuidId>48ef2b72-74bf-4bba-97ca-7245378ea501</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;export-node-data-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;export-node-data-button&apos;]</value>
+      <webElementGuid>ec6e08b8-5282-4acd-9e19-aabf89ede729</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Tooltip</name>
+   <tag></tag>
+   <elementGuidId>f0ceb974-8e97-435a-af5a-c93d402b3b09</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;export-submission-request-tooltip&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;export-submission-request-tooltip&apos;]</value>
+      <webElementGuid>e19476fb-8f06-4aa3-ae87-b20eb6c20e39</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ReviewComment-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>538d7f6c-a98b-4c31-bd00-622b84aa372f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;review-comment&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;review-comment&apos;]</value>
+      <webElementGuid>93eb55cf-369b-413b-ad92-e2da0437a9d2</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

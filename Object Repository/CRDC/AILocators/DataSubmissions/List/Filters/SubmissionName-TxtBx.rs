@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubmissionName-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>5085eb58-50e8-44fe-9e3e-31db7010853f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;submission-name-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;submission-name-input&apos;]</value>
+      <webElementGuid>c0c63063-40c0-4bc9-a3cc-b49a0fbe4393</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>TokenInput-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>aca71150-e760-4a56-b547-632fbf3c2362</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;api-token-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;api-token-input&apos;]</value>
+      <webElementGuid>7817835f-fbcc-48eb-b7ea-65b9ca033fc7</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

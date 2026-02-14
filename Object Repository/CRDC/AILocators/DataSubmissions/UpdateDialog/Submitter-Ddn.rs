@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Submitter-Ddn</name>
+   <tag></tag>
+   <elementGuidId>9d22b461-ee99-42f0-8366-4ee344b72b1a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;update-submission-submitter-field&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;update-submission-submitter-field&apos;]</value>
+      <webElementGuid>4c376ec9-8f04-4b79-bf30-34259f2d4d42</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

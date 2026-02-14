@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubmissionType-RadioBtn</name>
+   <tag></tag>
+   <elementGuidId>4ecaaed0-c2a8-473d-ac1d-fb72750df6b3</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;create-data-submission-dialog-submission-type-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;create-data-submission-dialog-submission-type-input&apos;]</value>
+      <webElementGuid>d94a1160-0f83-43c9-a1c7-af0a64515963</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

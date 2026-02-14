@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CollaboratorHeader</name>
+   <tag></tag>
+   <elementGuidId>578495b5-e78e-42b6-bbbd-a06c71303376</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;header-collaborator&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;header-collaborator&apos;]</value>
+      <webElementGuid>fd47d6ce-0440-4135-ac8e-478e1782ddfa</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

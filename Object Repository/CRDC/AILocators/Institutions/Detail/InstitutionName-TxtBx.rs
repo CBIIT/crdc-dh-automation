@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>InstitutionName-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>02c25402-3bd5-44f0-a30a-8eeae911c56e</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;institutionName-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;institutionName-input&apos;]</value>
+      <webElementGuid>fac9c994-2281-4e1f-a092-18abf5fa5d26</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

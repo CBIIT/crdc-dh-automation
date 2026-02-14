@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Discard-Btn</name>
+   <tag></tag>
+   <elementGuidId>610108e5-eb4b-49c7-b807-ca2e3a6bec01</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[.=&apos;Discard&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[.=&apos;Discard&apos;]</value>
+      <webElementGuid>c65ed56a-f11b-4fe7-84e4-944c571e316f</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

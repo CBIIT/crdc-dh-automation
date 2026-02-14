@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ProgramOptionAll-Ddn-Option</name>
+   <tag></tag>
+   <elementGuidId>d40b3185-ad87-457a-984f-ad1e140f97ca</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;organization-option-All&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;organization-option-All&apos;]</value>
+      <webElementGuid>aa1856d7-5c6a-4313-9a27-806b16cf2043</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

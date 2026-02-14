@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DbGaPID-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>8f65ac13-9dff-42b1-9aac-d2a62db6699d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;create-data-submission-dialog-dbgap-id-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;create-data-submission-dialog-dbgap-id-input&apos;]</value>
+      <webElementGuid>c4bd8940-42ba-4a67-aa14-1cf768e3ede0</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

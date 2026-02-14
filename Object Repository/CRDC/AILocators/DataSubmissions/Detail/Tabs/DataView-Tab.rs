@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataView-Tab</name>
+   <tag></tag>
+   <elementGuidId>6b21b4ef-5b79-4278-a748-ebd83fffb47d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//a[contains(@href,&apos;/data-view&apos;)]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//a[contains(@href,&apos;/data-view&apos;)]</value>
+      <webElementGuid>af490a26-bd72-4ae0-90ca-e15cdfec7953</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

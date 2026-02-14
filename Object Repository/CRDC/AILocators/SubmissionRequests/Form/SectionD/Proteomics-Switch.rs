@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Proteomics-Switch</name>
+   <tag></tag>
+   <elementGuidId>7384b2c4-3342-4883-b30a-abe900bb635a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-proteomics&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-proteomics&apos;]</value>
+      <webElementGuid>0196934c-ff20-4c7f-af71-40fca9aab6c5</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

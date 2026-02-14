@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubmitterName-Ddn</name>
+   <tag></tag>
+   <elementGuidId>7c06f46c-bf7a-4556-90ef-49c4fd6394d0</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;submitter-name-select&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;submitter-name-select&apos;]</value>
+      <webElementGuid>4179d82a-10a7-4f81-b841-b66441f414fe</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

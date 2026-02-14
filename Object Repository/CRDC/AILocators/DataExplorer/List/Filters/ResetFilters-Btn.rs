@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ResetFilters-Btn</name>
+   <tag></tag>
+   <elementGuidId>dc7922d3-f5f8-4d52-9cff-51ed93bb234a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;reset-filters-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;reset-filters-button&apos;]</value>
+      <webElementGuid>a55569a5-4aa1-4047-82d1-c4ba13583977</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

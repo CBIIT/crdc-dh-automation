@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ErrorCount-Btn</name>
+   <tag></tag>
+   <elementGuidId>9b2d6749-9d49-4a24-8fbb-e1651adcd530</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[starts-with(@data-testid,&apos;activity-error-count-&apos;)]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[starts-with(@data-testid,&apos;activity-error-count-&apos;)]</value>
+      <webElementGuid>eaa485a8-ab95-4d88-a877-408774cfd66e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

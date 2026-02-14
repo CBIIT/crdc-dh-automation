@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>EditName-Icon</name>
+   <tag></tag>
+   <elementGuidId>5b3a1071-8330-4892-9fba-112f9950cf42</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;edit-submission-name-icon&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;edit-submission-name-icon&apos;]</value>
+      <webElementGuid>6d1b2e59-e58e-4ef6-978d-fc9bff8e790a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
