@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FileTypeTable-FileType-Header</name>
+   <tag></tag>
+   <elementGuidId>0e0a99fc-dc43-431f-9d7d-67a27f20b4d2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;review-file-type-table-file-type&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;review-file-type-table-file-type&apos;]</value>
+      <webElementGuid>7ea13ba1-19bd-4c32-a561-d18687871a73</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

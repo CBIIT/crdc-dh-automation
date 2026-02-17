@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Menu-Btn</name>
+   <tag></tag>
+   <elementGuidId>3f47466d-cb6a-4388-9d6f-d495011e512e</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;header-navbar-open-menu-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;header-navbar-open-menu-button&apos;]</value>
+      <webElementGuid>99f02ea3-224c-40a1-9747-c1db8bd68f2d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

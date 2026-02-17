@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ProgressBar-Review</name>
+   <tag></tag>
+   <elementGuidId>fefc2dc8-6ea4-486d-9198-4dbd795f0735</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;progress-bar-section-REVIEW&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;progress-bar-section-REVIEW&apos;]</value>
+      <webElementGuid>514d4711-7006-4afe-b60e-78238fe246ab</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CopyToken-Btn</name>
+   <tag></tag>
+   <elementGuidId>80917ae3-f7d4-49b7-b214-ae306d48ffc5</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;api-token-copy-token-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;api-token-copy-token-button&apos;]</value>
+      <webElementGuid>87e37669-6860-4fa0-8f3f-24f7f3edc70c</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

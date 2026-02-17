@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Login-Btn</name>
+   <tag></tag>
+   <elementGuidId>7258675f-fffe-47d6-a3bf-a3729c6b3992</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;header-navbar-login-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;header-navbar-login-button&apos;]</value>
+      <webElementGuid>e9824483-dcf2-4019-afeb-2cb306a9827d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

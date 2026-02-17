@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FileCount-Lbl</name>
+   <tag></tag>
+   <elementGuidId>14cddb55-d8ab-4c58-8cb1-19f3d07c3ef9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;metadata-upload-file-count&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;metadata-upload-file-count&apos;]</value>
+      <webElementGuid>8b66e2d4-6977-4f6e-897c-23a79edcfc57</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

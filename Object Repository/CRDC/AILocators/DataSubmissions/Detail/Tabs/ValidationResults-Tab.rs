@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ValidationResults-Tab</name>
+   <tag></tag>
+   <elementGuidId>317b3264-1c55-4dd4-b51a-2e03a983889e</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//a[contains(@href,&apos;/validation-results&apos;)]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//a[contains(@href,&apos;/validation-results&apos;)]</value>
+      <webElementGuid>3c3c97f3-907e-41a1-a88f-ce25c4a0fbd4</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

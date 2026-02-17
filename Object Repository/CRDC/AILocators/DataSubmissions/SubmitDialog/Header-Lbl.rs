@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Header-Lbl</name>
+   <tag></tag>
+   <elementGuidId>8302ebb0-4e9b-48cc-a44c-b70d1673c94b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;submit-dialog-header&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;submit-dialog-header&apos;]</value>
+      <webElementGuid>9ab5b4ec-acef-441e-9bd1-e00ca21edbc8</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

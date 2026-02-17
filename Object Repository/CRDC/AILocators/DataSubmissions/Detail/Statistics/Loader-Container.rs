@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Loader-Container</name>
+   <tag></tag>
+   <elementGuidId>ae97dc50-6225-4846-8c12-67a69be274e0</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;statistics-loader-container&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;statistics-loader-container&apos;]</value>
+      <webElementGuid>982a2660-ed9f-468a-b267-38352941bee4</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

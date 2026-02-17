@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ProgramAbbreviation-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>1c9e5441-e731-4726-98b0-51bd0e3d8482</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-b-program-abbreviation&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-b-program-abbreviation&apos;]</value>
+      <webElementGuid>d007686f-b388-42f7-b2e0-24110c8b6c15</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ErrorAlert</name>
+   <tag></tag>
+   <elementGuidId>4ca82ede-f479-4030-b41c-35434198e5bc</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;release-notes-error&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;release-notes-error&apos;]</value>
+      <webElementGuid>25a6c81d-fbdf-4ff9-b97f-b08c4bf85258</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

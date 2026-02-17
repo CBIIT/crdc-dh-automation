@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AdditionalContact-0-Phone-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>4f6870a6-aca7-46bd-8742-d90ac9175afc</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-a-additionalContacts-0-phone-number&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-a-additionalContacts-0-phone-number&apos;]</value>
+      <webElementGuid>57c5a9ea-6bcd-476c-95bb-0503d3f3e4c9</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Table-Container</name>
+   <tag></tag>
+   <elementGuidId>f3fbeda3-a9cc-43b9-89b3-5d41d21c7389</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;collaborators-table-container&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;collaborators-table-container&apos;]</value>
+      <webElementGuid>6df7e168-2a74-4fe6-87fd-55c7f1c2451e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

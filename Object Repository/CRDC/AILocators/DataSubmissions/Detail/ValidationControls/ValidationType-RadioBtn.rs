@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ValidationType-RadioBtn</name>
+   <tag></tag>
+   <elementGuidId>2a5d6f0c-abe5-4f5f-bf85-2d44be60317f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;validate-controls-validation-type&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;validate-controls-validation-type&apos;]</value>
+      <webElementGuid>6b0c51e6-055f-4157-818b-7abd384b553e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

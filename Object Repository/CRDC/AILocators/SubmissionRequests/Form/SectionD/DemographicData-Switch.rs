@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DemographicData-Switch</name>
+   <tag></tag>
+   <elementGuidId>15e05d8f-926a-4252-9158-a32a7f870672</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-demographic-data&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-demographic-data&apos;]</value>
+      <webElementGuid>59e5acc9-b1b6-490e-a4c5-dec8eb72af05</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

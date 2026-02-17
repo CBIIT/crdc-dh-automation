@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PI-ORCID-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>60442ff7-c512-4aaa-9ee7-f98695875315</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-a-pi-orcid&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-a-pi-orcid&apos;]</value>
+      <webElementGuid>b1c647b9-7237-440b-91dd-c9ae884d4730</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

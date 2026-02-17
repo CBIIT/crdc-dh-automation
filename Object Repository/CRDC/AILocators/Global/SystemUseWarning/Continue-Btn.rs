@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Continue-Btn</name>
+   <tag></tag>
+   <elementGuidId>c4e45e6e-ec74-42b3-83eb-b523ac4889bc</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;system-use-warning-dialog&apos;]//button[.=&apos;Continue&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;system-use-warning-dialog&apos;]//button[.=&apos;Continue&apos;]</value>
+      <webElementGuid>8558417b-cc08-4a2a-a39a-691f913f9314</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DeletionAlert</name>
+   <tag></tag>
+   <elementGuidId>0574636a-7f5e-42be-bf46-258fb902f4df</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;submitted-data-deletion-alert&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;submitted-data-deletion-alert&apos;]</value>
+      <webElementGuid>b8aaa820-9e10-4cc8-b576-2471b00a990a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SameAsProgramContact-Chkbx</name>
+   <tag></tag>
+   <elementGuidId>52a0bff1-81ab-4e53-9ddd-856cf792f955</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;sameAsProgramPrimaryContact-checkbox&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;sameAsProgramPrimaryContact-checkbox&apos;]</value>
+      <webElementGuid>1033ed9f-fa3d-47da-babc-c421a440f045</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

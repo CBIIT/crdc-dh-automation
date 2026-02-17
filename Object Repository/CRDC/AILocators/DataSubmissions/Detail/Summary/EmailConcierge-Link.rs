@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>EmailConcierge-Link</name>
+   <tag></tag>
+   <elementGuidId>aade047d-6b24-4214-8e6e-d379353bc79c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;email-primary-contact-link&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;email-primary-contact-link&apos;]</value>
+      <webElementGuid>0e0ea11d-f4cc-4835-aca7-8c5db590bb63</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

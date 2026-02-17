@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Save-Btn</name>
+   <tag></tag>
+   <elementGuidId>796ea5dd-5ff6-4e49-8d1d-2e847d1bd95d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;submission-form-save-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;submission-form-save-button&apos;]</value>
+      <webElementGuid>d89a7b7e-225a-4299-baf6-e728e59ea21b</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

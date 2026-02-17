@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>USABanner</name>
+   <tag></tag>
+   <elementGuidId>c73cef67-c729-4b61-afec-d5b5181a7c55</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;navigation-flag-banner&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;navigation-flag-banner&apos;]</value>
+      <webElementGuid>bfab7ff7-1d25-4083-8275-7b7b426de389</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataDeIdentified-RadioBtn</name>
+   <tag></tag>
+   <elementGuidId>cab4bf54-b95c-4147-b65a-396d9bb45bfa</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-data-de-identified&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-data-de-identified&apos;]</value>
+      <webElementGuid>d23b8772-66d1-4646-b05b-b64ef7a29846</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

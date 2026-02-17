@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Reset-Btn</name>
+   <tag></tag>
+   <elementGuidId>24045f6c-764d-4d5f-8110-4bf168845553</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;reset-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;reset-button&apos;]</value>
+      <webElementGuid>3af9f9b8-a3a9-4f42-92f8-7d0bd3115b26</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

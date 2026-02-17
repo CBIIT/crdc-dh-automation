@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CLIVersion-Link</name>
+   <tag></tag>
+   <elementGuidId>59b9d3e7-2ead-4586-8ac6-9aea1c27fa9d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;uploader-cli-version-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;uploader-cli-version-button&apos;]</value>
+      <webElementGuid>9d6a8849-fa7d-4fba-ad1e-f91237fd14cd</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

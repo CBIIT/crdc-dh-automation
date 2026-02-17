@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubmittedID-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>09dc4fb4-422d-4144-a148-38f0dc74c50a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;data-content-submitted-id-filter&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;data-content-submitted-id-filter&apos;]</value>
+      <webElementGuid>2156c88a-5703-4a50-859d-6a646bfa5005</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

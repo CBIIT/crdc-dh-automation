@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>NumberOfSubjects-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>cd310b8a-c4af-42e5-a33e-e9f76056b0c6</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-c-number-of-subjects-included-in-the-submission&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-c-number-of-subjects-included-in-the-submission&apos;]</value>
+      <webElementGuid>1b2d57f7-c41e-40b1-bb21-62cd2b40c49a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

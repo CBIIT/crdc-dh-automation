@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>TimeoutClose-Btn</name>
+   <tag></tag>
+   <elementGuidId>be6c89df-6794-4e92-9cce-ea71d6c7399f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[.=&apos;CLOSE&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[.=&apos;CLOSE&apos;]</value>
+      <webElementGuid>4bf7e3da-b0c8-4aba-a7d3-5bdf30732aa7</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

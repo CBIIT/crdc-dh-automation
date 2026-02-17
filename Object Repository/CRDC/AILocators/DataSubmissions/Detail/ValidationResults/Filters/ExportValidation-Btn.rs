@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ExportValidation-Btn</name>
+   <tag></tag>
+   <elementGuidId>ac47d8bd-cb24-426e-bcb0-6426f1c4d984</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;export-validation-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;export-validation-button&apos;]</value>
+      <webElementGuid>b4078a08-d6b9-418b-a0b3-85e0831b0eb8</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

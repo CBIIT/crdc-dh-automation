@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Close-Btn</name>
+   <tag></tag>
+   <elementGuidId>54e73af4-67e5-469b-855d-96db66ac3dd3</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;uploader-cli-close-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;uploader-cli-close-button&apos;]</value>
+      <webElementGuid>75818baa-f290-4c59-8f11-5c35f16c4f6f</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

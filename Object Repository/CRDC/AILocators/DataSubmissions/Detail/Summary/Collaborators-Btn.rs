@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Collaborators-Btn</name>
+   <tag></tag>
+   <elementGuidId>6444c557-be00-4b2e-8c18-fccdc499201f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;collaborators-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;collaborators-button&apos;]</value>
+      <webElementGuid>39d158d7-0bd4-4347-a96a-26fcf810b8d2</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

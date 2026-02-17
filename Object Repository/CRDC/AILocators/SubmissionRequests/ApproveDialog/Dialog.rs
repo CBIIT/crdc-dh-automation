@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Dialog</name>
+   <tag></tag>
+   <elementGuidId>6cae633f-11a1-4222-af3d-a9c86ce5a928</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;approve-form-dialog&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;approve-form-dialog&apos;]</value>
+      <webElementGuid>2d5d53be-cc86-419a-b1cf-7c4caad741f6</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

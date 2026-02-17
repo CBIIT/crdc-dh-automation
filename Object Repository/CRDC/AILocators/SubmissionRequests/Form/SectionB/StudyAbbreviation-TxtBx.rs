@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>StudyAbbreviation-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>0614282b-b2e4-4ebf-ada8-c1e050934e9b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-b-study-abbreviation-or-acronym&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-b-study-abbreviation-or-acronym&apos;]</value>
+      <webElementGuid>42468420-ba51-4f7e-a844-826e7bf1284c</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

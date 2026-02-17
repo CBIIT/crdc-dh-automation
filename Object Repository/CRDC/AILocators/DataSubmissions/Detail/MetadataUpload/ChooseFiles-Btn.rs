@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ChooseFiles-Btn</name>
+   <tag></tag>
+   <elementGuidId>a8f84199-2c8a-44bd-84ee-4db8dced6f4b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;metadata-upload-file-select-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;metadata-upload-file-select-button&apos;]</value>
+      <webElementGuid>c5e78eb7-004d-4eaa-9f55-4a9546facfa4</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

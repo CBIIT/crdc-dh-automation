@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AccountStatus-Ddn</name>
+   <tag></tag>
+   <elementGuidId>e5a9a769-19cb-480b-99b2-c3d53a02839c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@aria-labelledby=&apos;userStatusLabel&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@aria-labelledby=&apos;userStatusLabel&apos;]</value>
+      <webElementGuid>924bbb36-cdb1-4ef8-ac1d-202fde2efd9e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

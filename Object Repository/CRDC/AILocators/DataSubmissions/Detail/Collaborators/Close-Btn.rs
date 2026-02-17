@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Close-Btn</name>
+   <tag></tag>
+   <elementGuidId>c48603a1-a8f9-4c17-92a9-df24d7c2b1f1</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;collaborators-dialog-close-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;collaborators-dialog-close-button&apos;]</value>
+      <webElementGuid>1e295a36-902d-451b-b1e0-f3baa995e93d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

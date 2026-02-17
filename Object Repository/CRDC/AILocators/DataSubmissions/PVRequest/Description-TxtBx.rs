@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Description-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>8a77714d-4e73-4a9c-9ede-a61e4ab77caf</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;request-pv-description&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;request-pv-description&apos;]</value>
+      <webElementGuid>f1f00ad1-049d-4a8b-af36-c4ccf68fbdde</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

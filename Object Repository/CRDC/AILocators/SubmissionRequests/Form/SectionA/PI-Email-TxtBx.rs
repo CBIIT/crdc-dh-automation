@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PI-Email-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>dacd308c-c959-4545-9f16-5693cd0694f9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-a-pi-email&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-a-pi-email&apos;]</value>
+      <webElementGuid>4cd4eb47-722a-464e-af77-edcd07cc8415</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

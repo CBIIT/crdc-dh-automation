@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>StudyName-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>a223cc0e-b939-45e0-a009-4f17ac012930</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;studyName-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;studyName-input&apos;]</value>
+      <webElementGuid>6242f0b8-dc8c-472e-9bb8-721a6d3c5fd3</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

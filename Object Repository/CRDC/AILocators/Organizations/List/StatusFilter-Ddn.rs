@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>StatusFilter-Ddn</name>
+   <tag></tag>
+   <elementGuidId>fc29b119-26e5-41c1-a74b-09fb6492fcd8</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;status-filter&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;status-filter&apos;]</value>
+      <webElementGuid>b961202f-5f89-4254-add7-02e1763f58c0</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

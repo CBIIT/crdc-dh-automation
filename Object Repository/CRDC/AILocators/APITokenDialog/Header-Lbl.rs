@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Header-Lbl</name>
+   <tag></tag>
+   <elementGuidId>7d013745-ce61-4e6c-88ab-8cbfe4f715ca</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;api-token-header&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;api-token-header&apos;]</value>
+      <webElementGuid>40b30c2b-eb1a-4bd3-b459-539cbc11b3f8</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

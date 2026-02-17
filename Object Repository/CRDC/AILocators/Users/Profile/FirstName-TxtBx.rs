@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FirstName-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>3b4b315d-3fb5-4265-a759-8a6a52ce07bf</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@aria-labelledby=&apos;firstNameLabel&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@aria-labelledby=&apos;firstNameLabel&apos;]</value>
+      <webElementGuid>697e4239-9709-42f9-a7c1-ba3937300bd9</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

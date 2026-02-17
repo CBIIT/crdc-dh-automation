@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Tooltip</name>
+   <tag></tag>
+   <elementGuidId>e46a4b06-4a77-4171-b625-bce694c6d064</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;export-application-excel-template-tooltip&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;export-application-excel-template-tooltip&apos;]</value>
+      <webElementGuid>4117ed47-2d3d-426d-8aa5-009a6417ccbd</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

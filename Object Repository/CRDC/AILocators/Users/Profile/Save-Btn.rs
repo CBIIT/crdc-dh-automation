@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Save-Btn</name>
+   <tag></tag>
+   <elementGuidId>ef76c8e7-09ab-4391-97d2-d64cd743386c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[.=&apos;Save&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[.=&apos;Save&apos;]</value>
+      <webElementGuid>342d5015-76e3-4bd9-8f3e-3bcba061d9cb</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

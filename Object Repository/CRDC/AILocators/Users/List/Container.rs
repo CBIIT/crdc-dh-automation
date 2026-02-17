@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Container</name>
+   <tag></tag>
+   <elementGuidId>d05cb324-4ebc-4ee7-a4f4-0342eebe8609</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;list-view-container&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;list-view-container&apos;]</value>
+      <webElementGuid>1a8dea86-c1d8-42cf-8ef2-ef24b857d524</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

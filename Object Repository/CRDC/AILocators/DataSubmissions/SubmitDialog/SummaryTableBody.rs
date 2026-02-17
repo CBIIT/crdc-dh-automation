@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SummaryTableBody</name>
+   <tag></tag>
+   <elementGuidId>e6998e3f-4313-401d-9b4e-7b382fcd28d6</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;submit-summary-table-body&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;submit-summary-table-body&apos;]</value>
+      <webElementGuid>421654ee-f651-4c2a-a989-3f500fabf059</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

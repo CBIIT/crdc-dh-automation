@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ORCID-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>0525f011-0bc4-40bf-99e4-e6a530f1c908</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;ORCID-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;ORCID-input&apos;]</value>
+      <webElementGuid>2a8376ad-dfed-4a52-b1f3-ca557d1fb9f5</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

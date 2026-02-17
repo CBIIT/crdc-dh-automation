@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AddFundingAgency-Btn</name>
+   <tag></tag>
+   <elementGuidId>551e9cd1-742c-4293-a1be-6bdf5da7f3d1</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-b-add-funding-agency-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-b-add-funding-agency-button&apos;]</value>
+      <webElementGuid>27156622-dcea-471f-ba56-f1177eae2540</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

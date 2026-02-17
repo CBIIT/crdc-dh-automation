@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Close-Btn</name>
+   <tag></tag>
+   <elementGuidId>35cbb674-107c-42b6-a02d-8bea3becefa0</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;data-view-dialog-cancel-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;data-view-dialog-cancel-button&apos;]</value>
+      <webElementGuid>23dbdbdf-1917-41b9-9ca5-ee11aad5a1d0</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

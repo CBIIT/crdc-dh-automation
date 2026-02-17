@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CopyID-Btn</name>
+   <tag></tag>
+   <elementGuidId>99484fa9-7483-422d-b340-ca85f849d506</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;data-submission-copy-id-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;data-submission-copy-id-button&apos;]</value>
+      <webElementGuid>b56897d9-5495-4513-aa9a-95c053512937</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

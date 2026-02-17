@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ExportValidationTooltip</name>
+   <tag></tag>
+   <elementGuidId>1f0cd3ca-ff1e-4d34-8591-43d1f2b213f5</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;export-validation-tooltip&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;export-validation-tooltip&apos;]</value>
+      <webElementGuid>00603050-5b85-487a-848b-25bae70d14ea</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

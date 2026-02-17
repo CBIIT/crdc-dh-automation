@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>StatusChip</name>
+   <tag></tag>
+   <elementGuidId>6c2c9ff3-9943-4609-bf7d-9a7c37c20fe9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;validation-status-chip&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;validation-status-chip&apos;]</value>
+      <webElementGuid>2d9ba677-214b-4e55-9a4f-19756773e33c</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

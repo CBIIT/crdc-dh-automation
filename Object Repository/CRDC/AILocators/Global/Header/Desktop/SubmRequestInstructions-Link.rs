@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubmRequestInstructions-Link</name>
+   <tag></tag>
+   <elementGuidId>0d507545-e5f9-4db7-8c04-0e952659966d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;submission-request-instructions&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;submission-request-instructions&apos;]</value>
+      <webElementGuid>4fc848cc-6dc3-4a65-850d-ebc29e43fbe9</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

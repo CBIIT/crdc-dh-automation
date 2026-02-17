@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>TableBody</name>
+   <tag></tag>
+   <elementGuidId>47539bd2-6296-4252-a39b-f90229bc5883</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;generic-table-body&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;generic-table-body&apos;]</value>
+      <webElementGuid>286cdac7-b502-4150-9f09-b4ab3f1776af</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

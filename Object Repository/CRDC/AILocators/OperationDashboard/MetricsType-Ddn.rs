@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>MetricsType-Ddn</name>
+   <tag></tag>
+   <elementGuidId>5eb90be9-0588-45c8-9d9e-2b79f750d006</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;dashboard-type&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;dashboard-type&apos;]</value>
+      <webElementGuid>5e0173b7-f531-4831-ab27-0723e66ca4ab</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

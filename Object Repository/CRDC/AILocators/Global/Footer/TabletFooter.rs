@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>TabletFooter</name>
+   <tag></tag>
+   <elementGuidId>423adf5c-6c20-4603-ba14-9914dc109f9c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;tablet-footer&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;tablet-footer&apos;]</value>
+      <webElementGuid>17fb5092-c01a-4b65-ae6b-954f2e442514</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Cancel-Btn</name>
+   <tag></tag>
+   <elementGuidId>04f49142-c49d-49ac-9878-9dcd34a56a64</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;submit-dialog-cancel-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;submit-dialog-cancel-button&apos;]</value>
+      <webElementGuid>ed4b6f0c-af25-4310-9b43-f35a260c4acf</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FileTypeTable-Count-Header</name>
+   <tag></tag>
+   <elementGuidId>d6cedec8-7c40-419c-8c41-29d6e8de36a5</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;review-file-type-table-number-of-files&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;review-file-type-table-number-of-files&apos;]</value>
+      <webElementGuid>f914fec5-de4b-416a-b088-48d064f36980</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

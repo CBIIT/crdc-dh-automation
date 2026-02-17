@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Container</name>
+   <tag></tag>
+   <elementGuidId>4c14420b-071d-4ba6-9f75-08c9d40d2fa3</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;study-view-container&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;study-view-container&apos;]</value>
+      <webElementGuid>ab9f9a2d-047d-4e58-9258-693fae494456</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

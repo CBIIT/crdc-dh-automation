@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubmitterNameOptionAll-Ddn-Option</name>
+   <tag></tag>
+   <elementGuidId>46676286-cac3-4b76-ad95-f310f92a420a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;submitter-name-option-All&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;submitter-name-option-All&apos;]</value>
+      <webElementGuid>60b9f379-16ec-4ce6-8d04-c7e24cc4a347</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

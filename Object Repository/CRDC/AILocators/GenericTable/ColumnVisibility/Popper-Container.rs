@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Popper-Container</name>
+   <tag></tag>
+   <elementGuidId>696b71f8-eadb-4434-8ff0-8d8e6b9ef98a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;column-visibility-popper&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;column-visibility-popper&apos;]</value>
+      <webElementGuid>a155956d-bf74-420f-9153-1c938a929f0b</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

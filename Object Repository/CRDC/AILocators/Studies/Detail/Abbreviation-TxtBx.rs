@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Abbreviation-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>330f275a-7d53-4a6d-bd21-32670aa059e1</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;studyAbbreviation-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;studyAbbreviation-input&apos;]</value>
+      <webElementGuid>21d812d6-f48d-42b8-941a-87b75e32ceb5</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

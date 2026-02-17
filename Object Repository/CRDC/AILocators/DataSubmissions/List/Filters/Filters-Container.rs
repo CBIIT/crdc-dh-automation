@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Filters-Container</name>
+   <tag></tag>
+   <elementGuidId>1e825667-d2a9-43bf-a260-26788315e6ff</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;data-submission-list-filters&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;data-submission-list-filters&apos;]</value>
+      <webElementGuid>bd07d16d-0573-4eae-aa35-18602a759f0f</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

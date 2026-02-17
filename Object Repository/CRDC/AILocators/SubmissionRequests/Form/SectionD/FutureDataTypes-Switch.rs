@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FutureDataTypes-Switch</name>
+   <tag></tag>
+   <elementGuidId>e884b320-b26f-428e-ba34-da88292c2804</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-additional-data-in-future&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-additional-data-in-future&apos;]</value>
+      <webElementGuid>a039221e-c37a-4e59-8150-3753c81b17f3</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>RowCheckbox-Chkbx</name>
+   <tag></tag>
+   <elementGuidId>831f63ab-a870-437b-be52-a5273e5e98d7</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;row-checkbox&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;row-checkbox&apos;]</value>
+      <webElementGuid>99c9d39a-9ae7-4b80-b039-5285ba0d4dbf</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

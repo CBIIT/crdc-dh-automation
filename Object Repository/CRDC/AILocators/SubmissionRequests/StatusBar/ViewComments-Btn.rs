@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ViewComments-Btn</name>
+   <tag></tag>
+   <elementGuidId>e742e684-75b6-4a5a-99fd-2f689b37fa55</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;status-bar-review-comments-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;status-bar-review-comments-button&apos;]</value>
+      <webElementGuid>46283962-a055-4098-9041-3a66145ef8ec</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

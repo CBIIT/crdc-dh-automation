@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Dialog</name>
+   <tag></tag>
+   <elementGuidId>eef3ab5a-dced-486d-ae22-9e918a19ecde</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;file-list-dialog&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;file-list-dialog&apos;]</value>
+      <webElementGuid>b7c2cd9f-9dd2-4531-acae-8687e24149a6</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

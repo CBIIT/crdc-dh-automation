@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>BackToMainMenu-Btn</name>
+   <tag></tag>
+   <elementGuidId>5f9ad2b8-098b-45f5-be06-4607fb6e0a24</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;navbar-back-to-main-menu-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;navbar-back-to-main-menu-button&apos;]</value>
+      <webElementGuid>6922b7a0-2780-42ee-8251-3ead7870494d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

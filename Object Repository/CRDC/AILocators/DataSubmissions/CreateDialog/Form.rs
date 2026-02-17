@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Form</name>
+   <tag></tag>
+   <elementGuidId>ae86babe-efa2-49d5-ba1a-b74d8ada9cb3</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;create-submission-dialog-form&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;create-submission-dialog-form&apos;]</value>
+      <webElementGuid>5ac3bfbc-5e22-4a45-8f06-fe3a0bd4b3d8</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

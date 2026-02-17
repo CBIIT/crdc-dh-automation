@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Dialog</name>
+   <tag></tag>
+   <elementGuidId>70291a45-f082-4720-b5a3-ab0f0cc5ae47</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;review-comments-dialog&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;review-comments-dialog&apos;]</value>
+      <webElementGuid>0469f32e-c7fc-42a8-b69c-a98f75537ca0</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ExportCrossValidationTooltip</name>
+   <tag></tag>
+   <elementGuidId>7decb0e7-a59e-4143-8b28-db054e45886f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;export-cross-validation-tooltip&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;export-cross-validation-tooltip&apos;]</value>
+      <webElementGuid>bd5ddb83-65c7-4372-961e-c3b9114f65b2</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

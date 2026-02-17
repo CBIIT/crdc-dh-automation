@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>RoleFilter-Ddn</name>
+   <tag></tag>
+   <elementGuidId>75b04389-a1fe-46c0-91bf-914e0954a4af</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;role-filter&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;role-filter&apos;]</value>
+      <webElementGuid>d420abb4-0153-49d9-a7a9-eecbc0f875ef</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

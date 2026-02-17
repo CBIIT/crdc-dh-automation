@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Container</name>
+   <tag></tag>
+   <elementGuidId>37ce3df0-ca3a-4c56-ac77-cc7b1d4a9280</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;operation-dashboard-container&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;operation-dashboard-container&apos;]</value>
+      <webElementGuid>010b307e-d9e2-473c-be38-fe191a80b0bb</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

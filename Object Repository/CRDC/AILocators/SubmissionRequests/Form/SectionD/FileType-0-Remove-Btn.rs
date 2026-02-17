@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FileType-0-Remove-Btn</name>
+   <tag></tag>
+   <elementGuidId>d963826a-cbee-4b55-a13e-4afc5d5fc2a6</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-file-type-0-remove-file-type-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-file-type-0-remove-file-type-button&apos;]</value>
+      <webElementGuid>463c7cbb-0945-41e0-8c1d-1161869bcf9c</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

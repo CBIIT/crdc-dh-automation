@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ErrorList-Container</name>
+   <tag></tag>
+   <elementGuidId>66110133-dc87-475a-8b01-aec19d742308</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;error-details-error-list&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;error-details-error-list&apos;]</value>
+      <webElementGuid>cd3f0f28-dad2-4592-b4fb-d4ba74c7ebfe</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

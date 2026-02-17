@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Confirm-Btn</name>
+   <tag></tag>
+   <elementGuidId>5a580f68-75c4-4994-9480-9b58626e8a40</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;submit-dialog-confirm-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;submit-dialog-confirm-button&apos;]</value>
+      <webElementGuid>3d6f1506-5861-4771-850c-110743a0f208</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

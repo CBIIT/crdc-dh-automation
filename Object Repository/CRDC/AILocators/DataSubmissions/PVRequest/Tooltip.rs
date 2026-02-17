@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Tooltip</name>
+   <tag></tag>
+   <elementGuidId>2f00ddcf-49c7-4e36-8c51-70abafccce74</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;request-pv-tooltip&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;request-pv-tooltip&apos;]</value>
+      <webElementGuid>2c41bf3d-4a3e-4b88-a6e7-253390144f99</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

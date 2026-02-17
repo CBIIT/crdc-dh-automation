@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CLIDownload-Link</name>
+   <tag></tag>
+   <elementGuidId>c5b0bf6e-6f83-46af-8695-1cf1d15f4f1c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;uploader-cli-download-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;uploader-cli-download-button&apos;]</value>
+      <webElementGuid>ae09487a-acc4-4b7d-84d7-5f7ee21f6782</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

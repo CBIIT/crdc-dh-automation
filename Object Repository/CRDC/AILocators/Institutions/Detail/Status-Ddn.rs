@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Status-Ddn</name>
+   <tag></tag>
+   <elementGuidId>0445af62-65d0-4c9f-8ebc-d93faeb57c0e</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;status-select&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;status-select&apos;]</value>
+      <webElementGuid>ea424da4-c8fe-4f1d-8979-6b1b6e4b75a5</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

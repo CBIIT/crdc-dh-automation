@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataFolder-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>d3d79476-3aaf-46bc-9186-f4079a902d7b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;uploader-config-dialog-input-data-folder&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;uploader-config-dialog-input-data-folder&apos;]</value>
+      <webElementGuid>b1439d52-756f-47ca-8bdd-a0d245411b8d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Header-Lbl</name>
+   <tag></tag>
+   <elementGuidId>bb54aeb2-faab-4ffb-acad-5de71b8c4752</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;delete-dialog-header&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;delete-dialog-header&apos;]</value>
+      <webElementGuid>f6e59aa3-310d-4d18-8ba3-9b4fbd90d411</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

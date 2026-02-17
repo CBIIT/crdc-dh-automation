@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Filters-Container</name>
+   <tag></tag>
+   <elementGuidId>069909b1-badb-4b33-a109-e85f7f7c077d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;data-explorer-filters&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;data-explorer-filters&apos;]</value>
+      <webElementGuid>974af5ac-c412-4f4d-85d7-d0783ddf7c99</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

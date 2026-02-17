@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Withdraw-Btn</name>
+   <tag></tag>
+   <elementGuidId>e6dc9d52-5700-4578-9e97-c2bf11809a0d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[.=&apos;Withdraw&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[.=&apos;Withdraw&apos;]</value>
+      <webElementGuid>f8071aa1-7fe5-4871-99bb-e6edb3da2e8a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

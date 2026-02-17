@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Confirm-Btn</name>
+   <tag></tag>
+   <elementGuidId>558f36a8-b899-4e39-82db-4492e61f513d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;delete-dialog-confirm-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;delete-dialog-confirm-button&apos;]</value>
+      <webElementGuid>c66efb7f-3538-47ad-a075-2ee8e1b226af</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

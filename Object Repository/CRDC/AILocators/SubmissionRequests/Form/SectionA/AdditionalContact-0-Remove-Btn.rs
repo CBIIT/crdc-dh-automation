@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AdditionalContact-0-Remove-Btn</name>
+   <tag></tag>
+   <elementGuidId>162c31a8-9981-4ed6-a095-5302bb6ee6bb</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-a-additionalContacts-0-remove-contact-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-a-additionalContacts-0-remove-contact-button&apos;]</value>
+      <webElementGuid>5b790c98-0787-4ec3-adfe-265cb8ec474b</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

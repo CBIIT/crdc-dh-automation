@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>NodeType-Ddn</name>
+   <tag></tag>
+   <elementGuidId>46422227-6f0e-4ef0-b007-3fc89c747f2b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;cross-validation-nodeType-filter&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;cross-validation-nodeType-filter&apos;]</value>
+      <webElementGuid>a32a57b4-e246-45fc-8948-1b1bc3fea7d2</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

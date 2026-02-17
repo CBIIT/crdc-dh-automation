@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Version-Lbl</name>
+   <tag></tag>
+   <elementGuidId>ae216ec1-b5c7-44e9-b146-51a7884788a8</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;uploader-cli-version&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;uploader-cli-version&apos;]</value>
+      <webElementGuid>462f06e0-2d80-428e-985c-2226bf0eb2da</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

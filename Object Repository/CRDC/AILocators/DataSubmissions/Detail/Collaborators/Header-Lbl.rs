@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Header-Lbl</name>
+   <tag></tag>
+   <elementGuidId>eea131bb-34be-4912-99fe-544d02226110</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;collaborators-dialog-header&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;collaborators-dialog-header&apos;]</value>
+      <webElementGuid>4712de30-966d-4744-a756-abc7ea9d119d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

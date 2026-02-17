@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Close-Btn</name>
+   <tag></tag>
+   <elementGuidId>60d313f6-6315-486f-994f-e45de45fdb08</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;review-comments-dialog-close&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;review-comments-dialog-close&apos;]</value>
+      <webElementGuid>ec035c4e-277f-422f-96cf-207963bacac3</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

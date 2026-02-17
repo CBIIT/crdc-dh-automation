@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Description-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>1e639250-b7d7-479c-816d-df3348132f88</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@aria-labelledby=&apos;descriptionLabel&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@aria-labelledby=&apos;descriptionLabel&apos;]</value>
+      <webElementGuid>cc6225d6-b0c4-4dac-8dcf-ff271ad8454d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>GreyOverlay-Btn</name>
+   <tag></tag>
+   <elementGuidId>b3b8a321-01fe-448b-bfcf-9bedde01a2ee</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;navbar-close-navbar-grey-section&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;navbar-close-navbar-grey-section&apos;]</value>
+      <webElementGuid>1a801abc-2544-4866-85fe-68e9932e0054</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

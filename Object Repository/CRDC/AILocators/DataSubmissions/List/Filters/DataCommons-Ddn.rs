@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataCommons-Ddn</name>
+   <tag></tag>
+   <elementGuidId>9ffafc3b-3b8f-43ac-9c28-3769c5111597</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;data-commons-select&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;data-commons-select&apos;]</value>
+      <webElementGuid>6e5b56d4-aad7-4ae5-b744-f5209f0afc7f</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

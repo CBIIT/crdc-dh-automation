@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataCell</name>
+   <tag></tag>
+   <elementGuidId>14dd7c4a-c86f-4b58-b2fd-cdfc8980b045</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;table-body-cell-with-data&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;table-body-cell-with-data&apos;]</value>
+      <webElementGuid>c5ca7946-4d10-4fdb-9e8e-2d53c0efdd5c</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

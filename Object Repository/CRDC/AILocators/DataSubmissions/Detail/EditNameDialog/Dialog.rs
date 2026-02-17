@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Dialog</name>
+   <tag></tag>
+   <elementGuidId>138b4ec9-13fe-4dce-b95d-dd93cfd8071c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;edit-submission-name-dialog&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;edit-submission-name-dialog&apos;]</value>
+      <webElementGuid>df969ff3-db09-4d27-85bd-dfa4d27fd00e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

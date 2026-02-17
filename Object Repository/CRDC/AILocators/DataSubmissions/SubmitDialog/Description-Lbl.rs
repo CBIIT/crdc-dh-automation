@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Description-Lbl</name>
+   <tag></tag>
+   <elementGuidId>d5edf509-6fca-4c9a-b7dc-99226fd56377</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;submit-dialog-description&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;submit-dialog-description&apos;]</value>
+      <webElementGuid>1e90cc7c-4978-460a-8fcc-5a3089f9125d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

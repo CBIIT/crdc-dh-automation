@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PI-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>b8c5fe3e-7b11-48e5-9ad0-ef1f4a612bcf</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;PI-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;PI-input&apos;]</value>
+      <webElementGuid>cfa7c043-c7a7-4ab5-9e13-cae769f529cc</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

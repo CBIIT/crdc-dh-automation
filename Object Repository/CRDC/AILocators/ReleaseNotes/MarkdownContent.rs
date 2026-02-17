@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>MarkdownContent</name>
+   <tag></tag>
+   <elementGuidId>8bb4e369-e35a-4d2a-8ce0-b0ae06f91de4</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;release-notes-markdown&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;release-notes-markdown&apos;]</value>
+      <webElementGuid>473fd199-3d5e-4299-9986-ae17eff9c926</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

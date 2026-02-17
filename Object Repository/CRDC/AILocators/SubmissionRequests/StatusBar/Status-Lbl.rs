@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Status-Lbl</name>
+   <tag></tag>
+   <elementGuidId>b88ebfd3-fad6-412a-a3a2-a5c0700db18e</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;status-bar-status&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;status-bar-status&apos;]</value>
+      <webElementGuid>b3e0a614-63a2-4dd3-bb3b-3fddccbe3586</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
