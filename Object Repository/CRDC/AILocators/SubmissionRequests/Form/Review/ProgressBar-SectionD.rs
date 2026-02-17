@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ProgressBar-SectionD</name>
+   <tag></tag>
+   <elementGuidId>8cac75b0-e17a-4f78-b0cc-3db6dfaa5385</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;progress-bar-section-D&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;progress-bar-section-D&apos;]</value>
+      <webElementGuid>3266e5ea-8c44-4179-bd79-ea8d16f921e8</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

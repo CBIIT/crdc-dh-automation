@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>OtherCancerTypes-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>7116b346-6f48-40c8-b145-45cfeb49af3d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-c-other-cancer-types&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-c-other-cancer-types&apos;]</value>
+      <webElementGuid>30252a35-765e-4766-b938-49c51f8d8ca9</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

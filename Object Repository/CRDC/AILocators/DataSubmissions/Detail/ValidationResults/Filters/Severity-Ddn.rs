@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Severity-Ddn</name>
+   <tag></tag>
+   <elementGuidId>3bfe9883-3140-4662-8a5f-79f9d1391cd6</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;quality-control-severity-filter&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;quality-control-severity-filter&apos;]</value>
+      <webElementGuid>7bce88a2-2b76-47a9-b5b1-8f3456b659ce</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

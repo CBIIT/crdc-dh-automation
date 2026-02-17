@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>UploadActivities-Tab</name>
+   <tag></tag>
+   <elementGuidId>9f82778e-0f65-4286-bbd5-0950898394e6</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//a[contains(@href,&apos;/upload-activity&apos;)]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//a[contains(@href,&apos;/upload-activity&apos;)]</value>
+      <webElementGuid>ddf6eb4b-5f23-40b7-bc10-c88356150d9e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

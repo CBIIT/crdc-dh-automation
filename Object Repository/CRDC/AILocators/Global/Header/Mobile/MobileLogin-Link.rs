@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>MobileLogin-Link</name>
+   <tag></tag>
+   <elementGuidId>a3abb95c-7e98-42da-be80-3a2fea2ddf65</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;navbar-link-login&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;navbar-link-login&apos;]</value>
+      <webElementGuid>7a00a7d8-2007-4695-8750-cf7e8a698c4a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

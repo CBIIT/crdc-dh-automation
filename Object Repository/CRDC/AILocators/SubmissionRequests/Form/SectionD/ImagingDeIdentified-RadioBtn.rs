@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ImagingDeIdentified-RadioBtn</name>
+   <tag></tag>
+   <elementGuidId>f656f0d4-e4c0-4ede-a052-c12c88993335</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-imaging-de-identified&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-imaging-de-identified&apos;]</value>
+      <webElementGuid>69f715fb-30a7-4243-9ad5-326d3f3ebe4d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

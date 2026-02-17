@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PrimaryContact-Institution-Ddn</name>
+   <tag></tag>
+   <elementGuidId>e5ccd5f0-1834-463a-9acc-b3e4c689b6fd</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-a-primary-contact-institution&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-a-primary-contact-institution&apos;]</value>
+      <webElementGuid>bc6bb10f-4d70-40db-8305-86834c5c389d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

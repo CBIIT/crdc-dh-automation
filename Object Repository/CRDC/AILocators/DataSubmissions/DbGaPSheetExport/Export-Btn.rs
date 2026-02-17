@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Export-Btn</name>
+   <tag></tag>
+   <elementGuidId>ce452cb5-778d-4f56-986d-45ae775fb501</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;dbgap-sheet-export-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;dbgap-sheet-export-button&apos;]</value>
+      <webElementGuid>01ad8d91-6d50-44f8-9b4f-70b025b6dee1</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ControlledAccess-Chkbx</name>
+   <tag></tag>
+   <elementGuidId>57cc184a-2da3-4e6f-a4d3-ed52e232f1c0</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;controlledAccess-checkbox&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;controlledAccess-checkbox&apos;]</value>
+      <webElementGuid>a932a5b6-351f-4ef0-9afc-bea20b323876</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

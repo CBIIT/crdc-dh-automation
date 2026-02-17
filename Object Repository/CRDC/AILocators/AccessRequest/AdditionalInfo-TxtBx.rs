@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AdditionalInfo-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>f45117fe-929a-4c49-b342-080c2ea62b27</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;access-request-additionalInfo-field&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;access-request-additionalInfo-field&apos;]</value>
+      <webElementGuid>d0f20bae-9f38-4301-84a4-7e332f13d1af</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

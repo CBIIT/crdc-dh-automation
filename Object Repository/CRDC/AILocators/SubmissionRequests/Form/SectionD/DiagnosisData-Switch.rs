@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DiagnosisData-Switch</name>
+   <tag></tag>
+   <elementGuidId>f580c180-9e69-4e77-b36a-7a96c4b47df2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-diagnosis-data&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-diagnosis-data&apos;]</value>
+      <webElementGuid>6d590236-c891-4616-a5c3-ae202f1a98d2</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

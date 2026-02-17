@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>LoginDialogLink-Link</name>
+   <tag></tag>
+   <elementGuidId>cbfb3c25-76a1-436c-bd37-9f19631f752c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;loginDialogLinkToLogin&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;loginDialogLinkToLogin&apos;]</value>
+      <webElementGuid>e714b2ba-b3fa-47fd-b398-28b56b6783ff</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>NodeInfo-Lbl</name>
+   <tag></tag>
+   <elementGuidId>13dfd27a-125b-4858-8848-dc308aa28eed</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;error-details-node-info&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;error-details-node-info&apos;]</value>
+      <webElementGuid>e0f1b7fb-c4e6-474d-91ec-4135f407222d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

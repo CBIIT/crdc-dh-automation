@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>LoginLoader</name>
+   <tag></tag>
+   <elementGuidId>8ab8189f-c5a9-443c-be92-7326ae8b8ec7</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;login-flow-loader&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;login-flow-loader&apos;]</value>
+      <webElementGuid>f8de222c-2cc6-4c0f-94f8-bbd46e6cc6b6</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

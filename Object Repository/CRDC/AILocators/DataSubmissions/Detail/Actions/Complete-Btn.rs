@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Complete-Btn</name>
+   <tag></tag>
+   <elementGuidId>c91ff0fa-d0c0-456b-8c7f-c593e607911d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[.=&apos;Complete&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[.=&apos;Complete&apos;]</value>
+      <webElementGuid>6fe7df77-c03b-4530-affe-2ea1ef3d1319</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

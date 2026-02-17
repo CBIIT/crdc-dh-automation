@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataCommonsOptionAll-Ddn-Option</name>
+   <tag></tag>
+   <elementGuidId>7bf3da2d-2636-4133-9dee-67f355544292</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;data-commons-option-All&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;data-commons-option-All&apos;]</value>
+      <webElementGuid>453e006d-4eaf-40f0-9e3e-6fc423247ece</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

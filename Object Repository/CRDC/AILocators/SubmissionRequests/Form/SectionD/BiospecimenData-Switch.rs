@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>BiospecimenData-Switch</name>
+   <tag></tag>
+   <elementGuidId>8dbe3fe3-8b93-4dff-9e9e-5d09b5b66ff6</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-biospecimen-data&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-biospecimen-data&apos;]</value>
+      <webElementGuid>297e70be-d60e-441c-a1e2-1395be76785a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

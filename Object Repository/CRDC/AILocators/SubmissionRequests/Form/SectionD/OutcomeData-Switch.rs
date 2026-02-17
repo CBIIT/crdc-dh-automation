@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>OutcomeData-Switch</name>
+   <tag></tag>
+   <elementGuidId>ba4f1580-c2e6-45c0-ac2b-e211cd6d550b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-outcome-data&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-outcome-data&apos;]</value>
+      <webElementGuid>db8f3623-ce7f-486d-8a21-c05dfde4b065</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

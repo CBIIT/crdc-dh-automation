@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CrossValidate-Btn</name>
+   <tag></tag>
+   <elementGuidId>2b07e6a5-c43d-46e7-af3f-381eda0cf4dd</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;cross-validate-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;cross-validate-button&apos;]</value>
+      <webElementGuid>a17482af-ef9e-4cfa-a3e1-6a6e6b3c78e8</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

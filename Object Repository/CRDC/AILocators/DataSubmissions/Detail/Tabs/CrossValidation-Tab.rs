@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CrossValidation-Tab</name>
+   <tag></tag>
+   <elementGuidId>edb96fda-efb5-4ea1-bda5-55202d4026c3</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//a[contains(@href,&apos;/cross-validation-results&apos;)]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//a[contains(@href,&apos;/cross-validation-results&apos;)]</value>
+      <webElementGuid>e9f7f19a-399c-4fde-bdf2-baaf0bc42c0e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

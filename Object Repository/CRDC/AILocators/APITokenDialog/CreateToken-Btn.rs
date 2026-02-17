@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CreateToken-Btn</name>
+   <tag></tag>
+   <elementGuidId>abf44270-6aae-4018-a9e6-910b41b7967e</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;api-token-create-token-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;api-token-create-token-button&apos;]</value>
+      <webElementGuid>5c34e0c2-54d5-4cae-8b85-960debb194d7</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

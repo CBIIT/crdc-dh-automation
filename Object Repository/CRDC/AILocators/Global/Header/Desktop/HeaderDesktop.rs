@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>HeaderDesktop</name>
+   <tag></tag>
+   <elementGuidId>3cdd6ce4-ed50-44ed-976a-a5d26d41c110</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;navigation-header-desktop&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;navigation-header-desktop&apos;]</value>
+      <webElementGuid>8336d04c-83ed-4e90-9e94-30ef192c9f53</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

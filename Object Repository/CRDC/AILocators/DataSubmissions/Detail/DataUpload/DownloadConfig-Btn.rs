@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DownloadConfig-Btn</name>
+   <tag></tag>
+   <elementGuidId>4197fce2-9fd9-4812-a117-c96815f6fbd8</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;uploader-cli-config-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;uploader-cli-config-button&apos;]</value>
+      <webElementGuid>88590fb7-ee7b-4f4f-b592-8adb0deca4c8</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

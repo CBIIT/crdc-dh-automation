@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>HeaderCheckbox-Chkbx</name>
+   <tag></tag>
+   <elementGuidId>c3b1e885-328b-48e2-be8a-6c48f7a10b2c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;header-checkbox&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;header-checkbox&apos;]</value>
+      <webElementGuid>1cc21cb7-a7f9-489b-b536-30b3a3987ff2</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

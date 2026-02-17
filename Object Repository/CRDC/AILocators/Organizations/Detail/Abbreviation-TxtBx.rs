@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Abbreviation-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>2d489db9-6960-4cea-9768-8c284daddaa9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@aria-labelledby=&apos;abbreviationLabel&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@aria-labelledby=&apos;abbreviationLabel&apos;]</value>
+      <webElementGuid>4f9a423f-4b80-4e8a-9304-4e9164224682</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

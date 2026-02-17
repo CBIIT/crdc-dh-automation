@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Value-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>18c94460-8bd4-46c9-8773-995256839cbc</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;request-pv-value&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;request-pv-value&apos;]</value>
+      <webElementGuid>a82295cf-b1ad-437c-8a34-50a6c6ae2c74</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

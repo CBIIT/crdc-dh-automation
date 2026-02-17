@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>TimeoutLogin-Btn</name>
+   <tag></tag>
+   <elementGuidId>a4682763-715c-4806-84d5-480a675231d8</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[.=&apos;LOGIN&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[.=&apos;LOGIN&apos;]</value>
+      <webElementGuid>cc24824c-857b-420a-b8d5-6031d063935c</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

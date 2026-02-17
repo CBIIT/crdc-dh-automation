@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ArchiveManifest-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>e4c6db6f-807c-4f73-a760-852740d317a5</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;uploader-config-dialog-input-archive-manifest&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;uploader-config-dialog-input-archive-manifest&apos;]</value>
+      <webElementGuid>4d748445-3a59-4c98-ab3b-202a41610048</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

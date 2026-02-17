@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Inquire-Btn</name>
+   <tag></tag>
+   <elementGuidId>27276c9d-c2a3-489d-b56e-06055e69b7f2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;submission-form-inquire-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;submission-form-inquire-button&apos;]</value>
+      <webElementGuid>201eb9de-b45d-43a7-a6a1-cb62d88a9e1a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

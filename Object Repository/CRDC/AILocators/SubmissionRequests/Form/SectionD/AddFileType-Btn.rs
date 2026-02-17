@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AddFileType-Btn</name>
+   <tag></tag>
+   <elementGuidId>f6c3aa2d-6f78-43fb-a8f7-12ca11ec62da</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-add-file-type-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-add-file-type-button&apos;]</value>
+      <webElementGuid>1446e8d1-0d22-47a8-bba0-25d13e3e0795</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

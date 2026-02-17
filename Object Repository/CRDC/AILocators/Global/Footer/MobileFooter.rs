@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>MobileFooter</name>
+   <tag></tag>
+   <elementGuidId>beee97f1-60b2-455e-a9c2-dcdd11db4e88</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;mobile-footer&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;mobile-footer&apos;]</value>
+      <webElementGuid>522fa536-434a-4d6e-893c-f7cf63c14b69</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

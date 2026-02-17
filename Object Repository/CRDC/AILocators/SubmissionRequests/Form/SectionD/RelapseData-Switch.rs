@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>RelapseData-Switch</name>
+   <tag></tag>
+   <elementGuidId>b41e42a9-d385-4fc9-aebf-2ca0aa59711f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-relapse-recurrence-data&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-relapse-recurrence-data&apos;]</value>
+      <webElementGuid>ac942c94-98b6-460b-86db-941ff8b76353</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ColumnList-Container</name>
+   <tag></tag>
+   <elementGuidId>b15bbd75-e8aa-4b61-963d-66d5687181c3</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;column-list&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;column-list&apos;]</value>
+      <webElementGuid>5f91b9fa-f6de-4b86-8d84-e063af0d9398</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

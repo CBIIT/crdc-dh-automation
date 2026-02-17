@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ProgramFilter-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>eeb7c549-0edc-4cd9-a687-61d8e752cfda</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;organization-filter&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;organization-filter&apos;]</value>
+      <webElementGuid>e6b10d34-265a-4d70-bc4c-e6a7818aafbf</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

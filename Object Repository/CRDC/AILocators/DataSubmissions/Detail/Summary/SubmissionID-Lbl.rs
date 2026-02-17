@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubmissionID-Lbl</name>
+   <tag></tag>
+   <elementGuidId>459f60d8-4262-45e1-9c90-cb8131cf2805</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;data-submission-id-value&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;data-submission-id-value&apos;]</value>
+      <webElementGuid>ddd7e205-4c4b-4c29-acfc-3c2a1218c1ed</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

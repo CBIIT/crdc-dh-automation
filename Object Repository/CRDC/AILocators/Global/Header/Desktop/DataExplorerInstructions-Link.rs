@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataExplorerInstructions-Link</name>
+   <tag></tag>
+   <elementGuidId>4f517d0c-879b-4d72-ad11-157dd25d1dc6</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;data-explorer-instructions&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;data-explorer-instructions&apos;]</value>
+      <webElementGuid>2b5e0d3a-36e4-4556-b97a-1972d0e0c49d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

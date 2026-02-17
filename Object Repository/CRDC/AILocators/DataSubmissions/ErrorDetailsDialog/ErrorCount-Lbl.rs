@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ErrorCount-Lbl</name>
+   <tag></tag>
+   <elementGuidId>9dbf4644-bcac-4fa6-86de-97e2d7cb740a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;error-details-error-count&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;error-details-error-count&apos;]</value>
+      <webElementGuid>68db2e5f-b574-48c0-a8ea-c50b2befcf93</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

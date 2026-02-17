@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PendingModelChange-Chkbx</name>
+   <tag></tag>
+   <elementGuidId>f724bc61-0125-47da-a2a2-0268fb0d0b1a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;pendingModelChange-checkbox&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;pendingModelChange-checkbox&apos;]</value>
+      <webElementGuid>da2b3414-e2c7-48b8-8d2e-d609c9b6316d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

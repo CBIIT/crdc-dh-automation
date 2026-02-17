@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>APIInstructions-Link</name>
+   <tag></tag>
+   <elementGuidId>9dfcf880-3a37-4510-89e6-eb62258003f5</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;api-instructions&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;api-instructions&apos;]</value>
+      <webElementGuid>8eaf14b9-3ad5-4e55-bc04-7c28121706a5</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

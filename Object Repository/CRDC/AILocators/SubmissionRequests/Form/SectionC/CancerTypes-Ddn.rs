@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CancerTypes-Ddn</name>
+   <tag></tag>
+   <elementGuidId>f0e4cd64-06e3-4eda-bb25-fd7b0bbaa43f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-c-cancer-types&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-c-cancer-types&apos;]</value>
+      <webElementGuid>acd97c27-aea9-45b8-9a1d-492b40e042f8</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Severity-Ddn</name>
+   <tag></tag>
+   <elementGuidId>3105f8d6-ec03-4769-b0ed-744fa9c1baa4</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;cross-validation-status-filter&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;cross-validation-status-filter&apos;]</value>
+      <webElementGuid>98982878-4f34-4aef-973f-cf14b5633fb5</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

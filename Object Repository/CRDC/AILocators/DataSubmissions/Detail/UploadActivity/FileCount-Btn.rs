@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FileCount-Btn</name>
+   <tag></tag>
+   <elementGuidId>8d12647c-c188-4caa-8f81-a48309682b74</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[starts-with(@data-testid,&apos;activity-file-count-&apos;)]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[starts-with(@data-testid,&apos;activity-file-count-&apos;)]</value>
+      <webElementGuid>998ab5ed-f87b-497a-9e90-09660940c5c7</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

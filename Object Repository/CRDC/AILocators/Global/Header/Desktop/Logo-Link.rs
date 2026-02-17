@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Logo-Link</name>
+   <tag></tag>
+   <elementGuidId>778d5d0f-4fc2-4ae8-b240-a0249996e6de</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;header-logo-home-link&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;header-logo-home-link&apos;]</value>
+      <webElementGuid>8e55aa95-e96d-48ae-b5ec-61e4af456683</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

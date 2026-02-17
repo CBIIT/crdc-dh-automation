@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Program-Ddn</name>
+   <tag></tag>
+   <elementGuidId>ee422bcd-a9a7-47e2-9166-0cca0a6b4eca</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;organization-select&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;organization-select&apos;]</value>
+      <webElementGuid>c177a9e7-0856-41e8-8f3b-f208e52b1e50</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AddContact-Btn</name>
+   <tag></tag>
+   <elementGuidId>18e32242-b2a0-4d73-ae0a-8f7ce4b81803</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-a-add-additional-contact-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-a-add-additional-contact-button&apos;]</value>
+      <webElementGuid>dfced734-bd54-494b-9000-283f0bda7481</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

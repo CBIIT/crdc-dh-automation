@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>HeaderRow</name>
+   <tag></tag>
+   <elementGuidId>603c76b6-d2ee-48e3-84ea-c997227be287</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;history-dialog-header-row&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;history-dialog-header-row&apos;]</value>
+      <webElementGuid>b7d05216-72f5-4e63-a461-26214aee8052</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

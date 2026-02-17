@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Filters-Container</name>
+   <tag></tag>
+   <elementGuidId>0ee63a43-b549-445d-bded-77c120bb78f4</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;quality-control-filters&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;quality-control-filters&apos;]</value>
+      <webElementGuid>0fcacad1-f587-42aa-83a6-74b0ae80d9b7</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

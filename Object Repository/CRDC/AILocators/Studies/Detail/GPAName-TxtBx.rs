@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>GPAName-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>2a44ce9a-fc94-4ad4-80d2-c3bb6dad97e2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;GPAName-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;GPAName-input&apos;]</value>
+      <webElementGuid>f5fe958f-4fd4-48a2-a6fe-bcd395987cc8</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

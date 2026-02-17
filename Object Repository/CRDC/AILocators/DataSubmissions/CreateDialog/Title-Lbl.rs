@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Title-Lbl</name>
+   <tag></tag>
+   <elementGuidId>8e34b47a-63e6-46d1-b031-d81746202e29</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;create-a-submission-title&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;create-a-submission-title&apos;]</value>
+      <webElementGuid>e9a88913-bb83-4ce7-8893-6eca933904b9</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DeleteNodeData-Btn</name>
+   <tag></tag>
+   <elementGuidId>7c911f77-7b8d-49f4-8254-fe3e32e17723</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;delete-node-data-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;delete-node-data-button&apos;]</value>
+      <webElementGuid>87b51ef3-ecd0-4a0e-a22d-e636494232e5</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

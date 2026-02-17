@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>TreatmentData-Switch</name>
+   <tag></tag>
+   <elementGuidId>d3f3cecb-1abc-4519-982a-5b5dceb9280b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-treatment-data&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-treatment-data&apos;]</value>
+      <webElementGuid>93a45e37-48ef-462a-b248-fe75df545711</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Validate-Btn</name>
+   <tag></tag>
+   <elementGuidId>64be744b-d5a7-4323-8f2a-e30d8212025e</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;validate-controls-validate-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;validate-controls-validate-button&apos;]</value>
+      <webElementGuid>58dc1386-e2f7-47a4-9dfe-cf53dd223c97</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

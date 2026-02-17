@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>NewsletterEmail-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>7aa2f933-5a1d-417c-aeb6-17ea1c5dfc11</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;email-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;email-input&apos;]</value>
+      <webElementGuid>875cb59c-2e69-4bad-9970-98b56689dc48</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

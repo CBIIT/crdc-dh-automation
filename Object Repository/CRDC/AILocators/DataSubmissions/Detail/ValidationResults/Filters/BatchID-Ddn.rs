@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>BatchID-Ddn</name>
+   <tag></tag>
+   <elementGuidId>58bb0d60-9f6f-4a64-98d7-b19991154eab</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;quality-control-batchID-filter&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;quality-control-batchID-filter&apos;]</value>
+      <webElementGuid>784ee924-8f15-47d9-8b2e-092d4d0abe49</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

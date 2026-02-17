@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Export-Btn</name>
+   <tag></tag>
+   <elementGuidId>173ac4f7-d7a7-40cb-84dc-af119a3198fe</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;export-submission-request-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;export-submission-request-button&apos;]</value>
+      <webElementGuid>f34e8b5e-b67a-4956-b483-d7cd9dc431e3</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

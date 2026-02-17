@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataSubmissions-Tab</name>
+   <tag></tag>
+   <elementGuidId>c60bb3ce-a0ef-41cb-a508-f27f775c8295</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;navbar-dropdown-data-submissions&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;navbar-dropdown-data-submissions&apos;]</value>
+      <webElementGuid>570d0380-a7a7-4ee3-876a-d6d6659ffcf4</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

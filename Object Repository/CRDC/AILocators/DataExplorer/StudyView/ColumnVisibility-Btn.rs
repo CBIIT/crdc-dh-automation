@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ColumnVisibility-Btn</name>
+   <tag></tag>
+   <elementGuidId>e1025f0b-0dd1-4690-ae29-56f236d853c9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;column-visibility-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;column-visibility-button&apos;]</value>
+      <webElementGuid>5e4845ab-d875-4a5c-b4b0-d73872aec998</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

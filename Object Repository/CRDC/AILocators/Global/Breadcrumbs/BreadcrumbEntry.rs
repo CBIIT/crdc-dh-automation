@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>BreadcrumbEntry</name>
+   <tag></tag>
+   <elementGuidId>ed3cdd96-d39d-40c5-8b08-99d60fd4e698</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[starts-with(@data-testid,&apos;breadcrumb-entry-&apos;)]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[starts-with(@data-testid,&apos;breadcrumb-entry-&apos;)]</value>
+      <webElementGuid>838b55a4-7215-466a-8ae0-dfa72181bdd0</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

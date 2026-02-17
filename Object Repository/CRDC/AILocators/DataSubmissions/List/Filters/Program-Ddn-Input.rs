@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Program-Ddn-Input</name>
+   <tag></tag>
+   <elementGuidId>b1f9bc70-e4e1-4197-bd70-38c5c3ae2612</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;organization-select-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;organization-select-input&apos;]</value>
+      <webElementGuid>554fdf85-a1a9-4d8c-aff3-845be8eaaad9</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

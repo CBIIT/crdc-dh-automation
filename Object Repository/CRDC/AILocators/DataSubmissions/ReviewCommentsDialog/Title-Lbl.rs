@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Title-Lbl</name>
+   <tag></tag>
+   <elementGuidId>35e313fc-b77c-4fb9-8669-4d47863bc893</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;review-comments-dialog-title&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;review-comments-dialog-title&apos;]</value>
+      <webElementGuid>ca2b8bba-e44b-4df5-b2e7-37a75c8dab16</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

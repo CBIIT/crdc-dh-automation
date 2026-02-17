@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataConcierge-Ddn</name>
+   <tag></tag>
+   <elementGuidId>8c2248e1-734c-4c0b-8ac0-4344b74f3467</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@aria-labelledby=&apos;dataConciergeLabel&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@aria-labelledby=&apos;dataConciergeLabel&apos;]</value>
+      <webElementGuid>c9e7e5d4-cf70-4310-bc2b-db3ab46b54a2</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

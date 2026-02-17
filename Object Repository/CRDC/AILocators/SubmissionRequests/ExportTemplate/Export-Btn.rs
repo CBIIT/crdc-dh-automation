@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Export-Btn</name>
+   <tag></tag>
+   <elementGuidId>02d494e0-644e-4c04-9116-5e0875441f49</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;export-application-excel-template-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;export-application-excel-template-button&apos;]</value>
+      <webElementGuid>eb4a5746-5724-4d3c-b6fd-87c06439bb90</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

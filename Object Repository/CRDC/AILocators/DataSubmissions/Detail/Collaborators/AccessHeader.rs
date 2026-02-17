@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AccessHeader</name>
+   <tag></tag>
+   <elementGuidId>85bb603a-7a00-4e8b-a0b3-7547cb6ae45f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;header-access&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;header-access&apos;]</value>
+      <webElementGuid>576bb873-07b6-4855-88b9-bdb70e1770b1</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

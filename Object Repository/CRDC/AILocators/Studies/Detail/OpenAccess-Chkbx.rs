@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>OpenAccess-Chkbx</name>
+   <tag></tag>
+   <elementGuidId>d9f48c2c-2ce7-4270-877e-8010b8138909</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;openAccess-checkbox&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;openAccess-checkbox&apos;]</value>
+      <webElementGuid>5784ac41-4748-4586-86e1-48f2da176174</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

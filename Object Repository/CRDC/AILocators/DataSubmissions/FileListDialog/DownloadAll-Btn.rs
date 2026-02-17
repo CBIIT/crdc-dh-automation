@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DownloadAll-Btn</name>
+   <tag></tag>
+   <elementGuidId>aaadfefe-c56d-4ffc-aa37-916557af9ed4</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;download-all-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;download-all-button&apos;]</value>
+      <webElementGuid>f0a08b9b-3ce0-4f12-bce1-40cc51ce998f</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

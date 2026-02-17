@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubmissionName-Link</name>
+   <tag></tag>
+   <elementGuidId>429ea0ad-0203-44ac-b472-edecda883e15</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//a[contains(@href,&apos;/data-submission/&apos;)]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//a[contains(@href,&apos;/data-submission/&apos;)]</value>
+      <webElementGuid>014f1c31-b3b9-4660-9e9a-fa98aec3d746</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

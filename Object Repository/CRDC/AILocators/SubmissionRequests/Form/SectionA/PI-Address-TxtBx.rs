@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PI-Address-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>d9e10f3f-d635-4664-a032-1a765e81790c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-a-pi-institution-address&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-a-pi-institution-address&apos;]</value>
+      <webElementGuid>d742fe6e-36f4-4d93-9709-93b8ff17d68d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

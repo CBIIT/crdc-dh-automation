@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>UploaderCLI-Btn</name>
+   <tag></tag>
+   <elementGuidId>e84b2501-1e86-4625-ad57-c91f426340c0</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;navbar-dropdown-item-uploader-tool&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;navbar-dropdown-item-uploader-tool&apos;]</value>
+      <webElementGuid>1a6d59bd-3aed-4bb8-95bf-c67488a0e48e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

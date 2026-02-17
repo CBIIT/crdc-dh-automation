@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Version-Ddn</name>
+   <tag></tag>
+   <elementGuidId>76d43bee-4a4f-4a90-8ae6-b6fa5899650d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;update-submission-version-field&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;update-submission-version-field&apos;]</value>
+      <webElementGuid>2a6cb80f-f44a-4ccd-8a47-008be12572ae</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>OtherSpecies-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>7359c500-17bb-49a0-b3b3-b57e92cf67c9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-c-other-species-of-subjects&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-c-other-species-of-subjects&apos;]</value>
+      <webElementGuid>5eee8ada-2c14-4d0e-83ad-c20b03e65ae9</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataSubInstructions-Link</name>
+   <tag></tag>
+   <elementGuidId>f293b2c5-82e1-415b-9122-aec7fb6bba6a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;data-submission-instructions&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;data-submission-instructions&apos;]</value>
+      <webElementGuid>50a63413-8af8-4038-b72e-6fa37cb9d8a4</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

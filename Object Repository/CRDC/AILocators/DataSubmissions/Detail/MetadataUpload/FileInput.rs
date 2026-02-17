@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FileInput</name>
+   <tag></tag>
+   <elementGuidId>4266e9db-aecc-4760-ba4b-c1cbe4bb0cbb</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;metadata-upload-file-input&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;metadata-upload-file-input&apos;]</value>
+      <webElementGuid>b96684ce-2023-468e-9a4d-0de859fe394b</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

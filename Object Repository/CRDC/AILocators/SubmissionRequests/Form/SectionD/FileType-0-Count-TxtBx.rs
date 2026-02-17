@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>FileType-0-Count-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>b452c3a7-e5ce-4f9e-8f0a-ebfd4928d9a0</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-d-file-type-0-number-of-files&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-d-file-type-0-number-of-files&apos;]</value>
+      <webElementGuid>2544aab0-050a-4da0-8ad9-b3d9b47fd3e6</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

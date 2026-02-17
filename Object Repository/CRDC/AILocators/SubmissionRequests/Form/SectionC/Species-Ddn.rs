@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Species-Ddn</name>
+   <tag></tag>
+   <elementGuidId>e512f93e-1029-4d0d-a13c-1730ea85f764</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-c-species-of-subjects&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-c-species-of-subjects&apos;]</value>
+      <webElementGuid>84b7d2af-c031-4c9d-8f7b-e060ae2ab4be</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

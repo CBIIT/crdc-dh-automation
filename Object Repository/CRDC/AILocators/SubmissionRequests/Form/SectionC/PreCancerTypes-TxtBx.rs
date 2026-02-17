@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PreCancerTypes-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>51b2cb02-ccf1-4101-acc0-113b0e2ed99c</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;section-c-pre-cancer-types&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;section-c-pre-cancer-types&apos;]</value>
+      <webElementGuid>bf3dafaf-24ca-435a-b20d-15b2bc4d8a82</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
