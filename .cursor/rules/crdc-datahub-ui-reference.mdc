@@ -1,0 +1,65 @@
+---
+description: Reference for the CRDC Data Hub UI frontend project (crdc-datahub-ui) - architecture, components, routes, and DOM attributes
+alwaysApply: true
+---
+
+# CRDC Data Hub UI (crdc-datahub-ui) Reference
+
+## Project Location
+`/Users/leungvw/crdc-frontend/crdc-datahub-ui`
+
+## Tech Stack
+- **React 18** + **TypeScript 5.8**, **Vite 6** (port 3010)
+- **MUI v5** + **Emotion** (styling), **Apollo Client 3.9** + **GraphQL** (data)
+- **React Router v6** (lazy-loaded routes), **Redux** (Model Navigator only)
+- **React Context** (15+ contexts: Auth, Form, Submission, Collaborators, etc.)
+- **Zod 4** + **react-hook-form** (validation/forms)
+
+## Routes
+| Route | Content Area |
+|-------|-------------|
+| `/` | Home |
+| `/login` | Login (NIH SSO) |
+| `/submission-requests` | Questionnaire list |
+| `/submission-request/:appId/:section?` | Questionnaire form (Sections A-D + Review) |
+| `/data-submissions` | Data submissions list |
+| `/data-submission/:submissionId/:tab?` | Single submission (tabs: upload-activity, validation-results, cross-validation-results, data-view) |
+| `/data-explorer` | Data explorer |
+| `/users/:userId?` | User management |
+| `/profile/:userId?` | User profile |
+| `/programs/:orgId?` | Organizations |
+| `/studies/:studyId?` | Studies |
+| `/institutions`, `/institution/:institutionId?` | Institutions |
+| `/operation-dashboard` | Operation dashboard |
+| `/release-notes` | Release notes |
+| `/model-navigator/:model/:version?` | Data Model Navigator |
+
+## Key Source Directories
+- `src/components/` — 57+ component directories (~194 source files)
+- `src/content/` — Page-level views (12 content areas)
+- `src/graphql/` — 74 GraphQL operations
+- `src/config/` — Auth, tables, data commons config
+- `src/types/` — TypeScript type definitions
+- `src/hooks/` — 9 custom hooks
+- `src/utils/` — ~20 utility modules
+
+## Authentication
+- NIH SSO via OAuth code exchange
+- `AuthContext` manages session; PBAC via `hasPermission(user, resource, action)`
+- Roles: Admin, Federal Lead, DCP, Submitter, User
+
+## DOM Attribute Strategy for Locators
+1. **`data-testid`** — Most reliable (GenericTable, filters, dialogs, buttons)
+2. **`id`** — NavBar items, form labels, questionnaire fields
+3. **`aria-label` / `aria-labelledby`** — Accessible elements, form inputs
+4. **Text content** — Buttons, tabs, links (fallback)
+5. **MUI classes** — `Mui{Component}-root` patterns (last resort)
+
+## AILocators Object Repository
+All locators are in `Object Repository/CRDC/AILocators/` organized by page:
+- `Global/` — Header, Footer, SystemUseWarning, InactivityDialog, Breadcrumbs
+- `DataSubmissions/` — List, CreateDialog, Detail (Summary, Tabs, Validation, DataView, Actions, Dialogs)
+- `SubmissionRequests/` — List, Form (Sections A-D, Review, Navigation), StatusBar, Dialogs
+- `Users/`, `Organizations/`, `Studies/`, `Institutions/` — Admin pages
+- `DataExplorer/`, `OperationDashboard/`, `ReleaseNotes/` — Read-only pages
+- `AccessRequest/`, `APITokenDialog/`, `GenericTable/`, `DeleteDialog/` — Shared components

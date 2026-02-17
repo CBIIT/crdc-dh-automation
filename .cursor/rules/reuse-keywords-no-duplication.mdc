@@ -1,0 +1,34 @@
+---
+description: Reuse existing keywords and never duplicate code when implementing new functions
+globs: Keywords/**/*.groovy,**/*.groovy
+alwaysApply: false
+---
+
+# Reuse Keywords, No Duplication
+
+When implementing or modifying functions in this project:
+
+## Do Not Rewrite Unnecessarily
+
+- Do not rewrite existing functions. Extend or compose them instead.
+- Before writing new logic, search the codebase for existing keywords that already do it.
+- Prefer calling `CustomKeywords.'utilities.X.y'()` or internal methods over inlining equivalent logic.
+
+## Maximize Use of Existing Keywords
+
+- **Login, navigation, clicks:** Use `Login.*`, `WebUIUtils.clickTab`, `SubmissionRequest.logoutFromCrdc`, etc.
+- **Table/UI reads:** Use `Utils.getListWebElements`, `Utils.waitForElementToDisappear`, existing `DataSubmissions` helpers.
+- **Verification:** Use `WebUIUtils.verifyElementText`, `verifyButtonEnabled`, `ValidationReport.addValidationReportItem`.
+- **Data loading:** Use `Utils.getListFromDataFile`, `findTestData`, existing `load*` and `read*` methods in DataSubmissions.
+
+## Never Duplicate Code
+
+- If logic exists in another keyword, call that keyword or extract a shared helper. Do not copy-paste.
+- If you need logic from a private method, consider making it package-visible or extracting to a shared utility, rather than duplicating.
+- Before adding a new method, verify no equivalent exists in `DataSubmissions`, `WebUIUtils`, `Utils`, `Pbac`, `Login`, or `SubmissionRequest`.
+
+## Prefer Standard Selenium Over JavascriptExecutor
+
+- Use standard Selenium/Katalon APIs (`driver.findElements`, `element.click()`, `element.getText()`, `element.isEnabled()`, `new Select(element)`, etc.) for readability and consistency.
+- Only use `JavascriptExecutor` when standard Selenium cannot achieve the goal — for example, when React does not detect Selenium's native events on a specific element, or when bulk DOM reads in a loop would cause performance hangs.
+- When `JavascriptExecutor` is necessary, add a comment in the Javadoc or inline explaining **why** standard Selenium is insufficient for that specific case.

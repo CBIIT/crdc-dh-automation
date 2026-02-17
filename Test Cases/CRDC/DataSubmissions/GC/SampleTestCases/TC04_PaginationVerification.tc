@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Sample test to verify pagination keywords on the Data Submissions list table.</description>
+   <name>TC04_PaginationVerification</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a1b2c3d4-e5f6-7890-abcd-ef1234567890</testCaseGuid>
+</TestCaseEntity>

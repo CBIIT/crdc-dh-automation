@@ -1,0 +1,176 @@
+---
+description: CRDC Data Hub Automation framework context for Jira-to-test conversion
+globs: Keywords/**/*.groovy,Scripts/**/*.groovy,Test Cases/**/*,Data Files/**/*
+alwaysApply: true
+---
+
+# CRDC Data Hub Automation Framework
+
+## Project Overview
+
+**crdc-dh-automation** is a Katalon Studio–based UI automation framework for the **Cancer Research Data Commons (CRDC) Data Hub**. It uses **Groovy**, **Selenium**, and **Katalon built-in keywords** to automate end-to-end validation of CRDC workflows. Custom keywords extend Katalon where built-in keywords are insufficient.
+
+**Primary use case:** Convert Jira test cases into automated Katalon tests by composing existing keywords and adding new ones when needed.
+
+---
+
+## Technology Stack
+
+- **Katalon Studio** (9.x) – test authoring and execution
+- **Groovy** – scripting language for keywords and test scripts
+- **Selenium** – WebDriver for browser automation
+- **Python** – OTP generation for Login.gov 2FA (`PythonFiles/CRDC/GenerateOtp.py`)
+- **Apache POI** – Excel/TSV reading for test data
+- **Jenkins** – CI/CD (see `jenkins/`)
+
+---
+
+## Project Structure
+
+| Path | Purpose |
+|------|---------|
+| `Keywords/utilities/` | Custom Groovy keywords (Login, Pbac, DataSubmissions, WebUIUtils, Utils, etc.) |
+| `Scripts/CRDC/` | Groovy scripts executed by Test Cases (one script per test case) |
+| `Test Cases/CRDC/` | Katalon test case definitions (link to Scripts) |
+| `Object Repository/` | UI locators (`.rs` files with xpath, id, etc.) |
+| `Data Files/` | Katalon Data Files (`.dat` – reference Excel/CSV for test data) |
+| `InputFiles/CRDC/` | TSV, Excel, metadata used at runtime (e.g. `MetadataData/TC04/`, `MetadataData/PBAC/`) |
+| `Profiles/` | Global variables (URL, credentials) – `default.glbl`, `CRDC_STAGE.glbl`, `CRDC_QA.glbl` |
+| `Reports/` | Generated validation reports (HTML) |
+| `Include/config/` | Logging and other config |
+
+---
+
+## Keyword Architecture
+
+### Inheritance and Delegation
+
+- **TestRunner** – Base class; provides `givexpath(locatorKey)`, `clickTab(tabName)`, Excel parsing, etc.
+- **Login**, **Pbac**, **DataSubmissions**, **SubmissionRequest** – Extend `TestRunner`; domain-specific keywords.
+- **WebUIUtils**, **Utils**, **ValidationReport** – Standalone utilities; no inheritance from TestRunner.
+
+### Locator Resolution
+
+- **Object Repository path:** Use `'CRDC/DataSubmissions/Validation/Table-Headers'` or `'Object Repository/CRDC/DataSubmissions/Loading-Icon'`.
+- **TestRunner.givexpath(locatorKey):** Resolves Test Object to xpath via `findTestObject(locatorKey).findPropertyValue('xpath')`.
+- **Utils.getListWebElements(locator):** Uses `TestRunner.givexpath(locator)` then `driver.findElements(By.xpath(xpath))`.
+
+### Key Custom Keywords by Domain
+
+**Login**
+- `Login.navigateToCrdc()` – Create driver, navigate to `G_Urlname`
+- `Login.loginToCrdcOtp(pbacUser)` – Login.gov 2FA; `pbacUser` = Admin, Fedlead, Dcp, Submitter, User
+
+**WebUIUtils**
+- `WebUIUtils.clickTab(tabName)` – Resolve xpath, scroll, click via JS; retries on StaleElementReferenceException
+- `WebUIUtils.verifyElementText(to, expectedText)`, `verifyButtonEnabled`, `verifyTooltipOnHover`, etc.
+- `WebUIUtils.verifyTableColumnSortability(headersObj, nonSortableColumns, reportSection)`
+- `WebUIUtils.verifyTableColumnSortOrder(headersObj, rowsObj, columnName, direction, reportSection)`
+- `WebUIUtils.verifyTableColumnSortByClickAndVerify(headersObj, rowsObj, columnName, reportSection)`
+
+**DataSubmissions**
+- `DataSubmissions.uploadFolder(tcName)` – Upload metadata from `InputFiles/CRDC/MetadataData/{tcName}/`
+- `DataSubmissions.clickValidateButton()` – Click Validate
+- `DataSubmissions.verifyValidationResultsTabDisplayed()`, `verifyValidationResultsColumnSorting()`, `verifyValidationResultsPaginationOptions()`, `verifyMultipleRowsPerNodeIdInValidationResults()`
+- `DataSubmissions.verifyDataSubmissionTableHeaders(tab)` – tab = UploadActivities, ValidationResults, DataView
+- `DataSubmissions.verifyDataViewMatchesMetadataForTC(tcName)`, `verifyValidationResultsVsExpectedForTC(tcName)`
+
+**Pbac**
+- `Pbac.createDataSubmission()` – Create a new data submission
+- `Pbac.findAndEditUserByName(userRole)`, permission checks, etc.
+
+**SubmissionRequest**
+- `SubmissionRequest.navigateToCrdc()` – Delegates to Login
+- `SubmissionRequest.logoutFromCrdc()` – Logout flow
+
+**Utils**
+- `Utils.getListWebElements(locator)` – Returns `List<WebElement>` for xpath from Object Repository
+- `Utils.waitForElementToDisappear(locatorKey, timeoutSeconds)` – Poll until element gone (e.g. loading spinner)
+- `Utils.getListFromDataFile(dataFile)` – Read from Katalon Data File
+- `Utils.getQueryFilePath(input_file)`, `getMetadataFilesPath()` – Path resolution by AppKey
+
+**ValidationReport**
+- `ValidationReport.addValidationReportItem(section, label, expected, actual, status)` – Collect verification results
+- `ValidationReport.generateValidationReport()` – Write HTML to `Reports/ValidationReport_*.html` and clear collector
+
+---
+
+## Test Case and Script Pattern
+
+**One Jira test case → one Katalon Test Case → one Script.**
+
+Scripts live under `Scripts/CRDC/{Domain}/GC/{JiraOrFolder}/{TestCaseName}/Script*.groovy`.
+
+**Typical script flow:**
+1. `WebUI.closeBrowser()` (if starting fresh)
+2. `Login.navigateToCrdc()` then `Login.loginToCrdcOtp('Submitter')`
+3. `WebUIUtils.clickTab('CRDC/NavBar/DataSubmissions-Tab')`
+4. `Pbac.createDataSubmission()` (if needed)
+5. `WebUIUtils.clickTab('CRDC/DataSubmissions/DataSubmissionName-Link')`
+6. Domain-specific setup (e.g. `DataSubmissions.uploadFolder('TC04')`, `DataSubmissions.clickValidateButton()`)
+7. Verification keywords (e.g. `DataSubmissions.verifyValidationResultsColumnSorting()`)
+8. `ValidationReport.generateValidationReport()`
+
+**Keyword invocation:**
+```groovy
+CustomKeywords.'utilities.Login.navigateToCrdc'()
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Validation/ValidationResults-Tab')
+CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsPaginationOptions'()
+```
+
+---
+
+## Object Repository Conventions
+
+- Path format: `CRDC/{Domain}/{ElementName}` (e.g. `CRDC/DataSubmissions/Validation/Table-Headers`)
+- Common CRDC objects: `CRDC/NavBar/DataSubmissions-Tab`, `CRDC/DataSubmissions/Validation/ValidationResults-Tab`, `CRDC/DataSubmissions/Validation/Table-Row`, `CRDC/DataSubmissions/Validation/Table-Headers`, `CRDC/General/Pagination-Toolbar`, `Object Repository/CRDC/DataSubmissions/Loading-Icon`
+- Prefer existing Test Objects; add new ones under `Object Repository/CRDC/` when UI elements lack locators
+
+---
+
+## Data and Input Files
+
+- **Data Files** (`Data Files/CRDC/`): Katalon entities pointing to Excel/CSV (e.g. `Headers-ValidationResults`, `ValidationResults-Mappings`)
+- **InputFiles/CRDC/MetadataData/{tcName}/**: Metadata TSVs per test case (e.g. TC04, TC10); `expected-ValidationResults/` for expected validation output
+- **InputFiles/CRDC/MetadataData/PBAC/**: PBAC-specific metadata (program.tsv, participant.tsv, etc.)
+- Test case names (e.g. TC04) map to folders under `InputFiles/CRDC/MetadataData/`
+
+---
+
+## Jira-to-Test Mapping
+
+- **Jira ticket** (e.g. CRDCDH-686) → folder `CRDCDH-686` or `CRDCDH-686-Partial` under `Test Cases/` and `Scripts/`
+- **One verification step** in Jira → one keyword call or one `ValidationReport.addValidationReportItem`
+- Prefer **modular keywords**: each verification (pagination, sorting, headers) as its own keyword
+- **Reuse** existing keywords; add generic utilities (e.g. `WebUIUtils.verifyTableColumnSortability`) for cross-test use
+
+---
+
+## Verification and Reporting
+
+- Use `ValidationReport.addValidationReportItem(section, label, expected, actual, status)` for each check
+- `status` = "Pass" or "Fail"
+- Call `ValidationReport.generateValidationReport()` at end of test
+- Use `KeywordUtil.markFailed("message")` when a critical check fails
+- Use `KeywordUtil.logInfo("message")` for debugging
+
+---
+
+## Reuse and No Duplication (from existing rule)
+
+- Do not rewrite existing functions; extend or compose them
+- Before writing new logic, search for existing keywords
+- Prefer `CustomKeywords.'utilities.X.y'()` over inlining
+- Before adding a method, verify no equivalent in `DataSubmissions`, `WebUIUtils`, `Utils`, `Pbac`, `Login`, or `SubmissionRequest`
+
+---
+
+## When Adding New Tests from Jira
+
+1. **Map Jira steps** to existing keywords or new ones
+2. **Create Test Case** under `Test Cases/CRDC/...` (or reuse folder for ticket)
+3. **Create Script** under `Scripts/CRDC/...` with same structure
+4. **Add Object Repository** entries if new UI elements
+5. **Add InputFiles** (metadata, expected TSVs) if needed
+6. **Use ValidationReport** for all verification steps
+7. **Keep keywords generic** when logic applies to multiple tests (e.g. table sorting, pagination)
