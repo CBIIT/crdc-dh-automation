@@ -550,7 +550,45 @@ public class Utils {
 		throw new AssertionError("Element did not disappear within " + timeoutSeconds + " seconds: " + xpath);
 	}
 
+	/**
+	 * Wait for an element to become not visible (CSS display:none, visibility:hidden, or opacity:0).
+	 * Unlike waitForElementToDisappear which checks DOM presence, this checks computed CSS visibility.
+	 * Use this for elements that stay in the DOM but are hidden via CSS (e.g. React styled components
+	 * toggling display:flex/none).
+	 * Also returns immediately if the element is not found in the DOM at all.
+	 *
+	 * @param locatorKey Object Repository path (e.g. 'CRDC/AILocators/DataSubmissions/Detail/DataView/DeletionAlert')
+	 * @param timeoutSeconds Maximum time to wait
+	 */
+	@Keyword
+	public static void waitForElementNotVisible(String locatorKey, int timeoutSeconds) {
+		String xpath = TestRunner.givexpath(locatorKey);
+		WebDriver driver = DriverFactory.getWebDriver();
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		long start = System.currentTimeMillis();
 
+		KeywordUtil.logInfo("Polling for non-visibility of: " + xpath);
+
+		while ((System.currentTimeMillis() - start) / 1000 < timeoutSeconds) {
+			String script = "var el = document.evaluate(arguments[0], document, null, " +
+				"XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; " +
+				"if (!el) return 'gone'; " +
+				"var style = window.getComputedStyle(el); " +
+				"return (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') ? 'hidden' : 'visible';";
+			String result = (String) js.executeScript(script, xpath);
+
+			long elapsed = (System.currentTimeMillis() - start) / 1000;
+			KeywordUtil.logInfo("Loop at " + elapsed + "s. State: " + result);
+
+			if (result != 'visible') {
+				KeywordUtil.logInfo("Element no longer visible after " + elapsed + " seconds.");
+				return;
+			}
+			Thread.sleep(2000);
+		}
+
+		throw new AssertionError("Element still visible after " + timeoutSeconds + " seconds: " + xpath);
+	}
 
 	/**
 	 * This function changes the pagination dropdown to 100 results per page
