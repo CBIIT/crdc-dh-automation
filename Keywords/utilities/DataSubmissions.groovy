@@ -8,6 +8,7 @@ import com.kms.katalon.core.util.KeywordUtil
 import com.kms.katalon.core.webui.driver.DriverFactory
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import org.openqa.selenium.By
+import org.openqa.selenium.Keys
 import org.openqa.selenium.StaleElementReferenceException
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
@@ -1048,6 +1049,64 @@ class DataSubmissions extends TestRunner {
 			KeywordUtil.logInfo("--- MongoDB verification - " + errors.size() + " mismatch(es) ---")
 			for (String err : errors) KeywordUtil.logInfo(err)
 			KeywordUtil.markFailed("verifyRecordsInMongo: " + errors.size() + " record(s) failed. See ValidationReport and log above.")
+		}
+	}
+
+	/**
+	 * Navigate to the Data View tab, select the specified node type, select all rows,
+	 * click Delete, confirm the deletion dialog, and wait for deletion to complete.
+	 * Assumes the user is already on the Data Submission detail page and that data
+	 * for the given node has been uploaded.
+	 *
+	 * @param node Node type name as it appears in the dropdown (e.g. "program", "participant", "consent_group")
+	 */
+	@Keyword
+	void deleteNodeFromDataView(String node) {
+		KeywordUtil.logInfo("--- deleteNodeFromDataView: Deleting all rows for node '" + node + "' ---")
+		try {
+			WebDriver driver = DriverFactory.getWebDriver()
+
+			// Step 1: Navigate to Data View tab
+			KeywordUtil.logInfo("Step 1: Clicking Data View tab")
+			WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Tabs/DataView-Tab')
+			Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+			WebUI.delay(2)
+
+			// Step 2: Select node type from dropdown
+			KeywordUtil.logInfo("Step 2: Selecting node type '" + node + "' from dropdown")
+			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/NodeType-Ddn'), 30)
+			WebUI.click(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/NodeType-Ddn'))
+			WebUI.delay(1)
+			WebElement option = driver.findElement(By.xpath("//li[normalize-space(text())='" + node + "']"))
+			option.click()
+			WebUI.delay(2)
+			Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+			WebUI.delay(1)
+
+			// Step 3: Select all rows via header checkbox
+			KeywordUtil.logInfo("Step 3: Selecting all rows via header checkbox")
+			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/HeaderCheckbox-Chkbx'), 10)
+			WebUI.click(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/HeaderCheckbox-Chkbx'))
+			WebUI.delay(1)
+
+			// Step 4: Click Delete button
+			KeywordUtil.logInfo("Step 4: Clicking Delete button")
+			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/DeleteNodeData-Btn'), 10)
+			WebUI.click(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/DeleteNodeData-Btn'))
+			WebUI.delay(1)
+
+			// Step 5: Confirm deletion in dialog
+			KeywordUtil.logInfo("Step 5: Confirming deletion in dialog")
+			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'), 10)
+			WebUI.click(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'))
+
+			// Step 6: Wait for deletion to complete
+			KeywordUtil.logInfo("Step 6: Waiting for deletion to complete (up to 120s)")
+			Utils.waitForElementNotVisible('CRDC/AILocators/DataSubmissions/Detail/DataView/DeletionAlert', 120)
+
+			KeywordUtil.logInfo("deleteNodeFromDataView: Successfully deleted all rows for node '" + node + "'")
+		} catch (Exception e) {
+			KeywordUtil.markFailed("deleteNodeFromDataView: Failed to delete node '" + node + "'. Error: " + e.getMessage())
 		}
 	}
 }

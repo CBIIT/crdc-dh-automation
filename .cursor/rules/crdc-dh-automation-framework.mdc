@@ -1,0 +1,177 @@
+---
+description: CRDC Data Hub automation framework context
+globs: Keywords/**/*.groovy,Scripts/**/*.groovy,Test Cases/**/*,Data Files/**/*
+alwaysApply: true
+---
+
+# CRDC Data Hub Automation Framework
+
+## Project Overview
+
+**crdc-dh-automation** is a Katalon Studio–based UI automation framework for the **Cancer Research Data Commons (CRDC) Data Hub**. It uses **Groovy**, **Selenium**, and **Katalon built-in keywords** to automate end-to-end validation of CRDC workflows. Custom keywords extend Katalon where built-in keywords are insufficient.
+
+**Purpose:** Automate CRDC Data Hub UI validation using custom keywords. Compose existing keywords when adding new tests.
+
+---
+
+## Technology Stack
+
+- **Katalon Studio** (9.x) – test authoring and execution
+- **Groovy** – scripting language for keywords and test scripts
+- **Selenium** – WebDriver for browser automation
+- **Python** – OTP generation for Login.gov 2FA (`PythonFiles/CRDC/GenerateOtp.py`)
+- **Apache POI** – Excel/TSV reading for test data
+- **Jenkins** – CI/CD (see `jenkins/`)
+
+---
+
+## Project Structure
+
+| Path | Purpose |
+|------|---------|
+| `Keywords/utilities/` | Custom Groovy keywords (Login, Pbac, DataSubmissions, WebUIUtils, Utils, etc.) |
+| `Scripts/CRDC/` | Groovy scripts executed by Test Cases (one script per test case) |
+| `Test Cases/CRDC/` | Katalon test case definitions (link to Scripts) |
+| `Object Repository/` | UI locators (`.rs` files with xpath, id, etc.) |
+| `Data Files/` | Katalon Data Files (`.dat` – reference Excel/CSV for test data) |
+| `InputFiles/CRDC/` | TSV, Excel, metadata used at runtime (e.g. `MetadataData/TC04/`, `MetadataData/PBAC/`) |
+| `Profiles/` | Global variables (URL, credentials) – `default.glbl`, `CRDC_STAGE.glbl`, `CRDC_QA.glbl` |
+| `Reports/` | Generated validation reports (HTML) |
+| `Include/config/` | Logging and other config |
+
+---
+
+## Keyword Architecture
+
+### Inheritance and Delegation
+
+- **TestRunner** – Base class; provides `givexpath(locatorKey)`, `clickTab(tabName)`, Excel parsing, etc.
+- **Login**, **Pbac**, **DataSubmissions**, **SubmissionRequest** – Extend `TestRunner`; domain-specific keywords.
+- **WebUIUtils**, **Utils**, **ValidationReport** – Standalone utilities; no inheritance from TestRunner.
+
+### Locator Resolution
+
+- **Object Repository path:** Use `'CRDC/DataSubmissions/Validation/Table-Headers'` or `'Object Repository/CRDC/DataSubmissions/Loading-Icon'`.
+- **TestRunner.givexpath(locatorKey):** Resolves Test Object to xpath via `findTestObject(locatorKey).findPropertyValue('xpath')`.
+- **Utils.getListWebElements(locator):** Uses `TestRunner.givexpath(locator)` then `driver.findElements(By.xpath(xpath))`.
+
+### Key Custom Keywords by Domain
+
+**Login**
+- `Login.navigateToCrdc()` – Create driver, navigate to `G_Urlname`
+- `Login.loginToCrdcOtp(pbacUser)` – Login.gov 2FA; `pbacUser` = Admin, Fedlead, Dcp, Submitter, User
+
+**WebUIUtils**
+- `WebUIUtils.clickTab(tabName)` – Resolve xpath, scroll, click via JS; retries on StaleElementReferenceException
+- `WebUIUtils.verifyElementText(to, expectedText)`, `verifyButtonEnabled`, `verifyTooltipOnHover`, `verifyElementDisplayed`, etc.
+- **Table sorting:** `verifyTableColumnSortability(nonSortableColumns, reportSection)`, `verifyDefaultSortColumn(expectedColumn, expectedDirection, reportSection)`, `verifyColumnSortOnClick(columnName, reportSection)`, `verifyAllSortableColumnsSorting(nonSortableColumns, reportSection)`
+- **Pagination:** `verifyRowsPerPageOptions(expectedOptions, reportSection)`, `verifyDefaultRowsPerPage(expectedDefault, reportSection)`, `changeRowsPerPage(rowsPerPage)`
+
+**DataSubmissions**
+- `DataSubmissions.uploadFolder(tcName)` – Upload metadata from `InputFiles/CRDC/MetadataData/{tcName}/`
+- `DataSubmissions.clickValidateButton()` – Click Validate
+- `DataSubmissions.verifyDataSubmissionTableHeaders(tab)` – tab = UploadActivities, ValidationResults, DataView
+- `DataSubmissions.verifyDataViewMatchesMetadataForTC(tcName)`, `verifyValidationResultsVsExpectedForTC(tcName)`
+- `DataSubmissions.createDataSubmission(submiType, dataType, dataModel, study)` – Create with params
+- `DataSubmissions.deleteNodeFromDataView(node)` – Delete all rows for a node in Data View
+
+**Pbac**
+- `Pbac.createDataSubmission()` – Create metadata-only submission (no params); used by most scripts
+- `Pbac.findAndEditUserByName(userRole)`, permission checks, etc.
+
+**SubmissionRequest**
+- `SubmissionRequest.navigateToCrdc()` – Delegates to Login
+- `SubmissionRequest.logoutFromCrdc()` – Logout flow
+
+**Utils**
+- `Utils.getListWebElements(locator)` – Returns `List<WebElement>` for xpath from Object Repository
+- `Utils.waitForElementToDisappear(locatorKey, timeoutSeconds)` – Poll until element gone (e.g. loading spinner)
+- `Utils.getListFromDataFile(dataFile)` – Read from Katalon Data File
+- `Utils.getQueryFilePath(input_file)`, `getMetadataFilesPath()` – Path resolution by AppKey
+
+**ValidationReport**
+- `ValidationReport.addValidationReportItem(section, label, expected, actual, status)` – Collect verification results
+- `ValidationReport.generateValidationReport()` – Write HTML to `Reports/ValidationReport_*.html` and clear collector
+
+---
+
+## Test Case and Script Pattern
+
+Scripts live under `Scripts/CRDC/{Domain}/GC/{JiraOrFolder}/{TestCaseName}/Script*.groovy`.
+
+**Typical script flow:**
+1. `WebUI.closeBrowser()` (if starting fresh)
+2. `Login.navigateToCrdc()` then `Login.loginToCrdcOtp('Submitter')`
+3. `WebUIUtils.clickTab('CRDC/NavBar/DataSubmissions-Tab')`
+4. `Pbac.createDataSubmission()` (if needed)
+5. `WebUIUtils.clickTab('CRDC/DataSubmissions/DataSubmissionName-Link')` or `CRDC/AILocators/DataSubmissions/List/Table/SubmissionName-Link`
+6. Domain-specific setup (e.g. `DataSubmissions.uploadFolder('TC04')`, `DataSubmissions.clickValidateButton()`)
+7. Verification keywords (e.g. `WebUIUtils.verifyTableColumnSortability`) or `DataSubmissions.*`
+8. `ValidationReport.generateValidationReport()`
+
+**Keyword invocation:**
+```groovy
+CustomKeywords.'utilities.Login.navigateToCrdc'()
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Validation/ValidationResults-Tab')
+CustomKeywords.'utilities.WebUIUtils.verifyTableColumnSortability'(['Expand', 'Reasons'], 'Validation Results')
+```
+
+---
+
+## Object Repository Conventions
+
+- Path format: `CRDC/{Domain}/{ElementName}` (e.g. `CRDC/DataSubmissions/Validation/Table-Headers`)
+- Common CRDC objects: `CRDC/NavBar/DataSubmissions-Tab`, `CRDC/DataSubmissions/Validation/ValidationResults-Tab`, `CRDC/General/Pagination-Toolbar`, `Object Repository/CRDC/DataSubmissions/Loading-Icon`
+- AILocators (newer): `CRDC/AILocators/DataSubmissions/List/Table/SubmissionName-Link`, `CRDC/AILocators/DataSubmissions/Detail/Tabs/DataView-Tab`, etc.
+- Prefer existing Test Objects; add new ones under `Object Repository/CRDC/` when UI elements lack locators
+
+---
+
+## Data and Input Files
+
+- **Data Files** (`Data Files/CRDC/`): Katalon entities pointing to Excel/CSV (e.g. `Headers-ValidationResults`, `ValidationResults-Mappings`)
+- **InputFiles/CRDC/MetadataData/{tcName}/**: Metadata TSVs per test case (e.g. TC04, TC10); `expected-ValidationResults/` for expected validation output
+- **InputFiles/CRDC/MetadataData/PBAC/**: PBAC-specific metadata (program.tsv, participant.tsv, etc.)
+- Test case names (e.g. TC04) map to folders under `InputFiles/CRDC/MetadataData/`
+
+---
+
+## Verification and Reporting
+
+- Use `ValidationReport.addValidationReportItem(section, label, expected, actual, status)` for each check
+- `status` = "Pass" or "Fail"
+- Call `ValidationReport.generateValidationReport()` at end of test
+- Use `KeywordUtil.markFailed("message")` when a critical check fails
+- Use `KeywordUtil.logInfo("message")` for debugging
+
+---
+
+## Reuse and No Duplication
+
+When implementing or modifying functions in this project:
+
+### Do Not Rewrite Unnecessarily
+
+- Do not rewrite existing functions. Extend or compose them instead.
+- Before writing new logic, search the codebase for existing keywords that already do it.
+- Prefer calling `CustomKeywords.'utilities.X.y'()` or internal methods over inlining equivalent logic.
+
+### Maximize Use of Existing Keywords
+
+- **Login, navigation, clicks:** Use `Login.*`, `WebUIUtils.clickTab`, `SubmissionRequest.logoutFromCrdc`, etc.
+- **Table/UI reads:** Use `Utils.getListWebElements`, `Utils.waitForElementToDisappear`, existing `DataSubmissions` helpers.
+- **Verification:** Use `WebUIUtils.verifyElementText`, `verifyButtonEnabled`, `ValidationReport.addValidationReportItem`.
+- **Data loading:** Use `Utils.getListFromDataFile`, `findTestData`, existing `load*` and `read*` methods in DataSubmissions.
+
+### Never Duplicate Code
+
+- If logic exists in another keyword, call that keyword or extract a shared helper. Do not copy-paste.
+- If you need logic from a private method, consider making it package-visible or extracting to a shared utility, rather than duplicating.
+- Before adding a new method, verify no equivalent exists in `DataSubmissions`, `WebUIUtils`, `Utils`, `Pbac`, `Login`, or `SubmissionRequest`.
+
+### Prefer Standard Selenium Over JavascriptExecutor
+
+- Use standard Selenium/Katalon APIs (`driver.findElements`, `element.click()`, `element.getText()`, `element.isEnabled()`, `new Select(element)`, etc.) for readability and consistency.
+- Only use `JavascriptExecutor` when standard Selenium cannot achieve the goal — for example, when React does not detect Selenium's native events on a specific element, or when bulk DOM reads in a loop would cause performance hangs.
+- When `JavascriptExecutor` is necessary, add a comment in the Javadoc or inline explaining **why** standard Selenium is insufficient for that specific case.
+

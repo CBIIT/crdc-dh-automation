@@ -1,0 +1,55 @@
+---
+description: Naming conventions and locator strategy for AILocators Object Repository
+globs: "**/Object Repository/CRDC/AILocators/**"
+alwaysApply: false
+---
+
+# AILocators Naming Convention
+
+## File Naming
+Format: `{DescriptiveName}-{ElementType}.rs`
+
+## Element Type Suffixes
+| Suffix | Element Type |
+|--------|-------------|
+| `-Btn` | Buttons (clickable actions) |
+| `-Link` | Navigation links |
+| `-Tab` | Tab elements |
+| `-Ddn` | Dropdowns / Select elements |
+| `-Ddn-Option` | Dropdown option items |
+| `-Ddn-Input` | Dropdown input/search field |
+| `-TxtBx` | Text inputs |
+| `-RadioBtn` | Radio buttons |
+| `-Chkbx` | Checkboxes |
+| `-Switch` | Toggle switches |
+| `-Lbl` | Labels / display text |
+| `-Row` | Table rows |
+| `-Header` | Table column headers |
+| `-Icon` | Icon buttons or status icons |
+| `-Tooltip` | Tooltips |
+| `-Dialog` | Dialog/modal containers |
+| `-Alert` | Alert components |
+| `-Cell` | Table cells |
+| `-Chip` | Status chips |
+| `-Form` | Form containers |
+| `-Container` | Wrapper elements |
+
+## Naming Rules
+- PascalCase for multi-word names: `SubmissionName-TxtBx`, `DataCommons-Ddn`
+- Names match UI labels where possible
+- Dynamic elements use index placeholder in name: `AdditionalContact-0-FirstName-TxtBx`
+
+## XPath Locator Priority
+1. `//*[@data-testid='value']` — Prefer when available
+2. `//*[@id='value']` — For elements with stable IDs
+3. `//*[@aria-label='value']` — For accessible elements
+4. `//button[.='Text']` or `//a[.='Text']` — Text content match
+5. `//*[contains(@class,'MuiComponent')]` — MUI class (last resort)
+
+## Referencing AILocators in Scripts
+```groovy
+// Path format: CRDC/AILocators/{Page}/{SubPage}/{LocatorName}
+findTestObject('CRDC/AILocators/DataSubmissions/List/Filters/Program-Ddn')
+findTestObject('CRDC/AILocators/Global/Header/Desktop/DataSubmissions-Tab')
+findTestObject('CRDC/AILocators/SubmissionRequests/Form/SectionA/PI-FirstName-TxtBx')
+```
