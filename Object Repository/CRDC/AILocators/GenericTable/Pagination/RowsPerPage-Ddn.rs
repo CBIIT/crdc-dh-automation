@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>RowsPerPage-Ddn</name>
+   <tag></tag>
+   <elementGuidId>439210a8-ff5e-45f4-bb68-6a35d888b164</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;generic-table-rows-per-page-bottom&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;generic-table-rows-per-page-bottom&apos;]</value>
+      <webElementGuid>e0759e4a-aa71-424e-bd1c-2ba285ef339c</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

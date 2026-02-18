@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DisplayedRows-Lbl</name>
+   <tag></tag>
+   <elementGuidId>38395e41-5595-45fc-8b82-345555b19537</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//div[contains(@class,&apos;MuiTablePagination-toolbar&apos;)]//p[contains(@class,&apos;MuiTablePagination-displayedRows&apos;)]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//div[contains(@class,&apos;MuiTablePagination-toolbar&apos;)]//p[contains(@class,&apos;MuiTablePagination-displayedRows&apos;)]</value>
+      <webElementGuid>0f0b5e9f-d313-4eda-93c3-f8716ad6bf6a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

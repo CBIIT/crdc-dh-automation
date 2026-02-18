@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PaginationToolbar-Container</name>
+   <tag></tag>
+   <elementGuidId>79abc5df-8950-4f7f-87d6-4fad2c234fe6</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//div[contains(@class,&apos;MuiTablePagination-toolbar&apos;)]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//div[contains(@class,&apos;MuiTablePagination-toolbar&apos;)]</value>
+      <webElementGuid>e03bc828-3cfb-4b4b-aeb5-38f8a6dc8f5d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
