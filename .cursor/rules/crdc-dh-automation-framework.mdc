@@ -1,5 +1,5 @@
 ---
-description: CRDC Data Hub Automation framework context for Jira-to-test conversion
+description: CRDC Data Hub automation framework context
 globs: Keywords/**/*.groovy,Scripts/**/*.groovy,Test Cases/**/*,Data Files/**/*
 alwaysApply: true
 ---
@@ -10,7 +10,7 @@ alwaysApply: true
 
 **crdc-dh-automation** is a Katalon Studio–based UI automation framework for the **Cancer Research Data Commons (CRDC) Data Hub**. It uses **Groovy**, **Selenium**, and **Katalon built-in keywords** to automate end-to-end validation of CRDC workflows. Custom keywords extend Katalon where built-in keywords are insufficient.
 
-**Primary use case:** Convert Jira test cases into automated Katalon tests by composing existing keywords and adding new ones when needed.
+**Purpose:** Automate CRDC Data Hub UI validation using custom keywords. Compose existing keywords when adding new tests.
 
 ---
 
@@ -63,20 +63,20 @@ alwaysApply: true
 
 **WebUIUtils**
 - `WebUIUtils.clickTab(tabName)` – Resolve xpath, scroll, click via JS; retries on StaleElementReferenceException
-- `WebUIUtils.verifyElementText(to, expectedText)`, `verifyButtonEnabled`, `verifyTooltipOnHover`, etc.
-- `WebUIUtils.verifyTableColumnSortability(headersObj, nonSortableColumns, reportSection)`
-- `WebUIUtils.verifyTableColumnSortOrder(headersObj, rowsObj, columnName, direction, reportSection)`
-- `WebUIUtils.verifyTableColumnSortByClickAndVerify(headersObj, rowsObj, columnName, reportSection)`
+- `WebUIUtils.verifyElementText(to, expectedText)`, `verifyButtonEnabled`, `verifyTooltipOnHover`, `verifyElementDisplayed`, etc.
+- **Table sorting:** `verifyTableColumnSortability(nonSortableColumns, reportSection)`, `verifyDefaultSortColumn(expectedColumn, expectedDirection, reportSection)`, `verifyColumnSortOnClick(columnName, reportSection)`, `verifyAllSortableColumnsSorting(nonSortableColumns, reportSection)`
+- **Pagination:** `verifyRowsPerPageOptions(expectedOptions, reportSection)`, `verifyDefaultRowsPerPage(expectedDefault, reportSection)`, `changeRowsPerPage(rowsPerPage)`
 
 **DataSubmissions**
 - `DataSubmissions.uploadFolder(tcName)` – Upload metadata from `InputFiles/CRDC/MetadataData/{tcName}/`
 - `DataSubmissions.clickValidateButton()` – Click Validate
-- `DataSubmissions.verifyValidationResultsTabDisplayed()`, `verifyValidationResultsColumnSorting()`, `verifyValidationResultsPaginationOptions()`, `verifyMultipleRowsPerNodeIdInValidationResults()`
 - `DataSubmissions.verifyDataSubmissionTableHeaders(tab)` – tab = UploadActivities, ValidationResults, DataView
 - `DataSubmissions.verifyDataViewMatchesMetadataForTC(tcName)`, `verifyValidationResultsVsExpectedForTC(tcName)`
+- `DataSubmissions.createDataSubmission(submiType, dataType, dataModel, study)` – Create with params
+- `DataSubmissions.deleteNodeFromDataView(node)` – Delete all rows for a node in Data View
 
 **Pbac**
-- `Pbac.createDataSubmission()` – Create a new data submission
+- `Pbac.createDataSubmission()` – Create metadata-only submission (no params); used by most scripts
 - `Pbac.findAndEditUserByName(userRole)`, permission checks, etc.
 
 **SubmissionRequest**
@@ -97,8 +97,6 @@ alwaysApply: true
 
 ## Test Case and Script Pattern
 
-**One Jira test case → one Katalon Test Case → one Script.**
-
 Scripts live under `Scripts/CRDC/{Domain}/GC/{JiraOrFolder}/{TestCaseName}/Script*.groovy`.
 
 **Typical script flow:**
@@ -106,16 +104,16 @@ Scripts live under `Scripts/CRDC/{Domain}/GC/{JiraOrFolder}/{TestCaseName}/Scrip
 2. `Login.navigateToCrdc()` then `Login.loginToCrdcOtp('Submitter')`
 3. `WebUIUtils.clickTab('CRDC/NavBar/DataSubmissions-Tab')`
 4. `Pbac.createDataSubmission()` (if needed)
-5. `WebUIUtils.clickTab('CRDC/DataSubmissions/DataSubmissionName-Link')`
+5. `WebUIUtils.clickTab('CRDC/DataSubmissions/DataSubmissionName-Link')` or `CRDC/AILocators/DataSubmissions/List/Table/SubmissionName-Link`
 6. Domain-specific setup (e.g. `DataSubmissions.uploadFolder('TC04')`, `DataSubmissions.clickValidateButton()`)
-7. Verification keywords (e.g. `DataSubmissions.verifyValidationResultsColumnSorting()`)
+7. Verification keywords (e.g. `WebUIUtils.verifyTableColumnSortability`) or `DataSubmissions.*`
 8. `ValidationReport.generateValidationReport()`
 
 **Keyword invocation:**
 ```groovy
 CustomKeywords.'utilities.Login.navigateToCrdc'()
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Validation/ValidationResults-Tab')
-CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsPaginationOptions'()
+CustomKeywords.'utilities.WebUIUtils.verifyTableColumnSortability'(['Expand', 'Reasons'], 'Validation Results')
 ```
 
 ---
@@ -123,7 +121,8 @@ CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsPaginationOptio
 ## Object Repository Conventions
 
 - Path format: `CRDC/{Domain}/{ElementName}` (e.g. `CRDC/DataSubmissions/Validation/Table-Headers`)
-- Common CRDC objects: `CRDC/NavBar/DataSubmissions-Tab`, `CRDC/DataSubmissions/Validation/ValidationResults-Tab`, `CRDC/DataSubmissions/Validation/Table-Row`, `CRDC/DataSubmissions/Validation/Table-Headers`, `CRDC/General/Pagination-Toolbar`, `Object Repository/CRDC/DataSubmissions/Loading-Icon`
+- Common CRDC objects: `CRDC/NavBar/DataSubmissions-Tab`, `CRDC/DataSubmissions/Validation/ValidationResults-Tab`, `CRDC/General/Pagination-Toolbar`, `Object Repository/CRDC/DataSubmissions/Loading-Icon`
+- AILocators (newer): `CRDC/AILocators/DataSubmissions/List/Table/SubmissionName-Link`, `CRDC/AILocators/DataSubmissions/Detail/Tabs/DataView-Tab`, etc.
 - Prefer existing Test Objects; add new ones under `Object Repository/CRDC/` when UI elements lack locators
 
 ---
@@ -137,15 +136,6 @@ CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsPaginationOptio
 
 ---
 
-## Jira-to-Test Mapping
-
-- **Jira ticket** (e.g. CRDCDH-686) → folder `CRDCDH-686` or `CRDCDH-686-Partial` under `Test Cases/` and `Scripts/`
-- **One verification step** in Jira → one keyword call or one `ValidationReport.addValidationReportItem`
-- Prefer **modular keywords**: each verification (pagination, sorting, headers) as its own keyword
-- **Reuse** existing keywords; add generic utilities (e.g. `WebUIUtils.verifyTableColumnSortability`) for cross-test use
-
----
-
 ## Verification and Reporting
 
 - Use `ValidationReport.addValidationReportItem(section, label, expected, actual, status)` for each check
@@ -156,21 +146,32 @@ CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsPaginationOptio
 
 ---
 
-## Reuse and No Duplication (from existing rule)
+## Reuse and No Duplication
 
-- Do not rewrite existing functions; extend or compose them
-- Before writing new logic, search for existing keywords
-- Prefer `CustomKeywords.'utilities.X.y'()` over inlining
-- Before adding a method, verify no equivalent in `DataSubmissions`, `WebUIUtils`, `Utils`, `Pbac`, `Login`, or `SubmissionRequest`
+When implementing or modifying functions in this project:
 
----
+### Do Not Rewrite Unnecessarily
 
-## When Adding New Tests from Jira
+- Do not rewrite existing functions. Extend or compose them instead.
+- Before writing new logic, search the codebase for existing keywords that already do it.
+- Prefer calling `CustomKeywords.'utilities.X.y'()` or internal methods over inlining equivalent logic.
 
-1. **Map Jira steps** to existing keywords or new ones
-2. **Create Test Case** under `Test Cases/CRDC/...` (or reuse folder for ticket)
-3. **Create Script** under `Scripts/CRDC/...` with same structure
-4. **Add Object Repository** entries if new UI elements
-5. **Add InputFiles** (metadata, expected TSVs) if needed
-6. **Use ValidationReport** for all verification steps
-7. **Keep keywords generic** when logic applies to multiple tests (e.g. table sorting, pagination)
+### Maximize Use of Existing Keywords
+
+- **Login, navigation, clicks:** Use `Login.*`, `WebUIUtils.clickTab`, `SubmissionRequest.logoutFromCrdc`, etc.
+- **Table/UI reads:** Use `Utils.getListWebElements`, `Utils.waitForElementToDisappear`, existing `DataSubmissions` helpers.
+- **Verification:** Use `WebUIUtils.verifyElementText`, `verifyButtonEnabled`, `ValidationReport.addValidationReportItem`.
+- **Data loading:** Use `Utils.getListFromDataFile`, `findTestData`, existing `load*` and `read*` methods in DataSubmissions.
+
+### Never Duplicate Code
+
+- If logic exists in another keyword, call that keyword or extract a shared helper. Do not copy-paste.
+- If you need logic from a private method, consider making it package-visible or extracting to a shared utility, rather than duplicating.
+- Before adding a new method, verify no equivalent exists in `DataSubmissions`, `WebUIUtils`, `Utils`, `Pbac`, `Login`, or `SubmissionRequest`.
+
+### Prefer Standard Selenium Over JavascriptExecutor
+
+- Use standard Selenium/Katalon APIs (`driver.findElements`, `element.click()`, `element.getText()`, `element.isEnabled()`, `new Select(element)`, etc.) for readability and consistency.
+- Only use `JavascriptExecutor` when standard Selenium cannot achieve the goal — for example, when React does not detect Selenium's native events on a specific element, or when bulk DOM reads in a loop would cause performance hangs.
+- When `JavascriptExecutor` is necessary, add a comment in the Javadoc or inline explaining **why** standard Selenium is insufficient for that specific case.
+
