@@ -1,0 +1,43 @@
+import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
+import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
+import internal.GlobalVariable as GlobalVariable
+
+/*
+ * CRDCDH-1405 TC100: CLI data file upload with invalid file_id format.
+ *
+ * Uploads data files via CLI with a manifest containing invalid file_id values
+ * (e.g. "CDS-File-001", "dg.4DFC/not-a-valid-uuid", "12345") and verifies
+ * the CLI produces the correct error messages in the upload report.
+ *
+ * Pre-requisite: manifest.tsv in CRDCDH-1405_TC100/DataFiles/ has a file_id
+ * column with intentionally invalid values.
+ *
+ * Expected CLI error format:
+ *   Line N: "file_id": "value" is not in correct format. A correct "file_id"
+ *   should look like "dg.4DFC/e041576e-3595-5c8b-b0b3-272bc7cb6aa8". You can
+ *   provide correct "file_id" or remove the column and let the system generate
+ *   it for you.
+ */
+WebUI.closeBrowser()
+
+CustomKeywords.'utilities.Login.navigateToCrdc'()
+WebUI.setViewPortSize(1920, 1080)
+CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
+WebUI.delay(2)
+
+CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
+CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'both', 'GC', 'autoQA - AutomationQA_Study')
+CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
+
+CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('CRDCDH-1405_TC100', 'datafile')
+
+CustomKeywords.'utilities.CliUploader.verifyCliErrorMessages'('CRDCDH-1405_TC100')
+
+//TODO: Verify the CLI upload was actually rejected/blocked -- check the upload report status
+//      column shows failure for each row, or verify no datafile batch was created in the UI
+//      (navigate to Upload Activities tab and confirm no batch row appears).
+//      Per Jira: invalid file_id should prevent the upload from proceeding.
+
+CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
+
+WebUI.closeBrowser()

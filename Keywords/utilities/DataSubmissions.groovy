@@ -1109,4 +1109,80 @@ class DataSubmissions extends TestRunner {
 			KeywordUtil.markFailed("deleteNodeFromDataView: Failed to delete node '" + node + "'. Error: " + e.getMessage())
 		}
 	}
+
+	/**
+	 * Navigate to the Data View tab, select the specified node type, and delete
+	 * a specific number of rows by clicking individual row checkboxes.
+	 *
+	 * If the requested rowCount exceeds the default visible rows, the method
+	 * changes the rows-per-page setting to ensure enough rows are visible before
+	 * selecting. The rows-per-page options available are [5, 10, 20, 50].
+	 *
+	 * If rowCount exceeds the total available rows, all visible rows are selected
+	 * and a warning is logged.
+	 *
+	 * @param node     Node type name as it appears in the dropdown (e.g. "program", "file")
+	 * @param rowCount Number of rows to select and delete (must be >= 1)
+	 */
+	@Keyword
+	void deleteRowsFromDataView(String node, int rowCount) {
+		KeywordUtil.logInfo("--- deleteRowsFromDataView: Deleting " + rowCount + " row(s) for node '" + node + "' ---")
+		if (rowCount < 1) {
+			KeywordUtil.markFailed("deleteRowsFromDataView: rowCount must be >= 1. Got: " + rowCount)
+			return
+		}
+		try {
+			WebDriver driver = DriverFactory.getWebDriver()
+
+			WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Tabs/DataView-Tab')
+			Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+			WebUI.delay(2)
+
+			KeywordUtil.logInfo("Selecting node type '" + node + "' from dropdown")
+			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/NodeType-Ddn'), 30)
+			WebUI.click(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/NodeType-Ddn'))
+			WebUI.delay(1)
+			WebElement option = driver.findElement(By.xpath("//li[normalize-space(text())='" + node + "']"))
+			option.click()
+			WebUI.delay(2)
+			Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+			WebUI.delay(1)
+
+			int[] rpOptions = [5, 10, 20, 50]
+			int targetRp = rpOptions.find { it >= rowCount } ?: 50
+			KeywordUtil.logInfo("Setting rows per page to " + targetRp + " to accommodate " + rowCount + " row(s)")
+			WebUIUtils.changeRowsPerPage(targetRp)
+			Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+			WebUI.delay(1)
+
+			List<WebElement> checkboxes = driver.findElements(By.xpath("//*[@data-testid='row-checkbox']"))
+			int available = checkboxes.size()
+			int toSelect = Math.min(rowCount, available)
+			if (toSelect < rowCount) {
+				KeywordUtil.logInfo("deleteRowsFromDataView: requested " + rowCount + " but only " + available + " row(s) visible. Selecting all " + available + ".")
+			}
+			KeywordUtil.logInfo("Clicking " + toSelect + " individual row checkbox(es)")
+			for (int i = 0; i < toSelect; i++) {
+				checkboxes.get(i).click()
+				WebUI.delay(0.3)
+			}
+			WebUI.delay(1)
+
+			KeywordUtil.logInfo("Clicking Delete button")
+			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/DeleteNodeData-Btn'), 10)
+			WebUI.click(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/DeleteNodeData-Btn'))
+			WebUI.delay(1)
+
+			KeywordUtil.logInfo("Confirming deletion in dialog")
+			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'), 10)
+			WebUI.click(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'))
+
+			KeywordUtil.logInfo("Waiting for deletion to complete (up to 120s)")
+			Utils.waitForElementNotVisible('CRDC/AILocators/DataSubmissions/Detail/DataView/DeletionAlert', 120)
+
+			KeywordUtil.logInfo("deleteRowsFromDataView: Successfully deleted " + toSelect + " row(s) for node '" + node + "'")
+		} catch (Exception e) {
+			KeywordUtil.markFailed("deleteRowsFromDataView: Failed to delete rows for node '" + node + "'. Error: " + e.getMessage())
+		}
+	}
 }
