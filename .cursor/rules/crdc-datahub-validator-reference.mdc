@@ -1,0 +1,468 @@
+---
+description: CRDC Data Hub Validator service reference for writing validation-related test automation
+globs: Keywords/utilities/*.groovy,Scripts/**/*.groovy
+alwaysApply: false
+---
+
+# CRDC Data Hub Validator Reference
+
+## Overview
+
+The **crdc-datahub-validator** is a Python 3.11+ microservice that validates metadata and data files submitted to the CRDC Data Hub. It runs as **five independent SQS-driven services**, each deployed as a separate Docker container on AWS ECS:
+
+| Service | Config `service-type` | SQS Message Types |
+|---|---|---|
+| Essential Validation | `essential` | `Load Metadata`, `Delete Metadata` |
+| Metadata Validation | `metadata` | `Validate Metadata`, `Validate Cross-submission` |
+| File Validation | `file` | `Validate File`, `Validate Submission Files` |
+| Export | `export` | `Export Metadata`, `Complete Submission` |
+| PV Puller | `pv_puller` | N/A (scheduled) |
+
+**Entry point:** `src/validator.py` — parses YAML config, initializes MongoDB + SQS, dispatches to the correct service.
+
+**Infrastructure:** AWS SQS (job queuing), MongoDB (persistence), AWS S3 (file storage), AWS ECS (container orchestration).
+
+---
+
+## Validation Pipeline
+
+```
+Upload metadata TSV (UI or CLI)
+        │
+        ▼
+┌──────────────────────┐
+│ Essential Validation  │  SQS: "Load Metadata"
+│ (upload-time checks)  │  Validates TSV structure, types, file_id format
+└──────────┬───────────┘
+           │ Pass
+           ▼
+┌──────────────────────┐
+│    Data Loader        │  Loads validated rows into MongoDB dataRecords
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ Metadata Validation   │  SQS: "Validate Metadata"
+│ (property-level)      │  PV, types, relationships, program/study names
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│   File Validation     │  SQS: "Validate File" / "Validate Submission Files"
+│ (S3 integrity)        │  Existence, size, MD5, duplicates, orphans
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ Cross-Submission      │  SQS: "Validate Cross-submission"
+│   Validation          │  Duplicate nodes across submissions
+└──────────────────────┘
+```
+
+**Key distinction:** Essential validation runs at upload time and blocks data loading on failure. Metadata/File/Cross-submission validation runs asynchronously after data is loaded.
+
+---
+
+## Essential Validation (`src/essential_validator.py`)
+
+Runs when metadata TSV files are uploaded. If any check fails, the batch status is set to `Failed` and data is NOT loaded into MongoDB.
+
+### Checks Performed (in order)
+
+1. **Batch type** — only `metadata` batches allowed
+2. **File extension** — only `.tsv` and `.txt`
+3. **S3 download** — with error handling for `ClientError`, `ParserError`, `UnicodeDecodeError`
+4. **Empty file** — no data rows
+5. **Trailing empty columns/rows** — removed automatically
+6. **Extra columns/cells** — unnamed columns with data → `"<file>: line <N>": extra columns/cells found.`
+7. **Duplicate column headers** — `.1` suffix detection → `multiple columns with the same header`
+8. **Empty rows** → `"<file>: line <N>": empty row found.`
+9. **`type` column** — must exist, must not be null, must be a valid node type, all rows same type
+10. **ID property** — must exist as column, must not be empty
+11. **Composite ID** (`CompKey`) — for nodes with composition keys
+12. **File ID validation** (`validate_file_id`) — format check for file nodes only
+13. **Required properties** — missing required property columns
+14. **Relationship validation** — parent node types, ID properties
+15. **Duplicate rows** — within-file, with many-to-many handling
+16. **Delete intention** — file name property required
+
+### File ID Validation (`validate_file_id`)
+
+This is the critical validation for `file_id` format. It runs ONLY for file nodes (node types listed in the model's `file-nodes` definition).
+
+**Logic:**
+
+```python
+def validate_file_id(self, id_field, id, file_info, lineNum):
+    omit_prefix = self.model.get_omit_dcf_prefix()
+    low_id = id.lower()
+    if omit_prefix:
+        # File ID should be UUID only, NO "dg.4DFC/" prefix
+        if low_id.startswith("dg.4dfc/"):
+            return False, msg  # Has prefix when it shouldn't
+        if not validate_uuid_by_rex(low_id):
+            return False, msg  # Not a valid UUID
+    else:
+        # File ID should have "dg.4DFC/" prefix + UUID
+        if not low_id.startswith("dg.4dfc/"):
+            return False, msg  # Missing required prefix
+        uuid = low_id.split('/')[1]
+        if not validate_uuid_by_rex(uuid):
+            return False, msg  # UUID part invalid
+    return True, None
+```
+
+**UUID regex** (`common/utils.py:validate_uuid_by_rex`): `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$` (lowercase hex only, compared after `.lower()`)
+
+**Error message patterns:**
+
+- When `omit-DCF-prefix = false` (e.g., GC, CDS, CTDC):
+  `"<filename>:line <N>": "<value>" is not in correct format for file ID (property <id_field>). A correct file ID should look like "dg.4DFC/e041576e-3595-5c8b-b0b3-272bc7cb6aa8".`
+
+- When `omit-DCF-prefix = true` (e.g., ICDC):
+  `"<filename>:line <N>": "<value>" is not in correct format for file ID (property <id_field>). A correct file ID should look like "e041576e-3595-5c8b-b0b3-272bc7cb6aa8".`
+
+### Error Limits
+
+- `BATCH_ERROR_LIMIT = 1000` — max errors per batch
+- `FILE_ERROR_LIMIT = 100` — max errors per file within a batch
+
+### Result Storage
+
+Essential validation errors are stored as **string arrays** in:
+- `batch.errors` — all errors for the batch
+- `file.errors` — per-file errors within the batch
+
+These are the errors that appear in the UI's batch-level error display.
+
+---
+
+## Metadata Validation (`src/metadata_validator.py`)
+
+Runs after data is loaded into MongoDB `dataRecords`. Validates individual node records.
+
+### Per-Node Checks
+
+| Check | Error Code | Description |
+|---|---|---|
+| Node type in model | M035 | `Record/node type "<type>" is not defined in the model.` |
+| ID property value | M022 | `ID property, "<id>" is empty.` |
+| Duplicate IDs | M016 | `Same ID also appears in <locations>.` |
+| Required props empty | M003 | `Required property "<prop>" is empty.` |
+| Delete required prop | M033 | `deleting value of a required property "<prop>" is not allowed.` |
+| Program name match | M028, M030 | Program name vs pre-approved names |
+| Study name match | M029 | Study name vs submission's study |
+| Undefined property | M017 | Warning: `Property "<prop>" is not defined in the model.` |
+| String permissible values | M010 | `"<value>" is not a permissible value for property "<prop>".` |
+| Integer type | M004 | `"<value>" is not a valid integer type.` |
+| Number type | M005 | `"<value>" is not a valid number type.` |
+| Date/datetime format | M007 | `"<value>" is not a valid date type.` |
+| Boolean format | M008 | `"<value>" is not a valid boolean type.` |
+| String pattern (regex) | M031 | `"<value>" does not comply to string pattern for property "<prop>".` |
+| Value boundary | M011/M012 | Below/above bound |
+| Relationship not specified | M013 | `All related node IDs are missing.` |
+| Related node not found | M014 | `Related node "<type>" <id> not found.` |
+| Invalid relationship | M023 | `Relationship to a "<type>" node is not defined.` |
+| One-to-one conflict | M024 | Multiple parents for 1:1 relationship |
+| Many-to-one conflict | M025 | Multiple parents for N:1 relationship |
+| Updating existing data | M018 | Warning: already exists, will be updated |
+| Data not found (delete) | M019 | Node to delete doesn't exist in released data |
+| CDE not available | M027 | CDE permissible values unavailable |
+| Consent code conflict | M036 | File cannot be both controlled and open |
+| Array/value-list PV | M010 | Per-item permissible value check |
+
+### Message Prefix Format
+
+All metadata validation messages are prefixed with:
+`[<originalFileName>: line <lineNumber>]`
+
+### Permissible Value Matching
+
+- Case-insensitive matching with auto-correction to canonical case
+- Synonym suggestion via `synonyms` MongoDB collection
+- `<delete>` is always added as a valid PV
+
+### Result Storage
+
+Results stored in the `qcResults` MongoDB collection as structured objects (see QC Results Structure below).
+
+---
+
+## File Validation (`src/file_validator.py`)
+
+Validates actual data files in S3 after metadata is loaded.
+
+### Checks
+
+| Check | Error Code | Severity | Description |
+|---|---|---|---|
+| S3 file info presence | F009/F010 | Error | Missing s3FileInfo in record |
+| File not found in S3 | F001 | Error | `File "<name>" not found.` |
+| Size mismatch | F003 | Error | `expected size: <X>, actual size: <Y>.` |
+| MD5 mismatch | F004 | Error | `expected MD5: <X>, actual MD5: <Y>.` |
+| Same name + same MD5 | F005 | Warning | Duplicate file record |
+| Same name + diff MD5 | F006 | Warning | Conflict file record |
+| Diff name + same MD5 | F007 | Warning | Duplicate content |
+| Orphaned file | F008 | Error | File in S3 with no metadata record |
+| Internal error | F011 | Error | Unhandled exception |
+
+### Result Storage
+
+Results stored in `qcResults` collection, referenced by `s3FileInfo.qcResultID` in data records.
+
+---
+
+## Cross-Submission Validation (`src/x_submission_validator.py`)
+
+Checks for duplicate nodes across different submissions within the same **study AND data commons** scope.
+
+| Check | Error Code | Description |
+|---|---|---|
+| Duplicate node | S001 | `Identical data found in other submissions.` |
+
+Only compares submissions with status `Submitted` or `Released`.
+
+### Result Storage
+
+Results stored in `additionalErrors` field of each data record. Displayed in the UI's "Cross Validation Results" tab.
+
+---
+
+## Error Codes Reference
+
+### Metadata Validation (M-codes)
+
+| Code | Title | Severity | Message Template |
+|---|---|---|---|
+| M001 | | Error | `CDS model version "<ver>" is not available.` |
+| M003 | Missing required property | Error | `{prefix} Required property "<prop>" is empty.` |
+| M004 | Invalid integer value | Error | `{prefix} Property "<prop>": "<val>" is not a valid integer type.` |
+| M005 | Invalid number value | Error | `{prefix} Property "<prop>": "<val>" is not a valid number type.` |
+| M007 | Invalid date value | Error | `{prefix} Property "<prop>": "<val>" is not a valid date type.` |
+| M008 | Invalid boolean value | Error | `{prefix} Property "<prop>": "<val>" is not a valid boolean type.` |
+| M009 | Invalid property definition | Error | `{prefix} Property "<prop>": "<type>" type is not an allowed property type` |
+| M010 | Value not permitted | Error | `{prefix} "<val>" is not a permissible value for property "<prop>".` |
+| M011 | Value out of range | Error | `{prefix} Property "<prop>": "<val>" is below lower bound.` |
+| M012 | Value out of range | Error | `{prefix} Property "<prop>": "<val>" is above upper bound.` |
+| M013 | Relationship not specified | Error | `{prefix} All related node IDs are missing.` |
+| M014 | Related node not found | Error | `{prefix} Related node "<type>" <id> not found.` |
+| M016 | Duplicate IDs | Error | `{prefix} Same ID also appears in <locations>.` |
+| M017 | Invalid Property | Warning | `{prefix} Property "<prop>" is not defined in the model.` |
+| M018 | Updating existing data | Warning | `{prefix} "<type>": "<id>" already exists and will be updated.` |
+| M019 | Data not found | Error | `{prefix} The node to be deleted "<type>": "<id>" does not exist.` |
+| M020 | Internal error | Error | `Metadata validation failed due to internal errors.` |
+| M022 | Missing ID property | Error | `{prefix} ID property, "<id>" is empty.` |
+| M023 | Invalid relationship | Error | `{prefix} Relationship to a "<type>" node is not defined.` |
+| M024 | One-to-one conflict | Error | `{prefix} Associated with multiple "<type>" nodes: <ids>.` |
+| M025 | Many-to-one conflict | Error | `{prefix} Associated with multiple "<type>" nodes: <ids>.` |
+| M027 | CDE not available | Error | `{prefix} CDE for property "<prop>" is not available.` |
+| M028 | Program name mismatch | Error | `{prefix} Program name doesn't match pre-approved names.` |
+| M029 | Study name mismatch | Error | `{prefix} Study name doesn't match the Data Submission's associated study.` |
+| M031 | Invalid string pattern | Error | `{prefix} "<val>" does not comply to string pattern for property "<prop>".` |
+| M033 | Delete required property | Error | `{prefix} deleting value of a required property "<prop>" is not allowed.` |
+| M035 | Invalid record/node type | Error | `{prefix} Record/node type "<type>" is not defined in the model.` |
+| M036 | Incompatible consent codes | Error | `{prefix} A file cannot be both controlled access and open` |
+
+### File Validation (F-codes)
+
+| Code | Title | Severity | Message Template |
+|---|---|---|---|
+| F001 | Data File not found | Error | `File "<name>" not found.` |
+| F003 | Size mismatch | Error | `File "<name>": expected size: <X>, actual size: <Y>.` |
+| F004 | MD5 mismatch | Error | `File "<name>": expected MD5: <X>, actual MD5: <Y>.` |
+| F005 | Duplicate file records | Warning | `File "<name>": A file with same name but different md5 was found.` |
+| F006 | Conflict file records | Warning | `File "<name>": already exists with the same name and md5 value.` |
+| F007 | Duplicate content | Warning | `File "<name>": another file with the same MD5 found.` |
+| F008 | Orphaned file | Error | `File "<name>": associated metadata not found.` |
+| F009 | Invalid dataRecord | Error | `Invalid file object, no s3 file info.` |
+| F010 | Invalid data file info | Error | `Invalid s3 data file info.` |
+| F011 | Internal error | Error | `Data file validation failed due to internal errors.` |
+
+### Cross-Submission (S-codes)
+
+| Code | Title | Severity | Message Template |
+|---|---|---|---|
+| S001 | Conflict Data found | Error | `{prefix} Identical data found in other submissions.` |
+
+---
+
+## Data Model Configuration
+
+### Per-Data-Commons Settings
+
+Each data commons (GC, CDS, CTDC, ICDC) is configured via `content.json` in the models repository:
+
+| Setting | Purpose | Example |
+|---|---|---|
+| `model-files` | YAML files defining the model | `["model.yml", "props.yml"]` |
+| `current-version` | Default model version | `"1.2.0"` |
+| `omit-DCF-prefix` | Whether file IDs omit `dg.4DFC/` prefix | `true` (ICDC), `false` (GC, CDS, CTDC) |
+| `file-nodes` | File node definitions (name-field, size-field, md5-field) | `{"file": {"name-field": "file_name", ...}}` |
+| `main-nodes` | Entity type mappings for CRDC ID generation | `{"program": "Program", "study": "Study"}` |
+| `property-names` | Configured property name mappings | `{"programName": "program_name"}` |
+| `list-delimiter` | Delimiter for array/value-list properties | `"\|"` |
+
+### Key Constants (`src/common/constants.py`)
+
+```python
+DCF_PREFIX = "dg.4DFC/"
+OMIT_DCF_PREFIX = "omit-DCF-prefix"
+BATCH_TYPE_METADATA = "metadata"
+DELETE_COMMAND = "<delete>"
+```
+
+### Data Model Access (`src/common/model.py`)
+
+```python
+model.get_omit_dcf_prefix()    # Returns bool from content.json
+model.get_file_nodes()          # Returns dict of file node definitions
+model.get_node_id(node_type)    # Returns ID property name for a node
+model.get_node_keys()           # Returns all node type names
+model.get_node_req_props(node)  # Returns required properties
+model.get_list_delimiter()      # Returns list delimiter
+model.get_composition_key(node) # Returns composite key properties
+```
+
+---
+
+## QC Results Structure
+
+Metadata and file validation results are stored in the `qcResults` MongoDB collection:
+
+```json
+{
+    "_id": "<uuid>",
+    "submissionID": "<submission-uuid>",
+    "dataRecordID": "<data-record-uuid>",
+    "validationType": "metadata | data file",
+    "batchIDs": ["<batch-uuid>"],
+    "latestBatchID": "<batch-uuid>",
+    "displayID": "<batch-display-id>",
+    "type": "<nodeType> | data file",
+    "submittedID": "<nodeID> | <fileName>",
+    "uploadedDate": "<datetime>",
+    "severity": "Error | Warning",
+    "errors": [
+        {
+            "code": "M003",
+            "severity": "Error",
+            "title": "Missing required property",
+            "offendingProperty": "study_id",
+            "offendingValue": "",
+            "description": "[file.tsv: line 2] Required property \"study_id\" is empty."
+        }
+    ],
+    "warnings": [],
+    "validatedDate": "<datetime>",
+    "origin": "Metadata Validation Service | Data File Validation Service"
+}
+```
+
+### Error Object Fields
+
+| Field | Description |
+|---|---|
+| `code` | Message code (M003, F001, S001, etc.) |
+| `severity` | `"Error"` or `"Warning"` |
+| `title` | Human-readable title from message config |
+| `offendingProperty` | The property that caused the error |
+| `offendingValue` | The value that caused the error |
+| `description` | Full formatted error message |
+
+---
+
+## Mapping to Katalon Test Automation
+
+### Where Validation Results Appear in the UI
+
+| Validation Type | UI Location | Tab/Section |
+|---|---|---|
+| Essential validation errors | Batch-level errors | Upload Activity tab → error banner |
+| Metadata QC results | Per-node errors | Validation Results tab |
+| File QC results | Per-file errors | Validation Results tab |
+| Cross-submission errors | Per-node additional errors | Cross Validation Results tab |
+
+### Essential Validation Errors vs CLI Errors
+
+- **UI upload path:** Essential validation errors appear as batch-level errors in the Upload Activity tab. Use `DataSubmissions.uploadFolder(tcName)` to upload, then verify with `DataSubmissions.verifyValidationResultsVsExpectedForTC(tcName)`.
+- **CLI upload path:** The CLI uploader gets essential validation errors as part of the batch response and writes them to the `upload-report-*.tsv`. Use `CliUploader.uploadFilesViaCli(tcName, dataType)` to upload, then `CliUploader.verifyCliErrorMessages(tcName)` to verify.
+
+### Test Data Conventions for Validation Tests
+
+```
+InputFiles/CRDC/MetadataData/{testCaseName}/
+├── DataFiles/                        # Data files + *manifest.tsv (CLI data file upload)
+├── Metadata/                         # TSV metadata files (CLI metadata / UI upload)
+├── expected/                         # Expected CLI error TSVs
+│   └── *.tsv                         # Columns: file_name, expected_errors
+└── expected-ValidationResults/       # Expected UI validation result TSVs
+    └── *.tsv                         # Columns match UI validation results table
+```
+
+### Matching Error Messages in Tests
+
+When writing expected error messages for tests, match the **exact** format from the validator source code:
+
+- Essential validation messages use the file name directly: `"<fileName>:line <N>": ...`
+- Metadata validation messages use a prefix: `[<originalFileName>: line <lineNumber>] ...`
+- The `create_error()` function formats messages using templates from `messages_configuration.yml` when `msg` is a list; raw strings are passed through as-is.
+
+### Relevant Katalon Keywords for Validation Testing
+
+| Keyword | Validates |
+|---|---|
+| `DataSubmissions.uploadFolder(tcName)` | Upload metadata via UI |
+| `DataSubmissions.clickValidateButton()` | Trigger metadata/file validation |
+| `DataSubmissions.verifyValidationResultsVsExpectedForTC(tcName)` | Compare UI validation results against expected TSV |
+| `CliUploader.uploadFilesViaCli(tcName, dataType)` | Upload via CLI (triggers essential validation) |
+| `CliUploader.verifyCliErrorMessages(tcName)` | Compare CLI report errors against expected TSV |
+| `CliUploader.verifyFinalManifest(tcName)` | Verify CLI-generated final manifest file IDs |
+
+---
+
+## Project Structure (`crdc-datahub-validator`)
+
+| Path | Purpose |
+|---|---|
+| `src/validator.py` | Main entry point — dispatches to service by config |
+| `src/essential_validator.py` | Essential validation (upload-time TSV checks, file_id) |
+| `src/metadata_validator.py` | Metadata validation (property types, PV, relationships) |
+| `src/file_validator.py` | File validation (S3 existence, size, MD5, duplicates) |
+| `src/x_submission_validator.py` | Cross-submission validation (duplicate nodes) |
+| `src/data_loader.py` | Loads validated TSV into MongoDB dataRecords |
+| `src/metadata_remover.py` | Processes Delete Metadata requests |
+| `src/metadata_export.py` | Export/release metadata to S3 + DCF manifests |
+| `src/dcf_manifest_generator.py` | Generates DCF manifest TSVs (GUID, MD5, ACL) |
+| `src/pv_puller.py` | Pulls CDE permissible values from STS API |
+| `src/config.py` | Configuration parsing and MongoDB connection |
+| `src/common/constants.py` | All constant strings (DCF_PREFIX, collection names, etc.) |
+| `src/common/utils.py` | UUID validation, error creation, file utilities |
+| `src/common/model.py` | DataModel wrapper with convenience methods |
+| `src/common/model_store.py` | ModelFactory — loads/caches models from YAML |
+| `src/common/model_reader.py` | YamlModelParser — parses data model YAML files |
+| `src/common/mongo_dao.py` | MongoDB CRUD for all collections (1400+ lines) |
+| `src/common/s3_utils.py` | S3 operations (archive, upload, move, delete) |
+| `src/common/sqs_queue.py` | SQS message send/receive |
+| `src/common/api_client.py` | HTTP client for CDE/STS APIs |
+| `configs/messages_configuration.yml` | All error/warning message templates (M/F/S codes) |
+| `configs/validate-*-config*.yml` | Service configuration files |
+
+---
+
+## MongoDB Collections
+
+| Collection | Purpose |
+|---|---|
+| `batch` | Batch records with `errors[]` from essential validation |
+| `submissions` | Submission records (status, intention, dataCommons, modelVersion) |
+| `dataRecords` | All metadata/file node records with `qcResultID`, `additionalErrors` |
+| `release` | Released/published data records |
+| `qcResults` | QC validation results (metadata + file validation errors/warnings) |
+| `validation` | Validation run records (tracks metadata/file validation completion) |
+| `CDE` | Cached CDE permissible values |
+| `synonyms` | PV synonym mappings |
+| `pvConceptCodes` | Concept codes for PVs |
+| `configuration` | Environment configuration (SQS names, STS config) |
+| `approvedStudies` | Study records |
+| `organization` | Program/organization records |
+| `fileMD5` | Cached file MD5 checksums for optimization |

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Sample test to verify deleteRowsFromDataView keyword. Uploads metadata, then deletes a specific number of rows from Data View.</description>
+   <name>TC05_DeleteRowsFromDataView</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6e</testCaseGuid>
+</TestCaseEntity>
