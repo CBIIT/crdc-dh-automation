@@ -1,0 +1,204 @@
+---
+description: CRDC Data Hub CLI Uploader project reference for writing CLI-related test automation
+globs: Keywords/utilities/CliUploader.groovy,Scripts/**/*.groovy
+alwaysApply: false
+---
+
+# CRDC Data Hub CLI Uploader Reference
+
+## Overview
+
+The **crdc-datahub-cli-uploader** is a Python 3.13+ CLI tool that uploads data files and metadata to CRDC Data Hub via S3. It communicates with a GraphQL backend API, validates files locally, obtains temporary AWS STS credentials, and uploads to S3 with progress tracking. CLI version: **4.3**.
+
+---
+
+## CLI Workflow
+
+```
+YAML Config → CLI Parsing → Version Check → File Validation (size, MD5, names)
+  → Create Batch (GraphQL) → Get AWS STS Creds → Upload to S3
+  → Process Manifest (data files only) → Update Batch → Upload Report (TSV)
+```
+
+---
+
+## CLI Project Structure (crdc-datahub-cli-uploader)
+
+| Path | Purpose |
+|------|---------|
+| `src/uploader.py` | **Main entry point** — orchestrates full upload workflow |
+| `src/upload_config.py` | Config parsing (YAML + CLI args), validation, version check |
+| `src/file_validator.py` | File validation: size, MD5, naming rules, ZIP/archive support |
+| `src/file_uploader.py` | Upload queue with retry logic, progress tracking, statistics |
+| `src/copier.py` | S3 copy: multipart for >100MB, manual multipart for >5GB |
+| `src/process_manifest.py` | Adds file IDs to manifest, creates `-final.tsv`, uploads to S3 |
+| `src/common/constants.py` | Upload types, field names, batch statuses, S3 config |
+| `src/common/graphql_client.py` | `get_temp_credential()`, `create_batch()`, `update_batch()`, `get_data_file_config()` |
+| `src/common/s3util.py` | S3 upload/download, multipart, token refresh on expiry |
+| `src/common/utils.py` | TSV export, UUID validation, size/time formatting, S3 URL parsing |
+| `src/common/md5_calculator.py` | Chunked MD5 with dynamic chunk sizing |
+| `src/common/progress_bar.py` | Rich-based progress bars (speed, ETA) |
+| `src/common/upload_heart_beater.py` | Background heartbeat thread (default 300s) to prevent batch timeout |
+| `configs/` | Example YAML configs for data file and metadata uploads |
+| `requirements.txt` | pyyaml, boto3, requests, requests_aws4auth, rich, pandas, pytest |
+
+---
+
+## CLI Configuration (YAML)
+
+### Data File Upload
+
+```yaml
+Config:
+  api-url: https://api.example.com/graphql
+  token: "your-api-token"
+  submission: submission-uuid
+  type: data file
+  data: /path/to/data/files/
+  manifest: /path/to/manifest.tsv
+  archive_manifest: /path/to/archive-manifest.tsv  # optional, for ZIP files
+  id-field: file_id                                 # optional
+  retries: 3
+  overwrite: false
+  dryrun: false
+```
+
+### Metadata Upload
+
+```yaml
+Config:
+  api-url: https://api.example.com/graphql
+  token: "your-api-token"
+  submission: submission-uuid
+  type: metadata
+  data: /path/to/metadata/folder/
+  retries: 3
+  overwrite: false
+  dryrun: false
+```
+
+---
+
+## CLI Output Patterns (for verification)
+
+Success indicators in CLI stdout:
+- `"File uploading completed!"` — upload finished
+- `"Files failed: 0"` — no failures
+- `"Files processed: N"` — N files were processed
+- `"Files copied: N"` — N files were copied to S3
+- `"X out of Y file(s) have been validated"` — validation complete (X should equal Y)
+
+Failure indicators:
+- `"Failed to upload files"` — upload failure
+- `"can't get data file config"` — API/permission error
+- Non-zero exit code
+
+### Upload Report (`tmp/upload-report-*.tsv`)
+
+Generated in `<cliDir>/tmp/` after each run. TSV columns include:
+- `file_name` / `internal_file_name` — file identifier
+- `succeeded` — `true` or `false` per file
+- `errors` — error messages (Python list format: `['msg1', 'msg2']`)
+
+---
+
+## Katalon Integration (CliUploader.groovy)
+
+### Location
+
+`Keywords/utilities/CliUploader.groovy` — integrates CLI uploader into Katalon test automation.
+
+### CLI Location Resolution
+
+Default: `Tools/crdc-datahub-cli-uploader-src` (Python source). Override with profile variable `CRDC_CLI_DIR`. Prefers binary (`uploader`/`uploader.exe`) if present; otherwise runs `python3 src/uploader.py`.
+
+### Key Public Keywords
+
+| Keyword | Purpose |
+|---------|---------|
+| `CliUploader.uploadFilesViaCli(testCaseName, dataType)` | Upload data files or metadata via CLI |
+| `CliUploader.verifyCliErrorMessages(testCaseName)` | Compare CLI error report against expected errors |
+
+### `uploadFilesViaCli(testCaseName, dataType)`
+
+- **dataType**: `"datafile"` / `"data file"` / `"metadata"` (case-insensitive)
+- Reads API URL from `GlobalVariable.ApiUrl`, token from `GlobalVariable.SubmitterApiToken`
+- Reads submission ID from current browser URL via `DataSubmissions.getSubmissionIdFromUploadActivityUrl()`
+- Resolves data path: `InputFiles/CRDC/MetadataData/{testCaseName}/DataFiles` (data) or `.../Metadata` (metadata)
+- Resolves manifest: first `*manifest.tsv` file in the DataFiles folder
+- Builds YAML config, writes temp file, runs CLI process, verifies output
+- Refreshes browser after successful upload
+
+### `verifyCliErrorMessages(testCaseName)`
+
+- Reads latest `upload-report-*.tsv` from CLI `tmp/` folder
+- Reads expected errors from `InputFiles/CRDC/MetadataData/{testCaseName}/expected/*.tsv`
+- Expected TSV columns: `file_name` + `expected_errors` (or `expected_error`)
+- Normalizes error values (Python list format → sorted, joined with ` | `)
+- Generates comparison report in `Reports/CLI_ErrorVerification/`
+
+### Profile/GlobalVariable Dependencies
+
+| Variable | Purpose |
+|----------|---------|
+| `ApiUrl` | GraphQL API endpoint |
+| `SubmitterApiToken` | API auth token |
+| `CRDC_CLI_DIR` | Override CLI root directory (optional) |
+| `CRDC_CLI_RETRIES` | Retry count, default 3 (optional) |
+| `CRDC_CLI_OVERWRITE` | Overwrite existing files, default false (optional) |
+| `CRDC_CLI_DRYRUN` | Dry-run mode, default false (optional) |
+| `CRDC_MANIFEST_ID_FIELD` | Custom manifest ID field name (optional) |
+| `CRDC_ARCHIVE_MANIFEST_PATH` | Archive manifest path for ZIP files (optional) |
+
+---
+
+## Test Data Folder Convention
+
+```
+InputFiles/CRDC/MetadataData/{testCaseName}/
+├── DataFiles/              # Data files + *manifest.tsv (for "data file" type)
+├── Metadata/               # TSV/TXT metadata files (for "metadata" type)
+└── expected/               # Expected error TSVs (for verifyCliErrorMessages)
+    └── *.tsv               # Columns: file_name, expected_errors
+```
+
+---
+
+## Script Pattern for CLI Upload Tests
+
+```groovy
+// 1. Login and navigate to Data Submissions
+CustomKeywords.'utilities.Login.navigateToCrdc'()
+CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
+
+// 2. Create a submission (or navigate to existing one)
+CustomKeywords.'utilities.Pbac.createDataSubmission'()
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/List/Table/SubmissionName-Link')
+
+// 3. Upload via CLI (browser must be on upload-activity tab for submission ID)
+CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC_Name', 'datafile')
+// or for metadata:
+CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC_Name', 'metadata')
+
+// 4. Verify error messages (for negative test cases)
+CustomKeywords.'utilities.CliUploader.verifyCliErrorMessages'('TC_Name')
+
+// 5. Continue with UI verification after CLI upload
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Tabs/ValidationResults-Tab')
+// ... verify validation results, data view, etc.
+```
+
+---
+
+## CLI Features Relevant to Test Automation
+
+- **MD5 caching**: Repeated runs on same files skip re-computation
+- **Retry logic**: Configurable retries per file (default 3)
+- **Dry-run mode**: Validates without uploading (set `CRDC_CLI_DRYRUN=true`)
+- **Overwrite mode**: Re-uploads existing files (set `CRDC_CLI_OVERWRITE=true`)
+- **Large file support**: Multipart upload for files >100MB, manual multipart for >5GB
+- **S3-to-S3 transfer**: Source files can be S3 URLs
+- **Archive support**: ZIP files with embedded manifest
+- **Heartbeat**: Background thread prevents batch timeout during long uploads (300s interval)
+- **File name validation**: Rejects empty names, duplicates, absolute paths, reserved characters
