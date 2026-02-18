@@ -610,6 +610,10 @@ ${manifestBlock}               retries: ${retries}
 			String actualNorm = normalizeErrorCell(actualRaw)
 			String expectedNorm = normalizeErrorCell(expectedRaw)
 			boolean match = actualNorm == expectedNorm
+			String reportStatus = match ? "Pass" : "Fail"
+			String expectedTrunc = expectedNorm.length() > 200 ? expectedNorm.substring(0, 200) + "..." : expectedNorm
+			String actualTrunc = actualNorm.length() > 200 ? actualNorm.substring(0, 200) + "..." : actualNorm
+			ValidationReport.addValidationReportItem("CLI Error Verification", fileName, expectedTrunc, actualTrunc, reportStatus)
 			String status = match ? "PASS" : "FAIL"
 			String actualSafe = (actualRaw != null ? actualRaw : "").replace("\t", " ").replace("\n", " ").replace("\r", " ")
 			String expectedSafe = (expectedRaw != null ? expectedRaw : "").replace("\t", " ").replace("\n", " ").replace("\r", " ")
@@ -668,9 +672,11 @@ ${manifestBlock}               retries: ${retries}
 		String finalPath = originalManifestPath.replace(".tsv", "-final.tsv")
 		File finalManifest = new File(finalPath)
 		if (!finalManifest.exists() || !finalManifest.isFile()) {
+			ValidationReport.addValidationReportItem("CLI Final Manifest Verification", "Final manifest exists", "true", "false", "Fail")
 			KeywordUtil.markFailed("CliUploader.verifyFinalManifest: Final manifest not found: " + finalPath)
 			return
 		}
+		ValidationReport.addValidationReportItem("CLI Final Manifest Verification", "Final manifest exists", "true", "true", "Pass")
 		KeywordUtil.logInfo("CliUploader.verifyFinalManifest: Found final manifest " + finalManifest.getName())
 
 		List<String> origLines = Files.readAllLines(originalManifest.toPath(), StandardCharsets.UTF_8)
@@ -683,9 +689,11 @@ ${manifestBlock}               retries: ${retries}
 		int origDataRows = origLines.size() - 1
 		int finalDataRows = finalLines.size() - 1
 		if (origDataRows != finalDataRows) {
+			ValidationReport.addValidationReportItem("CLI Final Manifest Verification", "Row count matches", String.valueOf(origDataRows), String.valueOf(finalDataRows), "Fail")
 			KeywordUtil.markFailed("CliUploader.verifyFinalManifest: Row count mismatch. Original=" + origDataRows + ", Final=" + finalDataRows)
 			return
 		}
+		ValidationReport.addValidationReportItem("CLI Final Manifest Verification", "Row count matches", String.valueOf(origDataRows), String.valueOf(finalDataRows), "Pass")
 
 		String header = finalLines.get(0)
 		String[] headers = header.split("\t", -1)
@@ -697,9 +705,11 @@ ${manifestBlock}               retries: ${retries}
 			}
 		}
 		if (fileIdIdx < 0) {
+			ValidationReport.addValidationReportItem("CLI Final Manifest Verification", "file_id column present", "true", "false", "Fail")
 			KeywordUtil.markFailed("CliUploader.verifyFinalManifest: Final manifest has no 'file_id' column.")
 			return
 		}
+		ValidationReport.addValidationReportItem("CLI Final Manifest Verification", "file_id column present", "true", "true", "Pass")
 
 		List<String> invalidIds = []
 		for (int i = 1; i < finalLines.size(); i++) {
@@ -712,9 +722,12 @@ ${manifestBlock}               retries: ${retries}
 			}
 		}
 		if (!invalidIds.isEmpty()) {
+			String invalidSummary = invalidIds.size() + " invalid: " + (invalidIds.size() > 3 ? invalidIds.subList(0, 3).join("; ") + "..." : invalidIds.join("; "))
+			ValidationReport.addValidationReportItem("CLI Final Manifest Verification", "All file_id values valid", "0 invalid", invalidSummary, "Fail")
 			KeywordUtil.markFailed("CliUploader.verifyFinalManifest: Invalid file_id values: " + invalidIds.join("; "))
 			return
 		}
+		ValidationReport.addValidationReportItem("CLI Final Manifest Verification", "All file_id values valid", "0 invalid", "0 invalid", "Pass")
 		KeywordUtil.logInfo("CliUploader.verifyFinalManifest: Final manifest verified: " + finalDataRows + " row(s), all file_id values are valid DRS IDs.")
 	}
 

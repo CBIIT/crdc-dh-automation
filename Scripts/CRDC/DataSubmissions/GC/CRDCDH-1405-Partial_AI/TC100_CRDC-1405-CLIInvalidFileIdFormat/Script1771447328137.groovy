@@ -38,7 +38,6 @@ CustomKeywords.'utilities.CliUploader.verifyCliErrorMessages'('CRDCDH-1405_TC100
 //      (navigate to Upload Activities tab and confirm no batch row appears).
 //      Per Jira: invalid file_id should prevent the upload from proceeding.
 
-//TODO: Add ValidationReport.generateValidationReport() so results are captured in the HTML report
-// CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
+CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
 WebUI.closeBrowser()

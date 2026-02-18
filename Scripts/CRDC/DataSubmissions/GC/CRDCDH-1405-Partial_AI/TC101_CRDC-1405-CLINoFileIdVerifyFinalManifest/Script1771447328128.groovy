@@ -36,7 +36,6 @@ CustomKeywords.'utilities.CliUploader.verifyFinalManifest'('CRDCDH-1405_TC101')
 //      the final manifest. Upload the same files a second time, then verify the final manifest
 //      still contains all rows with valid file_ids (skipped files should not be excluded).
 
-//TODO: Add ValidationReport.generateValidationReport() so results are captured in the HTML report
-// CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
+CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
 WebUI.closeBrowser()
