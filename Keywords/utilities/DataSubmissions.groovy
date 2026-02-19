@@ -831,22 +831,17 @@ class DataSubmissions extends TestRunner {
 	/**
 	 * Click "See details" for the Validation Results row whose Submitted Identifier matches the given value.
 	 * Assumes caller is on Validation Results tab with filters applied. Waits for the error details dialog to appear.
-	 * Uses generic-table-row when available; falls back to tbody/tr for compatibility.
+	 * Uses GenericTable row locator from AILocators.
 	 *
 	 * @param submittedIdentifier The Submitted Identifier value (case-insensitive, trimmed)
 	 */
 	@Keyword
 	void clickSeeDetailsForSubmittedId(String submittedIdentifier) {
 		KeywordUtil.logInfo("--- clickSeeDetailsForSubmittedId: " + submittedIdentifier + " ---")
-		WebDriver driver = DriverFactory.getWebDriver()
 		String target = submittedIdentifier?.trim() ?: ""
 
-		// Try generic-table-row first (GenericTable), then tbody/tr (legacy)
-		List<WebElement> rows = driver.findElements(By.cssSelector("[data-testid='generic-table-row']"))
-		if (rows.isEmpty()) {
-			rows = driver.findElements(By.xpath("//tbody/tr"))
-		}
-		if (rows.isEmpty()) {
+		List<WebElement> rows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
+		if (rows == null || rows.isEmpty()) {
 			KeywordUtil.markFailed("clickSeeDetailsForSubmittedId: no table rows found")
 			return
 		}
@@ -873,8 +868,8 @@ class DataSubmissions extends TestRunner {
 				}
 			} catch (StaleElementReferenceException e) {
 				// Retry by re-querying
-				rows = driver.findElements(By.cssSelector("[data-testid='generic-table-row']"))
-				if (rows.isEmpty()) rows = driver.findElements(By.xpath("//tbody/tr"))
+				rows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
+				if (rows == null || rows.isEmpty()) continue
 				continue
 			}
 		}
@@ -884,7 +879,9 @@ class DataSubmissions extends TestRunner {
 			return
 		}
 
-		WebElement seeDetailsBtn = matchingRow.findElement(By.xpath(".//button[contains(text(),'See details')]"))
+		// Row-scoped lookup is intentional: there can be many "See details" buttons on the page,
+		// and we must click the one belonging to the matched Submitted Identifier row.
+		WebElement seeDetailsBtn = matchingRow.findElement(By.xpath(".//button[contains(.,'See details')]"))
 		seeDetailsBtn.click()
 		WebUI.delay(1)
 		WebUI.waitForElementPresent(findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/Dialog"), 10)
@@ -894,6 +891,8 @@ class DataSubmissions extends TestRunner {
 	/**
 	 * Read all issues from the open error details dialog. Returns a list of maps with keys severity and message.
 	 * Assumes the error details dialog is open.
+	 * Uses element lists (not WebUI.getText on one TestObject) to preserve row order and pair each
+	 * severity with its corresponding message.
 	 *
 	 * @return List of maps [severity: String, message: String]
 	 */
