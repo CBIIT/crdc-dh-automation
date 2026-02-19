@@ -8,31 +8,30 @@ import internal.GlobalVariable as GlobalVariable
  *
  * Scenario:
  *   S001 cross-submission conflict: the Submitter creates TWO data submissions for
- *   the SAME study, uploads identical participant records into both (same
- *   study_participant_id values), validates and submits each. After the second
+ *   the SAME study, uploads identical program records into both (same
+ *   program_acronym values), validates and submits each. After the second
  *   submission is submitted, the system runs cross-validation and flags the
- *   duplicate participant nodes. A DCP user then navigates to the second
+ *   duplicate program nodes. A DCP user then navigates to the second
  *   submission, triggers cross-validation, and the test verifies the expected
  *   S001 "Conflict Data found" errors appear in the Cross Validation Results tab.
  *
  * Test data:
- *   Upload file: InputFiles/CRDC/MetadataData/PBAC/participant.tsv
+ *   Upload file: InputFiles/CRDC/MetadataData/PBAC/program.tsv
  *   Expected CV results: InputFiles/CRDC/MetadataData/SampleTC_CrossValidation/
  *                        expected-CrossValidationResults/GC_expected-CrossValidationResults.tsv
  *
- * The expected TSV contains study_participant_id values (GC-CASE-992050,
- * GC-CASE-987680) from participant.tsv that will conflict across the two
- * submissions. Update the TSV if your participant records differ.
+ * The expected TSV contains program_acronym values (e.g. CDS-595435) from
+ * program.tsv that will conflict across the two submissions. Update the TSV
+ * if your program records differ.
  *
  * Flow:
  *   === Submitter ===
  *   1. Login as Submitter
- *   2. Create Submission 1 (metadata only, ATS study), upload participant.tsv,
+ *   2. Create Submission 1 (metadata only, ATS study), upload program.tsv,
  *      validate, submit -> capture submission ID
  *   3. Go back to DS list, create Submission 2 for the SAME study, upload the
- *      same participant.tsv (prepareUniqueMetadataAndUpload keeps IDs identical
- *      but only modifies participant_id to avoid duplicate-ID essential validation;
- *      study_participant_id stays the same -- that is the cross-validation key)
+ *      same program.tsv (same program_acronym values -- that is the cross-validation
+ *      key for duplicate program nodes across submissions)
  *      validate, submit -> capture submission ID
  *   4. Logout
  *   === DCP ===
@@ -48,7 +47,7 @@ import internal.GlobalVariable as GlobalVariable
 WebUI.closeBrowser()
 
 // -----------------------------------------------------------------------
-// Submitter: create Submission 1, upload participant data, validate, submit
+// Submitter: create Submission 1, upload program data, validate, submit
 // -----------------------------------------------------------------------
 CustomKeywords.'utilities.Login.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
@@ -59,8 +58,7 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab'
 CustomKeywords.'utilities.Pbac.createDataSubmission'()
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/List/Table/SubmissionName-Link')
 
-// Upload participant metadata -- keeps study_participant_id unchanged (cross-validation key)
-// participant_id is modified per row to avoid essential-validation duplicate-ID errors
+// Upload program metadata -- same program_acronym across both submissions (cross-validation key)
 CustomKeywords.'utilities.Pbac.uploadMetadataUI'('InputFiles/CRDC/MetadataData/PBAC/program.tsv')
 
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
@@ -76,13 +74,13 @@ WebUI.delay(2)
 String submissionId1 = CustomKeywords.'utilities.DataSubmissions.getSubmissionIdFromUploadActivityUrl'()
 
 // -----------------------------------------------------------------------
-// Submitter: create Submission 2, upload the SAME participant data, validate, submit
+// Submitter: create Submission 2, upload the SAME program data, validate, submit
 // -----------------------------------------------------------------------
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
 CustomKeywords.'utilities.Pbac.createDataSubmission'()
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/List/Table/SubmissionName-Link')
 
-// Upload participant metadata again -- study_participant_id values are identical to
+// Upload program metadata again -- program_acronym values are identical to
 // Submission 1, which will trigger S001 cross-validation conflicts
 CustomKeywords.'utilities.Pbac.uploadMetadataUI'('InputFiles/CRDC/MetadataData/PBAC/program.tsv')
 
