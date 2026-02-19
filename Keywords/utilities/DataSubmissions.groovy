@@ -614,15 +614,18 @@ class DataSubmissions extends TestRunner {
 	}
 
 	/**
-	 * Apply Validation Results filters (node, severity, issue type) and read table rows: [submittedId, issueType, severity].
-	 * Waits for Loading to disappear, stabilizes table row count, then re-queries rows by index and retries on StaleElementReferenceException to avoid flakiness.
+	 * Shared Validation Results filter application used by both table verification flows.
+	 * Keeps one source of truth for node/severity/issueType interactions.
 	 */
-	private List<List<String>> readValidationResultsTableFromUI(String node, String severity, String issueType) {
-		WebDriver driver = DriverFactory.getWebDriver()
+	private void applyValidationResultsFiltersInternal(String node, String severity, String issueType, boolean includeLogs) {
+		if (includeLogs) {
+			KeywordUtil.logInfo("--- applyValidationResultsFilters: node=" + node + ", severity=" + severity + ", issueType=" + issueType + " ---")
+		}
 		WebUI.delay(1)
 		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"), 15)
 		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"))
 		WebUI.delay(1)
+		WebDriver driver = DriverFactory.getWebDriver()
 		WebElement nodeOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + node + "']"))
 		nodeOpt.click()
 		WebUI.delay(1)
@@ -638,9 +641,19 @@ class DataSubmissions extends TestRunner {
 		WebElement issueOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + issueType + "']"))
 		issueOpt.click()
 		WebUI.delay(2)
-		// Wait for table to finish loading after filter change; then a short delay so content can settle.
 		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
 		WebUI.delay(1)
+		if (includeLogs) {
+			KeywordUtil.logInfo("applyValidationResultsFilters: completed")
+		}
+	}
+
+	/**
+	 * Apply Validation Results filters (node, severity, issue type) and read table rows: [submittedId, issueType, severity].
+	 * Waits for Loading to disappear, stabilizes table row count, then re-queries rows by index and retries on StaleElementReferenceException to avoid flakiness.
+	 */
+	private List<List<String>> readValidationResultsTableFromUI(String node, String severity, String issueType) {
+		applyValidationResultsFiltersInternal(node, severity, issueType, false)
 		// Stabilize table: after changing node/severity/issueType the UI re-renders the table. If we read rows
 		// before the DOM has settled, we can get StaleElementReferenceException when using row/cell references.
 		// Wait until row count is unchanged across two samples 0.5s apart (up to 5 tries).
@@ -810,30 +823,7 @@ class DataSubmissions extends TestRunner {
 	 */
 	@Keyword
 	void applyValidationResultsFilters(String node, String severity, String issueType) {
-		KeywordUtil.logInfo("--- applyValidationResultsFilters: node=" + node + ", severity=" + severity + ", issueType=" + issueType + " ---")
-		WebUI.delay(1)
-		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"), 15)
-		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"))
-		WebUI.delay(1)
-		WebDriver driver = DriverFactory.getWebDriver()
-		WebElement nodeOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + node + "']"))
-		nodeOpt.click()
-		WebUI.delay(1)
-		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn"), 10)
-		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn"))
-		WebUI.delay(1)
-		WebElement sevOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + severity + "']"))
-		sevOpt.click()
-		WebUI.delay(1)
-		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn"), 10)
-		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn"))
-		WebUI.delay(1)
-		WebElement issueOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + issueType + "']"))
-		issueOpt.click()
-		WebUI.delay(2)
-		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
-		WebUI.delay(1)
-		KeywordUtil.logInfo("applyValidationResultsFilters: completed")
+		applyValidationResultsFiltersInternal(node, severity, issueType, true)
 	}
 
 	// ------------------------------- Validation Error Details (See details dialog) -------------------------------
@@ -909,9 +899,14 @@ class DataSubmissions extends TestRunner {
 	 */
 	@Keyword
 	List<Map<String, String>> getErrorDetailsDialogIssues() {
-		WebDriver driver = DriverFactory.getWebDriver()
-		List<WebElement> severities = driver.findElements(By.cssSelector("[data-testid='error-details-dialog'] [data-testid='issue-severity']"))
-		List<WebElement> messages = driver.findElements(By.cssSelector("[data-testid='error-details-dialog'] [data-testid='issue-message']"))
+		List<WebElement> severities = WebUI.findWebElements(
+			findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/IssueSeverity-Lbl"),
+			10
+		)
+		List<WebElement> messages = WebUI.findWebElements(
+			findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/IssueMessage-Lbl"),
+			10
+		)
 
 		List<Map<String, String>> issues = new ArrayList<>()
 		int count = Math.min(severities.size(), messages.size())
@@ -1050,39 +1045,6 @@ class DataSubmissions extends TestRunner {
 			}
 		}
 		KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: completed")
-	}
-
-	/** Load rows [severity, issueType, message] for submittedId from expected TSV. Message = Expected_Issues or Issue_Type. */
-	private List<List<String>> loadExpectedErrorDetailsRowsForSubmittedId(String tsvPath, String submittedIdColumn, String submittedId) {
-		List<List<String>> out = new ArrayList<>()
-		Path path = Paths.get(tsvPath)
-		if (!Files.exists(path)) return out
-		List<String> lines = Files.readAllLines(path)
-		if (lines.size() < 2) return out
-		String[] headers = lines.get(0).split("\t", -1)
-		int idxId = -1, idxIssue = -1, idxSev = -1, idxExpectedIssues = -1
-		for (int i = 0; i < headers.length; i++) {
-			String h = headers[i].trim()
-			if (h.equalsIgnoreCase(submittedIdColumn)) idxId = i
-			if (h.equals("Issue_Type")) idxIssue = i
-			if (h.equals("Expected_Severity")) idxSev = i
-			if (h.equals("Expected_Issues")) idxExpectedIssues = i
-		}
-		if (idxId < 0 || idxIssue < 0 || idxSev < 0) return out
-		if (idxExpectedIssues < 0) idxExpectedIssues = idxIssue
-		String target = submittedId?.trim() ?: ""
-		for (int i = 1; i < lines.size(); i++) {
-			String[] cells = lines.get(i).split("\t", -1)
-			String id = idxId < cells.length ? cells[idxId].trim() : ""
-			if (!id.equalsIgnoreCase(target)) continue
-			String rowIssue = idxIssue < cells.length ? cells[idxIssue].trim() : ""
-			String rowSev = idxSev < cells.length ? cells[idxSev].trim() : ""
-			if (rowSev.isEmpty() || rowIssue.isEmpty()) continue
-			String message = idxExpectedIssues >= 0 && idxExpectedIssues < cells.length ? cells[idxExpectedIssues].trim() : ""
-			if (message.isEmpty()) message = rowIssue
-			out.add(Arrays.asList(rowSev, rowIssue, message))
-		}
-		return out
 	}
 
 	/**
