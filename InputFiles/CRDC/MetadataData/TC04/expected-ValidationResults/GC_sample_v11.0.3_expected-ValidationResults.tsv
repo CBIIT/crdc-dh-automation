@@ -2,5 +2,5 @@ type	Issue_Type	Expected_Severity	Expected_Issues	 participant.study_participant
 sample				auto_sp_1	auto_pdxkey_1	auto_CDS2016_DNA	Cells	samdescription	Analyte	Normal	Vulva|Wrist|Adenoid	45	derived from speci		Premalignant
 sample				auto_sp_2	auto_pdxkey_1	auto_CDS2014_DNA	Mouth Rinse	samdescription	Skin	Not Reported	Vulva|Wrist|Adrenal	43	derived from speci		Metastatic
 sample				auto_sp_3	auto_pdxkey_1	auto_CDS2008_DNA	Bone Marrow	samdescription	Central Nervous System	Tumor	Vulva|Wrist|Abdominal Wall	54	derived from speci		Progression
-sample	Missing required property	Error	Missing required property	auto_sp_2	auto_pdxkey_1	auto_CDS2009_DNA		samdescription	Body Fluid or Substance	Peritumoral	Vulva|Wrist|Acetabulum	65	derived from speci		Prior Primary
+sample	Missing required property	Error	Required property "sample_type" is empty.	auto_sp_2	auto_pdxkey_1	auto_CDS2009_DNA		samdescription	Body Fluid or Substance	Peritumoral	Vulva|Wrist|Acetabulum	65	derived from speci		Prior Primary
 sample				auto_sp_2	auto_pdxkey_1	auto_CDS2011_DNA	Tissue	samdescription	Skin	Unknown	Vulva|Wrist|Venous	65	derived from speci		Recurrent

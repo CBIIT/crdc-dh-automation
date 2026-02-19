@@ -799,6 +799,337 @@ class DataSubmissions extends TestRunner {
 		}
 	}
 
+	/**
+	 * Apply Validation Results filters (node, severity, issue type). Call before verifyErrorDetailsForSubmittedId
+	 * when the table must be filtered to a specific node/severity/issueType so the target row is visible.
+	 * Assumes caller is on Validation Results tab (Expanded view).
+	 *
+	 * @param node Node type (e.g. participant)
+	 * @param severity Severity filter (e.g. Error, Warning)
+	 * @param issueType Issue type filter (e.g. Missing required property)
+	 */
+	@Keyword
+	void applyValidationResultsFilters(String node, String severity, String issueType) {
+		KeywordUtil.logInfo("--- applyValidationResultsFilters: node=" + node + ", severity=" + severity + ", issueType=" + issueType + " ---")
+		WebUI.delay(1)
+		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"), 15)
+		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"))
+		WebUI.delay(1)
+		WebDriver driver = DriverFactory.getWebDriver()
+		WebElement nodeOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + node + "']"))
+		nodeOpt.click()
+		WebUI.delay(1)
+		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn"), 10)
+		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn"))
+		WebUI.delay(1)
+		WebElement sevOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + severity + "']"))
+		sevOpt.click()
+		WebUI.delay(1)
+		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn"), 10)
+		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn"))
+		WebUI.delay(1)
+		WebElement issueOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + issueType + "']"))
+		issueOpt.click()
+		WebUI.delay(2)
+		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+		WebUI.delay(1)
+		KeywordUtil.logInfo("applyValidationResultsFilters: completed")
+	}
+
+	// ------------------------------- Validation Error Details (See details dialog) -------------------------------
+
+	/**
+	 * Click "See details" for the Validation Results row whose Submitted Identifier matches the given value.
+	 * Assumes caller is on Validation Results tab with filters applied. Waits for the error details dialog to appear.
+	 * Uses generic-table-row when available; falls back to tbody/tr for compatibility.
+	 *
+	 * @param submittedIdentifier The Submitted Identifier value (case-insensitive, trimmed)
+	 */
+	@Keyword
+	void clickSeeDetailsForSubmittedId(String submittedIdentifier) {
+		KeywordUtil.logInfo("--- clickSeeDetailsForSubmittedId: " + submittedIdentifier + " ---")
+		WebDriver driver = DriverFactory.getWebDriver()
+		String target = submittedIdentifier?.trim() ?: ""
+
+		// Try generic-table-row first (GenericTable), then tbody/tr (legacy)
+		List<WebElement> rows = driver.findElements(By.cssSelector("[data-testid='generic-table-row']"))
+		if (rows.isEmpty()) {
+			rows = driver.findElements(By.xpath("//tbody/tr"))
+		}
+		if (rows.isEmpty()) {
+			KeywordUtil.markFailed("clickSeeDetailsForSubmittedId: no table rows found")
+			return
+		}
+
+		// Get header indices (use same Table-Headers as readValidationResultsTableFromUI)
+		List<WebElement> headerEls = Utils.getListWebElements("CRDC/DataSubmissions/Validation/Table-Headers")
+		List<String> headerNames = new ArrayList<>()
+		for (WebElement h : headerEls) headerNames.add(h.getText().trim())
+		int idxSubmitted = headerNames.findIndexOf { it.equalsIgnoreCase("Submitted Identifier") }
+		if (idxSubmitted < 0) {
+			KeywordUtil.markFailed("clickSeeDetailsForSubmittedId: Submitted Identifier column not found. Headers: " + headerNames)
+			return
+		}
+
+		WebElement matchingRow = null
+		for (WebElement row : rows) {
+			try {
+				List<WebElement> cells = row.findElements(By.tagName("td"))
+				if (idxSubmitted >= cells.size()) continue
+				String cellText = getCellText(cells, idxSubmitted, true)
+				if (cellText != null && cellText.trim().equalsIgnoreCase(target)) {
+					matchingRow = row
+					break
+				}
+			} catch (StaleElementReferenceException e) {
+				// Retry by re-querying
+				rows = driver.findElements(By.cssSelector("[data-testid='generic-table-row']"))
+				if (rows.isEmpty()) rows = driver.findElements(By.xpath("//tbody/tr"))
+				continue
+			}
+		}
+
+		if (matchingRow == null) {
+			KeywordUtil.markFailed("clickSeeDetailsForSubmittedId: no row with Submitted Identifier '" + submittedIdentifier + "'")
+			return
+		}
+
+		WebElement seeDetailsBtn = matchingRow.findElement(By.xpath(".//button[contains(text(),'See details')]"))
+		seeDetailsBtn.click()
+		WebUI.delay(1)
+		WebUI.waitForElementPresent(findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/Dialog"), 10)
+		KeywordUtil.logInfo("clickSeeDetailsForSubmittedId: opened error details dialog")
+	}
+
+	/**
+	 * Read all issues from the open error details dialog. Returns a list of maps with keys severity and message.
+	 * Assumes the error details dialog is open.
+	 *
+	 * @return List of maps [severity: String, message: String]
+	 */
+	@Keyword
+	List<Map<String, String>> getErrorDetailsDialogIssues() {
+		WebDriver driver = DriverFactory.getWebDriver()
+		List<WebElement> severities = driver.findElements(By.cssSelector("[data-testid='error-details-dialog'] [data-testid='issue-severity']"))
+		List<WebElement> messages = driver.findElements(By.cssSelector("[data-testid='error-details-dialog'] [data-testid='issue-message']"))
+
+		List<Map<String, String>> issues = new ArrayList<>()
+		int count = Math.min(severities.size(), messages.size())
+		for (int i = 0; i < count; i++) {
+			String sev = severities.get(i).getText()?.trim() ?: ""
+			String msg = messages.get(i).getText()?.trim() ?: ""
+			issues.add([severity: sev, message: msg])
+		}
+		KeywordUtil.logInfo("getErrorDetailsDialogIssues: found " + issues.size() + " issues")
+		return issues
+	}
+
+	/**
+	 * Verify the open error details dialog shows the expected issues. Uses "contains" for message matching.
+	 *
+	 * @param expectedIssues List of maps [severity: String, message: String]. Message matching: actual contains expected.
+	 * @param reportSection (Optional) Section for ValidationReport. Defaults to "Validation Error Details".
+	 */
+	@Keyword
+	void verifyErrorDetailsDialogIssues(List<Map<String, String>> expectedIssues, String reportSection = "Validation Error Details") {
+		KeywordUtil.logInfo("--- verifyErrorDetailsDialogIssues: expecting " + expectedIssues.size() + " issues ---")
+		List<Map<String, String>> actual = getErrorDetailsDialogIssues()
+		boolean allOk = true
+
+		if (actual.size() != expectedIssues.size()) {
+			ValidationReport.addValidationReportItem(reportSection, "Issue count", String.valueOf(expectedIssues.size()), String.valueOf(actual.size()), "Fail")
+			allOk = false
+		}
+
+		int compareCount = Math.min(actual.size(), expectedIssues.size())
+		for (int i = 0; i < compareCount; i++) {
+			Map<String, String> exp = expectedIssues.get(i)
+			Map<String, String> act = actual.get(i)
+			String expSev = (exp.get("severity") ?: "").trim()
+			String actSev = (act.get("severity") ?: "").trim()
+			String expMsg = (exp.get("message") ?: "").trim()
+			String actMsg = (act.get("message") ?: "").trim()
+
+			boolean sevOk = actSev.equalsIgnoreCase(expSev)
+			boolean msgOk = actMsg.contains(expMsg)
+
+			ValidationReport.addValidationReportItem(reportSection, "Issue " + (i + 1) + " severity", expSev, actSev, sevOk ? "Pass" : "Fail")
+			ValidationReport.addValidationReportItem(reportSection, "Issue " + (i + 1) + " message", expMsg, actMsg, msgOk ? "Pass" : "Fail")
+			if (!sevOk || !msgOk) allOk = false
+		}
+
+		if (allOk) {
+			KeywordUtil.logInfo("Error details dialog issues verified")
+		} else {
+			KeywordUtil.markFailed("verifyErrorDetailsDialogIssues: one or more issues did not match")
+		}
+	}
+
+	/**
+	 * Close the error details dialog by clicking the Close button. Waits for the dialog to disappear.
+	 */
+	@Keyword
+	void closeErrorDetailsDialog() {
+		KeywordUtil.logInfo("--- closeErrorDetailsDialog ---")
+		WebUI.click(findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/Close-Btn"))
+		WebUI.delay(1)
+		try {
+			Utils.waitForElementNotVisible("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/Dialog", 5)
+		} catch (Exception e) {
+			// Dialog may be removed from DOM; check if still present
+			WebDriver driver = DriverFactory.getWebDriver()
+			if (driver.findElements(By.cssSelector("[data-testid='error-details-dialog']")).isEmpty()) {
+				KeywordUtil.logInfo("closeErrorDetailsDialog: dialog closed")
+			} else {
+				KeywordUtil.logInfo("closeErrorDetailsDialog: dialog may still be visible: " + e.getMessage())
+			}
+		}
+	}
+
+	/**
+	 * Convenience: click See details for the row, verify issues, then close the dialog.
+	 * Caller must ensure Validation Results tab is active and filters (node, severity, issue type) are applied first.
+	 * For expected data from files, use verifyErrorDetailsForSubmittedIdForTC(tcName) instead.
+	 *
+	 * @param submittedIdentifier The Submitted Identifier of the row
+	 * @param expectedIssues List of maps [severity: String, message: String]
+	 * @param reportSection (Optional) Section for ValidationReport. Defaults to "Validation Error Details".
+	 */
+	@Keyword
+	void verifyErrorDetailsForSubmittedId(String submittedIdentifier, List<Map<String, String>> expectedIssues, String reportSection = "Validation Error Details") {
+		KeywordUtil.logInfo("--- verifyErrorDetailsForSubmittedId: " + submittedIdentifier + " ---")
+		clickSeeDetailsForSubmittedId(submittedIdentifier)
+		verifyErrorDetailsDialogIssues(expectedIssues, reportSection)
+		closeErrorDetailsDialog()
+		KeywordUtil.logInfo("verifyErrorDetailsForSubmittedId: completed")
+	}
+
+	/**
+	 * One-call verification: discovers all nodes and rows with expected issues from the TC's expected-ValidationResults TSVs,
+	 * applies filters for each, opens See details, verifies dialog content, and closes. Mirrors verifyValidationResultsVsExpectedForTC.
+	 *
+	 * Usage: CustomKeywords.'utilities.DataSubmissions.verifyErrorDetailsForSubmittedIdForTC'('TC04')
+	 *
+	 * @param tcName Test case name (e.g. TC04)
+	 */
+	@Keyword
+	void verifyErrorDetailsForSubmittedIdForTC(String tcName) {
+		KeywordUtil.logInfo("--- verifyErrorDetailsForSubmittedIdForTC: tcName=" + tcName + " ---")
+		TestRunner.clickTab("CRDC/DataSubmissions/Validation/ValidationResults-Tab")
+		TestRunner.clickTab("Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn")
+		WebUI.delay(2)
+		List<String> nodes = listNodesFromExpectedValidationResultsFolder(tcName)
+		if (nodes.isEmpty()) {
+			KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: No expected Validation Results files for TC '" + tcName + "'; skipping.")
+			return
+		}
+		Map<String, String> mappings = loadValidationResultsMappings()
+		for (String node : nodes) {
+			String submittedIdColumn = mappings.get(node)
+			if (submittedIdColumn == null || submittedIdColumn.isEmpty()) {
+				KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: no mapping for node '" + node + "'; skipping.")
+				continue
+			}
+			String tsvPath = findExpectedValidationResultsTsv(tcName, node)
+			if (tsvPath == null) {
+				KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: no expected TSV for node '" + node + "'; skipping.")
+				continue
+			}
+			List<List<String>> rows = loadAllExpectedErrorDetailRowsFromTsv(tsvPath, submittedIdColumn)
+			if (rows.isEmpty()) {
+				KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: no rows with issues for node '" + node + "'; skipping.")
+				continue
+			}
+			for (List<String> row : rows) {
+				String submittedId = row.get(0)
+				String severity = row.get(1)
+				String issueType = row.get(2)
+				String message = row.get(3)
+				applyValidationResultsFilters(node, severity, issueType)
+				verifyErrorDetailsForSubmittedId(submittedId, [[severity: severity, message: message]])
+			}
+		}
+		KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: completed")
+	}
+
+	/** Load rows [severity, issueType, message] for submittedId from expected TSV. Message = Expected_Issues or Issue_Type. */
+	private List<List<String>> loadExpectedErrorDetailsRowsForSubmittedId(String tsvPath, String submittedIdColumn, String submittedId) {
+		List<List<String>> out = new ArrayList<>()
+		Path path = Paths.get(tsvPath)
+		if (!Files.exists(path)) return out
+		List<String> lines = Files.readAllLines(path)
+		if (lines.size() < 2) return out
+		String[] headers = lines.get(0).split("\t", -1)
+		int idxId = -1, idxIssue = -1, idxSev = -1, idxExpectedIssues = -1
+		for (int i = 0; i < headers.length; i++) {
+			String h = headers[i].trim()
+			if (h.equalsIgnoreCase(submittedIdColumn)) idxId = i
+			if (h.equals("Issue_Type")) idxIssue = i
+			if (h.equals("Expected_Severity")) idxSev = i
+			if (h.equals("Expected_Issues")) idxExpectedIssues = i
+		}
+		if (idxId < 0 || idxIssue < 0 || idxSev < 0) return out
+		if (idxExpectedIssues < 0) idxExpectedIssues = idxIssue
+		String target = submittedId?.trim() ?: ""
+		for (int i = 1; i < lines.size(); i++) {
+			String[] cells = lines.get(i).split("\t", -1)
+			String id = idxId < cells.length ? cells[idxId].trim() : ""
+			if (!id.equalsIgnoreCase(target)) continue
+			String rowIssue = idxIssue < cells.length ? cells[idxIssue].trim() : ""
+			String rowSev = idxSev < cells.length ? cells[idxSev].trim() : ""
+			if (rowSev.isEmpty() || rowIssue.isEmpty()) continue
+			String message = idxExpectedIssues >= 0 && idxExpectedIssues < cells.length ? cells[idxExpectedIssues].trim() : ""
+			if (message.isEmpty()) message = rowIssue
+			out.add(Arrays.asList(rowSev, rowIssue, message))
+		}
+		return out
+	}
+
+	/**
+	 * Remove Excel/CSV-style quoting from a cell value. When TSV is edited in Excel,
+	 * cells with double quotes get wrapped in "..." and internal " become "".
+	 * This reverses that so the value matches the actual API/UI message format.
+	 */
+	private static String unquoteCsvStyle(String s) {
+		if (s == null) return ""
+		String t = s.trim()
+		if (t.length() >= 2 && t.startsWith('"') && t.endsWith('"')) {
+			t = t.substring(1, t.length() - 1).replace('""', '"')
+		}
+		return t
+	}
+
+	/** Load all rows with issues from expected TSV. Returns list of [submittedId, severity, issueType, message]. Message = Expected_Issues or Issue_Type. */
+	private List<List<String>> loadAllExpectedErrorDetailRowsFromTsv(String tsvPath, String submittedIdColumn) {
+		List<List<String>> out = new ArrayList<>()
+		Path path = Paths.get(tsvPath)
+		if (!Files.exists(path)) return out
+		List<String> lines = Files.readAllLines(path)
+		if (lines.size() < 2) return out
+		String[] headers = lines.get(0).split("\t", -1)
+		int idxId = -1, idxIssue = -1, idxSev = -1, idxExpectedIssues = -1
+		for (int i = 0; i < headers.length; i++) {
+			String h = headers[i].trim()
+			if (h.equalsIgnoreCase(submittedIdColumn)) idxId = i
+			if (h.equals("Issue_Type")) idxIssue = i
+			if (h.equals("Expected_Severity")) idxSev = i
+			if (h.equals("Expected_Issues")) idxExpectedIssues = i
+		}
+		if (idxId < 0 || idxIssue < 0 || idxSev < 0) return out
+		if (idxExpectedIssues < 0) idxExpectedIssues = idxIssue
+		for (int i = 1; i < lines.size(); i++) {
+			String[] cells = lines.get(i).split("\t", -1)
+			String rowIssue = idxIssue < cells.length ? cells[idxIssue].trim() : ""
+			String rowSev = idxSev < cells.length ? cells[idxSev].trim() : ""
+			if (rowSev.isEmpty() || rowIssue.isEmpty()) continue
+			String submittedId = idxId < cells.length ? cells[idxId].trim() : ""
+			String message = idxExpectedIssues >= 0 && idxExpectedIssues < cells.length ? unquoteCsvStyle(cells[idxExpectedIssues]) : ""
+			if (message.isEmpty()) message = rowIssue
+			out.add(Arrays.asList(submittedId, rowSev, rowIssue, message))
+		}
+		return out
+	}
+
 	// ------------------------------- From Pbac: upload + verify Data View for TC -------------------------------
 
 	/**

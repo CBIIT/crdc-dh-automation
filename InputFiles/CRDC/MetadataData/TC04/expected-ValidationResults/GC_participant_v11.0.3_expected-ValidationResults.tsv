@@ -3,4 +3,4 @@ participant				phs769076	auto_consent_1	auto_sp_1	2	Asian|American Indian or Ala
 participant				phs769076	auto_consent_2	auto_sp_2	3	Asian|white	Male	Not Hispanic or Latino|Not reported	test1
 participant				phs769076	auto_consent_3	auto_sp_3	3	Asian|Native Hawaiian or other Pacific Islander	Male	Not Hispanic or Latino	test2
 participant				phs769076	auto_consent_4	auto_key4	4	Asian	Female	Not reported	st3
-participant	Missing required property	Error	Missing required property	phs769076	auto_consent_5	auto_key5	5	White		Hispanic or Latino	test4
+participant	Missing required property	Error	Required property "sex" is empty	phs769076	auto_consent_5	auto_key5	5	White		Hispanic or Latino	test4
