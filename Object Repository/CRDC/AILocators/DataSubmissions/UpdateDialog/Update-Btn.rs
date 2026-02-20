@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//*[@data-testid=&apos;update-submission-button&apos;]</value>
+         <value>//button[@data-testid='update-submission-button']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//*[@data-testid=&apos;update-submission-button&apos;]</value>
-      <webElementGuid>beb6582d-ba44-4f21-8614-fd041d805db6</webElementGuid>
+      <value>//button[@data-testid='update-submission-button']</value>
+      <webElementGuid>43b49683-be0b-4a1b-8141-76ddb032c31d</webElementGuid>
    </webElementProperties>
 </WebElementEntity>
