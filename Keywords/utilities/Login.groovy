@@ -464,6 +464,15 @@ class Login extends TestRunner implements Comparator<List<XSSFCell>>{
 
 		if (!loggedIn) {
 			KeywordUtil.markFailed("OTP failed after 2 attempts.")
+		} else {
+			// Capture logged-in user name for verifyDataSubmissionHeaders (submitter)
+			WebUI.delay(2)
+			try {
+				WebUI.waitForElementPresent(findTestObject('CRDC/Login/UserProfile-Dd'), 15)
+				DataSubmissions.expectedSubmitter = WebUI.getText(findTestObject('CRDC/Login/UserProfile-Dd'))?.trim() ?: ''
+			} catch (Exception e) {
+				KeywordUtil.logInfo("Could not capture submitter name for header verification: " + e.getMessage())
+			}
 		}
 	}
 }//class ends
