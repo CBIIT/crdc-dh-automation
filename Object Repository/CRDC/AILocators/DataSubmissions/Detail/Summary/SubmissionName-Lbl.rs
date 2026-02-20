@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//*[@data-testid=&apos;submission-name-display&apos;]</value>
+         <value>(//*[@data-testid='truncated-text-label'])[1]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//*[@data-testid=&apos;submission-name-display&apos;]</value>
-      <webElementGuid>794b369b-d5d2-4819-a6c3-f68b9d4995f2</webElementGuid>
+      <value>(//*[@data-testid='truncated-text-label'])[1]</value>
+      <webElementGuid>c0818040-a906-4635-8a4e-c0ef3e28b035</webElementGuid>
    </webElementProperties>
 </WebElementEntity>
