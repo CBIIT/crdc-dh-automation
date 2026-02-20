@@ -186,7 +186,9 @@ class ManageStudies extends TestRunner {
 					boolean found = false
 					for (List<String> row : rows) {
 						for (String cell : row) {
-							if (cell != null && cell.contains(substring)) { found = true; break }
+							if (cell != null && cell.contains(substring)) {
+								found = true; break
+							}
 						}
 						if (found) break
 					}

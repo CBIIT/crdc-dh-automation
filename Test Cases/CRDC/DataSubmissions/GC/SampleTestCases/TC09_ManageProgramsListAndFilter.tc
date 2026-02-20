@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Sample test for Manage Programs: navigate to list, verify list page, and optionally apply filters and verify results. Uses ManagePrograms keywords with mixed data strategy (existing records).</description>
+   <name>TC09_ManageProgramsListAndFilter</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>f8a9b0c1-d2e3-4f5a-6b7c-8d9e0f1a2b3c</testCaseGuid>
+</TestCaseEntity>

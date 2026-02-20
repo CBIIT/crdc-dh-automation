@@ -19,6 +19,6 @@
       <name>xpath</name>
       <type>Main</type>
       <value>//*[@data-testid='study-input']</value>
-      <webElementGuid>e79b7a3e-3e56-4748-acf6-953b792a3033</webElementGuid>
+      <webElementGuid>3398570f-0861-40f7-9134-aa4b57735964</webElementGuid>
    </webElementProperties>
 </WebElementEntity>

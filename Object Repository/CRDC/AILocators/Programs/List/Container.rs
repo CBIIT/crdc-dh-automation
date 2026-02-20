@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Container</name>
+   <tag></tag>
+   <elementGuidId>f69848bc-7949-59fa-cff1-0bd3ff5e5e72</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@for='organization-filter']/../..</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@for='organization-filter']/../..</value>
+      <webElementGuid>27b9e1e9-9feb-4b82-aa52-a1f35d64e649</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
