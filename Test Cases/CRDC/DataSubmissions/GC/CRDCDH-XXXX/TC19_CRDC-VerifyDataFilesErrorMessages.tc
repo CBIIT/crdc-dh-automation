@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC19_CRDC-VerifyDataFilesErrorMessages</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>2256a932-c4ae-482b-8622-24dbb3360051</testCaseGuid>
+</TestCaseEntity>
