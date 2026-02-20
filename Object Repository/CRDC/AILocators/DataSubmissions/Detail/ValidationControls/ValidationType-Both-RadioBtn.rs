@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ValidationType-Both-RadioBtn</name>
+   <tag></tag>
+   <elementGuidId>a093b6d1-2fd6-4fc0-8749-c07ece2ef6a1</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>(//input[@value='All'])[1]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>(//input[@value='All'])[1]</value>
+      <webElementGuid>665c0310-e95d-4545-afee-70edb3c8f7a7</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
