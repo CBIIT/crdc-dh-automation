@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TestCaseEntity>
-   <description></description>
-   <name>TC18_CRDC-VerifyDataFilesErrorMessages</name>
-   <tag>Filter</tag>
-   <comment></comment>
-   <recordOption>OTHER</recordOption>
-   <testCaseGuid>07c9b999-d435-47bc-94fd-1aa38f491554</testCaseGuid>
-</TestCaseEntity>
