@@ -52,4 +52,4 @@ CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC18', 'datafile')
 // Step 4: Delete the "datafile" node from Data View
 CustomKeywords.'utilities.DataSubmissions.deleteNodeFromDataView'('data file')
 
-WebUI.delay(5)
+WebUI.closeBrowser()
