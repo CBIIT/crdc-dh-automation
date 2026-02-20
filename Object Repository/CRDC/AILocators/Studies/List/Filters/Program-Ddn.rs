@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Program-Ddn</name>
+   <tag></tag>
+   <elementGuidId>e5f6a7b8-c9d0-4e5f-2a3b-4c5d6e7f8a9b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id='mui-component-select-programID']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id='mui-component-select-programID']</value>
+      <webElementGuid>0e70f0aa-3ecf-4793-98a1-8d83ff05656a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
