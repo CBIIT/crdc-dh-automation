@@ -50,7 +50,7 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmiss
 //Upload metadata file
 CustomKeywords.'utilities.Pbac.prepareUniqueMetadataAndUpload'('InputFiles/CRDC/MetadataData/PBAC/program.tsv', "program_acronym")
 //Upload data files
-CustomKeywords.'utilities.CliUploader.uploadDataFiles'('TC17')
+CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC17', 'datafile')
 CustomKeywords.'utilities.Utils.waitForElementToDisappear'('Object Repository/CRDC/DataSubmissions/Uploading-Txt', 60)
 //Validate data
 WebUI.click(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/ValidationType-Both-RadioBtn'))

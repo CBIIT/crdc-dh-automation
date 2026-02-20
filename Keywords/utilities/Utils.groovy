@@ -571,10 +571,10 @@ public class Utils {
 
 		while ((System.currentTimeMillis() - start) / 1000 < timeoutSeconds) {
 			String script = "var el = document.evaluate(arguments[0], document, null, " +
-				"XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; " +
-				"if (!el) return 'gone'; " +
-				"var style = window.getComputedStyle(el); " +
-				"return (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') ? 'hidden' : 'visible';";
+					"XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; " +
+					"if (!el) return 'gone'; " +
+					"var style = window.getComputedStyle(el); " +
+					"return (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') ? 'hidden' : 'visible';";
 			String result = (String) js.executeScript(script, xpath);
 
 			long elapsed = (System.currentTimeMillis() - start) / 1000;
