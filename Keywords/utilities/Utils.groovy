@@ -160,9 +160,9 @@ public class Utils {
 			pyExecutablePath = "python3";
 		} else {
 			KeywordUtil.logInfo("Running locally. Using local Python executable path...");
-			//pyExecutablePath = "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3";
+			pyExecutablePath = "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3";
 			//pyExecutablePath = "C:/Users/kallakuriv2/AppData/Local/Programs/Python/Python312/python.exe";
-			pyExecutablePath = "/Users/leungvw/vincent_testEnv/bin/python3";
+			//pyExecutablePath = "/Users/leungvw/vincent_testEnv/bin/python3";
 			//pyExecutablePath = "C:/Users/epishinavv/AppData/Local/Programs/Python/Python312/python.exe";
 		}
 
@@ -571,10 +571,10 @@ public class Utils {
 
 		while ((System.currentTimeMillis() - start) / 1000 < timeoutSeconds) {
 			String script = "var el = document.evaluate(arguments[0], document, null, " +
-				"XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; " +
-				"if (!el) return 'gone'; " +
-				"var style = window.getComputedStyle(el); " +
-				"return (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') ? 'hidden' : 'visible';";
+					"XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; " +
+					"if (!el) return 'gone'; " +
+					"var style = window.getComputedStyle(el); " +
+					"return (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') ? 'hidden' : 'visible';";
 			String result = (String) js.executeScript(script, xpath);
 
 			long elapsed = (System.currentTimeMillis() - start) / 1000;

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC20_CRDC-VerifyRelatedNodeNotFound</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>59f1c72c-602d-463d-8643-d7b7b753f368</testCaseGuid>
+</TestCaseEntity>
