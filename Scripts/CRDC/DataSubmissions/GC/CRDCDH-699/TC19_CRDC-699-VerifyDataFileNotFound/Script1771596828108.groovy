@@ -44,13 +44,24 @@ CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
 WebUI.delay(2)
 
 //Create DS
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
 CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'both','GC','autoQA - AutomationQA_Study')
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC19', 'datafile')
 WebUI.delay(5)
 // Step 4: Delete the "datafile" node from Data View
-CustomKeywords.'utilities.DataSubmissions.deleteNodeFromDataView'('data file')
+CustomKeywords.'utilities.DataSubmissions.deleteRowsFromDataView'('data file', 2)
+
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationTarget-AllUploadedData-RadioBtn')
+
+CustomKeywords.'utilities.WebUIUtils.clickTab'('/CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Both-RadioBtn')
+
+CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
+
+//Verify Validation Results table in the UI matches the expected TSV files for each node with error(s) or warning(s)
+CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsVsExpectedForTC'("TC19")
+
+CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
 WebUI.delay(5)
