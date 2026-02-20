@@ -639,6 +639,9 @@ class DataSubmissions extends TestRunner {
 		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"))
 		WebUI.delay(1)
 		WebDriver driver = DriverFactory.getWebDriver()
+		if(node.equals("datafile")) {
+			node=node.replaceAll("datafile", "data file")
+		}
 		WebElement nodeOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + node + "']"))
 		nodeOpt.click()
 		WebUI.delay(1)
@@ -874,7 +877,7 @@ class DataSubmissions extends TestRunner {
 			try {
 				List<WebElement> cells = row.findElements(By.tagName("td"))
 				if (idxSubmitted >= cells.size()) continue
-				String cellText = getCellText(cells, idxSubmitted, true)
+					String cellText = getCellText(cells, idxSubmitted, true)
 				if (cellText != null && cellText.trim().equalsIgnoreCase(target)) {
 					matchingRow = row
 					break
@@ -883,7 +886,7 @@ class DataSubmissions extends TestRunner {
 				// Retry by re-querying
 				rows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
 				if (rows == null || rows.isEmpty()) continue
-				continue
+					continue
 			}
 		}
 
@@ -912,13 +915,13 @@ class DataSubmissions extends TestRunner {
 	@Keyword
 	List<Map<String, String>> getErrorDetailsDialogIssues() {
 		List<WebElement> severities = WebUI.findWebElements(
-			findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/IssueSeverity-Lbl"),
-			10
-		)
+				findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/IssueSeverity-Lbl"),
+				10
+				)
 		List<WebElement> messages = WebUI.findWebElements(
-			findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/IssueMessage-Lbl"),
-			10
-		)
+				findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/IssueMessage-Lbl"),
+				10
+				)
 
 		List<Map<String, String>> issues = new ArrayList<>()
 		int count = Math.min(severities.size(), messages.size())
@@ -1053,7 +1056,9 @@ class DataSubmissions extends TestRunner {
 				String issueType = row.get(2)
 				String message = row.get(3)
 				applyValidationResultsFilters(node, severity, issueType)
-				verifyErrorDetailsForSubmittedId(submittedId, [[severity: severity, message: message]])
+				verifyErrorDetailsForSubmittedId(submittedId, [
+					[severity: severity, message: message]
+				])
 			}
 		}
 		KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: completed")
@@ -1096,7 +1101,7 @@ class DataSubmissions extends TestRunner {
 			String rowIssue = idxIssue < cells.length ? cells[idxIssue].trim() : ""
 			String rowSev = idxSev < cells.length ? cells[idxSev].trim() : ""
 			if (rowSev.isEmpty() || rowIssue.isEmpty()) continue
-			String submittedId = idxId < cells.length ? cells[idxId].trim() : ""
+				String submittedId = idxId < cells.length ? cells[idxId].trim() : ""
 			String message = idxExpectedIssues >= 0 && idxExpectedIssues < cells.length ? unquoteCsvStyle(cells[idxExpectedIssues]) : ""
 			if (message.isEmpty()) message = rowIssue
 			out.add(Arrays.asList(submittedId, rowSev, rowIssue, message))
@@ -1695,7 +1700,7 @@ class DataSubmissions extends TestRunner {
 					try {
 						List<WebElement> currentRows = Utils.getListWebElements("CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Table-Row")
 						if (i >= (currentRows != null ? currentRows.size() : 0)) break
-						WebElement row = currentRows.get(i)
+							WebElement row = currentRows.get(i)
 						List<WebElement> cells = row.findElements(By.tagName("td"))
 						String submitted = getCellText(cells, idxSubmitted, false)
 						String nodeType = getCellText(cells, idxNodeType, false)
@@ -1761,7 +1766,7 @@ class DataSubmissions extends TestRunner {
 		for (int i = 1; i < lines.size(); i++) {
 			String line = lines.get(i).trim()
 			if (line.isEmpty()) continue
-			String[] cells = line.split("\t", -1)
+				String[] cells = line.split("\t", -1)
 			String id = idxId < cells.length ? cells[idxId].trim() : ""
 			String node = idxNode < cells.length ? cells[idxNode].trim() : ""
 			String sev = idxSev < cells.length ? cells[idxSev].trim() : ""
@@ -1845,8 +1850,8 @@ class DataSubmissions extends TestRunner {
 			if (actList == null || actList.isEmpty()) {
 				errors.add("Submitted ID '" + expId + "': expected in UI but not found")
 				ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + expId,
-					"NodeType=" + expNode + ", Severity=" + expSev + ", Issue=" + expIssue,
-					"(not found in UI)", "Fail")
+						"NodeType=" + expNode + ", Severity=" + expSev + ", Issue=" + expIssue,
+						"(not found in UI)", "Fail")
 				continue
 			}
 
@@ -1884,9 +1889,9 @@ class DataSubmissions extends TestRunner {
 
 			String status = (nodeOk && sevOk && issueOk) ? "Pass" : "Fail"
 			ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + expId,
-				"NodeType=" + expNode + ", Severity=" + expSev + ", Issue=" + expIssue,
-				"NodeType=" + actNode + ", Severity=" + actSev + ", Issue=" + actIssue,
-				status)
+					"NodeType=" + expNode + ", Severity=" + expSev + ", Issue=" + expIssue,
+					"NodeType=" + actNode + ", Severity=" + actSev + ", Issue=" + actIssue,
+					status)
 		}
 
 		// 6) Flag unexpected UI rows (present in UI but missing from expected files).
@@ -1900,9 +1905,9 @@ class DataSubmissions extends TestRunner {
 					String actIssue = act.size() >= 4 ? act.get(3) : ""
 					errors.add("Submitted ID '" + actualKey + "': present in UI but not in expected TSV")
 					ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + actualKey,
-						"(not in expected)",
-						"NodeType=" + actNode + ", Severity=" + actSev + ", Issue=" + actIssue,
-						"Fail")
+							"(not in expected)",
+							"NodeType=" + actNode + ", Severity=" + actSev + ", Issue=" + actIssue,
+							"Fail")
 				}
 			}
 		}
