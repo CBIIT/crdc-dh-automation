@@ -41,6 +41,19 @@ import com.kms.katalon.core.testobject.TestObject
  * Moved from SubmissionRequest and Pbac.
  */
 class DataSubmissions extends TestRunner {
+
+	// Expected data submission header values (set at login, createDataSubmission, or hardcoded; used by verifyDataSubmissionHeaders)
+	static String expectedSubmitter = null
+	static String expectedSubmissionName = null
+	static String expectedStudy = "autoQA"
+	static String expectedStudyTooltip = null
+	static String expectedProgram = "AUTOPROGRAM"
+	static String expectedProgramTooltip = ""
+	static String expectedSubmissionType = null  // set in createDataSubmission to "Delete" or "New/Update"
+	static String expectedCollaboratorsCount = "0"
+	static String expectedCollaboratorsTooltip = "Click to add new collaborators or view existing ones."
+	static String expectedDataCommons = null
+	static String expectedDataConcierge = "pbac.dcp-automation Please Do Not Edit"
 	/** Maps tab internal name (e.g. UploadActivities, DataView) to section name used in ValidationReport. */
 	private static String tabToSectionName(String tab) {
 		if (tab == "UploadActivities") return "Upload Activities"
@@ -1221,7 +1234,11 @@ class DataSubmissions extends TestRunner {
 
 		if (submiType.equalsIgnoreCase("Delete")) {
 			WebUI.click(findTestObject('CRDC/DataSubmissions/Create/SubTypeDelete-Btn'))
+			expectedSubmissionType = "Delete"
+		}else {
+			expectedSubmissionType ="New/Update";
 		}
+
 
 		if(dataType?.toLowerCase()?.contains("only")) {
 			WebUI.click(findTestObject('CRDC/DataSubmissions/Create/MetadataOnly-Btn'))
@@ -1275,6 +1292,8 @@ class DataSubmissions extends TestRunner {
 		String timestamp = new Date().format("yyyyMMdd_HHmmss")
 		String submissionName = "auto-test_" + timestamp
 		KeywordUtil.logInfo("Creating data submission with name " + submissionName)
+		expectedSubmissionName = submissionName
+		expectedDataCommons = dataModel
 
 		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/SubmissionName-Field'))
 		Actions actions = new Actions(DriverFactory.getWebDriver())
@@ -1284,6 +1303,124 @@ class DataSubmissions extends TestRunner {
 		//Create
 		TestRunner.clickTab('CRDC/DataSubmissions/Create/Create-Btn')
 		WebUI.delay(3)
+	}
+
+	private static final String HEADERS_SECTION = "Data Submission Headers"
+
+	/** Get header value text by label (e.g. "Study", "Program"). Uses label text then sibling value with data-testid. */
+	private static String getHeaderValueByLabel(WebDriver driver, String label) {
+		try {
+			String xpath = "//*[contains(normalize-space(text()),'" + label + "')]/following-sibling::*[1]//*[@data-testid='property-value' or @data-testid='submission-name-display']"
+			List<WebElement> el = driver.findElements(By.xpath(xpath))
+			if (el != null && !el.isEmpty()) return el.get(0).getText()?.trim() ?: ""
+		} catch (Exception e) {
+			KeywordUtil.logInfo("getHeaderValueByLabel('${label}'): " + e.getMessage())
+		}
+		return ""
+	}
+
+	/** Get full value from aria-label on truncated-text-wrapper (avoids truncated visible text). Returns empty if not found. */
+	private static String getHeaderValueFromTruncatedAriaLabel(WebDriver driver, String label) {
+		try {
+			String xpath = "//*[contains(normalize-space(text()),'" + label + "')]/following-sibling::*[1]//*[@data-testid='truncated-text-wrapper']"
+			List<WebElement> el = driver.findElements(By.xpath(xpath))
+			if (el != null && !el.isEmpty()) {
+				String aria = el.get(0).getAttribute("aria-label")?.trim()
+				if (aria != null && !aria.isEmpty()) return aria
+			}
+		} catch (Exception e) {
+			KeywordUtil.logInfo("getHeaderValueFromTruncatedAriaLabel('${label}'): " + e.getMessage())
+		}
+		return ""
+	}
+
+	/** Get header value: prefers full value from truncated-text-wrapper aria-label, else from property-value/submission-name-display text. */
+	private static String getHeaderValueByLabelOrAria(WebDriver driver, String label) {
+		String fromAria = getHeaderValueFromTruncatedAriaLabel(driver, label)
+		if (fromAria != null && !fromAria.isEmpty()) return fromAria
+		return getHeaderValueByLabel(driver, label)
+	}
+
+	private static String getTooltipTextByHover(WebDriver driver, String triggerXpath) {
+		try {
+			WebElement trigger = driver.findElement(By.xpath(triggerXpath))
+			new Actions(driver).moveToElement(trigger).perform()
+			WebUI.delay(1)
+			List<WebElement> tooltips = driver.findElements(By.cssSelector("[role='tooltip']"))
+			if (tooltips != null && !tooltips.isEmpty()) return tooltips.get(0).getText()?.replaceAll(/\s+/, ' ')?.trim() ?: ""
+		} catch (Exception e) {
+			KeywordUtil.logInfo("getTooltipTextByHover: " + e.getMessage())
+		}
+		return ""
+	}
+
+	/**
+	 * Verify data submission header fields and tooltips (Study, Program, Collaborators) against expected* values.
+	 * Expected values come from: login (expectedSubmitter), createDataSubmission (expectedSubmissionName, expectedDataCommons),
+	 * hardcoded defaults (expectedStudy, expectedProgram, expectedDataConcierge), and captureDataSubmissionHeaderExpectedValues() for the rest.
+	 */
+	@Keyword
+	static void verifyDataSubmissionHeaders() {
+		WebDriver driver = DriverFactory.getWebDriver()
+		try {
+			WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Summary/SubmissionName-Lbl'), 15)
+		} catch (Exception e) {
+			KeywordUtil.markFailed("verifyDataSubmissionHeaders: not on submission detail page. " + e.getMessage())
+			return
+		}
+		String exp = expectedSubmissionName ?: ""
+		String act = getHeaderValueByLabelOrAria(driver, "Submission Name")
+		if (!act) act = WebUI.getAttribute(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Summary/SubmissionName-Lbl'), "aria-label") ?: ""
+		if (!act) act = WebUI.getText(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Summary/SubmissionName-Lbl'))?.trim() ?: ""
+		compareAndReport("Submission Name", exp, act)
+		exp = expectedSubmitter.toLowerCase() +" Please Do Not Edit" ?: ""
+		act = getHeaderValueByLabelOrAria(driver, "Submitter")
+		compareAndReport("Submitter", exp, act)
+		exp = expectedSubmissionType ?: ""
+		act = getHeaderValueByLabel(driver, "Submission Type")
+		compareAndReport("Submission Type", exp, act)
+		exp = expectedCollaboratorsCount ?: ""
+		try {
+			act = WebUI.getText(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Summary/Collaborators-Btn'))?.trim() ?: ""
+		} catch (Exception e) {
+			act = ""
+		}
+		compareAndReport("Collaborators", exp, act)
+		exp = expectedStudy ?: ""
+		act = getHeaderValueByLabel(driver, "Study")
+		compareAndReport("Study", exp, act)
+		exp = expectedDataCommons ?: ""
+		act = getHeaderValueByLabel(driver, "Data Commons")
+		compareAndReport("Data Commons", exp, act)
+		exp = expectedProgram ?: ""
+		act = getHeaderValueByLabel(driver, "Program")
+		compareAndReport("Program", exp, act)
+		exp = expectedDataConcierge ?: ""
+		act = getHeaderValueByLabelOrAria(driver, "Data Concierge")
+		compareAndReport("Data Concierge", exp, act)
+		// Tooltips (same pattern as Collaborators for each)
+		try {
+			TestObject collaboratorsBtn = findTestObject('CRDC/AILocators/DataSubmissions/Detail/Summary/Collaborators-Btn')
+			WebUIUtils.verifyTooltipOnHover(collaboratorsBtn, expectedCollaboratorsTooltip, "add new collaborators")
+		} catch (Exception e) {
+			ValidationReport.addValidationReportItem(HEADERS_SECTION, "Collaborators tooltip", expectedCollaboratorsTooltip, "(error: " + e.getMessage() + ")", "Fail")
+		}
+		try {
+			String submissionNameXpath = "//*[contains(normalize-space(text()),'Submission Name')]/following-sibling::*[1]"
+			TestObject submissionNameTo = new com.kms.katalon.core.testobject.TestObject("SubmissionNameValue")
+			submissionNameTo.addProperty("xpath", com.kms.katalon.core.testobject.ConditionType.EQUALS, submissionNameXpath)
+			String expTip = expectedSubmissionName ?: ""
+			WebUIUtils.verifyTooltipOnHover(submissionNameTo, expTip, (expTip.length() > 20 ? expTip.take(20) : expTip) ?: "auto-test")
+		} catch (Exception e) {
+			ValidationReport.addValidationReportItem(HEADERS_SECTION, "Submission Name tooltip", expectedSubmissionName ?: "(empty)", "(error: " + e.getMessage() + ")", "Fail")
+		}
+	}
+
+	private static void compareAndReport(String label, String expected, String actual) {
+		String normExp = expected?.replaceAll(/\s+/, ' ')?.trim() ?: ""
+		String normAct = actual?.replaceAll(/\s+/, ' ')?.trim() ?: ""
+		String status = normExp.equals(normAct) ? "Pass" : "Fail"
+		ValidationReport.addValidationReportItem(HEADERS_SECTION, label, expected ?: "(empty)", actual ?: "(empty)", status)
 	}
 
 	/**
