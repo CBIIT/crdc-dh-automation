@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Filters-Container</name>
+   <tag></tag>
+   <elementGuidId>a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid='approved-study-filters']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid='approved-study-filters']</value>
+      <webElementGuid>cdffe767-2849-45d7-bb12-03f5bd79b3f3</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

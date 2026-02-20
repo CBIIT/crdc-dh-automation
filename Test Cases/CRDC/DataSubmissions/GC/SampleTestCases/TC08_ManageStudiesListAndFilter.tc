@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Sample test for Manage Studies: navigate to list, verify list page, and optionally apply filters and verify results. Uses ManageStudies keywords with mixed data strategy (existing records).</description>
+   <name>TC08_ManageStudiesListAndFilter</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>e7f8a9b0-c1d2-4e5f-6a7b-8c9d0e1f2a3b</testCaseGuid>
+</TestCaseEntity>
