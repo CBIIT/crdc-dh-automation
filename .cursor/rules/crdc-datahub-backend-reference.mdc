@@ -1,0 +1,548 @@
+---
+description: CRDC Data Hub Backend API reference for writing test automation
+globs: Keywords/utilities/*.groovy,Scripts/**/*.groovy
+alwaysApply: false
+---
+
+# CRDC Data Hub Backend Reference
+
+## Overview
+
+The **crdc-datahub-backend** is a Node.js 18+ / Express / GraphQL API that serves the CRDC Data Hub frontend and CLI uploader. It provides the full data submission lifecycle, batch processing, validation triggering, user management, and release workflows.
+
+| Aspect | Detail |
+|---|---|
+| Runtime | Node.js 18.16.0+, Express 4.18 |
+| API | GraphQL at `POST /api/graphql` |
+| Database | MongoDB via Prisma ORM |
+| Cloud | AWS S3, SQS (4 FIFO queues), STS, QuickSight |
+| Auth | Session-based (NIH SSO) + JWT Bearer tokens (CLI) |
+| Entry point | `bin/www.js` (port 4020) |
+| REST endpoints | `GET /ping` (health), `GET /version` |
+
+---
+
+## Submission Lifecycle
+
+### Status Transitions
+
+```
+         ┌──────────────────────────────────────────────┐
+         │                                              │
+New ──► In Progress ──► Submitted ──► Released ──► Completed ──► Archived
+         │                  │            │
+         │                  ▼            ▼
+         │              Withdrawn    Rejected
+         │                  │            │
+         │                  └────────────┘
+         │                       │
+         ▼                       ▼
+      Canceled              (can re-Submit)
+```
+
+### Actions (`submissionAction` mutation)
+
+| Action | From Status | To Status | Notes |
+|---|---|---|---|
+| Submit | In Progress, Withdrawn, Rejected | Submitted | Requires comment; checks org status, file size, validation |
+| Release | Submitted | Released | Requires cross-submission validation passed |
+| Withdraw | Submitted | Withdrawn | |
+| Reject | Submitted | Rejected | Requires comment (Fed Lead/Admin) |
+| Reject | Released | Rejected | Requires comment (Fed Lead/Admin) |
+| Complete | Released | Completed | Sends SQS `Complete Submission` |
+| Cancel | New, In Progress, Rejected | Canceled | Archives S3 files |
+| Archive | Completed | Archived | Automated overnight job |
+
+### Submission Properties
+
+| Field | Values |
+|---|---|
+| `intention` | `New/Update` or `Delete` |
+| `dataType` | `Metadata Only` or `Metadata and Data Files` |
+| `dataCommons` | GC, CDS, CTDC, ICDC, CCDI, PSDC |
+| `status` | New, In Progress, Submitted, Released, Completed, Archived, Canceled, Rejected, Withdrawn |
+| `metadataValidationStatus` | New, Validating, Passed, Warning, Error |
+| `fileValidationStatus` | New, Validating, Passed, Warning, Error |
+| `crossSubmissionStatus` | New, Validating, Passed, Warning, Error |
+
+### Automated Cron Jobs
+
+| Job | Purpose |
+|---|---|
+| `deleteInactiveSubmissions` | Delete submissions inactive for N days, clean S3/data |
+| `remindInactiveSubmission` | Send reminder emails at 7/30/60 days before expiration |
+| `archiveSubmissions` | Archive completed submissions after retention period |
+| `purgeDeletedDataFiles` | Remove S3 files tagged as completed beyond 180 days |
+| `deleteInactiveApplications` | Delete inactive submission requests |
+| `runDeactivateInactiveUsers` | Disable users inactive for N days |
+
+---
+
+## GraphQL API -- Key Queries
+
+### Submission Queries
+
+| Query | Parameters | Returns |
+|---|---|---|
+| `listSubmissions` | `name, dbGaPID, dataCommons, submitterName, organization, status[], first, offset, orderBy, sortDirection` | `ListSubmissions` (paginated with facets) |
+| `getSubmission` | `_id!` | `Submission` (full entity, 30+ fields) |
+| `submissionStats` | `_id!` | `SubmissionStats` (per-node-type validation counts) |
+| `listSubmissionNodeTypes` | `_id!` | `[String]` (distinct node types) |
+| `getSubmissionNodes` | `submissionID!, nodeType!, status, nodeID, first, offset, orderBy, sortDirection` | `SubmissionNodes` (Data View) |
+| `getNodeDetail` | `submissionID!, nodeType!, nodeID!` | `NodeDetail_Result` (parents + children) |
+| `getSubmissionAttributes` | `submissionID!` | Submission readiness checks |
+| `getSubmissionSummary` | `submissionID!` | New/updated/deleted counts per node type |
+
+### Batch Queries
+
+| Query | Parameters | Returns |
+|---|---|---|
+| `listBatches` | `submissionID!, first, offset, orderBy, sortDirection` | `ListBatches` (paginated) |
+| `downloadMetadataFile` | `batchID!, fileName` | Pre-signed download URL |
+
+### Validation Result Queries
+
+| Query | Parameters | Returns |
+|---|---|---|
+| `submissionQCResults` | `_id!, nodeTypes[], batchIDs[], severities, issueCode, first, offset, orderBy, sortDirection` | `QCResults` (per-node errors/warnings) |
+| `submissionCrossValidationResults` | `submissionID!, nodeTypes[], batchIDs[], severities, first, offset, orderBy, sortDirection` | `CrossValidationResults` |
+| `aggregatedSubmissionQCResults` | `submissionID!, severity, first, offset, orderBy, sortDirection` | `aggregatedQCResults` (grouped by issue code) |
+
+### CLI Configuration Queries
+
+| Query | Parameters | Returns |
+|---|---|---|
+| `retrieveCLIConfig` | `submissionID!, apiURL!, dataFolder, manifest, archive_manifest` | YAML config string |
+| `retrieveFileNodeConfig` | `submissionID!` | `DataFileConfig` (file node properties, `omit_DCF_prefix`) |
+| `retrieveCLIUploaderVersion` | (none, `@public`) | Latest CLI version string |
+
+### User and Admin Queries
+
+| Query | Parameters | Returns |
+|---|---|---|
+| `getMyUser` | (none) | Current user |
+| `listUsers` | (none) | All users (admin) |
+| `getUser` | `userID!` | Specific user |
+| `listPrograms` | `status!, first, offset, orderBy, sortDirection` | `ProgramList` |
+| `listApprovedStudies` | `controlledAccess, study, dbGaPID, first, offset, orderBy, sortDirection, programID` | `ApprovedStudyList` |
+| `retrievePBACDefaults` | `roles!` | PBAC configuration per role |
+
+### Data Explorer Queries
+
+| Query | Parameters | Returns |
+|---|---|---|
+| `listReleasedStudies` | `name, dbGaPID, dataCommonsDisplayNames!, first, offset, orderBy, sortDirection` | Published studies |
+| `listReleasedDataRecords` | `studyID!, nodeType!, properties[], first, offset, orderBy, sortDirection, dataCommonsDisplayName!` | Released nodes |
+
+### Pagination Pattern
+
+All paginated queries use:
+- `first`: number of records (-1 = all, default varies)
+- `offset`: records to skip (default 0)
+- `orderBy`: field name for sorting
+- `sortDirection`: `ASC` or `DESC`
+
+---
+
+## GraphQL API -- Key Mutations
+
+### Submission Lifecycle
+
+| Mutation | Parameters | Purpose |
+|---|---|---|
+| `createSubmission` | `studyID!, dataCommons!, name!, intention!, dataType!` | Create new submission |
+| `submissionAction` | `submissionID!, action!, comment` | State transitions (Submit, Release, etc.) |
+| `editSubmission` | `_id!, newName!` | Rename submission |
+| `editSubmissionCollaborators` | `submissionID!, collaborators[]` | Manage collaborators |
+
+### Batch and Upload
+
+| Mutation | Parameters | Purpose |
+|---|---|---|
+| `createBatch` | `submissionID!, type, files!` | Create batch; returns pre-signed URLs (metadata) or file IDs (data file) |
+| `updateBatch` | `batchID!, files[], uploading` | Update batch after upload; `uploading=true` is CLI heartbeat |
+| `createTempCredentials` | `submissionID!` | Get AWS STS credentials for CLI S3 uploads |
+
+### Validation
+
+| Mutation | Parameters | Purpose |
+|---|---|---|
+| `validateSubmission` | `_id!, types[], scope` | Trigger validation via SQS; `types`: `["file","metadata"]`; `scope`: `"New"` or `"All"` |
+| `deleteDataRecords` | `submissionID!, nodeType!, nodeIDs[], deleteAll, exclusiveIDs[]` | Delete data records |
+
+### User and Token
+
+| Mutation | Parameters | Purpose |
+|---|---|---|
+| `grantToken` | (none) | Generate JWT API token for CLI |
+| `invalidateToken` | `uuids[]` | Revoke tokens |
+| `updateMyUser` | `userInfo!` | Update own first/last name |
+| `editUser` | `userID!, permissions[], notifications[], status, role, dataCommons[], studies[], institutionID` | Admin edit user |
+| `requestAccess` | `role!, studies![], additionalInfo, institutionName` | Request role upgrade |
+
+### Admin Operations
+
+| Mutation | Parameters | Purpose |
+|---|---|---|
+| `createOrganization` | `name!, abbreviation!, conciergeID, studies[], description` | Create program |
+| `editOrganization` | `orgID!, name, abbreviation, conciergeID, studies[], status, description` | Edit program |
+| `createApprovedStudy` | 12 params including `name!, controlledAccess!, useProgramPC!` | Create study |
+| `updateApprovedStudy` | 13 params including `studyID!` | Update study |
+
+### Submission Request (Application) Lifecycle
+
+| Mutation | Purpose |
+|---|---|
+| `saveApplication` | Create/update questionnaire |
+| `submitApplication` | Submit for review |
+| `reviewApplication` | Set to In Review (Fed Lead) |
+| `approveApplication` | Approve (creates study + program) |
+| `rejectApplication` | Reject (requires comment) |
+| `inquireApplication` | Request more info |
+| `cancelApplication` / `restoreApplication` | Cancel or restore |
+
+---
+
+## Batch Processing
+
+### Batch Types
+
+| Type | Flow |
+|---|---|
+| `metadata` | FE calls `createBatch` -> gets pre-signed PUT URLs -> uploads TSVs to S3 -> calls `updateBatch` -> backend sends `Load Metadata` to SQS |
+| `data file` | FE/CLI calls `createBatch` -> backend generates DRS IDs -> CLI calls `createTempCredentials` -> CLI uploads to S3 directly -> CLI calls `updateBatch` |
+
+### Batch Statuses
+
+| Status | Meaning |
+|---|---|
+| `Uploading` | Batch created, files being uploaded |
+| `Uploaded` | All files uploaded successfully |
+| `Failed` | One or more files failed to upload |
+
+### Metadata Batch Upload Sequence
+
+```
+FE: createBatch(submissionID, "metadata", ["file1.tsv", "file2.tsv"])
+  -> BE returns: {batchID, files: [{fileName, signedURL}, ...]}
+FE: PUT each file to its signedURL
+FE: updateBatch(batchID, [{fileName, succeeded: true}, ...])
+  -> BE verifies S3 uploads, sends "Load Metadata" SQS message
+  -> External validator service picks up, parses TSVs, writes dataRecords
+```
+
+### Data File Batch Upload Sequence
+
+```
+CLI: createTempCredentials(submissionID)
+  -> BE returns: {accessKeyId, secretAccessKey, sessionToken}
+CLI: createBatch(submissionID, "data file", ["data1.csv", "data2.csv"])
+  -> BE generates file_id (DRS ID) per file, returns {batchID, files: [{fileName, fileID}, ...]}
+CLI: Uploads files directly to S3 using temp credentials
+CLI: updateBatch(batchID, [{fileName, succeeded: true}, ...], uploading: true)  // heartbeat
+CLI: updateBatch(batchID, [{fileName, succeeded: true}, ...])  // final update
+```
+
+### CLI Heartbeat (UploadingMonitor)
+
+- CLI sends `updateBatch(batchID, files, uploading: true)` periodically during upload
+- Backend stores batch in an in-memory pool with timestamp
+- Scheduler checks every 5 minutes; batches older than 15 minutes without heartbeat are marked `Failed`
+- Pool persisted to `logs/uploading_batch_pool.json`
+
+---
+
+## DRS ID / file_id Generation
+
+The backend generates deterministic file IDs using UUID v5 (namespace-based):
+
+```javascript
+_generateDataFileUUID(fileName, url, studyID, isOmitPrefix) {
+    const urlUUID = v5(url, v5.URL);
+    const studyUUID = v5(studyID, urlUUID);
+    const fileNameUUID = v5(fileName, studyUUID);
+    return isOmitPrefix ? fileNameUUID : `dg.4DFC/${fileNameUUID}`;
+}
+```
+
+- `url` = `prodURL` from backend configuration (the production S3 URL)
+- `studyID` = the submission's associated study ID
+- Same file name + study + URL always produces the same DRS ID (deterministic)
+- `omit-DCF-prefix` is read from the data model info per data commons:
+  - `false` (default, GC/CDS/CTDC): `dg.4DFC/<uuid>`
+  - `true` (ICDC): `<uuid>` only
+
+---
+
+## Validation Trigger Flow
+
+When the UI triggers validation (`validateSubmission` mutation):
+
+```
+UI: validateSubmission(_id, types=["metadata","file"], scope="New")
+  │
+  ├─► BE creates Validation record in MongoDB
+  │
+  ├─► Metadata validation:
+  │     sends "Validate Metadata" to METADATA_QUEUE
+  │     {type: "Validate Metadata", submissionID, scope, validationID}
+  │
+  ├─► Cross-submission validation:
+  │     sends "Validate Cross-submission" to METADATA_QUEUE
+  │     {type: "Validate Cross-submission", submissionID, validationID}
+  │
+  └─► File validation:
+        sends "Validate File" per file node to FILE_QUEUE (batches of 300)
+        {type: "Validate File", dataRecordID, validationID}
+        sends "Validate Submission Files" to FILE_QUEUE
+        {type: "Validate Submission Files", submissionID, validationID}
+```
+
+### SQS Queues
+
+| Queue Config Key | Queue Name (from config) | Message Types |
+|---|---|---|
+| `LOADER_QUEUE` | `sqs_loader_queue` | `Load Metadata` |
+| `METADATA_QUEUE` | `metadata_queue` | `Validate Metadata`, `Validate Cross-submission` |
+| `FILE_QUEUE` | `file_queue` | `Validate File`, `Validate Submission Files` |
+| `EXPORTER_QUEUE` | `export_queue` | `Export Metadata`, `Complete Submission` |
+
+All queues are FIFO (`.fifo` suffix). Messages include `MessageGroupId` and `MessageDeduplicationId` (UUID v4).
+
+### Validation Status Tracking
+
+| Field | Values | Set By |
+|---|---|---|
+| `metadataValidationStatus` | New, Validating, Passed, Warning, Error | Backend (on trigger), Validator service (on completion) |
+| `fileValidationStatus` | New, Validating, Passed, Warning, Error | Backend (on trigger), Validator service (on completion) |
+| `crossSubmissionStatus` | New, Validating, Passed, Warning, Error | Backend (on trigger), Validator service (on completion) |
+
+---
+
+## Authentication and PBAC
+
+### Authentication Methods
+
+| Method | Used By | Mechanism |
+|---|---|---|
+| Session-based | Browser/UI | NIH SSO via express-session + connect-mongo |
+| JWT Bearer token | CLI uploader | `Authorization: Bearer <token>` header, verified against user's token whitelist |
+
+### User Roles
+
+| Role | Access Level |
+|---|---|
+| Admin | Full system access |
+| Federal Lead | Review/approve submission requests, manage submissions |
+| Data Commons Personnel (DCP) | Manage submissions within assigned data commons |
+| Submitter | Create and manage own submissions |
+| User | Read-only, can request role upgrade |
+
+### PBAC Permission Format
+
+```
+entity:action:scope1+scope2:scopeValue1+scopeValue2
+```
+
+Examples:
+- `data_submission:create:all` -- can create submissions for any study
+- `data_submission:view:study:study1+study2` -- can view submissions for specific studies
+- `data_submission:view:own` -- can view only own submissions
+
+### Permission Scopes
+
+| Scope | Meaning |
+|---|---|
+| `all` | Access to all resources |
+| `none` | No access |
+| `own` | Access to own resources only (submitter's submissions) |
+| `study` | Access limited to assigned study IDs |
+| `DC` | Access limited to assigned data commons |
+| `role` | Access based on role-level scope values |
+
+### Key Permissions
+
+| Permission | Purpose |
+|---|---|
+| `data_submission:create` | Create submissions |
+| `data_submission:view` | View submissions list and details |
+| `data_submission:review` | Review/act on submissions (Fed Lead/Admin) |
+| `data_submission:confirm` | Release submissions |
+| `data_submission:cancel` | Cancel submissions |
+| `data_submission:admin_submit` | Submit on behalf of others |
+| `submission_request:create` | Create submission requests |
+| `admin:manage_user` | Manage users |
+| `admin:manage_studies` | Manage approved studies |
+| `admin:manage_programs` | Manage programs/organizations |
+
+---
+
+## S3 Path Structure
+
+```
+{bucketName}/
+└── submissions/
+    └── {submissionID}/
+        ├── metadata/
+        │   └── {timestamp}/     # Each metadata batch has a timestamped subfolder
+        │       ├── file1.tsv
+        │       └── file2.tsv
+        └── file/
+            ├── datafile1.csv    # Data files uploaded directly by CLI
+            └── datafile2.csv
+```
+
+- `rootPath` = `submissions/{submissionID}` (set on submission creation)
+- `bucketName` from program configuration or system default
+- Pre-signed URLs expire after 1 hour
+- STS temp credentials scoped to `arn:aws:s3:::{bucket}/{rootPath}/*` with `s3:GetObject` and `s3:PutObject`
+
+---
+
+## MongoDB Collections
+
+| Prisma Model | MongoDB Collection | Purpose |
+|---|---|---|
+| `Submission` | `submissions` | Data submissions (status, intention, dataType, collaborators, history) |
+| `Batch` | `batch` | Upload batches with file statuses and errors |
+| `DataRecord` | `dataRecords` | Individual metadata/file node records |
+| `QcResult` | `qcResults` | Validation QC results (errors, warnings per node) |
+| `Validation` | `validation` | Validation run records (tracks completion) |
+| `Application` | `applications` | Submission requests (questionnaires) |
+| `ApprovedStudy` | `approvedStudies` | Admin-approved studies |
+| `Program` | `organization` | Programs/organizations |
+| `User` | `users` | User accounts (roles, permissions, tokens) |
+| `Institution` | `institutions` | Institutions |
+| `Release` | `release` | Released data records (data explorer) |
+| `DataRecordsArchived` | `dataRecordsArchived` | Archived data records |
+| `CDE` | `CDE` | Common Data Elements cache |
+| `Configuration` | `configuration` | System config (PBAC, queues, emails, cron settings) |
+| `FileMD5` | `fileMD5` | Cached file MD5 checksums |
+| `PendingPVs` | `pendingPvs` | Pending permissible value requests |
+| `Log` | `logs` | Audit logs |
+| `Synonym` | `synonyms` | Term synonym mappings |
+
+### Key Relationships
+
+- `Submission` -> `Batch`, `DataRecord`, `QcResult`, `Validation` (cascade delete)
+- `Submission` -> `Program` (via `programID`), `ApprovedStudy` (via `studyID`)
+- `Submission` -> `User` (submitter via `submitterID`, concierge via `conciergeID`)
+- `ApprovedStudy` -> `Program` (via `programID`), `User` (primary contact)
+
+---
+
+## Key Error Constants
+
+Error strings from `constants/error-constants.js` that may appear in UI or API responses:
+
+### Submission Errors
+
+| Constant | Message |
+|---|---|
+| `SUBMISSION_NOT_EXIST` | `The submission you are trying to access does not exist` |
+| `CREATE_SUBMISSION_INVALID_PARAMS` | `One or more of the parameters for creating a submission is invalid` |
+| `CREATE_SUBMISSION_INVALID_NAME` | `Submission name cannot exceed $item$ characters in length.` |
+| `MISSING_CREATE_SUBMISSION_DBGAPID` | `dbGapID is required for controlled-access studies.` |
+| `INVALID_SUBMISSION_STATUS` | `The batch creation is aborted because the current submission is not in the valid state` |
+| `INVALID_BATCH_INTENTION` | `Uploading data files is not allowed for a Delete submission` |
+| `INVALID_BATCH_DATA_TYPE` | `Uploading data files is not allowed for a Metadata Only submission` |
+
+### Validation Errors
+
+| Constant | Message |
+|---|---|
+| `NO_VALIDATION_FILE` | `No file manifest(s) are uploaded for file validation` |
+| `NO_VALIDATION_METADATA` | `No metadata for validation` |
+| `NO_NEW_VALIDATION_METADATA` | `No new metadata for validation` |
+| `FAILED_VALIDATE_METADATA` | `Failed to validate metadata` |
+| `FAILED_VALIDATE_FILE` | `Failed to validate data file` |
+| `FAILED_VALIDATE_CROSS_SUBMISSION` | `Failed to validate cross-submission` |
+
+### Batch Errors
+
+| Constant | Message |
+|---|---|
+| `BATCH_NOT_EXIST` | `The batch you are trying to access does not exist` |
+| `INVALID_UPDATE_BATCH_STATUS` | `The batch update is aborted because the current batch status is not suitable for modification` |
+| `INVALID_FILE_EXTENSION` | `The $item$ file(s) extension is invalid. Please try again.` |
+| `UPLOADING_BATCH_CRASHED` | `CLI stopped responding while uploading files.` |
+
+### Permission Errors
+
+| Constant | Message |
+|---|---|
+| `INVALID_PERMISSION` | `You do not have permission to view this application` |
+| `INVALID_BATCH_PERMISSION` | `You do not have permission to run a batch operation` |
+| `INVALID_SUBMITTER` | `The user has no permissions to upload data for the submission` |
+| `INVALID_SESSION_OR_TOKEN` | `No valid session or valid API token` |
+
+---
+
+## Mapping to Katalon Test Automation
+
+### How Backend Operations Map to UI Actions
+
+| Backend Operation | UI Action | Katalon Keyword |
+|---|---|---|
+| `createSubmission` mutation | "Create a Data Submission" dialog | `DataSubmissions.createDataSubmission(intention, dataType, model, study)` |
+| `createBatch` + `updateBatch` | Upload Activity tab -> drag/drop files | `DataSubmissions.uploadFolder(tcName)` |
+| CLI `createTempCredentials` + `createBatch` + `updateBatch` | CLI tool upload | `CliUploader.uploadFilesViaCli(tcName, dataType)` |
+| `validateSubmission` mutation | "Validate" button click | `DataSubmissions.clickValidateButton()` |
+| `submissionQCResults` query | Validation Results tab | `DataSubmissions.verifyValidationResultsVsExpectedForTC(tcName)` |
+| `submissionCrossValidationResults` query | Cross Validation Results tab | (verify cross-validation tab) |
+| `getSubmissionNodes` query | Data View tab | `DataSubmissions.verifyDataViewMatchesMetadataForTC(tcName)` |
+| `listBatches` query | Upload Activity tab | `DataSubmissions.verifyDataSubmissionTableHeaders('UploadActivities')` |
+| `submissionAction(action: "Submit")` | "Submit" button | (submission action keywords) |
+| `grantToken` mutation | API Token dialog | Used by CLI for Bearer token auth |
+| `deleteDataRecords` mutation | Data View -> delete nodes | `DataSubmissions.deleteNodeFromDataView(node)` |
+
+### Understanding Backend for Test Data Design
+
+When designing test data for validation tests, understand that:
+
+1. **Essential validation** runs automatically when metadata is uploaded (via `Load Metadata` SQS). Errors appear as batch-level errors in Upload Activity.
+2. **Metadata + File validation** must be explicitly triggered via `validateSubmission`. The UI "Validate" button sends this mutation.
+3. **Cross-submission validation** also requires explicit trigger via `validateSubmission`.
+4. The backend generates `file_id` values when creating data file batches. The CLI uploader receives these IDs and writes them to the final manifest.
+5. Submission status must be `In Progress`, `Withdrawn`, or `Rejected` to create batches.
+6. The `intention` field (`New/Update` vs `Delete`) affects which validations run and what errors are expected.
+
+### CLI Token Authentication
+
+The CLI uses JWT tokens obtained via `grantToken` mutation. In test automation:
+- `GlobalVariable.SubmitterApiToken` stores the token
+- The CLI passes it in the YAML config as `token`
+- The backend verifies it against the user's `tokens[]` whitelist in MongoDB
+
+---
+
+## Backend Project Structure
+
+| Path | Purpose |
+|---|---|
+| `bin/www.js` | HTTP server entry point (port 4020) |
+| `app.js` | Express app setup, middleware, GraphQL router, cron jobs |
+| `config.js` | Environment/DB configuration management |
+| `resources/graphql/crdc-datahub.graphql` | GraphQL schema (types, queries, mutations) |
+| `routers/graphql-router.js` | GraphQL endpoint handler with resolver wiring |
+| `routers/api-authorization.js` | Auth middleware (session + token verification) |
+| `services/submission.js` | Submission lifecycle (create, action, list, validate) |
+| `services/batch-service.js` | Batch creation, update, heartbeat, S3 verification |
+| `services/data-record-service.js` | Data records, validation triggering, SQS messaging |
+| `services/qc-result-service.js` | QC result queries (validation results) |
+| `services/authentication-service.js` | Session and token authentication |
+| `services/authorization-service.js` | PBAC permission resolution |
+| `services/s3-service.js` | S3 operations (pre-signed URLs, upload, download, delete) |
+| `services/aws-request.js` | SQS messaging and STS credential generation |
+| `services/release-service.js` | Data release and export operations |
+| `services/data-model-service.js` | Fetches data model info from remote URL |
+| `domain/batch.js` | Batch and BatchFile domain objects, DRS ID generation |
+| `domain/history-event.js` | Submission history event creation |
+| `domain/user-scope.js` | PBAC scope wrapper (isAllScope, isOwnScope, etc.) |
+| `constants/submission-constants.js` | Submission statuses, actions, validation types |
+| `constants/error-constants.js` | All error message strings |
+| `constants/permission-scope-constants.js` | PBAC permission and scope constants |
+| `dao/` | Data Access Objects (Prisma-based CRUD for all collections) |
+| `verifier/` | Input validation (submission actions, batches, tokens) |
+| `middleware/` | Express middleware (authentication) |
+| `prisma/schema.prisma` | MongoDB schema definitions (18 models) |

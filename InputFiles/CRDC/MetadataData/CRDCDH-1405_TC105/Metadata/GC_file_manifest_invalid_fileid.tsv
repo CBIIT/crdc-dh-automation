@@ -1,0 +1,4 @@
+type	file_name	file_type	file_description	file_size	md5sum	study.study_id	participant.study_participant_id	sample.sample_id	file_id
+file	demo3.txt	SVS	sofia des3	21	a7d4af526e370c1853465f229734335b	st_id1	Key_4	CDS2009_DNA	file-0001
+file	demo4.csv	TAR	sofia des4	13	ecb7b3574e76b8993f953b7c51ef41c0	st_id1	Key_4	CDS2014_DNA	dg.4DFC/e041576e-3595-5c8b-b0b3-272bc7cb6aa8
+file	demo5.tsv	VCF	sofia des5	30	c28a24012f6e1b753508eab9644e6ec9	st_id1	Key_1	CDS2016_DNA	invalid-id-format

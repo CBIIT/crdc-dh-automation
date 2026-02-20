@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>IssueMessage-Lbl</name>
+   <tag></tag>
+   <elementGuidId>e5f6a7b8-c9d0-1234-ef01-issuemsg0001</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;error-details-dialog&apos;]//*[@data-testid=&apos;issue-message&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;error-details-dialog&apos;]//*[@data-testid=&apos;issue-message&apos;]</value>
+      <webElementGuid>f6a7b8c9-d0e1-2345-f012-issuemsg0002</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

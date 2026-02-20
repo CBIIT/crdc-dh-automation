@@ -1,0 +1,366 @@
+---
+description: CRDC Data Hub Authentication service reference for writing auth-related test automation
+globs: Keywords/utilities/*.groovy,Scripts/**/*.groovy
+alwaysApply: false
+---
+
+# CRDC Data Hub Authentication Service Reference
+
+## Overview
+
+The **crdc-datahub-authn** service is a Node.js 22+ / Express 4.18 microservice that handles authentication for the CRDC Data Hub. It implements NIH OAuth 2.0 authorization code flow and manages user sessions via MongoDB.
+
+| Aspect | Detail |
+|---|---|
+| Runtime | Node.js 22.21.1 (Alpine), Express 4.18.2 |
+| Base Path | `/api/authn` |
+| Ports | 4010 (development), 8082 (production) |
+| Entry Point | `bin/www` |
+| Session Store | MongoDB via `connect-mongo` 5.0 |
+| Auth Protocol | OAuth 2.0 Authorization Code (NIH SSO) |
+| Shared Module | `crdc-datahub-database-drivers` (git submodule) |
+
+---
+
+## API Endpoints
+
+### Authentication Endpoints
+
+| Method | Path | Purpose | Auth Required |
+|---|---|---|---|
+| `POST` | `/api/authn/login` | OAuth code exchange, session creation | No (creates session) |
+| `POST` | `/api/authn/logout` | Session destruction, IDP logout | Yes (session) |
+| `POST` | `/api/authn/authenticated` | Check session validity (refreshes session) | No (returns true/false) |
+
+### Health and Utility Endpoints
+
+| Method | Path | Purpose | Auth Required |
+|---|---|---|---|
+| `GET` | `/api/authn/ping` | Health check (returns `"pong"`) | No |
+| `GET` | `/api/authn/version` | Service version + MongoDB health (503 if DB fails) | No |
+| `GET` | `/api/authn/session-ttl` | Session time-to-live in seconds | No (reads cookie) |
+
+### Login Endpoint Detail
+
+```
+POST /api/authn/login
+Body: { code: string, IDP?: string, redirectUri?: string }
+Response: { name: string, email: string, timeout: number }
+```
+
+Flow:
+1. Receives OAuth authorization code from frontend
+2. Exchanges code for access token via NIH token endpoint
+3. Fetches user info (email, firstName, lastName) from NIH userinfo endpoint
+4. Detects IDP from email domain (`@nih.gov` -> NIH, `@login.gov` -> LOGIN_GOV)
+5. Checks `User.isEmailAndIDPLoginPermitted(email, idp)` -- returns 403 if inactive
+6. Stores `userInfo` and `tokens` in Express session
+7. Logs `LoginEvent` to MongoDB
+8. Returns user name, email, and session timeout (seconds)
+
+### Logout Endpoint Detail
+
+```
+POST /api/authn/logout
+Body: { IDP?: string }
+Response: { status: 'success' }
+```
+
+Flow:
+1. Logs `LogoutEvent` to MongoDB
+2. Calls IDP logout endpoint (sends `id_token` to NIH)
+3. Destroys Express session
+
+### Authenticated Endpoint Detail
+
+```
+POST /api/authn/authenticated
+Response: { status: true|false }
+```
+
+- Checks for `req.session.tokens`
+- Touching this endpoint refreshes the session TTL
+
+---
+
+## NIH OAuth 2.0 Flow
+
+```
+Browser                     Frontend (UI)              Auth Service             NIH SSO
+  │                            │                          │                       │
+  │──── Click Login ──────────►│                          │                       │
+  │                            │──── Redirect ───────────────────────────────────►│
+  │                            │     GET /auth/oauth/v2/authorize                 │
+  │                            │     ?client_id=...&redirect_uri=...              │
+  │                            │     &response_type=code&scope=openid email profile
+  │                            │     &prompt=login                                │
+  │                            │                          │                       │
+  │◄─── NIH Login Page ───────────────────────────────────────────────────────────│
+  │──── Enter Credentials ─────────────────────────────────────────────────────►  │
+  │                            │                          │                       │
+  │◄─── Redirect with code ───│◄──────────────────────────────────────────────── │
+  │                            │                          │                       │
+  │                            │──── POST /api/authn/login ──►│                   │
+  │                            │     { code, redirectUri }     │                  │
+  │                            │                          │──── POST /token ─────►│
+  │                            │                          │◄─── access_token ─────│
+  │                            │                          │──── GET /userinfo ───►│
+  │                            │                          │◄─── user profile ─────│
+  │                            │                          │                       │
+  │                            │                          │ Check isLoginPermitted │
+  │                            │                          │ Create session         │
+  │                            │                          │ Log LoginEvent         │
+  │                            │◄─── { name, email, timeout } │                   │
+  │                            │     + Set-Cookie: connect.sid │                   │
+  │◄─── Logged In ────────────│                          │                       │
+```
+
+### OAuth Configuration
+
+| Config Key | Purpose | Example Value |
+|---|---|---|
+| `NIH_CLIENT_ID` | OAuth client ID | (from environment) |
+| `NIH_CLIENT_SECRET` | OAuth client secret | (from environment) |
+| `NIH_BASE_URL` | NIH STS base URL | `https://stsstg.nih.gov` |
+| `NIH_REDIRECT_URL` | OAuth redirect URI | (app callback URL) |
+| `NIH_AUTHORIZE_URL` | Authorization endpoint | `/auth/oauth/v2/authorize` |
+| `NIH_TOKEN_URL` | Token exchange endpoint | `/auth/oauth/v2/token` |
+| `NIH_USERINFO_URL` | User info endpoint | `/openid/connect/v1/userinfo` |
+| `NIH_LOGOUT_URL` | Logout endpoint | `/connect/session/logout` |
+| `NIH_SCOPE` | OAuth scopes | `openid email profile` |
+| `NIH_PROMPT` | OAuth prompt type | `login` |
+
+### IDP Detection
+
+The service determines which Identity Provider was used based on the user's email domain:
+
+| Email Domain | IDP Constant | Value |
+|---|---|---|
+| `@nih.gov` | `NIH` | `'nih'` |
+| `@login.gov` | `LOGIN_GOV` | `'login.gov'` |
+| (dev only) | `TEST` | `'test-idp'` |
+
+---
+
+## Session Management
+
+### Session Data Structure
+
+```javascript
+req.session = {
+    userInfo: {
+        email: "user@login.gov",
+        IDP: "login.gov",       // 'nih', 'login.gov', or 'test-idp'
+        firstName: "John",
+        lastName: "Doe"
+    },
+    tokens: "<access_token>"    // OAuth access token from NIH
+}
+```
+
+### Session Configuration
+
+| Config Key | Purpose | Default |
+|---|---|---|
+| `SESSION_SECRET` | Cookie signing secret | (required, from environment) |
+| `SESSION_TIMEOUT` | Session timeout in seconds | `1800` (30 minutes) |
+
+### Session Lifecycle
+
+| Event | Trigger | Effect |
+|---|---|---|
+| Creation | Successful `POST /login` | Session stored in MongoDB, `connect.sid` cookie sent |
+| Refresh | `POST /authenticated` | Session TTL reset |
+| Expiration | No activity for `SESSION_TIMEOUT` | Session auto-deleted by MongoDB TTL index |
+| Destruction | `POST /logout` | Session deleted from MongoDB, cookie cleared |
+
+### Session Cookie
+
+- Cookie name: `connect.sid`
+- Signed with `SESSION_SECRET`
+- Stored server-side in MongoDB `sessions` collection
+- Session ID extractable from cookie for TTL queries
+
+---
+
+## User Permission Checking
+
+On login, the service validates that the user is permitted to access the system:
+
+```javascript
+const isPermitted = await userService.isEmailAndIDPLoginPermitted(email, idp)
+// Returns 403 with INACTIVE_USER error if not permitted
+```
+
+This check lives in the `crdc-datahub-database-drivers` submodule and queries the `users` MongoDB collection.
+
+### User Roles
+
+| Role Constant | Display Name |
+|---|---|
+| `ADMIN` | Admin |
+| `FEDERAL_LEAD` | Federal Lead |
+| `DC_POC` | Data Commons Personnel (DCP) |
+| `SUBMITTER` | Submitter |
+| `ORG_OWNER` | Organization Owner |
+| `CURATOR` | Curator |
+| `USER` | User |
+
+### User Statuses
+
+| Status | Meaning |
+|---|---|
+| `ACTIVE` | User can log in |
+| `INACTIVE` | User blocked from login (403 on `/login`) |
+
+---
+
+## Shared Database Drivers Module
+
+The `crdc-datahub-database-drivers` git submodule provides shared components used by the auth service and other CRDC microservices.
+
+### Components
+
+| Component | File | Purpose |
+|---|---|---|
+| `DatabaseConnector` | `database-connector.js` | MongoDB connection management |
+| `MongoDBCollection` | `mongodb-collection.js` | CRUD operations (find, insert, update, delete, aggregate) |
+| `MongoQueries` | `mongo-queries.js` | Auto-connecting query execution |
+| `MongoDBHealthCheck` | `mongo-health-check.js` | MongoDB ping health check |
+| `User` service | `services/user.js` | User queries, permission checks, token management |
+| `createSession` | `session-middleware.js` | Express session middleware with MongoDB store |
+| Log events | `domain/log-events.js` | Audit event classes (Login, Logout, Registration, etc.) |
+
+### MongoDB Collections Used
+
+| Constant | Collection | Purpose |
+|---|---|---|
+| `SESSION_COLLECTION` | `sessions` | Express sessions |
+| `USER_COLLECTION` | `users` | User accounts |
+| `LOG_COLLECTION` | `logs` | Audit log events |
+| `APPLICATION_COLLECTION` | `applications` | Submission requests |
+| `SUBMISSIONS_COLLECTION` | `submissions` | Data submissions |
+| `ORGANIZATION_COLLECTION` | `organization` | Programs/organizations |
+
+### Audit Log Events
+
+| Event Class | Trigger |
+|---|---|
+| `LoginEvent` | Successful login |
+| `LogoutEvent` | Logout |
+| `RegistrationEvent` | New user registration |
+| `UpdateProfileEvent` | Profile update |
+| `ReactivateUserEvent` | User reactivation |
+| `CreateTokenEvent` | API token creation |
+| `CreateApplicationEvent` | Submission request creation |
+| `UpdateApplicationStateEvent` | Submission request state change |
+| `CreateBatchEvent` | Batch creation |
+| `UpdateBatchEvent` | Batch update |
+| `SubmissionActionEvent` | Submission state transition |
+
+Each event includes: `_id` (UUID), `localtime`, `timestamp`, user email, event type.
+
+---
+
+## Error Constants
+
+| Constant | Message | When |
+|---|---|---|
+| `NOT_LOGGED_IN` | User is not logged in | No valid session on protected action |
+| `INACTIVE_USER` | User is inactive | `isEmailAndIDPLoginPermitted` returns false |
+| `INVALID_USER_STATUS` | Invalid user status | Unexpected user status value |
+| `INVALID_USERID` | Invalid user ID | Bad user ID parameter |
+| `INVALID_ROLE` | Invalid role | Unrecognized role value |
+| `MONGODB_HEALTH_CHECK_FAILED` | Health check failed | MongoDB unreachable (503 on `/version`) |
+
+---
+
+## Configuration Summary
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `VERSION` | Service version | (from build) |
+| `DATE` | Build date | (from build) |
+| `IDP` | Default identity provider | `'nih'` |
+| `SESSION_SECRET` | Cookie signing secret | (required) |
+| `SESSION_TIMEOUT` | Session timeout (seconds) | `1800` |
+| `MONGO_DB_HOST` | MongoDB host | (required) |
+| `MONGO_DB_PORT` | MongoDB port | (required) |
+| `MONGO_DB_USER` | MongoDB username | (required) |
+| `MONGO_DB_PASSWORD` | MongoDB password | (required) |
+| `MONGO_DB_DATABASE` | Database name | `'crdc-datahub'` |
+| `NODE_ENV` | Environment mode | (production by default) |
+| `NO_AUTO_LOGIN` | Disable dev auto-login | `false` |
+| `TEST_EMAIL` | Test IDP email | (dev only) |
+
+---
+
+## Mapping to Katalon Test Automation
+
+### How Auth Service Maps to Katalon Keywords
+
+| Auth Service Operation | What Happens | Katalon Keyword |
+|---|---|---|
+| NIH OAuth authorize redirect | Browser navigates to NIH login page | `Login.navigateToCrdc()` starts the flow |
+| Login.gov OTP entry | User enters credentials + OTP on Login.gov | `Login.loginToCrdcOtp(pbacUser)` automates this |
+| `POST /api/authn/login` | Code exchange + session creation | Handled automatically by browser after OAuth redirect |
+| `connect.sid` cookie set | Session persists across requests | Cookie maintained by Selenium WebDriver throughout test |
+| `POST /api/authn/authenticated` | Session check/refresh | Called by UI periodically; relevant for session timeout tests |
+| `POST /api/authn/logout` | Session destroyed | `SubmissionRequest.logoutFromCrdc()` triggers this |
+| `GET /api/authn/session-ttl` | Check remaining session time | Useful for inactivity timeout testing |
+
+### Login Keyword to Auth Service Mapping
+
+The `Login.loginToCrdcOtp(pbacUser)` keyword automates the full OAuth flow:
+
+1. Clicks "Continue" on the system use warning
+2. Clicks the Login button
+3. Clicks the Login.gov icon (triggers OAuth redirect to NIH SSO)
+4. Enters email/password on Login.gov page
+5. Generates and enters OTP via Python script (`PythonFiles/CRDC/GenerateOtp.py`)
+6. Clicks Grant (OAuth consent)
+7. Browser receives OAuth code, frontend calls `POST /api/authn/login`
+8. Session cookie (`connect.sid`) is set automatically
+
+The `pbacUser` parameter selects which test account credentials to use:
+
+| pbacUser | Role | Maps to Auth Service |
+|---|---|---|
+| `'Admin'` | Admin | `isEmailAndIDPLoginPermitted` must pass for admin email |
+| `'Fedlead'` | Federal Lead | Same check for fedlead email |
+| `'Dcp'` | Data Commons Personnel | Same check for DCP email |
+| `'Submitter'` | Submitter | Same check for submitter email |
+| `'User'` | User | Same check for user email |
+
+### Understanding Auth for Test Design
+
+When designing auth-related tests:
+
+1. **Session timeout tests**: The auth service session timeout is configurable via `SESSION_TIMEOUT` (default 30 min). The UI shows an inactivity dialog before timeout. The `/api/authn/session-ttl` endpoint returns remaining seconds.
+2. **User status tests**: Setting a user to `INACTIVE` in the database will cause `POST /api/authn/login` to return 403. Useful for testing disabled user scenarios.
+3. **Multi-IDP testing**: Users authenticating via NIH vs Login.gov follow the same OAuth flow but get different IDP values stored in their session.
+4. **Session persistence**: All Selenium requests carry the `connect.sid` cookie automatically. No special handling needed in Katalon unless testing cross-browser or incognito scenarios.
+5. **Logout verification**: After `POST /api/authn/logout`, the session is destroyed server-side. Verify by checking that `POST /api/authn/authenticated` returns `{status: false}`.
+
+---
+
+## Auth Service Project Structure
+
+| Path | Purpose |
+|---|---|
+| `bin/www` | HTTP server entry point (port 4010/8082) |
+| `app.js` | Express app setup, middleware, route mounting |
+| `config.js` | Environment variable loader and configuration object |
+| `routes/auth.js` | Login, logout, authenticated endpoints |
+| `routes/check.js` | Ping, version, session-ttl endpoints |
+| `services/nih-auth.js` | NIH OAuth token exchange, userinfo, logout |
+| `services/ttl-query.js` | Session TTL aggregation queries |
+| `services/session.js` | Session creation helper |
+| `controllers/auth-api.js` | Logout controller (session destroy) |
+| `idps/index.js` | IDP router/dispatcher |
+| `idps/nih.js` | NIH IDP client (login, authenticated, logout) |
+| `idps/testIDP.js` | Test IDP for development (mock auth) |
+| `constants/idp-constants.js` | IDP name constants (NIH, LOGIN_GOV, TEST) |
+| `util/string-util.js` | Case-insensitive string comparison |
+| `views/index.ejs` | Development test page (NIH login UI) |
+| `crdc-datahub-database-drivers/` | Shared DB utilities submodule |

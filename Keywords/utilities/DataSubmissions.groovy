@@ -54,7 +54,6 @@ class DataSubmissions extends TestRunner {
 	static String expectedCollaboratorsTooltip = "Click to add new collaborators or view existing ones."
 	static String expectedDataCommons = null
 	static String expectedDataConcierge = "pbac.dcp-automation Please Do Not Edit"
-
 	/** Maps tab internal name (e.g. UploadActivities, DataView) to section name used in ValidationReport. */
 	private static String tabToSectionName(String tab) {
 		if (tab == "UploadActivities") return "Upload Activities"
@@ -622,16 +621,24 @@ class DataSubmissions extends TestRunner {
 		}
 	}
 
+	private static String normalizeCrossValidationIssue(String s) {
+		if (s == null) return ""
+		return s.trim().replaceAll(/[.]+$/, "").toLowerCase()
+	}
+
 	/**
-	 * Apply Validation Results filters (node, severity, issue type) and read table rows: [submittedId, issueType, severity].
-	 * Waits for Loading to disappear, stabilizes table row count, then re-queries rows by index and retries on StaleElementReferenceException to avoid flakiness.
+	 * Shared Validation Results filter application used by both table verification flows.
+	 * Keeps one source of truth for node/severity/issueType interactions.
 	 */
-	private List<List<String>> readValidationResultsTableFromUI(String node, String severity, String issueType) {
-		WebDriver driver = DriverFactory.getWebDriver()
+	private void applyValidationResultsFiltersInternal(String node, String severity, String issueType, boolean includeLogs) {
+		if (includeLogs) {
+			KeywordUtil.logInfo("--- applyValidationResultsFilters: node=" + node + ", severity=" + severity + ", issueType=" + issueType + " ---")
+		}
 		WebUI.delay(1)
 		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"), 15)
 		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"))
 		WebUI.delay(1)
+		WebDriver driver = DriverFactory.getWebDriver()
 		WebElement nodeOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + node + "']"))
 		nodeOpt.click()
 		WebUI.delay(1)
@@ -647,9 +654,19 @@ class DataSubmissions extends TestRunner {
 		WebElement issueOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + issueType + "']"))
 		issueOpt.click()
 		WebUI.delay(2)
-		// Wait for table to finish loading after filter change; then a short delay so content can settle.
 		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
 		WebUI.delay(1)
+		if (includeLogs) {
+			KeywordUtil.logInfo("applyValidationResultsFilters: completed")
+		}
+	}
+
+	/**
+	 * Apply Validation Results filters (node, severity, issue type) and read table rows: [submittedId, issueType, severity].
+	 * Waits for Loading to disappear, stabilizes table row count, then re-queries rows by index and retries on StaleElementReferenceException to avoid flakiness.
+	 */
+	private List<List<String>> readValidationResultsTableFromUI(String node, String severity, String issueType) {
+		applyValidationResultsFiltersInternal(node, severity, issueType, false)
 		// Stabilize table: after changing node/severity/issueType the UI re-renders the table. If we read rows
 		// before the DOM has settled, we can get StaleElementReferenceException when using row/cell references.
 		// Wait until row count is unchanged across two samples 0.5s apart (up to 5 tries).
@@ -808,6 +825,285 @@ class DataSubmissions extends TestRunner {
 		}
 	}
 
+	/**
+	 * Apply Validation Results filters (node, severity, issue type). Call before verifyErrorDetailsForSubmittedId
+	 * when the table must be filtered to a specific node/severity/issueType so the target row is visible.
+	 * Assumes caller is on Validation Results tab (Expanded view).
+	 *
+	 * @param node Node type (e.g. participant)
+	 * @param severity Severity filter (e.g. Error, Warning)
+	 * @param issueType Issue type filter (e.g. Missing required property)
+	 */
+	@Keyword
+	void applyValidationResultsFilters(String node, String severity, String issueType) {
+		applyValidationResultsFiltersInternal(node, severity, issueType, true)
+	}
+
+	// ------------------------------- Validation Error Details (See details dialog) -------------------------------
+
+	/**
+	 * Click "See details" for the Validation Results row whose Submitted Identifier matches the given value.
+	 * Assumes caller is on Validation Results tab with filters applied. Waits for the error details dialog to appear.
+	 * Uses GenericTable row locator from AILocators.
+	 *
+	 * @param submittedIdentifier The Submitted Identifier value (case-insensitive, trimmed)
+	 */
+	@Keyword
+	void clickSeeDetailsForSubmittedId(String submittedIdentifier) {
+		KeywordUtil.logInfo("--- clickSeeDetailsForSubmittedId: " + submittedIdentifier + " ---")
+		String target = submittedIdentifier?.trim() ?: ""
+
+		List<WebElement> rows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
+		if (rows == null || rows.isEmpty()) {
+			KeywordUtil.markFailed("clickSeeDetailsForSubmittedId: no table rows found")
+			return
+		}
+
+		// Get header indices (use same Table-Headers as readValidationResultsTableFromUI)
+		List<WebElement> headerEls = Utils.getListWebElements("CRDC/DataSubmissions/Validation/Table-Headers")
+		List<String> headerNames = new ArrayList<>()
+		for (WebElement h : headerEls) headerNames.add(h.getText().trim())
+		int idxSubmitted = headerNames.findIndexOf { it.equalsIgnoreCase("Submitted Identifier") }
+		if (idxSubmitted < 0) {
+			KeywordUtil.markFailed("clickSeeDetailsForSubmittedId: Submitted Identifier column not found. Headers: " + headerNames)
+			return
+		}
+
+		WebElement matchingRow = null
+		for (WebElement row : rows) {
+			try {
+				List<WebElement> cells = row.findElements(By.tagName("td"))
+				if (idxSubmitted >= cells.size()) continue
+				String cellText = getCellText(cells, idxSubmitted, true)
+				if (cellText != null && cellText.trim().equalsIgnoreCase(target)) {
+					matchingRow = row
+					break
+				}
+			} catch (StaleElementReferenceException e) {
+				// Retry by re-querying
+				rows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
+				if (rows == null || rows.isEmpty()) continue
+				continue
+			}
+		}
+
+		if (matchingRow == null) {
+			KeywordUtil.markFailed("clickSeeDetailsForSubmittedId: no row with Submitted Identifier '" + submittedIdentifier + "'")
+			return
+		}
+
+		// Row-scoped lookup is intentional: there can be many "See details" buttons on the page,
+		// and we must click the one belonging to the matched Submitted Identifier row.
+		WebElement seeDetailsBtn = matchingRow.findElement(By.xpath(".//button[contains(.,'See details')]"))
+		seeDetailsBtn.click()
+		WebUI.delay(1)
+		WebUI.waitForElementPresent(findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/Dialog"), 10)
+		KeywordUtil.logInfo("clickSeeDetailsForSubmittedId: opened error details dialog")
+	}
+
+	/**
+	 * Read all issues from the open error details dialog. Returns a list of maps with keys severity and message.
+	 * Assumes the error details dialog is open.
+	 * Uses element lists (not WebUI.getText on one TestObject) to preserve row order and pair each
+	 * severity with its corresponding message.
+	 *
+	 * @return List of maps [severity: String, message: String]
+	 */
+	@Keyword
+	List<Map<String, String>> getErrorDetailsDialogIssues() {
+		List<WebElement> severities = WebUI.findWebElements(
+			findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/IssueSeverity-Lbl"),
+			10
+		)
+		List<WebElement> messages = WebUI.findWebElements(
+			findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/IssueMessage-Lbl"),
+			10
+		)
+
+		List<Map<String, String>> issues = new ArrayList<>()
+		int count = Math.min(severities.size(), messages.size())
+		for (int i = 0; i < count; i++) {
+			String sev = severities.get(i).getText()?.trim() ?: ""
+			String msg = messages.get(i).getText()?.trim() ?: ""
+			issues.add([severity: sev, message: msg])
+		}
+		KeywordUtil.logInfo("getErrorDetailsDialogIssues: found " + issues.size() + " issues")
+		return issues
+	}
+
+	/**
+	 * Verify the open error details dialog shows the expected issues. Uses "contains" for message matching.
+	 *
+	 * @param expectedIssues List of maps [severity: String, message: String]. Message matching: actual contains expected.
+	 * @param reportSection (Optional) Section for ValidationReport. Defaults to "Validation Error Details".
+	 */
+	@Keyword
+	void verifyErrorDetailsDialogIssues(List<Map<String, String>> expectedIssues, String reportSection = "Validation Error Details") {
+		KeywordUtil.logInfo("--- verifyErrorDetailsDialogIssues: expecting " + expectedIssues.size() + " issues ---")
+		List<Map<String, String>> actual = getErrorDetailsDialogIssues()
+		boolean allOk = true
+
+		if (actual.size() != expectedIssues.size()) {
+			ValidationReport.addValidationReportItem(reportSection, "Issue count", String.valueOf(expectedIssues.size()), String.valueOf(actual.size()), "Fail")
+			allOk = false
+		}
+
+		int compareCount = Math.min(actual.size(), expectedIssues.size())
+		for (int i = 0; i < compareCount; i++) {
+			Map<String, String> exp = expectedIssues.get(i)
+			Map<String, String> act = actual.get(i)
+			String expSev = (exp.get("severity") ?: "").trim()
+			String actSev = (act.get("severity") ?: "").trim()
+			String expMsg = (exp.get("message") ?: "").trim()
+			String actMsg = (act.get("message") ?: "").trim()
+
+			boolean sevOk = actSev.equalsIgnoreCase(expSev)
+			boolean msgOk = actMsg.contains(expMsg)
+
+			ValidationReport.addValidationReportItem(reportSection, "Issue " + (i + 1) + " severity", expSev, actSev, sevOk ? "Pass" : "Fail")
+			ValidationReport.addValidationReportItem(reportSection, "Issue " + (i + 1) + " message", expMsg, actMsg, msgOk ? "Pass" : "Fail")
+			if (!sevOk || !msgOk) allOk = false
+		}
+
+		if (allOk) {
+			KeywordUtil.logInfo("Error details dialog issues verified")
+		} else {
+			KeywordUtil.markFailed("verifyErrorDetailsDialogIssues: one or more issues did not match")
+		}
+	}
+
+	/**
+	 * Close the error details dialog by clicking the Close button. Waits for the dialog to disappear.
+	 */
+	@Keyword
+	void closeErrorDetailsDialog() {
+		KeywordUtil.logInfo("--- closeErrorDetailsDialog ---")
+		WebUI.click(findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/Close-Btn"))
+		WebUI.delay(1)
+		try {
+			Utils.waitForElementNotVisible("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/Dialog", 5)
+		} catch (Exception e) {
+			// Dialog may be removed from DOM; check if still present
+			WebDriver driver = DriverFactory.getWebDriver()
+			if (driver.findElements(By.cssSelector("[data-testid='error-details-dialog']")).isEmpty()) {
+				KeywordUtil.logInfo("closeErrorDetailsDialog: dialog closed")
+			} else {
+				KeywordUtil.logInfo("closeErrorDetailsDialog: dialog may still be visible: " + e.getMessage())
+			}
+		}
+	}
+
+	/**
+	 * Convenience: click See details for the row, verify issues, then close the dialog.
+	 * Caller must ensure Validation Results tab is active and filters (node, severity, issue type) are applied first.
+	 * For expected data from files, use verifyErrorDetailsForSubmittedIdForTC(tcName) instead.
+	 *
+	 * @param submittedIdentifier The Submitted Identifier of the row
+	 * @param expectedIssues List of maps [severity: String, message: String]
+	 * @param reportSection (Optional) Section for ValidationReport. Defaults to "Validation Error Details".
+	 */
+	@Keyword
+	void verifyErrorDetailsForSubmittedId(String submittedIdentifier, List<Map<String, String>> expectedIssues, String reportSection = "Validation Error Details") {
+		KeywordUtil.logInfo("--- verifyErrorDetailsForSubmittedId: " + submittedIdentifier + " ---")
+		clickSeeDetailsForSubmittedId(submittedIdentifier)
+		verifyErrorDetailsDialogIssues(expectedIssues, reportSection)
+		closeErrorDetailsDialog()
+		KeywordUtil.logInfo("verifyErrorDetailsForSubmittedId: completed")
+	}
+
+	/**
+	 * One-call verification: discovers all nodes and rows with expected issues from the TC's expected-ValidationResults TSVs,
+	 * applies filters for each, opens See details, verifies dialog content, and closes. Mirrors verifyValidationResultsVsExpectedForTC.
+	 *
+	 * Usage: CustomKeywords.'utilities.DataSubmissions.verifyErrorDetailsForSubmittedIdForTC'('TC04')
+	 *
+	 * @param tcName Test case name (e.g. TC04)
+	 */
+	@Keyword
+	void verifyErrorDetailsForSubmittedIdForTC(String tcName) {
+		KeywordUtil.logInfo("--- verifyErrorDetailsForSubmittedIdForTC: tcName=" + tcName + " ---")
+		TestRunner.clickTab("CRDC/DataSubmissions/Validation/ValidationResults-Tab")
+		TestRunner.clickTab("Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn")
+		WebUI.delay(2)
+		List<String> nodes = listNodesFromExpectedValidationResultsFolder(tcName)
+		if (nodes.isEmpty()) {
+			KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: No expected Validation Results files for TC '" + tcName + "'; skipping.")
+			return
+		}
+		Map<String, String> mappings = loadValidationResultsMappings()
+		for (String node : nodes) {
+			String submittedIdColumn = mappings.get(node)
+			if (submittedIdColumn == null || submittedIdColumn.isEmpty()) {
+				KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: no mapping for node '" + node + "'; skipping.")
+				continue
+			}
+			String tsvPath = findExpectedValidationResultsTsv(tcName, node)
+			if (tsvPath == null) {
+				KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: no expected TSV for node '" + node + "'; skipping.")
+				continue
+			}
+			List<List<String>> rows = loadAllExpectedErrorDetailRowsFromTsv(tsvPath, submittedIdColumn)
+			if (rows.isEmpty()) {
+				KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: no rows with issues for node '" + node + "'; skipping.")
+				continue
+			}
+			for (List<String> row : rows) {
+				String submittedId = row.get(0)
+				String severity = row.get(1)
+				String issueType = row.get(2)
+				String message = row.get(3)
+				applyValidationResultsFilters(node, severity, issueType)
+				verifyErrorDetailsForSubmittedId(submittedId, [[severity: severity, message: message]])
+			}
+		}
+		KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: completed")
+	}
+
+	/**
+	 * Remove Excel/CSV-style quoting from a cell value. When TSV is edited in Excel,
+	 * cells with double quotes get wrapped in "..." and internal " become "".
+	 * This reverses that so the value matches the actual API/UI message format.
+	 */
+	private static String unquoteCsvStyle(String s) {
+		if (s == null) return ""
+		String t = s.trim()
+		if (t.length() >= 2 && t.startsWith('"') && t.endsWith('"')) {
+			t = t.substring(1, t.length() - 1).replace('""', '"')
+		}
+		return t
+	}
+
+	/** Load all rows with issues from expected TSV. Returns list of [submittedId, severity, issueType, message]. Message = Expected_Issues or Issue_Type. */
+	private List<List<String>> loadAllExpectedErrorDetailRowsFromTsv(String tsvPath, String submittedIdColumn) {
+		List<List<String>> out = new ArrayList<>()
+		Path path = Paths.get(tsvPath)
+		if (!Files.exists(path)) return out
+		List<String> lines = Files.readAllLines(path)
+		if (lines.size() < 2) return out
+		String[] headers = lines.get(0).split("\t", -1)
+		int idxId = -1, idxIssue = -1, idxSev = -1, idxExpectedIssues = -1
+		for (int i = 0; i < headers.length; i++) {
+			String h = headers[i].trim()
+			if (h.equalsIgnoreCase(submittedIdColumn)) idxId = i
+			if (h.equals("Issue_Type")) idxIssue = i
+			if (h.equals("Expected_Severity")) idxSev = i
+			if (h.equals("Expected_Issues")) idxExpectedIssues = i
+		}
+		if (idxId < 0 || idxIssue < 0 || idxSev < 0) return out
+		if (idxExpectedIssues < 0) idxExpectedIssues = idxIssue
+		for (int i = 1; i < lines.size(); i++) {
+			String[] cells = lines.get(i).split("\t", -1)
+			String rowIssue = idxIssue < cells.length ? cells[idxIssue].trim() : ""
+			String rowSev = idxSev < cells.length ? cells[idxSev].trim() : ""
+			if (rowSev.isEmpty() || rowIssue.isEmpty()) continue
+			String submittedId = idxId < cells.length ? cells[idxId].trim() : ""
+			String message = idxExpectedIssues >= 0 && idxExpectedIssues < cells.length ? unquoteCsvStyle(cells[idxExpectedIssues]) : ""
+			if (message.isEmpty()) message = rowIssue
+			out.add(Arrays.asList(submittedId, rowSev, rowIssue, message))
+		}
+		return out
+	}
+
 	// ------------------------------- From Pbac: upload + verify Data View for TC -------------------------------
 
 	/**
@@ -903,6 +1199,20 @@ class DataSubmissions extends TestRunner {
 		//WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
 		KeywordUtil.logInfo("Waiting for Validation to finish - waiting up to 5 minutes")
 		WebUI.waitForElementNotHasAttribute(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 'disabled', 300)
+	}
+
+	/**
+	 * Click the Cross Validate button and wait for cross-validation to complete.
+	 * Cross-validation checks for duplicate nodes (S001 errors) across submissions
+	 * within the same study. Only DCPs can trigger this on submitted/released submissions.
+	 * After this returns, the Cross Validation Results tab will contain the S001 results.
+	 */
+	@Keyword
+	void clickCrossValidateButton() {
+		WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/CrossValidate-Btn'), 30)
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/CrossValidate-Btn')
+		KeywordUtil.logInfo("Waiting for cross-validation to finish - waiting up to 5 minutes")
+		WebUI.waitForElementNotHasAttribute(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/CrossValidate-Btn'), 'disabled', 300)
 	}
 
 	/**
@@ -1244,6 +1554,368 @@ class DataSubmissions extends TestRunner {
 			KeywordUtil.logInfo("deleteNodeFromDataView: Successfully deleted all rows for node '" + node + "'")
 		} catch (Exception e) {
 			KeywordUtil.markFailed("deleteNodeFromDataView: Failed to delete node '" + node + "'. Error: " + e.getMessage())
+		}
+	}
+
+	/**
+	 * Navigate to the Data View tab, select the specified node type, and delete
+	 * a specific number of rows by clicking individual row checkboxes.
+	 *
+	 * If the requested rowCount exceeds the default visible rows, the method
+	 * changes the rows-per-page setting to ensure enough rows are visible before
+	 * selecting. The rows-per-page options available are [5, 10, 20, 50].
+	 *
+	 * If rowCount exceeds the total available rows, all visible rows are selected
+	 * and a warning is logged.
+	 *
+	 * @param node     Node type name as it appears in the dropdown (e.g. "program", "file")
+	 * @param rowCount Number of rows to select and delete (must be >= 1)
+	 */
+	@Keyword
+	void deleteRowsFromDataView(String node, int rowCount) {
+		KeywordUtil.logInfo("--- deleteRowsFromDataView: Deleting " + rowCount + " row(s) for node '" + node + "' ---")
+		if (rowCount < 1) {
+			KeywordUtil.markFailed("deleteRowsFromDataView: rowCount must be >= 1. Got: " + rowCount)
+			return
+		}
+		try {
+			WebDriver driver = DriverFactory.getWebDriver()
+
+			WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Tabs/DataView-Tab')
+			Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+			WebUI.delay(2)
+
+			KeywordUtil.logInfo("Selecting node type '" + node + "' from dropdown")
+			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/NodeType-Ddn'), 30)
+			WebUI.click(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/NodeType-Ddn'))
+			WebUI.delay(1)
+			WebElement option = driver.findElement(By.xpath("//li[normalize-space(text())='" + node + "']"))
+			option.click()
+			WebUI.delay(2)
+			Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+			WebUI.delay(1)
+
+			int[] rpOptions = [5, 10, 20, 50]
+			int targetRp = rpOptions.find { it >= rowCount } ?: 50
+			KeywordUtil.logInfo("Setting rows per page to " + targetRp + " to accommodate " + rowCount + " row(s)")
+			WebUIUtils.changeRowsPerPage(targetRp)
+			Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+			WebUI.delay(1)
+
+			List<WebElement> checkboxes = driver.findElements(By.xpath("//*[@data-testid='row-checkbox']"))
+			int available = checkboxes.size()
+			int toSelect = Math.min(rowCount, available)
+			if (toSelect < rowCount) {
+				KeywordUtil.logInfo("deleteRowsFromDataView: requested " + rowCount + " but only " + available + " row(s) visible. Selecting all " + available + ".")
+			}
+			KeywordUtil.logInfo("Clicking " + toSelect + " individual row checkbox(es)")
+			for (int i = 0; i < toSelect; i++) {
+				checkboxes.get(i).click()
+				WebUI.delay(0.3)
+			}
+			WebUI.delay(1)
+
+			KeywordUtil.logInfo("Clicking Delete button")
+			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/DeleteNodeData-Btn'), 10)
+			WebUI.click(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/DeleteNodeData-Btn'))
+			WebUI.delay(1)
+
+			KeywordUtil.logInfo("Confirming deletion in dialog")
+			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'), 10)
+			WebUI.click(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'))
+
+			KeywordUtil.logInfo("Waiting for deletion to complete (up to 120s)")
+			Utils.waitForElementNotVisible('CRDC/AILocators/DataSubmissions/Detail/DataView/DeletionAlert', 120)
+
+			KeywordUtil.logInfo("deleteRowsFromDataView: Successfully deleted " + toSelect + " row(s) for node '" + node + "'")
+		} catch (Exception e) {
+			KeywordUtil.markFailed("deleteRowsFromDataView: Failed to delete rows for node '" + node + "'. Error: " + e.getMessage())
+		}
+	}
+
+	// ------------------------------- Cross Validation Results Verification -------------------------------
+
+	/**
+	 * Read all rows from the Cross Validation Results table in the UI.
+	 * Navigates to the Cross Validation tab, maximises visible rows (50 per page),
+	 * stabilises the table, then reads each row's Submitted Identifier, Node Type, Severity, and Issues columns.
+	 * Handles pagination: iterates all pages and collects rows across them.
+	 * @return List of [submittedId, nodeType, severity, issueText] lists
+	 */
+	private List<List<String>> readCrossValidationResultsTableFromUI() {
+		WebDriver driver = DriverFactory.getWebDriver()
+		int pageIndex = 0
+
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Tabs/CrossValidation-Tab')
+		WebUI.delay(2)
+		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 30)
+		WebUI.delay(1)
+
+		WebUIUtils.changeRowsPerPage(50)
+		WebUI.delay(1)
+		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+		WebUI.delay(1)
+
+		List<WebElement> headerEls = Utils.getListWebElements("CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Table-Headers")
+		List<String> headerNames = new ArrayList<>()
+		for (WebElement h : headerEls) headerNames.add(h.getText().trim())
+		KeywordUtil.logInfo("Cross Validation table headers: " + headerNames)
+
+		int idxSubmitted = headerNames.findIndexOf { it.equalsIgnoreCase("Submitted Identifier") }
+		int idxNodeType = headerNames.findIndexOf { it.equalsIgnoreCase("Node Type") }
+		int idxSeverity = headerNames.findIndexOf { it.equalsIgnoreCase("Severity") }
+		int idxIssues = headerNames.findIndexOf { it.equalsIgnoreCase("Issues") }
+		if (idxIssues < 0) idxIssues = headerNames.findIndexOf { it.toLowerCase().contains("issue") }
+
+		if (idxSubmitted < 0 || idxNodeType < 0 || idxSeverity < 0) {
+			KeywordUtil.markFailed("Cross Validation table missing required columns (Submitted Identifier, Node Type, Severity). Headers: " + headerNames)
+			return Collections.emptyList()
+		}
+
+		List<List<String>> allRows = new ArrayList<>()
+		boolean hasMorePages = true
+
+		while (hasMorePages) {
+			int rowCount = 0
+			for (int w = 0; w < 5; w++) {
+				List<WebElement> waitRows = Utils.getListWebElements("CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Table-Row")
+				int n = waitRows != null ? waitRows.size() : 0
+				WebUI.delay(0.5)
+				waitRows = Utils.getListWebElements("CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Table-Row")
+				int n2 = waitRows != null ? waitRows.size() : 0
+				if (n == n2) {
+					rowCount = n
+					break
+				}
+			}
+
+			for (int i = 0; i < rowCount; i++) {
+				boolean done = false
+				for (int attempt = 1; attempt <= 3 && !done; attempt++) {
+					try {
+						List<WebElement> currentRows = Utils.getListWebElements("CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Table-Row")
+						if (i >= (currentRows != null ? currentRows.size() : 0)) break
+						WebElement row = currentRows.get(i)
+						List<WebElement> cells = row.findElements(By.tagName("td"))
+						String submitted = getCellText(cells, idxSubmitted, false)
+						String nodeType = getCellText(cells, idxNodeType, false)
+						String severity = getCellText(cells, idxSeverity, false)
+						// For Cross Validation issue text, read visible cell text directly.
+						// Using getCellText() here can trigger slow nested element lookups under implicit wait.
+						String issues = idxIssues >= 0 ? cells.get(idxIssues).getText().trim() : ""
+						allRows.add(Arrays.asList(submitted, nodeType, severity, issues))
+						done = true
+					} catch (StaleElementReferenceException e) {
+						if (attempt == 3) throw e
+						WebUI.delay(0.5)
+					}
+				}
+			}
+
+			List<WebElement> nextBtns = driver.findElements(By.cssSelector("[aria-label='Go to next page']:not([disabled])"))
+			if (nextBtns != null && !nextBtns.isEmpty()) {
+				nextBtns.get(0).click()
+				WebUI.delay(1)
+				Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+				WebUI.delay(1)
+				pageIndex++
+			} else {
+				hasMorePages = false
+			}
+		}
+
+		KeywordUtil.logInfo("readCrossValidationResultsTableFromUI: read " + allRows.size() + " total row(s)")
+		return allRows
+	}
+
+	/**
+	 * Load expected cross-validation results from a TSV file.
+	 * TSV must have a header row with columns: submitted_id, node_type, severity, issue.
+	 * @param tsvPath absolute path to the expected TSV
+	 * @return List of [submittedId, nodeType, severity, issue] lists
+	 */
+	private List<List<String>> loadExpectedCrossValidationResultsTsv(String tsvPath) {
+		List<List<String>> out = new ArrayList<>()
+		Path path = Paths.get(tsvPath)
+		if (!Files.exists(path)) {
+			KeywordUtil.logInfo("loadExpectedCrossValidationResultsTsv: file not found: " + tsvPath)
+			return out
+		}
+		List<String> lines = Files.readAllLines(path)
+		if (lines.size() < 2) return out
+
+		String[] headers = lines.get(0).split("\t", -1)
+		int idxId = -1, idxNode = -1, idxSev = -1, idxIssue = -1
+		for (int i = 0; i < headers.length; i++) {
+			String h = headers[i].trim().toLowerCase()
+			if (h.equals("submitted_id")) idxId = i
+			else if (h.equals("node_type")) idxNode = i
+			else if (h.equals("severity")) idxSev = i
+			else if (h.equals("issue")) idxIssue = i
+		}
+		if (idxId < 0 || idxNode < 0 || idxSev < 0 || idxIssue < 0) {
+			KeywordUtil.logInfo("loadExpectedCrossValidationResultsTsv: missing required columns (submitted_id, node_type, severity, issue). Headers: " + Arrays.asList(headers))
+			return out
+		}
+
+		for (int i = 1; i < lines.size(); i++) {
+			String line = lines.get(i).trim()
+			if (line.isEmpty()) continue
+			String[] cells = line.split("\t", -1)
+			String id = idxId < cells.length ? cells[idxId].trim() : ""
+			String node = idxNode < cells.length ? cells[idxNode].trim() : ""
+			String sev = idxSev < cells.length ? cells[idxSev].trim() : ""
+			String issue = idxIssue < cells.length ? cells[idxIssue].trim() : ""
+			if (!id.isEmpty()) {
+				out.add(Arrays.asList(id, node, sev, issue))
+			}
+		}
+		KeywordUtil.logInfo("loadExpectedCrossValidationResultsTsv: loaded " + out.size() + " expected row(s) from " + tsvPath)
+		return out
+	}
+
+	/**
+	 * Verify Cross Validation Results in the UI against expected TSV files.
+	 * Discovers all *_expected-CrossValidationResults.tsv files under
+	 * InputFiles/CRDC/MetadataData/&lt;tcName&gt;/expected-CrossValidationResults/,
+	 * loads expected rows, reads actual rows from the UI Cross Validation tab,
+	 * and compares by Submitted Identifier as the matching key.
+	 * Reports each comparison via ValidationReport and marks failed on mismatch.
+	 * @param tcName Test case name (e.g. TC_CrossVal_01)
+	 */
+	@Keyword
+	void verifyCrossValidationResultsVsExpected(String tcName) {
+		KeywordUtil.logInfo("--- verifyCrossValidationResultsVsExpected for TC: " + tcName + " ---")
+
+		// 1) Resolve the expected-results folder for this test case and validate inputs exist.
+		String baseDir = RunConfiguration.getProjectDir()
+		File dir = new File(baseDir, "InputFiles/CRDC/MetadataData/${tcName}/expected-CrossValidationResults")
+		if (!dir.exists() || !dir.isDirectory()) {
+			KeywordUtil.markFailed("verifyCrossValidationResultsVsExpected: expected-CrossValidationResults folder not found: " + dir.absolutePath)
+			return
+		}
+
+		List<File> expectedFiles = dir.listFiles()?.findAll { it.isFile() && it.name.endsWith("_expected-CrossValidationResults.tsv") } ?: []
+		if (expectedFiles.isEmpty()) {
+			KeywordUtil.markFailed("verifyCrossValidationResultsVsExpected: no *_expected-CrossValidationResults.tsv files in " + dir.absolutePath)
+			return
+		}
+
+		// 2) Load all expected rows from all expected TSVs for this TC into one list.
+		// Each row shape is: [submittedId, nodeType, severity, issue].
+		List<List<String>> allExpected = new ArrayList<>()
+		for (File f : expectedFiles) {
+			List<List<String>> rows = loadExpectedCrossValidationResultsTsv(f.absolutePath)
+			allExpected.addAll(rows)
+		}
+		KeywordUtil.logInfo("Total expected cross-validation rows: " + allExpected.size())
+
+		// 3) Read actual rows from the UI Cross Validation table (all visible pages).
+		List<List<String>> actualRows = readCrossValidationResultsTableFromUI()
+		KeywordUtil.logInfo("Total actual cross-validation rows from UI: " + actualRows.size())
+
+		// 4) Group actual rows by Submitted ID so we can compare expected rows by key.
+		// We keep List<List<String>> because one submitted ID can have multiple CV entries.
+		Map<String, List<List<String>>> actualBySubmittedId = new LinkedHashMap<>()
+		for (List<String> row : actualRows) {
+			String key = row.get(0).trim()
+			if (!key.isEmpty()) {
+				if (!actualBySubmittedId.containsKey(key)) {
+					actualBySubmittedId.put(key, new ArrayList<>())
+				}
+				actualBySubmittedId.get(key).add(row)
+			}
+		}
+
+		List<String> errors = new ArrayList<>()
+		String sectionName = "Cross Validation Results"
+		Set<String> matchedActualKeys = new LinkedHashSet<>()
+
+		// 5) For each expected row:
+		//    - ensure Submitted ID exists in UI,
+		//    - compare Node Type + Severity (case-insensitive),
+		//    - compare Issue with normalized match (and allow expected issue to be contained in actual issue).
+		for (List<String> exp : allExpected) {
+			String expId = exp.get(0)
+			String expNode = exp.get(1)
+			String expSev = exp.get(2)
+			String expIssue = exp.get(3)
+
+			List<List<String>> actList = actualBySubmittedId.get(expId)
+			if (actList == null || actList.isEmpty()) {
+				errors.add("Submitted ID '" + expId + "': expected in UI but not found")
+				ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + expId,
+					"NodeType=" + expNode + ", Severity=" + expSev + ", Issue=" + expIssue,
+					"(not found in UI)", "Fail")
+				continue
+			}
+
+			matchedActualKeys.add(expId)
+
+			// Choose the best candidate row for this submitted ID.
+			// Prefer exact row match first; otherwise use the first available row and report detailed field-level diffs.
+			List<String> bestMatch = null
+			boolean exactMatch = false
+			for (List<String> act : actList) {
+				String actNode = act.get(1)
+				String actSev = act.get(2)
+				String actIssue = act.size() >= 4 ? act.get(3) : ""
+				if (actNode.equalsIgnoreCase(expNode) && actSev.equalsIgnoreCase(expSev) && actIssue.equals(expIssue)) {
+					bestMatch = act
+					exactMatch = true
+					break
+				}
+				if (bestMatch == null) bestMatch = act
+			}
+
+			String actNode = bestMatch.get(1)
+			String actSev = bestMatch.get(2)
+			String actIssue = bestMatch.size() >= 4 ? bestMatch.get(3) : ""
+			String expIssueNorm = normalizeCrossValidationIssue(expIssue)
+			String actIssueNorm = normalizeCrossValidationIssue(actIssue)
+
+			boolean nodeOk = actNode.equalsIgnoreCase(expNode)
+			boolean sevOk = actSev.equalsIgnoreCase(expSev)
+			boolean issueOk = actIssueNorm.equals(expIssueNorm) || (!expIssueNorm.isEmpty() && actIssueNorm.contains(expIssueNorm))
+
+			if (!nodeOk) errors.add("Submitted ID '" + expId + "': Node Type expected '" + expNode + "', actual '" + actNode + "'")
+			if (!sevOk) errors.add("Submitted ID '" + expId + "': Severity expected '" + expSev + "', actual '" + actSev + "'")
+			if (!issueOk) errors.add("Submitted ID '" + expId + "': Issue expected '" + expIssue + "', actual '" + actIssue + "'")
+
+			String status = (nodeOk && sevOk && issueOk) ? "Pass" : "Fail"
+			ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + expId,
+				"NodeType=" + expNode + ", Severity=" + expSev + ", Issue=" + expIssue,
+				"NodeType=" + actNode + ", Severity=" + actSev + ", Issue=" + actIssue,
+				status)
+		}
+
+		// 6) Flag unexpected UI rows (present in UI but missing from expected files).
+		// This protects against silent extra cross-validation issues not captured in expected data.
+		for (String actualKey : actualBySubmittedId.keySet()) {
+			if (!matchedActualKeys.contains(actualKey)) {
+				List<List<String>> unexpectedRows = actualBySubmittedId.get(actualKey)
+				for (List<String> act : unexpectedRows) {
+					String actNode = act.get(1)
+					String actSev = act.get(2)
+					String actIssue = act.size() >= 4 ? act.get(3) : ""
+					errors.add("Submitted ID '" + actualKey + "': present in UI but not in expected TSV")
+					ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + actualKey,
+						"(not in expected)",
+						"NodeType=" + actNode + ", Severity=" + actSev + ", Issue=" + actIssue,
+						"Fail")
+				}
+			}
+		}
+
+		// 7) Final assertion:
+		// if any mismatch was collected, fail once with a summarized error count.
+		if (!errors.isEmpty()) {
+			KeywordUtil.logInfo("--- Cross Validation Results vs Expected - " + errors.size() + " issue(s) ---")
+			for (String err : errors) KeywordUtil.logInfo(err)
+			KeywordUtil.logInfo("--- end ---")
+			KeywordUtil.markFailed("verifyCrossValidationResultsVsExpected: " + errors.size() + " mismatch(es). See log above.")
+		} else {
+			KeywordUtil.logInfo("Cross Validation Results match expected for TC: " + tcName)
 		}
 	}
 }

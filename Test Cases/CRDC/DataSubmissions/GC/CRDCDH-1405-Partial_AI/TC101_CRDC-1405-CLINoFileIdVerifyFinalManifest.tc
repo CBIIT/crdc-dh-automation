@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CLI data file upload without file_id column - verify final manifest generation and DRS ID format</description>
+   <name>TC101_CRDC-1405-CLINoFileIdVerifyFinalManifest</name>
+   <tag>CRDCDH-1405,CLI,file_id,final_manifest</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a1405101-1405-1405-1405-140510000101</testCaseGuid>
+</TestCaseEntity>
