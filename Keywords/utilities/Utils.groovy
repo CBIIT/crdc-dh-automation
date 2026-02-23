@@ -674,4 +674,37 @@ public class Utils {
 		// Clean up any trailing whitespace left by the removals
 		return out.trim()
 	}
+	
+	/**
+	 * Polls until an element is present in the DOM.
+	 * Mirror of waitForElementToDisappear — resolves xpath from Object Repository key,
+	 * then polls via JavaScript until the element is found or timeout is reached.
+	 * @param locatorKey Object Repository path (e.g. 'CRDC/DataSubmissions/Validation/Release-Btn')
+	 * @param timeoutSeconds maximum seconds to wait
+	 */
+	@Keyword
+	public static void waitForElementToAppear(String locatorKey, int timeoutSeconds) {
+		String xpath = TestRunner.givexpath(locatorKey);
+		WebDriver driver = DriverFactory.getWebDriver();
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		long start = System.currentTimeMillis();
+	
+		KeywordUtil.logInfo("Polling for appearance of: " + xpath);
+	
+		while ((System.currentTimeMillis() - start) / 1000 < timeoutSeconds) {
+			String script = "return document.evaluate(\"" + xpath + "\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue != null;";
+			boolean isPresent = (Boolean) js.executeScript(script);
+	
+			long elapsed = (System.currentTimeMillis() - start) / 1000;
+			KeywordUtil.logInfo("Loop at " + elapsed + "s. Found: " + isPresent);
+	
+			if (isPresent) {
+				KeywordUtil.logInfo("Element appeared after " + elapsed + " seconds.");
+				return;
+			}
+			Thread.sleep(2000);
+		}
+	
+		throw new AssertionError("Element did not appear within " + timeoutSeconds + " seconds: " + xpath);
+	}
 }
