@@ -1311,6 +1311,7 @@ class DataSubmissions extends TestRunner {
 	}
 
 	private static final String HEADERS_SECTION = "Data Submission Headers"
+	private static final String SUBMISSION_HISTORY_SECTION = "Submission History"
 
 	/** Get header value text by label (e.g. "Study", "Program"). Uses label text then sibling value with data-testid. */
 	private static String getHeaderValueByLabel(WebDriver driver, String label) {
@@ -1426,6 +1427,80 @@ class DataSubmissions extends TestRunner {
 		String normAct = actual?.replaceAll(/\s+/, ' ')?.trim() ?: ""
 		String status = normExp.equals(normAct) ? "Pass" : "Fail"
 		ValidationReport.addValidationReportItem(HEADERS_SECTION, label, expected ?: "(empty)", actual ?: "(empty)", status)
+	}
+
+	/**
+	 * Read the Full Submission History dialog (must be already open) and verify the list of statuses
+	 * matches the expected list. Order is newest-first (top to bottom in the UI). Closes the dialog when done.
+	 *
+	 * @param expectedStatusesNewestFirst List of status strings in order from newest to oldest (e.g. ["COMPLETED", "RELEASED", "SUBMITTED", ...])
+	 */
+	@Keyword
+	static void verifyFullSubmissionHistory(List<String> expectedStatusesNewestFirst) {
+		WebDriver driver = DriverFactory.getWebDriver()
+		WebElement dialog = null
+		try {
+			WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/DataSubmissions/HistoryDialog/Dialog'), 10)
+			dialog = driver.findElement(By.xpath("//*[@data-testid='history-dialog']"))
+		} catch (Exception e) {
+			KeywordUtil.markFailed("verifyFullSubmissionHistory: Submission History dialog not found. " + e.getMessage())
+			return
+		}
+		// Wait for first row (newest = COMPLETED) so the full list is rendered before we read
+		try {
+			TestObject firstStatus = new com.kms.katalon.core.testobject.TestObject("HistoryItem0Status")
+			firstStatus.addProperty("xpath", com.kms.katalon.core.testobject.ConditionType.EQUALS, "//*[@data-testid='history-dialog']//*[@data-testid='history-item-0-status']")
+			WebUI.waitForElementPresent(firstStatus, 10)
+			WebUI.delay(1)
+		} catch (Exception e) {
+			KeywordUtil.logInfo("verifyFullSubmissionHistory: first history row not found within 10s: " + e.getMessage())
+		}
+		List<String> actualStatuses = new ArrayList<>()
+		try {
+			dialog = driver.findElement(By.xpath("//*[@data-testid='history-dialog']"))
+			// Dialog uses data-testid="history-item-N-status" for each row's status (N = 0,1,2,... newest first)
+			List<WebElement> statusElements = dialog.findElements(By.xpath(".//*[contains(@data-testid,'history-item-') and contains(@data-testid,'-status')]"))
+			if (statusElements != null) {
+				for (WebElement el : statusElements) {
+					String text = el.getText()?.trim() ?: ""
+					if (!text.isEmpty()) actualStatuses.add(text)
+				}
+			}
+		} catch (Exception e) {
+			KeywordUtil.logInfo("verifyFullSubmissionHistory: row extraction " + e.getMessage())
+		}
+		List<String> expectedNormalized = new ArrayList<>()
+		if (expectedStatusesNewestFirst != null) {
+			for (String s : expectedStatusesNewestFirst) {
+				expectedNormalized.add((s ?: "")?.replaceAll("\\s+", "")?.trim()?.toUpperCase() ?: "")
+			}
+		}
+		List<String> actualNormalized = new ArrayList<>()
+		for (String s : actualStatuses) {
+			actualNormalized.add((s ?: "")?.replaceAll("\\s+", "")?.trim()?.toUpperCase() ?: "")
+		}
+		boolean match = expectedNormalized.size() == actualNormalized.size()
+		if (match) {
+			for (int i = 0; i < expectedNormalized.size(); i++) {
+				if (!expectedNormalized.get(i).equals(actualNormalized.get(i))) {
+					match = false
+					break
+				}
+			}
+		}
+		String expectedSummary = expectedNormalized.join(", ")
+		String actualSummary = actualNormalized.join(", ")
+		String status = match ? "Pass" : "Fail"
+		ValidationReport.addValidationReportItem(SUBMISSION_HISTORY_SECTION, "History (newest first)", expectedSummary, actualSummary, status)
+		if (!match) {
+			KeywordUtil.logInfo("verifyFullSubmissionHistory: expected " + expectedSummary + "; actual " + actualSummary)
+		}
+		try {
+			WebUI.click(findTestObject('CRDC/AILocators/DataSubmissions/HistoryDialog/Close-Btn'))
+			WebUI.delay(1)
+		} catch (Exception e) {
+			KeywordUtil.logInfo("verifyFullSubmissionHistory: could not close dialog: " + e.getMessage())
+		}
 	}
 
 	/**

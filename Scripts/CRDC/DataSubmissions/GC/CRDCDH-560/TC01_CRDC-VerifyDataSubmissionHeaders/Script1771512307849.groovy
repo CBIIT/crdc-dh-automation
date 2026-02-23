@@ -49,7 +49,7 @@ CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metada o
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 WebUI.delay(3)
-//CustomKeywords.'utilities.DataSubmissions.captureDataSubmissionHeaderExpectedValues'()
+
 CustomKeywords.'utilities.DataSubmissions.verifyDataSubmissionHeaders'()
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
