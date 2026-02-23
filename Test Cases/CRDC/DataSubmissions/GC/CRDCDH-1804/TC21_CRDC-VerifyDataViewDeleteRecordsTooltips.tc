@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description>Sample test to verify deleteRowsFromDataView keyword. Uploads metadata, then deletes a specific number of rows from Data View.</description>
-   <name>TC21_CRDC-VerifyDeleteRecordsTooltips</name>
+   <name>TC21_CRDC-VerifyDataViewDeleteRecordsTooltips</name>
    <tag></tag>
    <comment></comment>
    <recordOption>OTHER</recordOption>
