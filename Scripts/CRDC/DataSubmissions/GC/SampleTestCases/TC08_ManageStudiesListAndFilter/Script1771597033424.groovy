@@ -32,10 +32,15 @@ CustomKeywords.'utilities.ManageStudies.navigateToManageStudies'()
 CustomKeywords.'utilities.ManageStudies.verifyManageStudiesListPage'()
 
 // 3. Apply filters (use criteria that match your env; empty map skips applying)
-CustomKeywords.'utilities.ManageStudies.applyManageStudiesFilters'([ studyName: 'autoQA', program: 'AutoTest-Program', dbGaP: '' ])
+CustomKeywords.'utilities.ManageStudies.applyManageStudiesFilters'([ 
+	studyName: 'autoQA', 
+	program: 'AutoTest-Program', 
+	dbGaP: '' ])
 
 // 4. Verify filter results (expectations = expectAtLeastRows and/or rowContains)
-CustomKeywords.'utilities.ManageStudies.verifyManageStudiesFilterResults'([ expectAtLeastRows: 1, rowContains: 'autoQA' ])
+CustomKeywords.'utilities.ManageStudies.verifyManageStudiesFilterResults'([ 
+	expectAtLeastRows: 1, 
+	rowContains: 'autoQA' ])
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 

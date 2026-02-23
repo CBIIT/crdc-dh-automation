@@ -30,10 +30,14 @@ CustomKeywords.'utilities.ManagePrograms.navigateToManagePrograms'()
 CustomKeywords.'utilities.ManagePrograms.verifyManageProgramsListPage'()
 
 // 3. Apply filters (use criteria that match your env; empty map skips applying)
-CustomKeywords.'utilities.ManagePrograms.applyManageProgramsFilters'([ programName: 'AutoTest', studyName: 'autoQA' ])
+CustomKeywords.'utilities.ManagePrograms.applyManageProgramsFilters'([ 
+	programName: 'AutoTest', 
+	studyName: 'autoQA' ])
 
 // 4. Verify filter results (expectations = expectAtLeastRows and/or rowContains)
-CustomKeywords.'utilities.ManagePrograms.verifyManageProgramsFilterResults'([ expectAtLeastRows: 1, rowContains: 'auto' ])
+CustomKeywords.'utilities.ManagePrograms.verifyManageProgramsFilterResults'([ 
+	expectAtLeastRows: 1, 
+	rowContains: 'auto' ])
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
