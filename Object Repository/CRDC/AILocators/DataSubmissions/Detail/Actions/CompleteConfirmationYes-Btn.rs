@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CompleteConfirmationYes-Btn</name>
+   <tag></tag>
+   <elementGuidId>7db3d1af-ce04-498d-81e8-646ce02d0554</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[.='Yes']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[.='Yes']</value>
+      <webElementGuid>962cc672-5d98-4d2e-9e2e-455d89fb0ce1</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
