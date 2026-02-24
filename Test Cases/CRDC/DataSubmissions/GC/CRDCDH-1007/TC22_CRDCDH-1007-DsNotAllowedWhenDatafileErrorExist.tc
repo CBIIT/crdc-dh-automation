@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC22_CRDCDH-1007-DsNotAllowedWhenDatafileErrorExist</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>9a19f520-bc0a-492b-bb77-6dd0b1ecfc38</testCaseGuid>
+</TestCaseEntity>
