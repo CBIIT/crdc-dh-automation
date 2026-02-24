@@ -49,12 +49,8 @@ CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'both','G
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC21', 'datafile')
-WebUI.delay(5)
-//Delete the 2 recodes from "datafile" node from Data View
-//CustomKeywords.'utilities.DataSubmissions.deleteRowsFromDataView'('data file', 2)
 
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationTarget-AllUploadedData-RadioBtn')
-
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Both-RadioBtn')
 
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
@@ -65,3 +61,5 @@ CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsVsExpectedForTC
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
 WebUI.closeBrowser()
+
+
