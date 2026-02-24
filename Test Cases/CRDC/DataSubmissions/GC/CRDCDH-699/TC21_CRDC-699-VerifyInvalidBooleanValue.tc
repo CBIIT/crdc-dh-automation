@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC21_CRDC-699-VerifyInvalidBooleanValue</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>d665582a-f41a-4352-baaa-d2589bf37dd1</testCaseGuid>
+</TestCaseEntity>

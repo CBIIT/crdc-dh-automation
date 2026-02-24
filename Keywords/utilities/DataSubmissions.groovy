@@ -1308,6 +1308,8 @@ class DataSubmissions extends TestRunner {
 		//Create
 		TestRunner.clickTab('CRDC/DataSubmissions/Create/Create-Btn')
 		WebUI.delay(3)
+		WebUI.sendKeys(findTestObject('CRDC/AILocators/DataSubmissions/List/Filters/SubmissionName-TxtBx'), submissionName)
+		WebUI.delay(1)
 	}
 
 	private static final String HEADERS_SECTION = "Data Submission Headers"
