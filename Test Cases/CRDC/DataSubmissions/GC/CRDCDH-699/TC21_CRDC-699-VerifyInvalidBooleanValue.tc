@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description></description>
-   <name>TC21_CRDC-699-InvalidBooleanValue</name>
+   <name>TC21_CRDC-699-VerifyInvalidBooleanValue</name>
    <tag>Filter</tag>
    <comment></comment>
    <recordOption>OTHER</recordOption>
