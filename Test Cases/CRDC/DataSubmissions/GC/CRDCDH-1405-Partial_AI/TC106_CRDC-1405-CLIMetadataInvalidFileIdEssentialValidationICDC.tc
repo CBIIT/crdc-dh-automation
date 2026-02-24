@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TestCaseEntity>
-   <description>CLI metadata upload with invalid file_id - Essential Validation batch error (ICDC)</description>
-   <name>TC106_CRDC-1405-CLIMetadataInvalidFileIdEssentialValidationICDC</name>
-   <tag>CRDCDH-1405,CLI,file_id,essential_validation,ICDC</tag>
-   <comment></comment>
-   <recordOption>OTHER</recordOption>
-   <testCaseGuid>a1405106-1405-1405-1405-140510000106</testCaseGuid>
-</TestCaseEntity>
