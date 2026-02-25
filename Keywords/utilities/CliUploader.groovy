@@ -637,10 +637,10 @@ ${manifestBlock}               retries: ${retries}
 
 	/** DRS ID with DCF prefix: dg.4DFC/<uuid> */
 	private static final java.util.regex.Pattern DRS_ID_WITH_PREFIX =
-			java.util.regex.Pattern.compile('^dg\\.4DFC/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
+	java.util.regex.Pattern.compile('^dg\\.4DFC/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
 	/** Bare UUID (no DCF prefix) */
 	private static final java.util.regex.Pattern BARE_UUID =
-			java.util.regex.Pattern.compile('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
+	java.util.regex.Pattern.compile('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
 
 	/**
 	 * Verifies the CLI-generated final manifest after a successful data file upload.
@@ -663,7 +663,7 @@ ${manifestBlock}               retries: ${retries}
 		String originalManifestPath = getManifestPath(tcName)
 		if (originalManifestPath == null) return
 
-		File originalManifest = new File(originalManifestPath)
+			File originalManifest = new File(originalManifestPath)
 		if (!originalManifest.exists() || !originalManifest.isFile()) {
 			KeywordUtil.markFailed("CliUploader.verifyFinalManifest: Original manifest not found: " + originalManifestPath)
 			return
@@ -732,6 +732,112 @@ ${manifestBlock}               retries: ${retries}
 	}
 
 	/**
+	 * Verifies that generated file_ids in the final manifest are deterministic.
+	 * Re-runs the CLI upload and compares file_ids by file_name between the two runs.
+	 * Fails if any file_id differs between runs (expectation: UUID v5 from study + file_name).
+	 *
+	 * @param testCaseName  Test case name used to locate DataFiles/ folder (same as uploadFilesViaCli).
+	 */
+	@Keyword
+	static void verifyFinalManifestDeterministic(String testCaseName) {
+		if (testCaseName == null || testCaseName.trim().isEmpty()) {
+			KeywordUtil.markFailed("CliUploader.verifyFinalManifestDeterministic: testCaseName is required.")
+			return
+		}
+		String tcName = testCaseName.trim()
+
+		String originalManifestPath = getManifestPath(tcName)
+		if (originalManifestPath == null) return
+
+			String finalPath = originalManifestPath.replace(".tsv", "-final.tsv")
+		File firstFinal = new File(finalPath)
+		if (!firstFinal.exists() || !firstFinal.isFile()) {
+			KeywordUtil.markFailed("CliUploader.verifyFinalManifestDeterministic: First final manifest not found (run upload first): " + finalPath)
+			return
+		}
+
+		List<String> firstLines = Files.readAllLines(firstFinal.toPath(), StandardCharsets.UTF_8)
+		if (firstLines.size() < 2) {
+			KeywordUtil.markFailed("CliUploader.verifyFinalManifestDeterministic: First final manifest has no data rows.")
+			return
+		}
+		String header = firstLines.get(0)
+		int fileIdIdx = findColumnIndex(header, "file_id")
+		int fileNameIdx = findColumnIndex(header, FILE_NAME_COLUMN_CANDIDATES)
+		if (fileIdIdx < 0 || fileNameIdx < 0) {
+			KeywordUtil.markFailed("CliUploader.verifyFinalManifestDeterministic: First manifest missing file_id or file_name column.")
+			return
+		}
+
+		Map<String, String> firstFileIdsByFileName = [:]
+		for (int i = 1; i < firstLines.size(); i++) {
+			String[] cols = firstLines.get(i).split("\t", -1)
+			String fileName = fileNameIdx < cols.length ? cols[fileNameIdx].trim() : ""
+			String fileId = fileIdIdx < cols.length ? cols[fileIdIdx].trim() : ""
+			if (!fileName.isEmpty()) firstFileIdsByFileName.put(fileName, fileId)
+		}
+		if (firstFileIdsByFileName.isEmpty()) {
+			KeywordUtil.markFailed("CliUploader.verifyFinalManifestDeterministic: No file_name/file_id pairs in first manifest.")
+			return
+		}
+
+		KeywordUtil.logInfo("CliUploader.verifyFinalManifestDeterministic: Re-running CLI upload to verify deterministic file_ids...")
+		uploadFilesViaCli(tcName, "datafile")
+
+		File secondFinal = new File(finalPath)
+		if (!secondFinal.exists() || !secondFinal.isFile()) {
+			KeywordUtil.markFailed("CliUploader.verifyFinalManifestDeterministic: Second final manifest not found after re-upload: " + finalPath)
+			return
+		}
+
+		List<String> secondLines = Files.readAllLines(secondFinal.toPath(), StandardCharsets.UTF_8)
+		if (secondLines.size() < 2) {
+			KeywordUtil.markFailed("CliUploader.verifyFinalManifestDeterministic: Second final manifest has no data rows.")
+			return
+		}
+		String secondHeader = secondLines.get(0)
+		int secondFileIdIdx = findColumnIndex(secondHeader, "file_id")
+		int secondFileNameIdx = findColumnIndex(secondHeader, FILE_NAME_COLUMN_CANDIDATES)
+		if (secondFileIdIdx < 0 || secondFileNameIdx < 0) {
+			KeywordUtil.markFailed("CliUploader.verifyFinalManifestDeterministic: Second manifest missing file_id or file_name column.")
+			return
+		}
+
+		Map<String, String> secondFileIdsByFileName = [:]
+		for (int i = 1; i < secondLines.size(); i++) {
+			String[] cols = secondLines.get(i).split("\t", -1)
+			String fileName = secondFileNameIdx < cols.length ? cols[secondFileNameIdx].trim() : ""
+			String fileId = secondFileIdIdx < cols.length ? cols[secondFileIdIdx].trim() : ""
+			if (!fileName.isEmpty()) secondFileIdsByFileName.put(fileName, fileId)
+		}
+
+		List<String> mismatches = []
+		for (Map.Entry<String, String> e : firstFileIdsByFileName.entrySet()) {
+			String fileName = e.getKey()
+			String firstId = e.getValue()
+			String secondId = secondFileIdsByFileName.get(fileName)
+			if (secondId == null) {
+				mismatches.add(fileName + ": missing in second manifest")
+			} else if (firstId != secondId) {
+				mismatches.add(fileName + ": first=" + firstId + ", second=" + secondId)
+			}
+		}
+		for (String fileName : secondFileIdsByFileName.keySet()) {
+			if (!firstFileIdsByFileName.containsKey(fileName)) {
+				mismatches.add(fileName + ": missing in first manifest (extra in second)")
+			}
+		}
+
+		if (!mismatches.isEmpty()) {
+			ValidationReport.addValidationReportItem("CLI Deterministic file_id", "All file_ids identical across runs", "0 mismatches", mismatches.size() + " mismatches", "Fail")
+			KeywordUtil.markFailed("CliUploader.verifyFinalManifestDeterministic: file_id mismatch(es): " + mismatches.join("; "))
+			return
+		}
+		ValidationReport.addValidationReportItem("CLI Deterministic file_id", "All file_ids identical across runs", "0 mismatches", "0 mismatches", "Pass")
+		KeywordUtil.logInfo("CliUploader.verifyFinalManifestDeterministic: All " + firstFileIdsByFileName.size() + " file_id(s) identical across two upload runs. Determinism verified.")
+	}
+
+	/**
 	 * Upload files via CLI: data files (with manifest) or metadata (TSV/TXT folder).
 	 * dataType: "datafile" | "data file" | "metadata" (case-insensitive).
 	 */
@@ -790,6 +896,14 @@ ${manifestBlock}               retries: ${retries}
 			if (!manifestFile.exists() || !manifestFile.isFile()) {
 				KeywordUtil.markFailed("CliUploader: manifest file does not exist: " + manifestFile.getAbsolutePath())
 				return
+			}
+			// Delete any stale -final.tsv from a previous run so verifyFinalManifest
+			// can reliably confirm the CLI created a fresh one during this run.
+			String finalPath = toAbsolutePath(manifestPath).replace(".tsv", "-final.tsv")
+			File staleFinal = new File(finalPath)
+			if (staleFinal.exists()) {
+				staleFinal.delete()
+				KeywordUtil.logInfo("CliUploader: Deleted stale final manifest from previous run: " + staleFinal.getName())
 			}
 		}
 

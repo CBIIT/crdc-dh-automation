@@ -17,6 +17,8 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 
+import java.io.FileFilter
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -115,6 +117,275 @@ class DataSubmissions extends TestRunner {
 			}
 		} catch (Exception e) {
 			KeywordUtil.markFailed("Exception occurred: " + e.getMessage())
+		}
+	}
+
+	// --- Upload Activities verification: verifyUploadActivitiesBatchRow, verifyUploadActivitiesFailedErrorsModal, loadAggregatedExpectedErrorsForUi (expected TSV loading) ---
+
+	/** Column name candidates for Upload Activities batch table (flexible matching). These constants are used for column resolution, not for validating headers. */
+	private static final List<String> UPLOAD_ACTIVITIES_TYPE_CANDIDATES = ["Batch Type", "Type"]
+	private static final List<String> UPLOAD_ACTIVITIES_FILE_COUNT_CANDIDATES = ["File Count", "Files"]
+	private static final List<String> UPLOAD_ACTIVITIES_STATUS_CANDIDATES = ["Status"]
+
+	/** Helper method for getting header index for verifyUploadActivitiesBatchRow */
+	private static int findHeaderIndex(List<String> headers, List<String> candidates) {
+		for (String cand : candidates) {
+			int idx = headers.findIndexOf { it != null && it.equalsIgnoreCase(cand.trim()) }
+			if (idx >= 0) return idx
+		}
+		return -1
+	}
+
+	/** Default subfolder under InputFiles/CRDC/MetadataData/<tcName> for expected TSV(s) used by Upload Errors modal verification. */
+	private static final String EXPECTED_SUBFOLDER_UI = "expected"
+	/** Column name in expected TSV for expected error(s); used by loadAggregatedExpectedErrorsForUi. */
+	private static final List<String> EXPECTED_ERROR_COLUMN_CANDIDATES_UI = [
+		"expected_errors",
+		"expected_error"
+	]
+	/** Column names for file name in expected TSV; used by loadAggregatedExpectedErrorsForUi. */
+	private static final List<String> FILE_NAME_COLUMN_CANDIDATES_UI = [
+		"file_name",
+		"internal_file_name",
+		"fileName"
+	]
+
+	/** Find column index by name (case-insensitive) in a TSV header line; returns -1 if not found. Used for expected-errors TSV loading. */
+	private static int findColumnIndexForExpectedTsv(String headerLine, List<String> candidates) {
+		String[] headers = headerLine.split("\t", -1)
+		for (String cand : candidates) {
+			int idx = headers.findIndexOf { it != null && it.equalsIgnoreCase(cand.trim()) }
+			if (idx >= 0) return idx
+		}
+		return -1
+	}
+
+	/** Parse an expected_errors cell value (e.g. "['msg1', 'msg2']" or "msg1") into a list of individual error strings. */
+	private static List<String> parseExpectedErrorsToList(String raw) {
+		List<String> out = []
+		if (raw == null) return out
+		String s = raw.trim()
+		if (s.isEmpty()) return out
+		if (s.length() >= 2 && s.startsWith("\"") && s.endsWith("\"")) {
+			s = s.substring(1, s.length() - 1).replace("\"\"", "\"").trim()
+		}
+		if (s.startsWith("[") && s.endsWith("]")) {
+			String inner = s.substring(1, s.length() - 1).trim()
+			if (inner.isEmpty()) return out
+			String delim = "||SEP||"
+			String innerNorm = inner.replace("', '", delim).replace("\", \"", delim).replace("', \"", delim).replace("\", '", delim)
+			for (String segment : innerNorm.split(java.util.regex.Pattern.quote(delim), -1)) {
+				String t = segment.trim()
+				if (t.startsWith("'") && t.endsWith("'")) t = t.substring(1, t.length() - 1)
+				else if (t.startsWith("\"") && t.endsWith("\"")) t = t.substring(1, t.length() - 1)
+				t = t.trim()
+				if (!t.isEmpty()) out.add(t)
+			}
+			return out
+		}
+		out.add(s)
+		return out
+	}
+
+	/** Load and aggregate all expected error strings from TSV(s) in InputFiles/CRDC/MetadataData/<tcName>/expected/. Used by verifyUploadErrorsModalCompare. */
+	private static List<String> loadAggregatedExpectedErrorsForUi(String tcName) {
+		List<String> aggregated = []
+		if (tcName == null || tcName.trim().isEmpty()) return aggregated
+		String projectDir = RunConfiguration.getProjectDir()
+		File expectedDir = new File(projectDir, "InputFiles/CRDC/MetadataData/" + tcName.trim() + "/" + EXPECTED_SUBFOLDER_UI)
+		if (!expectedDir.exists() || !expectedDir.isDirectory()) return aggregated
+		File[] tsvs = expectedDir.listFiles({ File f -> f.isFile() && f.name.toLowerCase().endsWith(".tsv") } as FileFilter)
+		if (tsvs == null || tsvs.length == 0) return aggregated
+		for (File tsv : tsvs) {
+			List<String> lines = Files.readAllLines(tsv.toPath(), StandardCharsets.UTF_8)
+			if (lines.size() < 2) continue
+				String header = lines.get(0)
+			int expectedColIdx = findColumnIndexForExpectedTsv(header, EXPECTED_ERROR_COLUMN_CANDIDATES_UI)
+			int fileNameColIdx = findColumnIndexForExpectedTsv(header, FILE_NAME_COLUMN_CANDIDATES_UI)
+			if (expectedColIdx < 0 || fileNameColIdx < 0) continue
+				for (int i = 1; i < lines.size(); i++) {
+					String[] cols = lines.get(i).split("\t", -1)
+					String expectedVal = expectedColIdx < cols.length ? cols[expectedColIdx].trim() : ""
+					if (expectedVal.isEmpty()) continue
+						aggregated.addAll(parseExpectedErrorsToList(expectedVal))
+				}
+		}
+		return aggregated
+	}
+
+	/**
+	 * Verifies that the Upload Activities table contains a batch row matching the given criteria.
+	 * Caller must ensure the Upload Activities tab is visible before invoking.
+	 *
+	 * @param batchType Expected batch type (e.g. "Data File", "Metadata")
+	 * @param expectedFileCount Expected file count in the batch
+	 * @param expectedStatus Expected status value (e.g. "Uploaded", "Uploading", "Failed")
+	 */
+	@Keyword
+	void verifyUploadActivitiesBatchRow(String batchType, int expectedFileCount, String expectedStatus) {
+		try {
+			if (expectedStatus == null || expectedStatus.trim().isEmpty()) {
+				KeywordUtil.markFailed("verifyUploadActivitiesBatchRow: expectedStatus is required.")
+				return
+			}
+			WebDriver driver = DriverFactory.getWebDriver()
+
+			List<WebElement> headerList = Utils.getListWebElements('CRDC/DataSubmissions/Validation/Table-Headers')
+			if (headerList == null || headerList.isEmpty()) {
+				KeywordUtil.markFailed("verifyUploadActivitiesBatchRow: No table headers found. Ensure Upload Activities tab is visible.")
+				return
+			}
+			List<String> headerLabels = headerList.collect { it.getText().trim() }
+			int typeIdx = findHeaderIndex(headerLabels, UPLOAD_ACTIVITIES_TYPE_CANDIDATES)
+			int fileCountIdx = findHeaderIndex(headerLabels, UPLOAD_ACTIVITIES_FILE_COUNT_CANDIDATES)
+			int statusIdx = findHeaderIndex(headerLabels, UPLOAD_ACTIVITIES_STATUS_CANDIDATES)
+
+			if (typeIdx < 0 || fileCountIdx < 0 || statusIdx < 0) {
+				KeywordUtil.markFailed("verifyUploadActivitiesBatchRow: Could not find Batch Type, File Count, or Status columns. Headers: " + headerLabels)
+				return
+			}
+
+			List<WebElement> rows = Utils.getListWebElements('CRDC/AILocators/GenericTable/TableRow')
+			if (rows == null || rows.isEmpty()) {
+				ValidationReport.addValidationReportItem("Upload Activities", "Batch row " + batchType, "present", "0 rows", "Fail")
+				KeywordUtil.markFailed("verifyUploadActivitiesBatchRow: No batch rows found. Expected a " + batchType + " batch with " + expectedFileCount + " file(s).")
+				return
+			}
+
+			boolean found = false
+			String mismatchDetail = ""
+			for (WebElement row : rows) {
+				try {
+					List<WebElement> cells = row.findElements(By.xpath(".//td"))
+					if (cells.size() <= Math.max(typeIdx, Math.max(fileCountIdx, statusIdx))) continue
+
+						String rowType = (typeIdx < cells.size()) ? cells.get(typeIdx).getText().trim() : ""
+					String rowFileCountStr = (fileCountIdx < cells.size()) ? cells.get(fileCountIdx).getText().trim() : ""
+					String rowStatus = (statusIdx < cells.size()) ? cells.get(statusIdx).getText().trim() : ""
+
+					boolean typeMatch = rowType.equalsIgnoreCase(batchType)
+					int actualFileCount = -1
+					try {
+						actualFileCount = Integer.parseInt(rowFileCountStr.replaceAll("[^0-9]", ""))
+					} catch (Exception e) {
+						/* ignore */
+					}
+					boolean fileCountMatch = (actualFileCount >= 0 && actualFileCount == expectedFileCount)
+					boolean statusMatch = rowStatus.equalsIgnoreCase(expectedStatus.trim())
+
+					if (typeMatch && fileCountMatch && statusMatch) {
+						found = true
+						ValidationReport.addValidationReportItem("Upload Activities", "Batch " + batchType + " (" + expectedFileCount + " files)", "present", "found", "Pass")
+						KeywordUtil.logInfo("verifyUploadActivitiesBatchRow: Found matching " + batchType + " batch: fileCount=" + actualFileCount + ", status=" + rowStatus)
+						break
+					}
+					if (typeMatch && !fileCountMatch) {
+						mismatchDetail = "fileCount expected=" + expectedFileCount + ", actual=" + rowFileCountStr
+						break
+					}
+					if (typeMatch && !statusMatch) {
+						mismatchDetail = "status expected='" + expectedStatus + "', actual=" + rowStatus
+						break
+					}
+				} catch (StaleElementReferenceException e) {
+					KeywordUtil.logInfo("verifyUploadActivitiesBatchRow: Stale element, retrying...")
+				}
+			}
+
+			if (!found) {
+				String msg = "verifyUploadActivitiesBatchRow: No matching " + batchType + " batch with " + expectedFileCount + " file(s)"
+				if (mismatchDetail) msg += ". " + mismatchDetail
+				ValidationReport.addValidationReportItem("Upload Activities", "Batch " + batchType + " (" + expectedFileCount + " files)", "present", "not found", "Fail")
+				KeywordUtil.markFailed(msg)
+			}
+		} catch (Exception e) {
+			KeywordUtil.markFailed("verifyUploadActivitiesBatchRow: " + e.getMessage())
+		}
+	}
+
+	/**
+	 * Clicks the Upload Errors link in the Upload Activities table, reads the error-details modal content,
+	 * and verifies the displayed errors match the expected errors from TSV(s) in
+	 * InputFiles/CRDC/MetadataData/&lt;tcName&gt;/expected/. Assumes caller is on the data submission detail
+	 * page with Upload Activities tab selected and at least one batch has errors (e.g. Failed with "X Errors" link).
+	 * Uses loadAggregatedExpectedErrorsForUi(tcName) for expected list; compares sorted lists.
+	 * @param tcName Test case name (e.g. "CRDCDH-1405_TC104") used to resolve expected folder
+	 */
+	@Keyword
+	void verifyUploadActivitiesFailedErrorsModal(String tcName) {
+		if (tcName == null || tcName.trim().isEmpty()) {
+			KeywordUtil.markFailed("verifyUploadActivitiesFailedErrorsModal: tcName is required.")
+			return
+		}
+		try {
+			WebDriver driver = DriverFactory.getWebDriver()
+			// 1. Click first Upload Errors link
+			TestObject errorCountBtn = findTestObject("CRDC/AILocators/DataSubmissions/Detail/UploadActivity/ErrorCount-Btn")
+			WebUI.waitForElementPresent(errorCountBtn, 10)
+			WebUI.click(errorCountBtn)
+			WebUI.delay(1)
+			// 2. Wait for modal
+			WebUI.waitForElementPresent(findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/Dialog"), 10)
+			// 3. Read modal error list (v1: items are "1. msg", "2. msg" inside error-details-error-list)
+			String listContainerXpath = givexpath("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/ErrorList-Container")
+			WebElement listContainer = driver.findElement(By.xpath(listContainerXpath))
+			List<WebElement> itemElements = Utils.getListWebElements("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/ErrorList-Item")
+			if (itemElements.isEmpty()) {
+				// Fallback: container text may be in direct structure
+				String fullText = listContainer.getText()
+				List<String> actualErrors = []
+				if (fullText != null && !fullText.trim().isEmpty()) {
+					String[] parts = fullText.split(/\d+\.\s/)
+					for (int i = 1; i < parts.length; i++) {
+						String t = parts[i].trim()
+						if (!t.isEmpty()) actualErrors.add(t)
+					}
+				}
+				verifyUploadErrorsModalCompare(tcName, actualErrors)
+				return
+			}
+			List<String> actualErrors = []
+			for (WebElement el : itemElements) {
+				String t = el.getText()?.trim() ?: ""
+				if (t.matches(/^\d+\.\s+.+/)) {
+					actualErrors.add(t.replaceFirst(/^\d+\.\s*/, ""))
+				}
+			}
+			verifyUploadErrorsModalCompare(tcName, actualErrors)
+		} catch (Exception e) {
+			KeywordUtil.markFailed("verifyUploadActivitiesFailedErrorsModal: " + e.getMessage())
+		} finally {
+			try {
+				WebUI.click(findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/Close-Btn"))
+			} catch (Exception ignore) {}
+		}
+	}
+
+	/** Normalize Unicode curly/smart quotes to ASCII straight quote so UI (curly) and TSV (straight) match. */
+	private static String normalizeQuotesForComparison(String s) {
+		if (s == null) return ""
+		return s.replace('\u201C', '"').replace('\u201D', '"').replace('\u201E', '"').replace('\u201F', '"')
+	}
+
+	private void verifyUploadErrorsModalCompare(String tcName, List<String> actualErrors) {
+		List<String> expectedErrors = loadAggregatedExpectedErrorsForUi(tcName)
+		if (expectedErrors.isEmpty()) {
+			KeywordUtil.markFailed("verifyUploadActivitiesFailedErrorsModal: No expected errors loaded from InputFiles/CRDC/MetadataData/" + tcName + "/expected/")
+			return
+		}
+		List<String> expectedSorted = new ArrayList<>(expectedErrors.collect { normalizeQuotesForComparison(it) }).sort()
+		List<String> actualSorted = new ArrayList<>(actualErrors.collect { normalizeQuotesForComparison(it) }).sort()
+		boolean match = expectedSorted == actualSorted
+		String status = match ? "Pass" : "Fail"
+		String expectedDisplay = expectedSorted.size() + " error(s)"
+		String actualDisplay = actualSorted.size() + " error(s)" + (match ? "" : " (mismatch)")
+		ValidationReport.addValidationReportItem("Upload Errors Modal", "Errors vs expected (" + tcName + ")", expectedDisplay, actualDisplay, status)
+		if (!match) {
+			List<String> missing = expectedSorted.findAll { !actualSorted.contains(it) }
+			List<String> extra = actualSorted.findAll { !expectedSorted.contains(it) }
+			if (!missing.isEmpty()) KeywordUtil.logInfo("verifyUploadActivitiesFailedErrorsModal: Expected but not in modal: " + missing.take(3) + (missing.size() > 3 ? "..." : ""))
+			if (!extra.isEmpty()) KeywordUtil.logInfo("verifyUploadActivitiesFailedErrorsModal: In modal but not expected: " + extra.take(3) + (extra.size() > 3 ? "..." : ""))
+			KeywordUtil.markFailed("verifyUploadActivitiesFailedErrorsModal: Modal errors do not match expected. Expected " + expectedSorted.size() + ", actual " + actualSorted.size() + ".")
 		}
 	}
 
@@ -404,8 +675,8 @@ class DataSubmissions extends TestRunner {
 		return base.contains("_") ? base.substring(base.indexOf("_") + 1) : base
 	}
 
-	/** Load node -> submitted-identifier column name from Data File (Data Files/CRDC/DataSubmissions/ValidationResults-Mappings). Falls back to Excel if Data File not available. */
-	private Map<String, String> loadValidationResultsMappings() {
+	/** Load node -> submitted-identifier column name from Data File (Data Files/CRDC/DataSubmissions/ValidationResults-Mappings). Falls back to Excel if Data File not available. Used by DatabaseUtils.verifyRecordsInMongo. */
+	public static Map<String, String> loadValidationResultsMappings() {
 		Map<String, String> nodeToColumn = new HashMap<>()
 		try {
 			def data = findTestData("Data Files/CRDC/DataSubmissions/ValidationResults-Mappings")
@@ -547,8 +818,8 @@ class DataSubmissions extends TestRunner {
 		return out
 	}
 
-	/** Load unique non-empty submitted identifier values from a TSV column. Returns List<String>. */
-	private List<String> loadSubmittedIdentifiersFromTsv(String tsvPath, String submittedIdentifierColumn) {
+	/** Load unique non-empty submitted identifier values from a TSV column. Returns List<String>. Used by DatabaseUtils.verifyRecordsInMongo. */
+	public static List<String> loadSubmittedIdentifiersFromTsv(String tsvPath, String submittedIdentifierColumn) {
 		Set<String> seen = new LinkedHashSet<>()
 		Path path = Paths.get(tsvPath)
 		if (!Files.exists(path)) return new ArrayList<>(seen)
@@ -1125,9 +1396,9 @@ class DataSubmissions extends TestRunner {
 
 	/**
 	 * List TSV files in InputFiles/CRDC/MetadataData/&lt;tcName&gt;/ and return [relativePaths, nodes].
-	 * Empty lists if folder missing or no TSV files. Used by uploadFolder and verifyDataViewMatchesMetadataForTC.
+	 * Empty lists if folder missing or no TSV files. Used by uploadFolder, verifyDataViewMatchesMetadataForTC, and DatabaseUtils.verifyRecordsInMongo.
 	 */
-	private List<List<String>> listTsvFilesAndNodesForTC(String tcName) {
+	public static List<List<String>> listTsvFilesAndNodesForTC(String tcName) {
 		String baseDir = RunConfiguration.getProjectDir()
 		String folderPath = "InputFiles/CRDC/MetadataData/${tcName}"
 		File folder = new File(baseDir, folderPath)
@@ -1254,6 +1525,7 @@ class DataSubmissions extends TestRunner {
 		//Select the Data Commons
 		WebDriver driver = DriverFactory.getWebDriver()
 		WebUI.click(findTestObject('Object Repository/CRDC/DataSubmissions/Create/DataCommons-Ddn'))
+		WebUI.delay(2)
 		List<WebElement> commonsDropdownOptions = WebUI.findWebElements(findTestObject('Object Repository/CRDC/DataSubmissions/Create/DataCommonsDdn-Option'), 10)
 		WebElement matchDataCommons = commonsDropdownOptions.find {it.getAttribute("innerText")?.trim() == dataModel}
 		if (matchDataCommons != null) {
@@ -1502,82 +1774,6 @@ class DataSubmissions extends TestRunner {
 			WebUI.delay(1)
 		} catch (Exception e) {
 			KeywordUtil.logInfo("verifyFullSubmissionHistory: could not close dialog: " + e.getMessage())
-		}
-	}
-
-	/**
-	 * Verify records in MongoDB for each node from the given test case.
-	 * Gets submissionID from CliUploader.getSubmissionIdFromUploadActivityUrl(), derives nodes from
-	 * listTsvFilesAndNodesForTC(tcName), uses loadValidationResultsMappings to get the submitted-identifier
-	 * column per node, reads metadata TSV to extract submitted IDs, then queries MongoDB for each
-	 * (submissionID, nodeID) where nodeID is the Submitted Identifier value.
-	 * @param tcName Test case name (e.g. TC09) - used to derive nodes and metadata paths from InputFiles/CRDC/MetadataData/&lt;tcName&gt;/
-	 * @param queryKey Query key in DBQueries data file (e.g. "released")
-	 * @param expectedStatus Expected value for the "status" field (e.g. "Deleted")
-	 */
-	@Keyword
-	void verifyRecordsInMongo(String tcName, String queryKey, String expectedStatus) {
-		// Get submission ID from Upload Activity URL
-		String submissionID = DataSubmissions.getSubmissionIdFromUploadActivityUrl()
-		if (submissionID == null || submissionID.isEmpty()) {
-			KeywordUtil.markFailed("verifyRecordsInMongo: Could not get submissionID from Upload Activity URL.")
-			return
-		}
-		// Get metadata TSV paths and node names for this test case
-		List<List<String>> listResult = listTsvFilesAndNodesForTC(tcName)
-		List<String> relativePaths = listResult.get(0)
-		List<String> nodes = listResult.get(1)
-		if (nodes.isEmpty()) {
-			KeywordUtil.markFailed("verifyRecordsInMongo: No nodes found for tcName '${tcName}'.")
-			return
-		}
-		// Load node -> submitted-identifier column mapping from ValidationResults-Mappings
-		Map<String, String> mappings = loadValidationResultsMappings()
-		String baseDir = RunConfiguration.getProjectDir()
-		// Connect to MongoDB
-		DatabaseUtils.connectFromGlobalVariable()
-		List<String> errors = new ArrayList<>()
-		String sectionName = "MongoDB"
-		try {
-			for (int i = 0; i < nodes.size(); i++) {
-				String node = nodes.get(i)
-				String relativePath = relativePaths.get(i)
-				// Resolve submitted-identifier column for this node
-				String submittedIdColumn = mappings.get(node)
-				if (submittedIdColumn == null || submittedIdColumn.isEmpty()) {
-					KeywordUtil.logInfo("[WARNING] verifyRecordsInMongo: no mapping for node '${node}' in ValidationResults-Mappings; skipping.")
-					continue
-				}
-				// Read metadata TSV and extract unique submitted identifier values
-				String tsvPath = new File(baseDir, relativePath).absolutePath
-				List<String> submittedIds = loadSubmittedIdentifiersFromTsv(tsvPath, submittedIdColumn)
-				if (submittedIds.isEmpty()) {
-					KeywordUtil.logInfo("[WARNING] verifyRecordsInMongo: no submitted identifiers for node '${node}' in ${relativePath}; skipping.")
-					continue
-				}
-				// For each submitted ID, query MongoDB, verify record, and log to ValidationReport
-				for (String submittedId : submittedIds) {
-					Map params = [status: expectedStatus, submissionID: submissionID, nodeID: submittedId]
-					def doc = DatabaseUtils.findRecordFromDataFile(
-							"Data Files/CRDC/DataSubmissions/DBQueries", queryKey, params)
-					String actualStatus = doc != null ? doc.get("status")?.toString() : null
-					boolean recordOk = doc != null
-					boolean statusOk = expectedStatus.equals(actualStatus)
-					String status = (recordOk && statusOk) ? "Pass" : "Fail"
-					String actualDisplay = actualStatus != null ? actualStatus : "(not found)"
-					ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + submittedId, expectedStatus, actualDisplay, status)
-					if (status == "Fail") {
-						errors.add("Submitted ID '${submittedId}': expected status '${expectedStatus}', actual '${actualDisplay}'")
-					}
-				}
-			}
-		} finally {
-			DatabaseUtils.close()
-		}
-		if (!errors.isEmpty()) {
-			KeywordUtil.logInfo("--- MongoDB verification - " + errors.size() + " mismatch(es) ---")
-			for (String err : errors) KeywordUtil.logInfo(err)
-			KeywordUtil.markFailed("verifyRecordsInMongo: " + errors.size() + " record(s) failed. See ValidationReport and log above.")
 		}
 	}
 

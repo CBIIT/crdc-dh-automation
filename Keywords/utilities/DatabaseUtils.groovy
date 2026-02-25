@@ -1,8 +1,11 @@
 package utilities
 
 import com.kms.katalon.core.annotation.Keyword
+import com.kms.katalon.core.configuration.RunConfiguration
 import com.kms.katalon.core.testdata.TestDataFactory
 import com.kms.katalon.core.util.KeywordUtil
+import java.io.File
+import java.util.ArrayList
 import groovy.json.JsonSlurper
 import internal.GlobalVariable
 import org.bson.Document
@@ -22,7 +25,9 @@ public class DatabaseUtils {
 
 	private static MongoClient mongoClient
 	private static MongoDatabase database
-	
+	/** Collection name for data records in MongoDB. */
+	private static final String DATA_RECORDS_COLLECTION = "dataRecords"
+
 	/**
 	 * Connect using connection URI and database name from GlobalVariable.
 	 * Set GlobalVariable.G_MongoUri and GlobalVariable.G_MongoDatabase (e.g. in Katalon profile or execution settings).
@@ -249,6 +254,132 @@ public class DatabaseUtils {
 	}
 
 	/**
+	 * Verifies that no records exist in the dataRecords collection for the given submission ID.
+	 * Used for negative scenarios (e.g. failed essential validation, no data loaded).
+	 * Manages connection lifecycle (connect, verify, close).
+	 * @param submissionId Submission UUID (e.g. from DataSubmissions.getSubmissionIdFromUploadActivityUrl)
+	 */
+	@Keyword
+	public static void verifyNoRecordsInMongoForSubmission() {
+		String submissionId = DataSubmissions.getSubmissionIdFromUploadActivityUrl()
+		if (submissionId == null || submissionId.isEmpty()) {
+			KeywordUtil.markFailed("verifyNoRecordsInMongoForSubmission: submissionId must not be null or empty.")
+			return
+		}
+		connectFromGlobalVariable()
+		try {
+			Map filter = [submissionID: submissionId]
+			long count = count(DATA_RECORDS_COLLECTION, filter)
+			String status = (count == 0) ? "Pass" : "Fail"
+			ValidationReport.addValidationReportItem("MongoDB", "dataRecords count for submission " + submissionId, "0", String.valueOf(count), status)
+			if (count > 0) {
+				KeywordUtil.markFailed("verifyNoRecordsInMongoForSubmission: Expected 0 records in dataRecords for submission " + submissionId + ", but found " + count + ".")
+			} else {
+				KeywordUtil.logInfo("verifyNoRecordsInMongoForSubmission: No records in dataRecords for submission " + submissionId + " (as expected).")
+			}
+		} finally {
+			close()
+		}
+	}
+
+	/**
+	 * Verifies that at least one record exists in the dataRecords collection for the given submission ID.
+	 * Used for positive scenarios (e.g. successful upload, data loaded).
+	 * Manages connection lifecycle (connect, verify, close).
+	 * @param submissionId Submission UUID (e.g. from DataSubmissions.getSubmissionIdFromUploadActivityUrl)
+	 */
+	@Keyword
+	public static void verifyRecordsExistInMongoForSubmission() {
+		String submissionId = DataSubmissions.getSubmissionIdFromUploadActivityUrl()
+		if (submissionId == null || submissionId.isEmpty()) {
+			KeywordUtil.markFailed("verifyRecordsExistInMongoForSubmission: submissionId must not be null or empty.")
+			return
+		}
+		connectFromGlobalVariable()
+		try {
+			Map filter = [submissionID: submissionId]
+			long count = count(DATA_RECORDS_COLLECTION, filter)
+			String status = (count > 0) ? "Pass" : "Fail"
+			ValidationReport.addValidationReportItem("MongoDB", "dataRecords count for submission " + submissionId, "> 0", String.valueOf(count), status)
+			if (count == 0) {
+				KeywordUtil.markFailed("verifyRecordsExistInMongoForSubmission: Expected at least 1 record in dataRecords for submission " + submissionId + ", but found 0.")
+			} else {
+				KeywordUtil.logInfo("verifyRecordsExistInMongoForSubmission: Found " + count + " record(s) in dataRecords for submission " + submissionId + " (as expected).")
+			}
+		} finally {
+			close()
+		}
+	}
+
+	/**
+	 * Verify records in MongoDB for each node from the given test case.
+	 * Gets submissionID from DataSubmissions.getSubmissionIdFromUploadActivityUrl(), derives nodes from
+	 * DataSubmissions.listTsvFilesAndNodesForTC(tcName), uses loadValidationResultsMappings to get the submitted-identifier
+	 * column per node, reads metadata TSV to extract submitted IDs, then queries MongoDB for each
+	 * (submissionID, nodeID) where nodeID is the Submitted Identifier value.
+	 * @param tcName Test case name (e.g. TC09) - used to derive nodes and metadata paths from InputFiles/CRDC/MetadataData/&lt;tcName&gt;/
+	 * @param queryKey Query key in DBQueries data file (e.g. "released")
+	 * @param expectedStatus Expected value for the "status" field (e.g. "Deleted")
+	 */
+	@Keyword
+	public static void verifyRecordsInMongo(String tcName, String queryKey, String expectedStatus) {
+		String submissionID = DataSubmissions.getSubmissionIdFromUploadActivityUrl()
+		if (submissionID == null || submissionID.isEmpty()) {
+			KeywordUtil.markFailed("verifyRecordsInMongo: Could not get submissionID from Upload Activity URL.")
+			return
+		}
+		List<List<String>> listResult = DataSubmissions.listTsvFilesAndNodesForTC(tcName)
+		List<String> relativePaths = listResult.get(0)
+		List<String> nodes = listResult.get(1)
+		if (nodes.isEmpty()) {
+			KeywordUtil.markFailed("verifyRecordsInMongo: No nodes found for tcName '${tcName}'.")
+			return
+		}
+		Map<String, String> mappings = DataSubmissions.loadValidationResultsMappings()
+		String baseDir = RunConfiguration.getProjectDir()
+		connectFromGlobalVariable()
+		List<String> errors = new ArrayList<>()
+		String sectionName = "MongoDB"
+		try {
+			for (int i = 0; i < nodes.size(); i++) {
+				String node = nodes.get(i)
+				String relativePath = relativePaths.get(i)
+				String submittedIdColumn = mappings.get(node)
+				if (submittedIdColumn == null || submittedIdColumn.isEmpty()) {
+					KeywordUtil.logInfo("[WARNING] verifyRecordsInMongo: no mapping for node '${node}' in ValidationResults-Mappings; skipping.")
+					continue
+				}
+				String tsvPath = new File(baseDir, relativePath).absolutePath
+				List<String> submittedIds = DataSubmissions.loadSubmittedIdentifiersFromTsv(tsvPath, submittedIdColumn)
+				if (submittedIds.isEmpty()) {
+					KeywordUtil.logInfo("[WARNING] verifyRecordsInMongo: no submitted identifiers for node '${node}' in ${relativePath}; skipping.")
+					continue
+				}
+				for (String submittedId : submittedIds) {
+					Map params = [status: expectedStatus, submissionID: submissionID, nodeID: submittedId]
+					Document doc = findRecordFromDataFile("Data Files/CRDC/DataSubmissions/DBQueries", queryKey, params)
+					String actualStatus = doc != null ? doc.get("status")?.toString() : null
+					boolean recordOk = doc != null
+					boolean statusOk = expectedStatus.equals(actualStatus)
+					String status = (recordOk && statusOk) ? "Pass" : "Fail"
+					String actualDisplay = actualStatus != null ? actualStatus : "(not found)"
+					ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + submittedId, expectedStatus, actualDisplay, status)
+					if (status == "Fail") {
+						errors.add("Submitted ID '${submittedId}': expected status '${expectedStatus}', actual '${actualDisplay}'")
+					}
+				}
+			}
+		} finally {
+			close()
+		}
+		if (!errors.isEmpty()) {
+			KeywordUtil.logInfo("--- MongoDB verification - " + errors.size() + " mismatch(es) ---")
+			for (String err : errors) KeywordUtil.logInfo(err)
+			KeywordUtil.markFailed("verifyRecordsInMongo: " + errors.size() + " record(s) failed. See ValidationReport and log above.")
+		}
+	}
+
+	/**
 	 * Close the MongoDB client and release resources.
 	 */
 	@Keyword
@@ -258,7 +389,7 @@ public class DatabaseUtils {
 				mongoClient.close()
 				KeywordUtil.logInfo("MongoDB connection closed.")
 			} catch (Exception e) {
-				KeywordUtil.logWarning("Error closing MongoDB client: ${e.message}")
+				KeywordUtil.logInfo("Error closing MongoDB client: ${e.message}")
 			}
 			mongoClient = null
 			database = null
