@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description>Sample test for cross-validation verification. Submitter creates two metadata-only submissions for the same study with identical program program_acronym values, validates and submits both. DCP then triggers cross-validation on the second submission and the test verifies S001 Conflict Data found errors appear in the Cross Validation Results tab.</description>
-   <name>TC06_CrossValidationVerification</name>
+   <name>TC06_CrossValidationResultsVerification</name>
    <tag></tag>
    <comment></comment>
    <recordOption>OTHER</recordOption>
