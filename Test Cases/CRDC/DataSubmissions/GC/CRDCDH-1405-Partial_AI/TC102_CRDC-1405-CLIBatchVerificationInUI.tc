@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TestCaseEntity>
-   <description>Verify CLI creates metadata and datafile batches visible in UI Upload Activities</description>
-   <name>TC102_CRDC-1405-CLIBatchVerificationInUI</name>
-   <tag>CRDCDH-1405,CLI,batch</tag>
-   <comment></comment>
-   <recordOption>OTHER</recordOption>
-   <testCaseGuid>a1405102-1405-1405-1405-140510000102</testCaseGuid>
-</TestCaseEntity>

@@ -1,0 +1,4 @@
+type	participant.participant_id	data_file_name	data_file_type	data_file_description	data_file_format	data_file_size	data_file_checksum_value	data_file_checksum_type	data_file_compression_status	internal_file_name	data_file_uuid
+file	CTDC-SUBJECT-343157	file_1_5730.txt	Clinical	Details about the contents of the file	TXT	4945	8a1c7905ef1359d3ff794846935a1c63	md5sum	Uncompressed	file_1_5730.txt	ABC123
+file	CTDC-SUBJECT-456210	file_2_9382.txt	Clinical	Details about the contents of the file	TXT	3551	f463b6b46c76fef0c13407f574d26f0e	md5sum	Unknown	file_2_9382.txt	dg.4DFC/test
+file	CTDC-SUBJECT-408391	file_3_7365.txt	Clinical	Details about the contents of the file	TXT	9166	8bafb78c5f78cd693cdbc612fb71b370	md5sum	Uncompressed	file_3_7365.txt	e041576e-3595-5c8b-b0b3-272bc7cb6aa8

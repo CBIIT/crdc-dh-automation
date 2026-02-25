@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TestCaseEntity>
-   <description>CLI data file upload with invalid file_id format - verify CLI error messages</description>
-   <name>TC100_CRDC-1405-CLIInvalidFileIdFormat</name>
-   <tag>CRDCDH-1405,CLI,file_id</tag>
-   <comment></comment>
-   <recordOption>OTHER</recordOption>
-   <testCaseGuid>a1405100-1405-1405-1405-140510000100</testCaseGuid>
-</TestCaseEntity>
