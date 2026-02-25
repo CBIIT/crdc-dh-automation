@@ -27,7 +27,7 @@ CustomKeywords.'utilities.DataSubmissions.uploadFolder'('CRDCDH-1405_TC105')
 
 CustomKeywords.'utilities.DataSubmissions.verifyUploadActivitiesBatchRow'('Metadata', 1, 'Failed')
 
-CustomKeywords.'utilities.DataSubmissions.verifyUploadErrorsModalMatchesExpected'('CRDCDH-1405_TC105')
+CustomKeywords.'utilities.DataSubmissions.verifyUploadActivitiesFailedErrorsModal'('CRDCDH-1405_TC105')
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 

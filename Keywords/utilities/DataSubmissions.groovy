@@ -120,7 +120,7 @@ class DataSubmissions extends TestRunner {
 		}
 	}
 
-	// --- Upload Activities verification: verifyUploadActivitiesBatchRow, verifyUploadErrorsModalMatchesExpected, loadAggregatedExpectedErrorsForUi (expected TSV loading) ---
+	// --- Upload Activities verification: verifyUploadActivitiesBatchRow, verifyUploadActivitiesFailedErrorsModal, loadAggregatedExpectedErrorsForUi (expected TSV loading) ---
 
 	/** Column name candidates for Upload Activities batch table (flexible matching). These constants are used for column resolution, not for validating headers. */
 	private static final List<String> UPLOAD_ACTIVITIES_TYPE_CANDIDATES = ["Batch Type", "Type"]
@@ -312,9 +312,9 @@ class DataSubmissions extends TestRunner {
 	 * @param tcName Test case name (e.g. "CRDCDH-1405_TC104") used to resolve expected folder
 	 */
 	@Keyword
-	void verifyUploadErrorsModalMatchesExpected(String tcName) {
+	void verifyUploadActivitiesFailedErrorsModal(String tcName) {
 		if (tcName == null || tcName.trim().isEmpty()) {
-			KeywordUtil.markFailed("verifyUploadErrorsModalMatchesExpected: tcName is required.")
+			KeywordUtil.markFailed("verifyUploadActivitiesFailedErrorsModal: tcName is required.")
 			return
 		}
 		try {
@@ -353,7 +353,7 @@ class DataSubmissions extends TestRunner {
 			}
 			verifyUploadErrorsModalCompare(tcName, actualErrors)
 		} catch (Exception e) {
-			KeywordUtil.markFailed("verifyUploadErrorsModalMatchesExpected: " + e.getMessage())
+			KeywordUtil.markFailed("verifyUploadActivitiesFailedErrorsModal: " + e.getMessage())
 		} finally {
 			try {
 				WebUI.click(findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/Close-Btn"))
@@ -370,7 +370,7 @@ class DataSubmissions extends TestRunner {
 	private void verifyUploadErrorsModalCompare(String tcName, List<String> actualErrors) {
 		List<String> expectedErrors = loadAggregatedExpectedErrorsForUi(tcName)
 		if (expectedErrors.isEmpty()) {
-			KeywordUtil.markFailed("verifyUploadErrorsModalMatchesExpected: No expected errors loaded from InputFiles/CRDC/MetadataData/" + tcName + "/expected/")
+			KeywordUtil.markFailed("verifyUploadActivitiesFailedErrorsModal: No expected errors loaded from InputFiles/CRDC/MetadataData/" + tcName + "/expected/")
 			return
 		}
 		List<String> expectedSorted = new ArrayList<>(expectedErrors.collect { normalizeQuotesForComparison(it) }).sort()
@@ -383,9 +383,9 @@ class DataSubmissions extends TestRunner {
 		if (!match) {
 			List<String> missing = expectedSorted.findAll { !actualSorted.contains(it) }
 			List<String> extra = actualSorted.findAll { !expectedSorted.contains(it) }
-			if (!missing.isEmpty()) KeywordUtil.logInfo("verifyUploadErrorsModalMatchesExpected: Expected but not in modal: " + missing.take(3) + (missing.size() > 3 ? "..." : ""))
-			if (!extra.isEmpty()) KeywordUtil.logInfo("verifyUploadErrorsModalMatchesExpected: In modal but not expected: " + extra.take(3) + (extra.size() > 3 ? "..." : ""))
-			KeywordUtil.markFailed("verifyUploadErrorsModalMatchesExpected: Modal errors do not match expected. Expected " + expectedSorted.size() + ", actual " + actualSorted.size() + ".")
+			if (!missing.isEmpty()) KeywordUtil.logInfo("verifyUploadActivitiesFailedErrorsModal: Expected but not in modal: " + missing.take(3) + (missing.size() > 3 ? "..." : ""))
+			if (!extra.isEmpty()) KeywordUtil.logInfo("verifyUploadActivitiesFailedErrorsModal: In modal but not expected: " + extra.take(3) + (extra.size() > 3 ? "..." : ""))
+			KeywordUtil.markFailed("verifyUploadActivitiesFailedErrorsModal: Modal errors do not match expected. Expected " + expectedSorted.size() + ", actual " + actualSorted.size() + ".")
 		}
 	}
 
