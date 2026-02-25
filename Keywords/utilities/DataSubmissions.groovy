@@ -126,7 +126,7 @@ class DataSubmissions extends TestRunner {
 	private static final List<String> UPLOAD_ACTIVITIES_TYPE_CANDIDATES = ["Batch Type", "Type"]
 	private static final List<String> UPLOAD_ACTIVITIES_FILE_COUNT_CANDIDATES = ["File Count", "Files"]
 	private static final List<String> UPLOAD_ACTIVITIES_STATUS_CANDIDATES = ["Status"]
-	
+
 	/** Helper method for getting header index for verifyUploadActivitiesBatchRow */
 	private static int findHeaderIndex(List<String> headers, List<String> candidates) {
 		for (String cand : candidates) {
@@ -139,9 +139,16 @@ class DataSubmissions extends TestRunner {
 	/** Default subfolder under InputFiles/CRDC/MetadataData/<tcName> for expected TSV(s) used by Upload Errors modal verification. */
 	private static final String EXPECTED_SUBFOLDER_UI = "expected"
 	/** Column name in expected TSV for expected error(s); used by loadAggregatedExpectedErrorsForUi. */
-	private static final List<String> EXPECTED_ERROR_COLUMN_CANDIDATES_UI = ["expected_errors", "expected_error"]
+	private static final List<String> EXPECTED_ERROR_COLUMN_CANDIDATES_UI = [
+		"expected_errors",
+		"expected_error"
+	]
 	/** Column names for file name in expected TSV; used by loadAggregatedExpectedErrorsForUi. */
-	private static final List<String> FILE_NAME_COLUMN_CANDIDATES_UI = ["file_name", "internal_file_name", "fileName"]
+	private static final List<String> FILE_NAME_COLUMN_CANDIDATES_UI = [
+		"file_name",
+		"internal_file_name",
+		"fileName"
+	]
 
 	/** Find column index by name (case-insensitive) in a TSV header line; returns -1 if not found. Used for expected-errors TSV loading. */
 	private static int findColumnIndexForExpectedTsv(String headerLine, List<String> candidates) {
@@ -192,16 +199,16 @@ class DataSubmissions extends TestRunner {
 		for (File tsv : tsvs) {
 			List<String> lines = Files.readAllLines(tsv.toPath(), StandardCharsets.UTF_8)
 			if (lines.size() < 2) continue
-			String header = lines.get(0)
+				String header = lines.get(0)
 			int expectedColIdx = findColumnIndexForExpectedTsv(header, EXPECTED_ERROR_COLUMN_CANDIDATES_UI)
 			int fileNameColIdx = findColumnIndexForExpectedTsv(header, FILE_NAME_COLUMN_CANDIDATES_UI)
 			if (expectedColIdx < 0 || fileNameColIdx < 0) continue
-			for (int i = 1; i < lines.size(); i++) {
-				String[] cols = lines.get(i).split("\t", -1)
-				String expectedVal = expectedColIdx < cols.length ? cols[expectedColIdx].trim() : ""
-				if (expectedVal.isEmpty()) continue
-				aggregated.addAll(parseExpectedErrorsToList(expectedVal))
-			}
+				for (int i = 1; i < lines.size(); i++) {
+					String[] cols = lines.get(i).split("\t", -1)
+					String expectedVal = expectedColIdx < cols.length ? cols[expectedColIdx].trim() : ""
+					if (expectedVal.isEmpty()) continue
+						aggregated.addAll(parseExpectedErrorsToList(expectedVal))
+				}
 		}
 		return aggregated
 	}
@@ -252,7 +259,7 @@ class DataSubmissions extends TestRunner {
 					List<WebElement> cells = row.findElements(By.xpath(".//td"))
 					if (cells.size() <= Math.max(typeIdx, Math.max(fileCountIdx, statusIdx))) continue
 
-					String rowType = (typeIdx < cells.size()) ? cells.get(typeIdx).getText().trim() : ""
+						String rowType = (typeIdx < cells.size()) ? cells.get(typeIdx).getText().trim() : ""
 					String rowFileCountStr = (fileCountIdx < cells.size()) ? cells.get(fileCountIdx).getText().trim() : ""
 					String rowStatus = (statusIdx < cells.size()) ? cells.get(statusIdx).getText().trim() : ""
 
@@ -260,7 +267,9 @@ class DataSubmissions extends TestRunner {
 					int actualFileCount = -1
 					try {
 						actualFileCount = Integer.parseInt(rowFileCountStr.replaceAll("[^0-9]", ""))
-					} catch (Exception e) { /* ignore */ }
+					} catch (Exception e) {
+						/* ignore */
+					}
 					boolean fileCountMatch = (actualFileCount >= 0 && actualFileCount == expectedFileCount)
 					boolean statusMatch = rowStatus.equalsIgnoreCase(expectedStatus.trim())
 
@@ -666,8 +675,8 @@ class DataSubmissions extends TestRunner {
 		return base.contains("_") ? base.substring(base.indexOf("_") + 1) : base
 	}
 
-	/** Load node -> submitted-identifier column name from Data File (Data Files/CRDC/DataSubmissions/ValidationResults-Mappings). Falls back to Excel if Data File not available. */
-	private Map<String, String> loadValidationResultsMappings() {
+	/** Load node -> submitted-identifier column name from Data File (Data Files/CRDC/DataSubmissions/ValidationResults-Mappings). Falls back to Excel if Data File not available. Used by DatabaseUtils.verifyRecordsInMongo. */
+	public static Map<String, String> loadValidationResultsMappings() {
 		Map<String, String> nodeToColumn = new HashMap<>()
 		try {
 			def data = findTestData("Data Files/CRDC/DataSubmissions/ValidationResults-Mappings")
@@ -809,8 +818,8 @@ class DataSubmissions extends TestRunner {
 		return out
 	}
 
-	/** Load unique non-empty submitted identifier values from a TSV column. Returns List<String>. */
-	private List<String> loadSubmittedIdentifiersFromTsv(String tsvPath, String submittedIdentifierColumn) {
+	/** Load unique non-empty submitted identifier values from a TSV column. Returns List<String>. Used by DatabaseUtils.verifyRecordsInMongo. */
+	public static List<String> loadSubmittedIdentifiersFromTsv(String tsvPath, String submittedIdentifierColumn) {
 		Set<String> seen = new LinkedHashSet<>()
 		Path path = Paths.get(tsvPath)
 		if (!Files.exists(path)) return new ArrayList<>(seen)
@@ -1387,9 +1396,9 @@ class DataSubmissions extends TestRunner {
 
 	/**
 	 * List TSV files in InputFiles/CRDC/MetadataData/&lt;tcName&gt;/ and return [relativePaths, nodes].
-	 * Empty lists if folder missing or no TSV files. Used by uploadFolder and verifyDataViewMatchesMetadataForTC.
+	 * Empty lists if folder missing or no TSV files. Used by uploadFolder, verifyDataViewMatchesMetadataForTC, and DatabaseUtils.verifyRecordsInMongo.
 	 */
-	private List<List<String>> listTsvFilesAndNodesForTC(String tcName) {
+	public static List<List<String>> listTsvFilesAndNodesForTC(String tcName) {
 		String baseDir = RunConfiguration.getProjectDir()
 		String folderPath = "InputFiles/CRDC/MetadataData/${tcName}"
 		File folder = new File(baseDir, folderPath)
@@ -1763,82 +1772,6 @@ class DataSubmissions extends TestRunner {
 			WebUI.delay(1)
 		} catch (Exception e) {
 			KeywordUtil.logInfo("verifyFullSubmissionHistory: could not close dialog: " + e.getMessage())
-		}
-	}
-
-	/**
-	 * Verify records in MongoDB for each node from the given test case.
-	 * Gets submissionID from CliUploader.getSubmissionIdFromUploadActivityUrl(), derives nodes from
-	 * listTsvFilesAndNodesForTC(tcName), uses loadValidationResultsMappings to get the submitted-identifier
-	 * column per node, reads metadata TSV to extract submitted IDs, then queries MongoDB for each
-	 * (submissionID, nodeID) where nodeID is the Submitted Identifier value.
-	 * @param tcName Test case name (e.g. TC09) - used to derive nodes and metadata paths from InputFiles/CRDC/MetadataData/&lt;tcName&gt;/
-	 * @param queryKey Query key in DBQueries data file (e.g. "released")
-	 * @param expectedStatus Expected value for the "status" field (e.g. "Deleted")
-	 */
-	@Keyword
-	void verifyRecordsInMongo(String tcName, String queryKey, String expectedStatus) {
-		// Get submission ID from Upload Activity URL
-		String submissionID = DataSubmissions.getSubmissionIdFromUploadActivityUrl()
-		if (submissionID == null || submissionID.isEmpty()) {
-			KeywordUtil.markFailed("verifyRecordsInMongo: Could not get submissionID from Upload Activity URL.")
-			return
-		}
-		// Get metadata TSV paths and node names for this test case
-		List<List<String>> listResult = listTsvFilesAndNodesForTC(tcName)
-		List<String> relativePaths = listResult.get(0)
-		List<String> nodes = listResult.get(1)
-		if (nodes.isEmpty()) {
-			KeywordUtil.markFailed("verifyRecordsInMongo: No nodes found for tcName '${tcName}'.")
-			return
-		}
-		// Load node -> submitted-identifier column mapping from ValidationResults-Mappings
-		Map<String, String> mappings = loadValidationResultsMappings()
-		String baseDir = RunConfiguration.getProjectDir()
-		// Connect to MongoDB
-		DatabaseUtils.connectFromGlobalVariable()
-		List<String> errors = new ArrayList<>()
-		String sectionName = "MongoDB"
-		try {
-			for (int i = 0; i < nodes.size(); i++) {
-				String node = nodes.get(i)
-				String relativePath = relativePaths.get(i)
-				// Resolve submitted-identifier column for this node
-				String submittedIdColumn = mappings.get(node)
-				if (submittedIdColumn == null || submittedIdColumn.isEmpty()) {
-					KeywordUtil.logInfo("[WARNING] verifyRecordsInMongo: no mapping for node '${node}' in ValidationResults-Mappings; skipping.")
-					continue
-				}
-				// Read metadata TSV and extract unique submitted identifier values
-				String tsvPath = new File(baseDir, relativePath).absolutePath
-				List<String> submittedIds = loadSubmittedIdentifiersFromTsv(tsvPath, submittedIdColumn)
-				if (submittedIds.isEmpty()) {
-					KeywordUtil.logInfo("[WARNING] verifyRecordsInMongo: no submitted identifiers for node '${node}' in ${relativePath}; skipping.")
-					continue
-				}
-				// For each submitted ID, query MongoDB, verify record, and log to ValidationReport
-				for (String submittedId : submittedIds) {
-					Map params = [status: expectedStatus, submissionID: submissionID, nodeID: submittedId]
-					def doc = DatabaseUtils.findRecordFromDataFile(
-							"Data Files/CRDC/DataSubmissions/DBQueries", queryKey, params)
-					String actualStatus = doc != null ? doc.get("status")?.toString() : null
-					boolean recordOk = doc != null
-					boolean statusOk = expectedStatus.equals(actualStatus)
-					String status = (recordOk && statusOk) ? "Pass" : "Fail"
-					String actualDisplay = actualStatus != null ? actualStatus : "(not found)"
-					ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + submittedId, expectedStatus, actualDisplay, status)
-					if (status == "Fail") {
-						errors.add("Submitted ID '${submittedId}': expected status '${expectedStatus}', actual '${actualDisplay}'")
-					}
-				}
-			}
-		} finally {
-			DatabaseUtils.close()
-		}
-		if (!errors.isEmpty()) {
-			KeywordUtil.logInfo("--- MongoDB verification - " + errors.size() + " mismatch(es) ---")
-			for (String err : errors) KeywordUtil.logInfo(err)
-			KeywordUtil.markFailed("verifyRecordsInMongo: " + errors.size() + " record(s) failed. See ValidationReport and log above.")
 		}
 	}
 
