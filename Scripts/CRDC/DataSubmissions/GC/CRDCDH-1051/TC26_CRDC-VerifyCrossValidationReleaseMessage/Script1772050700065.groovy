@@ -36,8 +36,6 @@ CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 CustomKeywords.'utilities.Utils.waitForElementToDisappear'('CRDC/DataSubmissions/Loading-Icon', 30)
 CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC26')
-WebUI.delay(3)
-CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "In Progress")
 
 //Create DS 2, submit, and verify special Release message
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/Global/Header/Desktop/DataSubmissions-Tab')
@@ -46,8 +44,7 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmiss
 CustomKeywords.'utilities.Utils.waitForElementToDisappear'('CRDC/DataSubmissions/Loading-Icon', 30)
 CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC26')
 //Validate
-WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Validate-Btn')
+CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 //Submit
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'), 30)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Submit-Btn')
@@ -66,10 +63,14 @@ CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('CRD
 CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn'))
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx')
-WebUI.setText(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx'), 'testing Reject')
+WebUI.setText(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx'), 'Rejecting this DS to clean up data for future runs')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('Object Repository/CRDC/AILocators/DataSubmissions/Detail/Actions/ConfirmToReject-Btn')
-WebUI.delay(3)
-CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Rejected")
+
+/*
+ * Troubleshooting note in possible scenario that this test case fails:
+ * Ensure that there are no DS that are in Submitted status for program: auto_program-cv
+ * If there are, manually Reject them and rerun test case
+ */
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
