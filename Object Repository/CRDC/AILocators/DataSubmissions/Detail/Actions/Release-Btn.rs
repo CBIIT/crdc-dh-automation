@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>(//*[contains(@id, &quot;:r&quot;)])[6]</value>
+         <value>//button[contains(.,'Release')]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>(//*[contains(@id, &quot;:r&quot;)])[6]</value>
-      <webElementGuid>b9113852-813d-4355-ad92-ca7bd1714ffc</webElementGuid>
+      <value>//button[contains(.,'Release')]</value>
+      <webElementGuid>c8ea6a9e-401d-49fd-8fb6-c34cedf560bd</webElementGuid>
    </webElementProperties>
 </WebElementEntity>
