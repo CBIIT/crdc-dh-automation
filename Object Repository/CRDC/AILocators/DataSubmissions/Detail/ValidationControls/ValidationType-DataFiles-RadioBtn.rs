@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ValidationType-DataFiles-RadioBtn</name>
+   <tag></tag>
+   <elementGuidId>ad81a78c-086e-4a62-9968-f2806dc4f72b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>(//input[@value='file'])[1]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>(//input[@value='file'])[1]</value>
+      <webElementGuid>aadcf053-8d95-4f69-b063-c6b5cd34563d</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

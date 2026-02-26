@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC23_CRDCDH-1042-VerifyDeleteSubmission</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>8127160d-b8a8-4be5-b620-356d4f911ba1</testCaseGuid>
+</TestCaseEntity>
