@@ -92,7 +92,7 @@
       <guid>e36d3ba6-2383-4703-9658-84c871b9edad</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-675-Partial/TC11_CRDC-VerifyDataFileUploadViaCLI</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-675/TC11_CRDC-VerifyDataFileUploadViaCLI</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
@@ -113,7 +113,7 @@
       <guid>64e30f70-3b69-4605-b7a3-0bf56c86c75d</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-675-Partial/TC13_CRDC-VerifyDataFileSizeAndMd5Mismatch</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-697/TC13_CRDC-VerifyDataFileSizeAndMd5Mismatch</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>

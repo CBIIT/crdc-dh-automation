@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//*[.=&quot;Confirm Release&quot;]</value>
+         <value>//button[.='Confirm Release']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//*[.=&quot;Confirm Release&quot;]</value>
-      <webElementGuid>f5205e7d-0d79-4461-8bf6-e585639cff0a</webElementGuid>
+      <value>//button[.='Confirm Release']</value>
+      <webElementGuid>a87273d6-da5e-459f-b82a-d66c6aff4d7a</webElementGuid>
    </webElementProperties>
 </WebElementEntity>

@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//button[contains(.,'Release')]</value>
+         <value>//*[contains(text(), &quot;Release to&quot;)]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//button[contains(.,'Release')]</value>
-      <webElementGuid>c8ea6a9e-401d-49fd-8fb6-c34cedf560bd</webElementGuid>
+      <value>//*[contains(text(), &quot;Release to&quot;)]</value>
+      <webElementGuid>09106591-ff79-4f7a-8005-4d18c71ea2e6</webElementGuid>
    </webElementProperties>
 </WebElementEntity>

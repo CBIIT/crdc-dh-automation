@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TestCaseEntity>
-   <description>UI metadata upload with invalid file_id - Essential Validation batch error (ICDC)</description>
-   <name>TC104_CRDC-1405-UIInvalidFileIdEssentialValidationICDC</name>
-   <tag>CRDCDH-1405,UI,file_id,essential_validation,ICDC</tag>
-   <comment></comment>
-   <recordOption>OTHER</recordOption>
-   <testCaseGuid>a1405104-1405-1405-1405-140510000104</testCaseGuid>
-</TestCaseEntity>

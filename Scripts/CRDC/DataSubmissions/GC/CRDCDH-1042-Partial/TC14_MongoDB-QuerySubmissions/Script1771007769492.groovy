@@ -22,4 +22,4 @@ CustomKeywords.'utilities.DatabaseUtils.verifyRecordReturned'(doc)
 CustomKeywords.'utilities.DatabaseUtils.close'()
 
 // After create, upload, validate, release & complete, then validate in Mongo, for example:
-// CustomKeywords.'utilities.DataSubmissions.verifyRecordsInMongo'('TC09', 'released', 'Deleted')
+// CustomKeywords.'utilities.DatabaseUtils.verifyRecordsInMongo'('TC09', 'released', 'Deleted')
