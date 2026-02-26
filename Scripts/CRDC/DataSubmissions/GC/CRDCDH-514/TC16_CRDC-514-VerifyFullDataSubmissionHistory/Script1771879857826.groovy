@@ -115,7 +115,7 @@ CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submiss
 CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Submitted")
 //After data submission is submitted, Status = Submitted
 CustomKeywords.'utilities.DataSubmissions.clickCrossValidateButton'()
-//Click on reject button
+//Click on Release button
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Release-Btn')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseConfirmationYes-Btn')
 WebUI.delay(3)
