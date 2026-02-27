@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC28_VerifyUnicodeDataFileUploadViaCLI</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>09d841ca-b168-4d27-bda8-3c40ddf173b7</testCaseGuid>
+</TestCaseEntity>
