@@ -50,6 +50,10 @@ CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmiss
 
 CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC11', 'datafile')
 
-WebUI.delay(5)
+CustomKeywords.'utilities.WebUIUtils.refreshPageAndWaitForLoad'()
+
+//Verify upload is successful
+CustomKeywords.'utilities.DataSubmissions.verifyUploadActivitiesBatchRow'('Metadata', 1, 'Uploaded')
+CustomKeywords.'utilities.DataSubmissions.verifyUploadActivitiesBatchRow'('Data File', 5, 'Uploaded')
 
 WebUI.closeBrowser()
