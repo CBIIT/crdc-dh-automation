@@ -223,8 +223,11 @@ class DataSubmissions extends TestRunner {
 	 */
 	@Keyword
 	void verifyUploadActivitiesBatchRow(String batchType, int expectedFileCount, String expectedStatus) {
+		String sectionName = "Upload Activities"
+		String batchLabel = "Batch " + batchType + " (" + expectedFileCount + " files)"
 		try {
 			if (expectedStatus == null || expectedStatus.trim().isEmpty()) {
+				ValidationReport.addValidationReportItem(sectionName, "Expected status provided", "non-empty", "(empty)", "Fail")
 				KeywordUtil.markFailed("verifyUploadActivitiesBatchRow: expectedStatus is required.")
 				return
 			}
@@ -232,22 +235,26 @@ class DataSubmissions extends TestRunner {
 
 			List<WebElement> headerList = Utils.getListWebElements('CRDC/DataSubmissions/Validation/Table-Headers')
 			if (headerList == null || headerList.isEmpty()) {
+				ValidationReport.addValidationReportItem(sectionName, "Headers present", "present", "not found", "Fail")
 				KeywordUtil.markFailed("verifyUploadActivitiesBatchRow: No table headers found. Ensure Upload Activities tab is visible.")
 				return
 			}
+			ValidationReport.addValidationReportItem(sectionName, "Headers present", "present", "found", "Pass")
 			List<String> headerLabels = headerList.collect { it.getText().trim() }
 			int typeIdx = findHeaderIndex(headerLabels, UPLOAD_ACTIVITIES_TYPE_CANDIDATES)
 			int fileCountIdx = findHeaderIndex(headerLabels, UPLOAD_ACTIVITIES_FILE_COUNT_CANDIDATES)
 			int statusIdx = findHeaderIndex(headerLabels, UPLOAD_ACTIVITIES_STATUS_CANDIDATES)
 
 			if (typeIdx < 0 || fileCountIdx < 0 || statusIdx < 0) {
+				ValidationReport.addValidationReportItem(sectionName, "Required columns found", "Batch Type, File Count, Status", String.valueOf(headerLabels), "Fail")
 				KeywordUtil.markFailed("verifyUploadActivitiesBatchRow: Could not find Batch Type, File Count, or Status columns. Headers: " + headerLabels)
 				return
 			}
+			ValidationReport.addValidationReportItem(sectionName, "Required columns found", "Batch Type, File Count, Status", "found", "Pass")
 
 			List<WebElement> rows = Utils.getListWebElements('CRDC/AILocators/GenericTable/TableRow')
 			if (rows == null || rows.isEmpty()) {
-				ValidationReport.addValidationReportItem("Upload Activities", "Batch row " + batchType, "present", "0 rows", "Fail")
+				ValidationReport.addValidationReportItem(sectionName, batchLabel, "present", "0 rows", "Fail")
 				KeywordUtil.markFailed("verifyUploadActivitiesBatchRow: No batch rows found. Expected a " + batchType + " batch with " + expectedFileCount + " file(s).")
 				return
 			}
@@ -275,7 +282,7 @@ class DataSubmissions extends TestRunner {
 
 					if (typeMatch && fileCountMatch && statusMatch) {
 						found = true
-						ValidationReport.addValidationReportItem("Upload Activities", "Batch " + batchType + " (" + expectedFileCount + " files)", "present", "found", "Pass")
+						ValidationReport.addValidationReportItem(sectionName, batchLabel, "present", "found", "Pass")
 						KeywordUtil.logInfo("verifyUploadActivitiesBatchRow: Found matching " + batchType + " batch: fileCount=" + actualFileCount + ", status=" + rowStatus)
 						break
 					}
@@ -295,10 +302,11 @@ class DataSubmissions extends TestRunner {
 			if (!found) {
 				String msg = "verifyUploadActivitiesBatchRow: No matching " + batchType + " batch with " + expectedFileCount + " file(s)"
 				if (mismatchDetail) msg += ". " + mismatchDetail
-				ValidationReport.addValidationReportItem("Upload Activities", "Batch " + batchType + " (" + expectedFileCount + " files)", "present", "not found", "Fail")
+				ValidationReport.addValidationReportItem(sectionName, batchLabel, "present", "not found", "Fail")
 				KeywordUtil.markFailed(msg)
 			}
 		} catch (Exception e) {
+			ValidationReport.addValidationReportItem(sectionName, batchLabel, "no exception", e.getMessage(), "Fail")
 			KeywordUtil.markFailed("verifyUploadActivitiesBatchRow: " + e.getMessage())
 		}
 	}
@@ -313,7 +321,9 @@ class DataSubmissions extends TestRunner {
 	 */
 	@Keyword
 	void verifyUploadActivitiesFailedErrorsModal(String tcName) {
+		String sectionName = "Upload Errors Modal"
 		if (tcName == null || tcName.trim().isEmpty()) {
+			ValidationReport.addValidationReportItem(sectionName, "TC name provided", "non-empty", "(empty)", "Fail")
 			KeywordUtil.markFailed("verifyUploadActivitiesFailedErrorsModal: tcName is required.")
 			return
 		}
@@ -321,11 +331,23 @@ class DataSubmissions extends TestRunner {
 			WebDriver driver = DriverFactory.getWebDriver()
 			// 1. Click first Upload Errors link
 			TestObject errorCountBtn = findTestObject("CRDC/AILocators/DataSubmissions/Detail/UploadActivity/ErrorCount-Btn")
-			WebUI.waitForElementPresent(errorCountBtn, 10)
+			boolean errorLinkPresent = WebUI.waitForElementPresent(errorCountBtn, 10)
+			if (!errorLinkPresent) {
+				ValidationReport.addValidationReportItem(sectionName, "Error link clickable", "present", "not found", "Fail")
+				KeywordUtil.markFailed("verifyUploadActivitiesFailedErrorsModal: Upload Errors link not found.")
+				return
+			}
+			ValidationReport.addValidationReportItem(sectionName, "Error link clickable", "present", "found", "Pass")
 			WebUI.click(errorCountBtn)
 			WebUI.delay(1)
 			// 2. Wait for modal
-			WebUI.waitForElementPresent(findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/Dialog"), 10)
+			boolean modalPresent = WebUI.waitForElementPresent(findTestObject("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/Dialog"), 10)
+			if (!modalPresent) {
+				ValidationReport.addValidationReportItem(sectionName, "Modal displayed", "displayed", "not displayed", "Fail")
+				KeywordUtil.markFailed("verifyUploadActivitiesFailedErrorsModal: Error details modal did not appear.")
+				return
+			}
+			ValidationReport.addValidationReportItem(sectionName, "Modal displayed", "displayed", "displayed", "Pass")
 			// 3. Read modal error list (v1: items are "1. msg", "2. msg" inside error-details-error-list)
 			String listContainerXpath = givexpath("CRDC/AILocators/DataSubmissions/ErrorDetailsDialog/ErrorList-Container")
 			WebElement listContainer = driver.findElement(By.xpath(listContainerXpath))
@@ -353,6 +375,7 @@ class DataSubmissions extends TestRunner {
 			}
 			verifyUploadErrorsModalCompare(tcName, actualErrors)
 		} catch (Exception e) {
+			ValidationReport.addValidationReportItem(sectionName, "Modal verification exception", "no exception", e.getMessage(), "Fail")
 			KeywordUtil.markFailed("verifyUploadActivitiesFailedErrorsModal: " + e.getMessage())
 		} finally {
 			try {
@@ -370,9 +393,11 @@ class DataSubmissions extends TestRunner {
 	private void verifyUploadErrorsModalCompare(String tcName, List<String> actualErrors) {
 		List<String> expectedErrors = loadAggregatedExpectedErrorsForUi(tcName)
 		if (expectedErrors.isEmpty()) {
+			ValidationReport.addValidationReportItem("Upload Errors Modal", "Expected errors loaded", "at least 1 error", "0 loaded", "Fail")
 			KeywordUtil.markFailed("verifyUploadActivitiesFailedErrorsModal: No expected errors loaded from InputFiles/CRDC/MetadataData/" + tcName + "/expected/")
 			return
 		}
+		ValidationReport.addValidationReportItem("Upload Errors Modal", "Expected errors loaded", "at least 1 error", String.valueOf(expectedErrors.size()) + " loaded", "Pass")
 		List<String> expectedSorted = new ArrayList<>(expectedErrors.collect { normalizeQuotesForComparison(it) }).sort()
 		List<String> actualSorted = new ArrayList<>(actualErrors.collect { normalizeQuotesForComparison(it) }).sort()
 		boolean match = expectedSorted == actualSorted
