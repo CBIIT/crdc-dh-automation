@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description>Query MongoDB using query from data file (key 'released'), verify record returned. Connection from profile; params in script.</description>
-   <name>TC14_MongoDB-QuerySubmissions</name>
+   <name>TC11_MongoDBQuerySubmissions</name>
    <tag>MongoDB</tag>
    <comment>Substitute connectionUri and databaseName (and credentials in URI) before running.</comment>
    <recordOption>OTHER</recordOption>
