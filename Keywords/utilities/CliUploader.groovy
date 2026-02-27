@@ -89,9 +89,27 @@ class CliUploader {
 		return manifestFile.getAbsolutePath()
 	}
 
+	private static boolean hasZipFiles(File dir) {
+		if (dir == null || !dir.exists() || !dir.isDirectory()) return false
+		File[] zipFiles = dir.listFiles({ File f ->
+			f.isFile() && f.name.toLowerCase().endsWith(".zip")
+		} as FileFilter)
+		return zipFiles != null && zipFiles.length > 0
+	}
 
-	private static String getArchiveManifestPath() {
-		return safeGlobal("CRDC_ARCHIVE_MANIFEST_PATH", null)?.toString()?.trim()
+	private static String getZipArchiveManifestPath(String testCaseName) {
+		File dir = new File(
+				RunConfiguration.getProjectDir() + "/InputFiles/CRDC/MetadataData/" + testCaseName + "/DataFiles")
+		if (!dir.exists() || !dir.isDirectory()) {
+			KeywordUtil.markFailed("Archive manifest directory not found: " + dir.getAbsolutePath())
+			return null
+		}
+		File archiveManifest = new File(dir, "zip-archive-manifest.tsv")
+		if (!archiveManifest.exists() || !archiveManifest.isFile()) {
+			KeywordUtil.markFailed("Zip archive manifest not found: " + archiveManifest.getAbsolutePath())
+			return null
+		}
+		return archiveManifest.getAbsolutePath()
 	}
 
 	/**
@@ -913,9 +931,20 @@ ${manifestBlock}               retries: ${retries}
 			return
 		}
 
-		String archiveManifestPath = getArchiveManifestPath()
-		if (archiveManifestPath != null) archiveManifestPath = archiveManifestPath.trim()
-		if (archiveManifestPath != null && archiveManifestPath.isEmpty()) archiveManifestPath = null
+		String archiveManifestPath = null
+		if (TYPE_DATA_FILE.equals(type) && hasZipFiles(dataDir)) {
+			KeywordUtil.logInfo("CliUploader: Detected .zip files in data path; requiring zip-archive-manifest.tsv.")
+			archiveManifestPath = getZipArchiveManifestPath(testCaseName)
+			if (archiveManifestPath == null || archiveManifestPath.trim().isEmpty()) {
+				KeywordUtil.markFailed("CliUploader: zip-archive-manifest.tsv is required when uploading .zip files.")
+				return
+			}
+			File archiveManifestFile = new File(toAbsolutePath(archiveManifestPath))
+			if (!archiveManifestFile.exists() || !archiveManifestFile.isFile()) {
+				KeywordUtil.markFailed("CliUploader: archive manifest file does not exist: " + archiveManifestFile.getAbsolutePath())
+				return
+			}
+		}
 		int retries = getRetries()
 		boolean overwrite = getOverwrite()
 		boolean dryrun = getDryrun()
