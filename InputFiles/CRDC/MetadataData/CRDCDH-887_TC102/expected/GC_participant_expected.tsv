@@ -1,0 +1,3 @@
+type	expected_errors	 study.study_id	 consent_group.consent_group_id	study_participant_id	participant_id	race	sex	ethnicity	dbGaP_subject_id
+participant	"""GC_participant.tsv:2"": duplicated data detected: ""study_participant_id"": Key_1."	st_id1	consent_1	Key_1	2	Asian|American Indian or Alaska Native	Male	Not Hispanic or Latino|Hispanic or Latino	dbgap_subID
+participant	"""GC_participant.tsv:3"": duplicated data detected: ""study_participant_id"": Key_1."	st_id1	consent_1	Key_1	3	Asian|white	Male	Not Hispanic or Latino|Not reported	

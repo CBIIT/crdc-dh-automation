@@ -49,13 +49,13 @@ CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 //Upload data via folder
-CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC99')
+CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC10')
 
 //Validate data
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
 //Verify Validation Results table in the UI matches the expected TSV files for each node with error(s) or warning(s)
-CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsVsExpectedForTC'("TC99")
+CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsVsExpectedForTC'("TC10")
 
 //Generate HTML report
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()

@@ -88,4 +88,25 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-699/TC21_CRDC-699-VerifyInvalidBooleanValue</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>f1ec2972-fa1c-453f-ac9a-74851e861fef</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1195/TC101_CRDC-1195-EmptyRowColumnBatchErrors</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>64dd5ae7-112a-47bc-b5b5-adcbbe4d9a94</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-887/TC101_CRDC-887-ColumnRequiredBatchErrors</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>06c90e18-909a-44d6-b83c-36e2b56e4cd8</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-887/TC102_CRDC-887-ExtraConflictDuplicateBatchErrors</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>
