@@ -12,13 +12,6 @@
    <rerunImmediately>true</rerunImmediately>
    <testSuiteGuid>da511912-1a63-433b-97f8-db467341cdb4</testSuiteGuid>
    <testCaseLink>
-      <guid>2675abbf-9c7f-4011-83c0-66faf0c363a1</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-2765-Partial/TC28_VerifyUnicodeDataFileUploadViaCLI</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
       <guid>61e8f53a-c8b3-46c8-94a8-aae876598575</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
