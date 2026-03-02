@@ -150,11 +150,13 @@ class DataSubmissions extends TestRunner {
 		"fileName"
 	]
 
-	/** Find column index by name (case-insensitive) in a TSV header line; returns -1 if not found. Used for expected-errors TSV loading. */
+	/** Find column index by name (case-insensitive) in a TSV header line; returns -1 if not found. Used for expected-errors TSV loading. Trims header cells so CRLF or spaces do not break matching. */
 	private static int findColumnIndexForExpectedTsv(String headerLine, List<String> candidates) {
 		String[] headers = headerLine.split("\t", -1)
 		for (String cand : candidates) {
-			int idx = headers.findIndexOf { it != null && it.equalsIgnoreCase(cand.trim()) }
+			String c = cand != null ? cand.trim() : ""
+			if (c.isEmpty()) continue
+			int idx = headers.findIndexOf { it != null && it.trim().equalsIgnoreCase(c) }
 			if (idx >= 0) return idx
 		}
 		return -1
@@ -199,16 +201,15 @@ class DataSubmissions extends TestRunner {
 		for (File tsv : tsvs) {
 			List<String> lines = Files.readAllLines(tsv.toPath(), StandardCharsets.UTF_8)
 			if (lines.size() < 2) continue
-				String header = lines.get(0)
+			String header = lines.get(0)
 			int expectedColIdx = findColumnIndexForExpectedTsv(header, EXPECTED_ERROR_COLUMN_CANDIDATES_UI)
-			int fileNameColIdx = findColumnIndexForExpectedTsv(header, FILE_NAME_COLUMN_CANDIDATES_UI)
-			if (expectedColIdx < 0 || fileNameColIdx < 0) continue
-				for (int i = 1; i < lines.size(); i++) {
-					String[] cols = lines.get(i).split("\t", -1)
-					String expectedVal = expectedColIdx < cols.length ? cols[expectedColIdx].trim() : ""
-					if (expectedVal.isEmpty()) continue
-						aggregated.addAll(parseExpectedErrorsToList(expectedVal))
-				}
+			if (expectedColIdx < 0) continue
+			for (int i = 1; i < lines.size(); i++) {
+				String[] cols = lines.get(i).split("\t", -1)
+				String expectedVal = expectedColIdx < cols.length ? cols[expectedColIdx].trim() : ""
+				if (expectedVal.isEmpty()) continue
+				aggregated.addAll(parseExpectedErrorsToList(expectedVal))
+			}
 		}
 		return aggregated
 	}
