@@ -50,6 +50,10 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmiss
 
 CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC21', 'datafile')
 
+//extra refresh and hard wait for now, but should debug more later on for dynamic wait for below radio buttons
+WebUI.refresh()
+WebUI.delay(10)
+
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationTarget-AllUploadedData-RadioBtn')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Both-RadioBtn')
 

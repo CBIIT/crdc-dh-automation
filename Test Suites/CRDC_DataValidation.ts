@@ -12,66 +12,10 @@
    <rerunImmediately>false</rerunImmediately>
    <testSuiteGuid>d45babf5-ad28-43cb-ab98-2b3e689c6d73</testSuiteGuid>
    <testCaseLink>
-      <guid>b669f784-0a0c-4c3c-a1d7-e9c31dae96bc</guid>
+      <guid>da03d8ec-7be0-41d1-8abe-4010e07498d3</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1032-Partial/TC02_CRDC-DataSubmissions-DataView</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>5a5b58eb-fc53-4f6b-a47a-5312c028b8b7</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1163/TC16_CRDC-1163-DCPValidationAfterSubmissionSubmittedMetadata</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>a6e4c033-52e2-4fb2-b68b-8a61b9ff854c</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-699/TC05_CRDC-699-VerifyRelationshipNotSpecified</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>2d025be3-2396-4858-9074-b2c49dee3491</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1228/TC12_CRDC-1228_VerifyMetadataUploadViaCLI</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>60813f6d-581b-4ef4-97b3-82355d747c51</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1032-Partial/TC01_CRDC-DataSubmissions-DataView</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>891dfd20-4d6f-46e1-9ce4-0ac5e8814072</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-686-Partial/TC10_CRDC-VerifyStdyNamMismProgNamMismVluNotPerm</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>3267c6cf-46e6-4df5-a834-75bc2d16a5a4</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1163/TC17_CRDC-1163-DCPValidationAfterSubmissionSubmittedDataFiles</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>4ce372c9-1617-4c01-b182-eb78646be80d</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-699/TC04_CRDC-699-VerifyMissingRequiredProperty</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>346a8574-1893-49ab-b86b-195d1460244e</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-686-Partial/TC08_CRDC-VerifyInvalidIntegerValue</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1007/TC22_CRDCDH-1007-DsNotAllowedWhenDatafileErrorExist</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
@@ -82,10 +26,17 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>69567faa-ff8d-4d55-b90d-620f804f1cd3</guid>
+      <guid>4ddaa66d-231a-4333-a0a7-368f47eec42b</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-675/TC11_CRDC-VerifyDataFileUploadViaCLI</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-686-Partial/TC07_CRDC-VerifyOneToOneRelationshipConflict</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>346a8574-1893-49ab-b86b-195d1460244e</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-686-Partial/TC08_CRDC-VerifyInvalidIntegerValue</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
@@ -96,24 +47,66 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>4ddaa66d-231a-4333-a0a7-368f47eec42b</guid>
+      <guid>891dfd20-4d6f-46e1-9ce4-0ac5e8814072</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-686-Partial/TC07_CRDC-VerifyOneToOneRelationshipConflict</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-686-Partial/TC10_CRDC-VerifyStdyNamMismProgNamMismVluNotPerm</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>05cf06df-0113-4973-9336-b05e74ed81ad</guid>
+      <guid>c2f4ecf5-984d-4af3-902f-47f32bb6750e</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-697/TC13_CRDC-VerifyDataFileSizeAndMd5Mismatch</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-686-Partial/TC20_CRDC-VerifyRelatedNodeNotFound</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>256e157c-892e-43d5-99ca-acb962b1f17b</guid>
+      <guid>4ce372c9-1617-4c01-b182-eb78646be80d</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1225/TC15_CRDC-1225-DownloadSubmittedDataFromDataView</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-699/TC04_CRDC-699-VerifyMissingRequiredProperty</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>a6e4c033-52e2-4fb2-b68b-8a61b9ff854c</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-699/TC05_CRDC-699-VerifyRelationshipNotSpecified</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>a9d1f35e-6871-4adf-b0e5-df676caa0024</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-699/TC19_CRDC-699-VerifyDataFileNotFound</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>35d2f309-678b-485a-ba72-809d0d664231</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-699/TC21_CRDC-699-VerifyInvalidBooleanValue</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>f1ec2972-fa1c-453f-ac9a-74851e861fef</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1195/TC101_CRDC-1195-EmptyRowColumnBatchErrors</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>64dd5ae7-112a-47bc-b5b5-adcbbe4d9a94</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-887/TC101_CRDC-887-ColumnRequiredBatchErrors</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>06c90e18-909a-44d6-b83c-36e2b56e4cd8</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-887/TC102_CRDC-887-ExtraConflictDuplicateBatchErrors</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>
