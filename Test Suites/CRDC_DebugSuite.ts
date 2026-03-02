@@ -12,17 +12,17 @@
    <rerunImmediately>true</rerunImmediately>
    <testSuiteGuid>da511912-1a63-433b-97f8-db467341cdb4</testSuiteGuid>
    <testCaseLink>
-      <guid>ef305992-4d5d-4801-817b-169ecee394d0</guid>
+      <guid>2675abbf-9c7f-4011-83c0-66faf0c363a1</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-686-Partial/TC10_CRDC-VerifyStdyNamMismProgNamMismVluNotPerm</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-2765-Partial/TC28_VerifyUnicodeDataFileUploadViaCLI</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>6ceb5f46-04ab-441b-8336-53d758d9a5c1</guid>
+      <guid>61e8f53a-c8b3-46c8-94a8-aae876598575</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-699/TC21_CRDC-699-VerifyInvalidBooleanValue</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1228/TC12_CRDC-1228_VerifyMetadataUploadViaCLI</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>
