@@ -19,13 +19,6 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>29eff155-c597-47d3-9af4-75fd73b0bc73</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-699/TC04_CRDC-699-VerifyMissingRequiredProperty</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
       <guid>6ceb5f46-04ab-441b-8336-53d758d9a5c1</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
