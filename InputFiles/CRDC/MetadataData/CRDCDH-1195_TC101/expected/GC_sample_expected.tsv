@@ -1,0 +1,6 @@
+type	expected_errors	 participant.study_participant_id		sample_id	sample_type	sample_tumor_status	sample_anatomic_site	sample_body_site	sample_age_at_collection	derived_from_specimen	biosample_accession	crdc_id
+sample	"""GC_sample.tsv"": empty column(s) found."	phs002729_173MUS		HCI014_pdx_P0_XXX_RNA_15301X1	RNA	Tumor	Effusion	Plural effusion			SAMN27768858	
+sample		phs002729_173MUS		HCI014_pdx_P0_XXX_WXS_15306X5	DNA	Tumor	Effusion	Plural effusion			SAMN27768877	
+sample	"""GC_sample.tsv: line 5"": empty row found."	phs002729_779812		HCI005_tumor_patient_XXX_RNA_8506X5	RNA	Tumor	Effusion	Plural effusion			SAMN27768867	
+												
+		TEST										

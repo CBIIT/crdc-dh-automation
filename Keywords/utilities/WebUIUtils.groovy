@@ -24,7 +24,7 @@ import org.openqa.selenium.support.ui.WebDriverWait
 class WebUIUtils {
 
 	private static final String REPORT_SECTION = "Export Buttons"
-	private static final int DEFAULT_TIMEOUT = 10
+	private static final int DEFAULT_TIMEOUT = 20
 
 	/**
 	 * Verify tooltip text when it is in the element's aria-label attribute.
@@ -206,6 +206,22 @@ class WebUIUtils {
 		WebUI.delay(2)
 	}
 
+	/**
+	 * Refresh the current page and wait until it is fully loaded.
+	 * Uses WebUI page-load wait plus document.readyState check for stability after refresh.
+	 * @param timeoutSeconds Optional timeout in seconds (defaults to DEFAULT_TIMEOUT)
+	 */
+	@Keyword
+	static void refreshPageAndWaitForLoad(int timeoutSeconds = DEFAULT_TIMEOUT) {
+		int timeout = timeoutSeconds > 0 ? timeoutSeconds : DEFAULT_TIMEOUT
+		WebUI.refresh()
+		WebUI.waitForPageLoad(timeout)
+		WebDriver driver = DriverFactory.getWebDriver()
+		WebDriverWait wait = new WebDriverWait(driver, timeout)
+		wait.until { d -> ((JavascriptExecutor) d).executeScript("return document.readyState") == "complete" }
+		KeywordUtil.logInfo("refreshPageAndWaitForLoad: page refreshed and fully loaded.")
+	}
+
 	// ======================== Table Sorting Verification ========================
 
 	/**
@@ -278,24 +294,24 @@ class WebUIUtils {
 
 		JavascriptExecutor js = (JavascriptExecutor) driver
 		String script = "var colIdx = arguments[0];" +
-			"var rows = document.querySelectorAll(\"[data-testid='generic-table-row']\");" +
-			"var values = [];" +
-			"for (var i = 0; i < rows.length; i++) {" +
-			"  var cells = rows[i].querySelectorAll('td');" +
-			"  var val = '';" +
-			"  if (colIdx < cells.length) {" +
-			"    var cell = cells[colIdx];" +
-			"    var truncEl = cell.querySelector(\"[data-testid='truncated-text-wrapper']\");" +
-			"    if (truncEl) {" +
-			"      var aria = truncEl.getAttribute('aria-label');" +
-			"      val = (aria && aria.trim()) ? aria.trim() : (cell.innerText || '').trim();" +
-			"    } else {" +
-			"      val = (cell.innerText || '').trim();" +
-			"    }" +
-			"  }" +
-			"  values.push(val);" +
-			"}" +
-			"return values;"
+				"var rows = document.querySelectorAll(\"[data-testid='generic-table-row']\");" +
+				"var values = [];" +
+				"for (var i = 0; i < rows.length; i++) {" +
+				"  var cells = rows[i].querySelectorAll('td');" +
+				"  var val = '';" +
+				"  if (colIdx < cells.length) {" +
+				"    var cell = cells[colIdx];" +
+				"    var truncEl = cell.querySelector(\"[data-testid='truncated-text-wrapper']\");" +
+				"    if (truncEl) {" +
+				"      var aria = truncEl.getAttribute('aria-label');" +
+				"      val = (aria && aria.trim()) ? aria.trim() : (cell.innerText || '').trim();" +
+				"    } else {" +
+				"      val = (cell.innerText || '').trim();" +
+				"    }" +
+				"  }" +
+				"  values.push(val);" +
+				"}" +
+				"return values;"
 		List<String> values = (List<String>) js.executeScript(script, colIdx)
 		KeywordUtil.logInfo("readColumnValues: read " + (values != null ? values.size() : 0) + " values for column '" + columnName + "'")
 		return values ?: Collections.emptyList()
@@ -316,7 +332,7 @@ class WebUIUtils {
 			String b = values.get(i + 1) ?: ""
 			// Skip empty values in comparison
 			if (a.isEmpty() || b.isEmpty()) continue
-			int cmp
+				int cmp
 			try {
 				double da = Double.parseDouble(a)
 				double db = Double.parseDouble(b)
@@ -365,7 +381,7 @@ class WebUIUtils {
 			WebElement hdr = headers.get(i)
 			String colName = getColumnName(hdr)
 			if (colName.isEmpty()) continue
-			boolean hasSortLabel = !hdr.findElements(By.cssSelector(".MuiTableSortLabel-root")).isEmpty()
+				boolean hasSortLabel = !hdr.findElements(By.cssSelector(".MuiTableSortLabel-root")).isEmpty()
 			boolean shouldBeNonSortable = nonSortableColumns.any {
 				it != null && (colName.equalsIgnoreCase(it) || colName.toLowerCase().contains(it.toLowerCase()))
 			}
@@ -415,14 +431,14 @@ class WebUIUtils {
 		// Verify column name
 		boolean columnOk = actualColumn != null && actualColumn.equalsIgnoreCase(expectedColumn)
 		ValidationReport.addValidationReportItem(reportSection, "Default sort column",
-			expectedColumn, actualColumn != null ? actualColumn : "(none)", columnOk ? "Pass" : "Fail")
+				expectedColumn, actualColumn != null ? actualColumn : "(none)", columnOk ? "Pass" : "Fail")
 		// Verify direction
 		boolean dirOk = actualDirection != null && actualDirection.equalsIgnoreCase(expectedDirection)
 		ValidationReport.addValidationReportItem(reportSection, "Default sort direction",
-			expectedDirection, actualDirection != null ? actualDirection : "(none)", dirOk ? "Pass" : "Fail")
+				expectedDirection, actualDirection != null ? actualDirection : "(none)", dirOk ? "Pass" : "Fail")
 		if (!columnOk || !dirOk) {
 			KeywordUtil.markFailed("verifyDefaultSortColumn: expected '" + expectedColumn + "' " + expectedDirection +
-				", actual '" + actualColumn + "' " + actualDirection)
+					", actual '" + actualColumn + "' " + actualDirection)
 		} else {
 			KeywordUtil.logInfo("Default sort verified: '" + actualColumn + "' " + actualDirection)
 		}
@@ -485,16 +501,16 @@ class WebUIUtils {
 		String firstDir = dirAfterFirstClick
 		if (firstDir == null) {
 			ValidationReport.addValidationReportItem(reportSection, "Column '" + columnName + "' sort after click 1",
-				"asc or desc", "(no aria-sort)", "Fail")
+					"asc or desc", "(no aria-sort)", "Fail")
 			allOk = false
 		} else {
 			ValidationReport.addValidationReportItem(reportSection, "Column '" + columnName + "' aria-sort after click 1",
-				firstDir, firstDir, "Pass")
+					firstDir, firstDir, "Pass")
 			// Verify data is actually sorted in that direction
 			List<String> valuesFirst = readColumnValues(columnName)
 			boolean sortedFirst = isSortedCorrectly(valuesFirst, firstDir)
 			ValidationReport.addValidationReportItem(reportSection, "Column '" + columnName + "' data order (" + firstDir + ")",
-				"sorted " + firstDir, sortedFirst ? "sorted " + firstDir : "not sorted", sortedFirst ? "Pass" : "Fail")
+					"sorted " + firstDir, sortedFirst ? "sorted " + firstDir : "not sorted", sortedFirst ? "Pass" : "Fail")
 			if (!sortedFirst) allOk = false
 		}
 
@@ -518,19 +534,19 @@ class WebUIUtils {
 
 			if (dirAfterSecondClick == null) {
 				ValidationReport.addValidationReportItem(reportSection, "Column '" + columnName + "' sort after click 2",
-					expectedSecondDir, "(no aria-sort)", "Fail")
+						expectedSecondDir, "(no aria-sort)", "Fail")
 				allOk = false
 			} else {
 				boolean dirOk = dirAfterSecondClick.equalsIgnoreCase(expectedSecondDir)
 				ValidationReport.addValidationReportItem(reportSection, "Column '" + columnName + "' aria-sort after click 2",
-					expectedSecondDir, dirAfterSecondClick, dirOk ? "Pass" : "Fail")
+						expectedSecondDir, dirAfterSecondClick, dirOk ? "Pass" : "Fail")
 				if (!dirOk) allOk = false
 
 				// Verify data order
 				List<String> valuesSecond = readColumnValues(columnName)
 				boolean sortedSecond = isSortedCorrectly(valuesSecond, dirAfterSecondClick)
 				ValidationReport.addValidationReportItem(reportSection, "Column '" + columnName + "' data order (" + dirAfterSecondClick + ")",
-					"sorted " + dirAfterSecondClick, sortedSecond ? "sorted " + dirAfterSecondClick : "not sorted", sortedSecond ? "Pass" : "Fail")
+						"sorted " + dirAfterSecondClick, sortedSecond ? "sorted " + dirAfterSecondClick : "not sorted", sortedSecond ? "Pass" : "Fail")
 				if (!sortedSecond) allOk = false
 			}
 		}
@@ -562,7 +578,7 @@ class WebUIUtils {
 		for (WebElement hdr : headers) {
 			String colName = getColumnName(hdr)
 			if (colName.isEmpty()) continue
-			boolean hasSortLabel = !hdr.findElements(By.cssSelector(".MuiTableSortLabel-root")).isEmpty()
+				boolean hasSortLabel = !hdr.findElements(By.cssSelector(".MuiTableSortLabel-root")).isEmpty()
 			if (hasSortLabel) {
 				sortableColumns.add(colName)
 			}
@@ -574,7 +590,7 @@ class WebUIUtils {
 		KeywordUtil.logInfo("--- verifyAllSortableColumnsSorting complete ---")
 	}
 
-	
+
 	// ======================== Pagination Verification Methods ========================
 
 	/**
@@ -720,7 +736,7 @@ class WebUIUtils {
 
 		if (select == null) {
 			ValidationReport.addValidationReportItem(reportSection, "Rows per page options",
-				expectedOptions.toString(), "dropdown not found", "Fail")
+					expectedOptions.toString(), "dropdown not found", "Fail")
 			KeywordUtil.markFailed("verifyRowsPerPageOptions: rows-per-page dropdown not found")
 			return
 		}
@@ -730,7 +746,7 @@ class WebUIUtils {
 		}
 		boolean match = (actualInts == expectedOptions)
 		ValidationReport.addValidationReportItem(reportSection, "Rows per page options",
-			expectedOptions.toString(), actualInts.toString(), match ? "Pass" : "Fail")
+				expectedOptions.toString(), actualInts.toString(), match ? "Pass" : "Fail")
 
 		if (match) {
 			KeywordUtil.logInfo("Rows per page options verified: " + actualInts)
@@ -754,7 +770,7 @@ class WebUIUtils {
 
 		if (select == null) {
 			ValidationReport.addValidationReportItem(reportSection, "Default rows per page",
-				String.valueOf(expectedDefault), "dropdown not found", "Fail")
+					String.valueOf(expectedDefault), "dropdown not found", "Fail")
 			KeywordUtil.markFailed("verifyDefaultRowsPerPage: rows-per-page dropdown not found")
 			return
 		}
@@ -762,7 +778,7 @@ class WebUIUtils {
 		int actual = Integer.parseInt(select.getFirstSelectedOption().getAttribute("value"))
 		boolean match = (actual == expectedDefault)
 		ValidationReport.addValidationReportItem(reportSection, "Default rows per page",
-			String.valueOf(expectedDefault), String.valueOf(actual), match ? "Pass" : "Fail")
+				String.valueOf(expectedDefault), String.valueOf(actual), match ? "Pass" : "Fail")
 
 		if (match) {
 			KeywordUtil.logInfo("Default rows per page verified: " + actual)
@@ -810,7 +826,7 @@ class WebUIUtils {
 
 		if (info == null) {
 			ValidationReport.addValidationReportItem(reportSection, "Displayed rows text",
-				"X-Y of Z", "not found or unparseable", "Fail")
+					"X-Y of Z", "not found or unparseable", "Fail")
 			KeywordUtil.markFailed("verifyDisplayedRowsText: could not read displayed-rows text")
 			return
 		}
@@ -822,7 +838,7 @@ class WebUIUtils {
 		// Verify from <= to <= total
 		boolean rangeOk = (from >= 1 && from <= to && to <= total)
 		ValidationReport.addValidationReportItem(reportSection, "Displayed rows range validity",
-			"1 <= from <= to <= total", "${from} <= ${to} <= ${total}", rangeOk ? "Pass" : "Fail")
+				"1 <= from <= to <= total", "${from} <= ${to} <= ${total}", rangeOk ? "Pass" : "Fail")
 		if (!rangeOk) allOk = false
 
 		// Verify actual row count matches expected
@@ -830,7 +846,7 @@ class WebUIUtils {
 		int actualRowCount = getVisibleRowCount()
 		boolean countOk = (actualRowCount == expectedRowCount)
 		ValidationReport.addValidationReportItem(reportSection, "Displayed rows vs actual row count",
-			String.valueOf(expectedRowCount), String.valueOf(actualRowCount), countOk ? "Pass" : "Fail")
+				String.valueOf(expectedRowCount), String.valueOf(actualRowCount), countOk ? "Pass" : "Fail")
 		if (!countOk) allOk = false
 
 		if (allOk) {
@@ -872,7 +888,7 @@ class WebUIUtils {
 		String prevState = (prevBtn == null) ? "not found" : (prevBtn.isEnabled() ? "enabled" : "disabled")
 		boolean prevDisabledOk = ("disabled".equals(prevState))
 		ValidationReport.addValidationReportItem(reportSection, "Previous button disabled on page 1",
-			"disabled", prevState, prevDisabledOk ? "Pass" : "Fail")
+				"disabled", prevState, prevDisabledOk ? "Pass" : "Fail")
 		if (!prevDisabledOk) allOk = false
 
 		// 2. Get total pages to decide what tests are possible
@@ -886,7 +902,7 @@ class WebUIUtils {
 			String nextState = (nextBtn == null) ? "not found" : (nextBtn.isEnabled() ? "enabled" : "disabled")
 			boolean nextDisabledOk = ("disabled".equals(nextState))
 			ValidationReport.addValidationReportItem(reportSection, "Next button disabled (single page)",
-				"disabled", nextState, nextDisabledOk ? "Pass" : "Fail")
+					"disabled", nextState, nextDisabledOk ? "Pass" : "Fail")
 			if (!nextDisabledOk) allOk = false
 			KeywordUtil.logInfo("Only 1 page -- skipping multi-page navigation tests")
 		} else {
@@ -898,14 +914,14 @@ class WebUIUtils {
 			int pageAfterNext = getCurrentPageNumber()
 			boolean nextOk = (pageAfterNext == 2)
 			ValidationReport.addValidationReportItem(reportSection, "Page after clicking Next",
-				"2", String.valueOf(pageAfterNext), nextOk ? "Pass" : "Fail")
+					"2", String.valueOf(pageAfterNext), nextOk ? "Pass" : "Fail")
 			if (!nextOk) allOk = false
 
 			// 4. Verify displayed rows text updated (from should not be 1 anymore)
 			Map<String, Integer> infoPage2 = getDisplayedRowsInfo()
 			boolean page2TextOk = (infoPage2 != null && infoPage2.from > 1)
 			ValidationReport.addValidationReportItem(reportSection, "Displayed rows updated after Next",
-				"from > 1", infoPage2 != null ? "from=" + infoPage2.from : "null", page2TextOk ? "Pass" : "Fail")
+					"from > 1", infoPage2 != null ? "from=" + infoPage2.from : "null", page2TextOk ? "Pass" : "Fail")
 			if (!page2TextOk) allOk = false
 
 			// 5. Click "Previous" and verify we go back to page 1
@@ -916,7 +932,7 @@ class WebUIUtils {
 			int pageAfterPrev = getCurrentPageNumber()
 			boolean prevOk = (pageAfterPrev == 1)
 			ValidationReport.addValidationReportItem(reportSection, "Page after clicking Previous",
-				"1", String.valueOf(pageAfterPrev), prevOk ? "Pass" : "Fail")
+					"1", String.valueOf(pageAfterPrev), prevOk ? "Pass" : "Fail")
 			if (!prevOk) allOk = false
 
 			// 6. Click page number 2 directly and verify
@@ -928,7 +944,7 @@ class WebUIUtils {
 				int pageAfterDirect = getCurrentPageNumber()
 				boolean directOk = (pageAfterDirect == 2)
 				ValidationReport.addValidationReportItem(reportSection, "Page after clicking page 2 button",
-					"2", String.valueOf(pageAfterDirect), directOk ? "Pass" : "Fail")
+						"2", String.valueOf(pageAfterDirect), directOk ? "Pass" : "Fail")
 				if (!directOk) allOk = false
 			}
 
@@ -953,7 +969,7 @@ class WebUIUtils {
 			String nextStateOnLast = (nextBtnOnLast == null) ? "not found" : (nextBtnOnLast.isEnabled() ? "enabled" : "disabled")
 			boolean nextDisabledOnLast = ("disabled".equals(nextStateOnLast))
 			ValidationReport.addValidationReportItem(reportSection, "Next button disabled on last page",
-				"disabled", nextStateOnLast, nextDisabledOnLast ? "Pass" : "Fail")
+					"disabled", nextStateOnLast, nextDisabledOnLast ? "Pass" : "Fail")
 			if (!nextDisabledOnLast) allOk = false
 
 			// Return to page 1
@@ -986,7 +1002,7 @@ class WebUIUtils {
 		boolean changed = changeRowsPerPage(rowsPerPage)
 		if (!changed) {
 			ValidationReport.addValidationReportItem(reportSection, "Change rows per page to " + rowsPerPage,
-				"success", "dropdown not found", "Fail")
+					"success", "dropdown not found", "Fail")
 			KeywordUtil.markFailed("verifyRowsPerPageChange: could not change rows per page")
 			return
 		}
@@ -996,14 +1012,14 @@ class WebUIUtils {
 		int actualSelected = (select != null) ? Integer.parseInt(select.getFirstSelectedOption().getAttribute("value")) : -1
 		boolean selectedOk = (actualSelected == rowsPerPage)
 		ValidationReport.addValidationReportItem(reportSection, "Rows per page dropdown value after change",
-			String.valueOf(rowsPerPage), String.valueOf(actualSelected), selectedOk ? "Pass" : "Fail")
+				String.valueOf(rowsPerPage), String.valueOf(actualSelected), selectedOk ? "Pass" : "Fail")
 		if (!selectedOk) allOk = false
 
 		// Verify actual row count is <= rowsPerPage
 		int actualRowCount = getVisibleRowCount()
 		boolean countOk = (actualRowCount > 0 && actualRowCount <= rowsPerPage)
 		ValidationReport.addValidationReportItem(reportSection, "Row count after changing to " + rowsPerPage,
-			"<= " + rowsPerPage, String.valueOf(actualRowCount), countOk ? "Pass" : "Fail")
+				"<= " + rowsPerPage, String.valueOf(actualRowCount), countOk ? "Pass" : "Fail")
 		if (!countOk) allOk = false
 
 		// Verify displayed rows text is consistent
@@ -1011,12 +1027,12 @@ class WebUIUtils {
 		if (info != null) {
 			boolean textOk = (info.from == 1 && info.to == actualRowCount)
 			ValidationReport.addValidationReportItem(reportSection, "Displayed rows after change to " + rowsPerPage,
-				"1-" + actualRowCount + " of " + info.total,
-				info.from + "-" + info.to + " of " + info.total, textOk ? "Pass" : "Fail")
+					"1-" + actualRowCount + " of " + info.total,
+					info.from + "-" + info.to + " of " + info.total, textOk ? "Pass" : "Fail")
 			if (!textOk) allOk = false
 		} else {
 			ValidationReport.addValidationReportItem(reportSection, "Displayed rows text after change",
-				"parseable", "not found", "Fail")
+					"parseable", "not found", "Fail")
 			allOk = false
 		}
 

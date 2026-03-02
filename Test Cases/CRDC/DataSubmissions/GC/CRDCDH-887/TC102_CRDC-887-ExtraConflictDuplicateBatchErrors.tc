@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Upload Errors modal content matches expected TSV after negative-scenario CLI upload</description>
+   <name>TC102_CRDC-887-ExtraConflictDuplicateBatchErrors</name>
+   <tag>CRDCDH-1405,Upload Activities,Upload Errors,modal,expected_errors</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>196a8a69-c543-49df-912f-59095c4d3130</testCaseGuid>
+</TestCaseEntity>
