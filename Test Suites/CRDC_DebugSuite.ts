@@ -12,10 +12,10 @@
    <rerunImmediately>true</rerunImmediately>
    <testSuiteGuid>da511912-1a63-433b-97f8-db467341cdb4</testSuiteGuid>
    <testCaseLink>
-      <guid>61e8f53a-c8b3-46c8-94a8-aae876598575</guid>
+      <guid>0cf17a3f-af0c-490c-a730-9eb1fce6d88c</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1228/TC12_CRDC-1228_VerifyMetadataUploadViaCLI</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-2765-Partial/TC28_VerifyUnicodeDataFileUploadViaCLI</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>
