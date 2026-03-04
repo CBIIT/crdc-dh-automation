@@ -573,12 +573,16 @@ ${manifestBlock}               retries: ${retries}
 		"Real file size"
 	]
 
+	/** Max age difference (ms) between report and log to consider them from the same run. 120 seconds. */
+	private static final long REPORT_LOG_MAX_AGE_MS = 120_000L
+
 	/**
-	 * Finds the most recently modified CLI log file in cliDir and cliDir/tmp.
-	 * Prefers filenames like "Uploader Main-*.log"; falls back to any *.log in tmp.
-	 * Logs are stored under Tools/crdc-datahub-cli-uploader-src/tmp.
+	 * Finds the CLI log file that best matches the given upload-report (same run).
+	 * Prefers a .log file whose lastModified is within REPORT_LOG_MAX_AGE_MS of the report's lastModified;
+	 * among those, picks the one closest in time to the report. Falls back to latest .log if none in window.
+	 * Logs are stored under Tools/crdc-datahub-cli-uploader-src/tmp. Works on Jenkins when multiple tests run in sequence.
 	 */
-	private static File findLatestCliLogFile(File cliDir) {
+	private static File findCliLogFileForReport(File cliDir, File reportFile) {
 		List<File> candidates = []
 		File tmpDir = new File(cliDir, "tmp")
 		for (File dir : [cliDir, tmpDir]) {
@@ -591,6 +595,11 @@ ${manifestBlock}               retries: ${retries}
 		if (candidates.isEmpty()) {
 			KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: No .log file found in " + cliDir.getAbsolutePath() + " or " + tmpDir.getAbsolutePath())
 			return null
+		}
+		long reportTime = reportFile != null && reportFile.exists() ? reportFile.lastModified() : 0L
+		List<File> inWindow = candidates.findAll { Math.abs(it.lastModified() - reportTime) <= REPORT_LOG_MAX_AGE_MS }
+		if (!inWindow.isEmpty()) {
+			return inWindow.sort { Math.abs(it.lastModified() - reportTime) }.get(0)
 		}
 		return candidates.sort { -it.lastModified() }.get(0)
 	}
@@ -610,15 +619,16 @@ ${manifestBlock}               retries: ${retries}
 
 	/**
 	 * Strips syslog/logger prefix from a log line so only the error message body remains.
-	 * Finds the earliest occurrence of any CLI_ERROR_LINE_SUBSTRINGS and returns from that point onward (trimmed).
+	 * Finds the earliest occurrence of any CLI_ERROR_LINE_SUBSTRINGS (case-insensitive) and returns from that point onward (trimmed).
 	 * E.g. "&lt;14&gt;1 2026-03-04T17:05:03.059Z - - 35293 - - ERROR: (File_Validator) Real file md5 ..." -> "Real file md5 ..."
 	 */
 	private static String stripLogPrefixToMessage(String logLine) {
 		if (logLine == null || logLine.isEmpty()) return logLine
 		String trimmed = logLine.trim()
+		String lower = trimmed.toLowerCase()
 		int start = trimmed.length()
 		for (String phrase : CLI_ERROR_LINE_SUBSTRINGS) {
-			int idx = trimmed.indexOf(phrase)
+			int idx = lower.indexOf(phrase.toLowerCase())
 			if (idx >= 0 && idx < start) start = idx
 		}
 		return (start < trimmed.length()) ? trimmed.substring(start).trim() : trimmed
@@ -640,7 +650,7 @@ ${manifestBlock}               retries: ${retries}
 			if (trimmed.isEmpty()) continue
 			boolean hasErrorPhrase = false
 			for (String phrase : CLI_ERROR_LINE_SUBSTRINGS) {
-				if (trimmed.contains(phrase)) {
+				if (trimmed.toLowerCase().contains(phrase.toLowerCase())) {
 					hasErrorPhrase = true
 					break
 				}
@@ -711,10 +721,12 @@ ${manifestBlock}               retries: ${retries}
 			String actualRaw = actualErrorsIdx < cols.length ? cols[actualErrorsIdx].trim() : ""
 			reportRows.add([file_name: fileName, actual_error: actualRaw])
 		}
-		File logFile = findLatestCliLogFile(cliDir)
+		File logFile = findCliLogFileForReport(cliDir, latestReport)
 		String logContent = readCliLogContent(logFile)
 		if (logFile != null && (logContent == null || logContent.isEmpty())) {
 			KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: CLI log file empty or unreadable: " + logFile.getAbsolutePath())
+		} else if (logFile != null) {
+			KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: using CLI log for this run: " + logFile.getAbsolutePath())
 		}
 		List<String> mismatches = []
 		List<String> reportLinesOut = [
@@ -728,7 +740,7 @@ ${manifestBlock}               retries: ${retries}
 				String fromLog = extractErrorFromCliOutput(fileName, logContent, singleFileFallback)
 				if (!fromLog.isEmpty()) {
 					actualRaw = stripLogPrefixToMessage(fromLog)
-					KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: errors column empty for " + fileName + "; using error line from CLI log " + (logFile != null ? logFile.getName() : ""))
+					KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: errors column empty for " + fileName + "; using error line from CLI log " + (logFile != null ? logFile.getName() : "") + (logFile != null ? " (" + logFile.getAbsolutePath() + ")" : ""))
 				} else if (expectedMap.get(fileName) != null && !expectedMap.get(fileName).isEmpty()) {
 					KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: no matching error line in CLI log for " + fileName + " (log has " + logContent.split("[\r\n]+").length + " lines)")
 				}
