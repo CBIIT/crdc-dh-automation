@@ -350,8 +350,8 @@ ${manifestBlock}               retries: ${retries}
 			StringBuilder sb = new StringBuilder()
 			byte[] buf = new byte[512]
 			int n
-			InputStream in = p.getInputStream()
-			while ((n = in.read(buf)) != -1) {
+			InputStream stream = p.getInputStream()
+			while ((n = stream.read(buf)) != -1) {
 				sb.append(new String(buf, 0, n, StandardCharsets.UTF_8))
 			}
 			boolean finished = p.waitFor(5, TimeUnit.SECONDS)
