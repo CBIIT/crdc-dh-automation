@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Verifies that when a zip file is uploaded with an archive manifest that has a wrong file size for a file inside the zip, the CLI outputs the expected error (e.g. "Real file size ... of file X does not match with that in archive manifest ...!") and no data files are uploaded. Aligns with CRDCDH-3027.</description>
+   <name>TC32_CRDC-3027-CLIBadArchiveManifestFileSize</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>d4a9de03-0acf-4b95-a9f6-b29396282f49</testCaseGuid>
+</TestCaseEntity>

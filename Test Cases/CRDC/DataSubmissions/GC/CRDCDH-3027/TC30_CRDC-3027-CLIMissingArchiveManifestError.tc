@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Verifies that when data files include zip files but no archive manifest is provided, the CLI outputs the required error per zip (e.g. "No archive manifest found for X.zip, content of the zip archive cannot be validated.") and no data files are uploaded. Aligns with CRDCDH-3027.</description>
+   <name>TC30_CRDC-3027-CLIMissingArchiveManifestError</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>b287cb82-e8ae-4b93-97e4-90914760e127</testCaseGuid>
+</TestCaseEntity>
