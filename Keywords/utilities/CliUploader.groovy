@@ -6,6 +6,7 @@ import com.kms.katalon.core.util.KeywordUtil
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import internal.GlobalVariable
 import java.io.FileFilter
+import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.Date
@@ -337,6 +338,35 @@ ${manifestBlock}               retries: ${retries}
 	}
 
 	/**
+	 * Runs the given Python executable with --version and returns stdout+stderr (for verification during test run).
+	 * Returns null or empty string on failure or timeout.
+	 */
+	private static String getPythonVersionForCli(String pythonExe) {
+		if (pythonExe == null || pythonExe.trim().isEmpty()) return null
+		try {
+			ProcessBuilder pb = new ProcessBuilder(pythonExe.trim(), "--version")
+			pb.redirectErrorStream(true)
+			Process p = pb.start()
+			StringBuilder sb = new StringBuilder()
+			byte[] buf = new byte[512]
+			int n
+			InputStream in = p.getInputStream()
+			while ((n = in.read(buf)) != -1) {
+				sb.append(new String(buf, 0, n, StandardCharsets.UTF_8))
+			}
+			boolean finished = p.waitFor(5, TimeUnit.SECONDS)
+			if (!finished) {
+				p.destroyForcibly()
+				return null
+			}
+			return sb.toString()
+		} catch (Exception e) {
+			KeywordUtil.logInfo("CliUploader: getPythonVersionForCli failed: " + (e.getMessage() != null ? e.getMessage() : e.toString()))
+			return null
+		}
+	}
+
+	/**
 	 * Builds the command list to run the uploader: either binary (uploader/uploader.exe) or
 	 * Python source (pythonExe src/uploader.py --config &lt;path&gt;). Fails the test and returns null if neither is available.
 	 */
@@ -358,6 +388,12 @@ ${manifestBlock}               retries: ${retries}
 		if (script.exists() && script.isFile()) {
 			String pythonExe = Utils.getPythonExecutablePath()
 			KeywordUtil.logInfo("CliUploader: using Python source " + script.getAbsolutePath() + " with " + pythonExe)
+			String versionOut = getPythonVersionForCli(pythonExe)
+			if (versionOut != null && !versionOut.isEmpty()) {
+				KeywordUtil.logInfo("CliUploader: Python version used for CLI: " + versionOut.trim())
+			} else {
+				KeywordUtil.logInfo("CliUploader: could not get Python version (run failed or timeout)")
+			}
 			return [
 				pythonExe,
 				UPLOADER_SCRIPT_PATH,
