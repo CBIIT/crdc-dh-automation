@@ -742,7 +742,14 @@ ${manifestBlock}               retries: ${retries}
 					actualRaw = stripLogPrefixToMessage(fromLog)
 					KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: errors column empty for " + fileName + "; using error line from CLI log " + (logFile != null ? logFile.getName() : "") + (logFile != null ? " (" + logFile.getAbsolutePath() + ")" : ""))
 				} else if (expectedMap.get(fileName) != null && !expectedMap.get(fileName).isEmpty()) {
-					KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: no matching error line in CLI log for " + fileName + " (log has " + logContent.split("[\r\n]+").length + " lines)")
+					String[] logLines = logContent.split("[\r\n]+")
+					KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: no matching error line in CLI log for " + fileName + " (log has " + logLines.length + " lines). Log file contents:")
+					int maxLineLen = 500
+					for (int idx = 0; idx < logLines.length; idx++) {
+						String ln = logLines[idx] != null ? logLines[idx].trim() : ""
+						String truncated = (ln.length() > maxLineLen) ? ln.substring(0, maxLineLen) + "..." : ln
+						KeywordUtil.logInfo("  [CLI log line " + (idx + 1) + "] " + truncated)
+					}
 				}
 			}
 			String expectedRaw = expectedMap.get(fileName)
