@@ -26,13 +26,6 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>2bf13f1a-f545-4986-aab3-81b7d030bcd8</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027/TC30_CRDC-3027-CLIMissingArchiveManifestError</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
       <guid>e02764ed-6bab-4453-9d67-44ef73b93a61</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
