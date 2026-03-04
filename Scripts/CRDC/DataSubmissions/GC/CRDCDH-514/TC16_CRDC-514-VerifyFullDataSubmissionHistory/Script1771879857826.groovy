@@ -135,4 +135,4 @@ CustomKeywords.'utilities.DataSubmissions.verifyFullSubmissionHistory'(expectedH
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
 
-//WebUI.closeBrowser()
+WebUI.closeBrowser()
