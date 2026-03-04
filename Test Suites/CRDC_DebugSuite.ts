@@ -18,4 +18,11 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027/TC29_VerifyZipDataFileUploadViaCLI</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>470fc248-be9b-4de2-ad61-a7b3ab55b074</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027/TC32_CRDC-3027-CLIBadArchiveManifestFileSize</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>
