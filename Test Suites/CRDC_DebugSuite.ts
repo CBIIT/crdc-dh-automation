@@ -15,28 +15,28 @@
       <guid>73e1e2e1-82f3-430c-a27d-480b11fa7ed0</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027/TC29_CRDC-3027-VerifyZipDataFileUploadViaCLI</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027-Partial/TC29_CRDC-3027-VerifyZipDataFileUploadViaCLI</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>470fc248-be9b-4de2-ad61-a7b3ab55b074</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027/TC32_CRDC-3027-CLIBadArchiveManifestFileSize</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027-Partial/TC32_CRDC-3027-CLIBadArchiveManifestFileSize</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>a387cb82-e8ae-4b93-97e4-90914760e128</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027/TC33_CRDC-3027-CLIArchiveManifestWrongColumns</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027-Partial/TC33_CRDC-3027-CLIArchiveManifestWrongColumns</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>a387cb82-e8ae-4b93-97e4-90914760e129</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027/TC34_CRDC-3027-CLIArchiveManifestMissingColumn</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027-Partial/TC34_CRDC-3027-CLIArchiveManifestMissingColumn</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
