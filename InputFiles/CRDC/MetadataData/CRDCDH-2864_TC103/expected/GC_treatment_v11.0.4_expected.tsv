@@ -1,0 +1,4 @@
+type	treatment_id	treatment_type	days_to_treatment	therapeutic_agents	response	participant.study_participant_id	status
+treatment	part.sdy1_ther_agents_1			ther_agents_1		part.sdy1	New
+treatment	part.sdy2_ther_agents_2			ther_agents_2		part.sdy2	New
+treatment	part.sdy3_ther_agents_3			ther_agents_3		part.sdy3	New

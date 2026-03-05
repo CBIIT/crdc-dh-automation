@@ -23,8 +23,8 @@ WebUI.setViewPortSize(1920, 1080)
 
 //Login as Admin and set up DCP user
 CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Admin')
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/Login/UserProfile-Dd')
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/ManageUsers-Btn')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/Login/UserProfile-Dd')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/ManageUsers-Btn')
 CustomKeywords.'utilities.Pbac.editPbacPermissions'('Dcp', 'positive')
 CustomKeywords.'utilities.SubmissionRequest.logoutFromCrdc'()
 WebUI.closeBrowser()

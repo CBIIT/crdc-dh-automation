@@ -43,15 +43,15 @@ WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Admin')
 
 //Navigate to Manage Users
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/Login/UserProfile-Dd')
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/ManageUsers-Btn')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/Login/UserProfile-Dd')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/ManageUsers-Btn')
 
 //Verify PBAC permissions for role
 CustomKeywords.'utilities.Pbac.verifyPbacPermissionDefaults'('Admin')
 
 //Navigate to Profile
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/Login/UserProfile-Dd')
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/Login/UserProfile-Link')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/Login/UserProfile-Dd')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/Login/UserProfile-Link')
 
 //Verify PBAC permissions for self
 CustomKeywords.'utilities.Pbac.verifyPbacPermissionDefaults'('Admin-self')
