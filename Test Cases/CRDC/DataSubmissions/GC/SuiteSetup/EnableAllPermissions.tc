@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>EnableAllPermissions</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>d461c8c8-c8ba-448c-bb5d-67525ff0de03</testCaseGuid>
+</TestCaseEntity>
