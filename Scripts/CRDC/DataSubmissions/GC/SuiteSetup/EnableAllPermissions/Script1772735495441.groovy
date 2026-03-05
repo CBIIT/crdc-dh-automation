@@ -28,11 +28,9 @@ import java.nio.file.Path as Path
 import java.nio.file.Paths as Paths
 
 /*This test script:
- - Opens the browser of choice: Chrome, Firefox or Edge
- - Driver opened by Katalon is used in Selenium.
  - Logs in as Admin
- - Goes to Manage Users and Edit the user being tested
- - Verifies the default permissions 
+ - Goes to Manage Users and enables all permissions for all roles
+ - Prevents other script failures if permissions are not enabled correctly, for example after PBAC run
  */
 WebUI.closeBrowser()
 
