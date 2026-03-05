@@ -19,9 +19,9 @@ WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
 WebUI.delay(2)
 
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
 CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata only', 'ICDC', 'autoQA - AutomationQA_Study')
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 CustomKeywords.'utilities.DataSubmissions.uploadFolder'('CRDCDH-1405_TC106')
 

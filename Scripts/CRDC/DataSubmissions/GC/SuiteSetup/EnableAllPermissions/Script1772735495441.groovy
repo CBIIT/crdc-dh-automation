@@ -41,8 +41,8 @@ WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Master')
 
 //Navigate to Manage Users
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/Login/UserProfile-Dd')
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/ManageUsers-Btn')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/Login/UserProfile-Dd')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/ManageUsers-Btn')
 
 //Enable permissions for roles
 CustomKeywords.'utilities.Pbac.editPbacPermissions'('Admin', 'positive')

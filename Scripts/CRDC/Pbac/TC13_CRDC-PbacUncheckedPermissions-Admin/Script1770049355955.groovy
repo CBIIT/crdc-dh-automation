@@ -43,8 +43,8 @@ WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Master')
 
 //Navigate to Manage Users
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/Login/UserProfile-Dd')
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/ManageUsers-Btn')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/Login/UserProfile-Dd')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/ManageUsers-Btn')
 
 //Positive scenario-- Edit user permissions and write expected checkbox statuses to output sheet 
 CustomKeywords.'utilities.Pbac.editPbacPermissions'('Admin', 'negative')
@@ -67,8 +67,8 @@ WebUI.closeBrowser()
 CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Master')
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/Login/UserProfile-Dd')
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/ManageUsers-Btn')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/Login/UserProfile-Dd')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/ManageUsers-Btn')
 CustomKeywords.'utilities.Pbac.editPbacPermissions'('Admin', 'positive')
 
 WebUI.closeBrowser()

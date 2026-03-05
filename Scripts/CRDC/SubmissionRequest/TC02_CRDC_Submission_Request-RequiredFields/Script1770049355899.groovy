@@ -49,14 +49,14 @@ WebUI.setViewPortSize(1920, 1080)
 
 WebUI.delay(2)
 WebUI.waitForElementVisible(findTestObject('CRDC/NavBar/SubmissionRequest-Tab'), 10)
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/SubmissionRequest-Tab')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/SubmissionRequest-Tab')
 
 WebUI.waitForElementPresent(findTestObject('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn'), 5)
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
 
 WebUI.delay(1)
 WebUI.waitForElementPresent(findTestObject('CRDC/SubmissionRequest/readAndAcceptPopUp-Btn'), 5)
-CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/SubmissionRequest/readAndAcceptPopUp-Btn')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/SubmissionRequest/readAndAcceptPopUp-Btn')
 
 CustomKeywords.'utilities.SubmissionRequest.verifyStatusBar'('NEW')
 CustomKeywords.'utilities.SubmissionRequest.enterPrincipalInvestigatorInfo'(2)

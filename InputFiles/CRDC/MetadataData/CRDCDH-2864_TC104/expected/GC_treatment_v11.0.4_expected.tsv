@@ -1,0 +1,4 @@
+type	treatment_id	treatment_type	days_to_treatment	therapeutic_agents	response	status
+treatment	_ther_agents_1			ther_agents_1		New
+treatment	_ther_agents_2			ther_agents_2		New
+treatment	_ther_agents_3			ther_agents_3		New

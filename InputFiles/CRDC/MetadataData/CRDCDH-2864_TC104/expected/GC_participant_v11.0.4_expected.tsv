@@ -1,0 +1,6 @@
+type	study_participant_id	participant_id	race	sex	ethnicity	dbGaP_subject_id	consent_group.consent_group_id	status
+participant	_autopart1	autopart1	Asian|American Indian or Alaska Native	Male	Not Hispanic or Latino|Hispanic or Latino	dbgap_subID	consent_1	New
+participant	_autopart2	autopart2	Asian|white	Male	Not Hispanic or Latino|Not reported		consent_1	New
+participant	_autopart3	autopart3	Asian|Native Hawaiian or other Pacific Islander	Male	Not Hispanic or Latino		consent_3	New
+participant	_autopart4	autopart4	Asian|Native Hawaiian or other Pacific Islander	Male	Not Hispanic or Latino		consent_4	New
+participant	_autopart5	autopart5	Asian|Native Hawaiian or other Pacific Islander	Male	Not Hispanic or Latino		consent_5	New
