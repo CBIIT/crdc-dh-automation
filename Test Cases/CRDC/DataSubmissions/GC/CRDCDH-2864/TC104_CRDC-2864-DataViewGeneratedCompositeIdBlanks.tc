@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description>Upload Errors modal content matches expected TSV after negative-scenario CLI upload</description>
-   <name>TC103_CRDC-2865-DataViewGeneratedCompositeId</name>
+   <name>TC104_CRDC-2864-DataViewGeneratedCompositeIdBlanks</name>
    <tag>CRDCDH-1405,Upload Activities,Upload Errors,modal,expected_errors</tag>
    <comment></comment>
    <recordOption>OTHER</recordOption>
-   <testCaseGuid>a8b41ca2-0dde-4e61-bb5b-a67d26bc99c6</testCaseGuid>
+   <testCaseGuid>b65429cb-cdc9-4a70-b26e-b1b093ecf8d3</testCaseGuid>
 </TestCaseEntity>
