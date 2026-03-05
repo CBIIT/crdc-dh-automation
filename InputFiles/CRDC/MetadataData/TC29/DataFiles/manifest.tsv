@@ -1,0 +1,12 @@
+file_name	file_type	file_size	experimental_strategy_and_data_subtypes	type	study.study_id	md5sum	submission_version
+random_20MB1.txt	TXT	20971520	Archer Fusion	file	phs009855	afde7efc8f3a58fee2f6bbd6c885ca69	damnant_quod_non_5555
+random_20MB2.txt	TXT	20971520	Archer Fusion	file	phs009855	afde7efc8f3a58fee2f6bbd6c885ca69	saltus_in_demonstrando5555
+random_20MB3.txt	TXT	20971520	Archer Fusion	file	phs009855	afde7efc8f3a58fee2f6bbd6c885ca69	Obedientia_civium_urbis_felicitas5555
+random_20MB4.txt	TXT	20971520	Archer Fusion	file	phs009855	afde7efc8f3a58fee2f6bbd6c885ca69	Macte_animo_Generose_puer_sic_itur_ad_astra5555
+random_20MB5.txt	TXT	20971520	Archer Fusion	file	phs009855	afde7efc8f3a58fee2f6bbd6c885ca69	O_Tite_tute_Tati_tibi_tanta_tyranne_tulisti5555
+sub-folder1/random_20MB1.txt	TXT	20971520	Archer Fusion	file	phs009855	afde7efc8f3a58fee2f6bbd6c885ca69	damnant_quod_non_5555
+sub-folder1/sub-folder2/random_20MB1.txt	TXT	20971520	Archer Fusion	file	phs009855	afde7efc8f3a58fee2f6bbd6c885ca69	damnant_quod_non_5555
+sub-folder1/sub-folder2b/random_20MB1.txt	TXT	20971520	Archer Fusion	file	phs009855	afde7efc8f3a58fee2f6bbd6c885ca69	damnant_quod_non_5555
+sub-folder1/sub-folder2/sub-folder3/random_20MB1.txt	TXT	20971520	Archer Fusion	file	phs009855	afde7efc8f3a58fee2f6bbd6c885ca69	damnant_quod_non_5555
+3-4-5-compressed.zip	CSV	47316621	Archer Fusion	file	phs009855	43d52a93ec865253c3348d897e7309da	damnant_quod_non_5555
+sub-folder1/sub-folder2/1-1-compressed.zip	CSV	31544600	Archer Fusion	file	phs009855	8478551d9687b071364b5bd6cb4b2f8b	damnant_quod_non_5555

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Logs in as Submitter, creates a data submission, uploads data files (including zip archives) via CLI, verifies upload batch row counts, and verifies the zip archive receives a CRDC ID as a normal file via CLI final manifest (file_id present for every row including zip rows).</description>
+   <name>TC29_CRDC-3027-VerifyZipDataFileUploadViaCLI</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a186cb82-e8ae-4b93-97e4-90914760e126</testCaseGuid>
+</TestCaseEntity>

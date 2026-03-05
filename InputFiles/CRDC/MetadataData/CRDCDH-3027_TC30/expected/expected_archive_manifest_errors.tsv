@@ -1,0 +1,2 @@
+file_name	expected_error
+no-archive-manifest.zip	No archive manifest found for no-archive-manifest.zip, content of the zip archive cannot be validated.

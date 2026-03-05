@@ -1,0 +1,2 @@
+file_name	expected_error
+bad_md5.zip	Real file md5 275876e34cf609db118f3d84b799a790 of file dummy.txt does not match with that in archive manifest 00000000000000000000000000000000!

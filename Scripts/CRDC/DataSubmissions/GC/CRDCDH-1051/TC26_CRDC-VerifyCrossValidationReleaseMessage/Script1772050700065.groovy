@@ -53,7 +53,7 @@ WebUI.delay(3)
 
 //Click on Release button and verify buttons and dialog text
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Release-Btn')
-CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseConfirmationYes-Btn'))
+CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseCrossValidationConfirmRelease-Btn'))
 CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/Cancel-Btn'))
 CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('Object Repository/CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseConfirmation-Txt'), 
 	'There are other data submissions for the same study currently ongoing. Are you sure you want to release this data submission to Data Commons?')
