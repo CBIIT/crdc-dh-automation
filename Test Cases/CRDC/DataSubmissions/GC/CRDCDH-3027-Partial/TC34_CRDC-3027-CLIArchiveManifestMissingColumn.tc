@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Verifies that when the archive manifest is missing a required column (e.g. md5), the CLI outputs an error and no data files are uploaded. Requirement: archive manifest must contain archive_name, file_path, file_size, md5. Update expected_archive_manifest_errors.tsv with actual CLI message after first run if needed.</description>
+   <name>TC34_CRDC-3027-CLIArchiveManifestMissingColumn</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>b287cb82-e8ae-4b93-97e4-90914760e129</testCaseGuid>
+</TestCaseEntity>

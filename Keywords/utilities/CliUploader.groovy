@@ -6,6 +6,7 @@ import com.kms.katalon.core.util.KeywordUtil
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import internal.GlobalVariable
 import java.io.FileFilter
+import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.Date
@@ -337,6 +338,35 @@ ${manifestBlock}               retries: ${retries}
 	}
 
 	/**
+	 * Runs the given Python executable with --version and returns stdout+stderr (for verification during test run).
+	 * Returns null or empty string on failure or timeout.
+	 */
+	private static String getPythonVersionForCli(String pythonExe) {
+		if (pythonExe == null || pythonExe.trim().isEmpty()) return null
+		try {
+			ProcessBuilder pb = new ProcessBuilder(pythonExe.trim(), "--version")
+			pb.redirectErrorStream(true)
+			Process p = pb.start()
+			StringBuilder sb = new StringBuilder()
+			byte[] buf = new byte[512]
+			int n
+			InputStream stream = p.getInputStream()
+			while ((n = stream.read(buf)) != -1) {
+				sb.append(new String(buf, 0, n, StandardCharsets.UTF_8))
+			}
+			boolean finished = p.waitFor(5, TimeUnit.SECONDS)
+			if (!finished) {
+				p.destroyForcibly()
+				return null
+			}
+			return sb.toString()
+		} catch (Exception e) {
+			KeywordUtil.logInfo("CliUploader: getPythonVersionForCli failed: " + (e.getMessage() != null ? e.getMessage() : e.toString()))
+			return null
+		}
+	}
+
+	/**
 	 * Builds the command list to run the uploader: either binary (uploader/uploader.exe) or
 	 * Python source (pythonExe src/uploader.py --config &lt;path&gt;). Fails the test and returns null if neither is available.
 	 */
@@ -358,6 +388,12 @@ ${manifestBlock}               retries: ${retries}
 		if (script.exists() && script.isFile()) {
 			String pythonExe = Utils.getPythonExecutablePath()
 			KeywordUtil.logInfo("CliUploader: using Python source " + script.getAbsolutePath() + " with " + pythonExe)
+			String versionOut = getPythonVersionForCli(pythonExe)
+			if (versionOut != null && !versionOut.isEmpty()) {
+				KeywordUtil.logInfo("CliUploader: Python version used for CLI: " + versionOut.trim())
+			} else {
+				KeywordUtil.logInfo("CliUploader: could not get Python version (run failed or timeout)")
+			}
 			return [
 				pythonExe,
 				UPLOADER_SCRIPT_PATH,
@@ -475,8 +511,11 @@ ${manifestBlock}               retries: ${retries}
 		"expected_errors",
 		"expected_error"
 	]
-	/** Column name in actual report for errors. */
-	private static final String ACTUAL_ERRORS_COLUMN = "errors"
+	/** Column names in actual CLI report for errors (first found wins). CLI may use "error", "errors", etc. */
+	private static final List<String> ACTUAL_ERRORS_COLUMN_CANDIDATES = [
+		"errors",
+		"error"
+	]
 	/** Column names to match rows between actual and expected (first found wins). */
 	private static final List<String> FILE_NAME_COLUMN_CANDIDATES = [
 		"file_name",
@@ -558,6 +597,105 @@ ${manifestBlock}               retries: ${retries}
 		return map
 	}
 
+	/** Substrings that indicate an error line in CLI log (archive manifest, validation, etc.). */
+	private static final List<String> CLI_ERROR_LINE_SUBSTRINGS = [
+		"does not match",
+		"No archive manifest",
+		"does not match with that in archive manifest",
+		"Real file md5",
+		"Real file size"
+	]
+
+	/** Max age difference (ms) between report and log to consider them from the same run. 120 seconds. */
+	private static final long REPORT_LOG_MAX_AGE_MS = 120_000L
+
+	/**
+	 * Finds the CLI log file that best matches the given upload-report (same run).
+	 * Prefers a .log file whose lastModified is within REPORT_LOG_MAX_AGE_MS of the report's lastModified;
+	 * among those, picks the one closest in time to the report. Falls back to latest .log if none in window.
+	 * Logs are stored under Tools/crdc-datahub-cli-uploader-src/tmp. Works on Jenkins when multiple tests run in sequence.
+	 */
+	private static File findCliLogFileForReport(File cliDir, File reportFile) {
+		List<File> candidates = []
+		File tmpDir = new File(cliDir, "tmp")
+		for (File dir : [cliDir, tmpDir]) {
+			if (!dir.exists() || !dir.isDirectory()) continue
+				File[] files = dir.listFiles({ File f ->
+					f.isFile() && f.name.toLowerCase().endsWith(".log")
+				} as FileFilter)
+			if (files != null) candidates.addAll(files.toList())
+		}
+		if (candidates.isEmpty()) {
+			KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: No .log file found in " + cliDir.getAbsolutePath() + " or " + tmpDir.getAbsolutePath())
+			return null
+		}
+		long reportTime = reportFile != null && reportFile.exists() ? reportFile.lastModified() : 0L
+		List<File> inWindow = candidates.findAll { Math.abs(it.lastModified() - reportTime) <= REPORT_LOG_MAX_AGE_MS }
+		if (!inWindow.isEmpty()) {
+			return inWindow.sort { Math.abs(it.lastModified() - reportTime) }.get(0)
+		}
+		return candidates.sort { -it.lastModified() }.get(0)
+	}
+
+	/**
+	 * Reads log file content as UTF-8; returns empty string if null or unreadable.
+	 */
+	private static String readCliLogContent(File logFile) {
+		if (logFile == null || !logFile.exists() || !logFile.isFile()) return ""
+		try {
+			return new String(Files.readAllBytes(logFile.toPath()), StandardCharsets.UTF_8)
+		} catch (Exception e) {
+			KeywordUtil.logInfo("CliUploader: Could not read log file " + logFile.getAbsolutePath() + ": " + e.getMessage())
+			return ""
+		}
+	}
+
+	/**
+	 * Strips syslog/logger prefix from a log line so only the error message body remains.
+	 * Finds the earliest occurrence of any CLI_ERROR_LINE_SUBSTRINGS (case-insensitive) and returns from that point onward (trimmed).
+	 * E.g. "&lt;14&gt;1 2026-03-04T17:05:03.059Z - - 35293 - - ERROR: (File_Validator) Real file md5 ..." -> "Real file md5 ..."
+	 */
+	private static String stripLogPrefixToMessage(String logLine) {
+		if (logLine == null || logLine.isEmpty()) return logLine
+		String trimmed = logLine.trim()
+		String lower = trimmed.toLowerCase()
+		int start = trimmed.length()
+		for (String phrase : CLI_ERROR_LINE_SUBSTRINGS) {
+			int idx = lower.indexOf(phrase.toLowerCase())
+			if (idx >= 0 && idx < start) start = idx
+		}
+		return (start < trimmed.length()) ? trimmed.substring(start).trim() : trimmed
+	}
+
+	/**
+	 * Extracts an error line for the given file from CLI log (or any) text.
+	 * First tries a line that contains fileName (or base name without extension) and at least one of CLI_ERROR_LINE_SUBSTRINGS.
+	 * If none found and singleFileFallback is true (e.g. only one row in report), returns the first line that contains an error phrase and looks like an error message (length > 40).
+	 * Returns trimmed line (first match) or "".
+	 */
+	private static String extractErrorFromCliOutput(String fileName, String logOrOutput, boolean singleFileFallback = false) {
+		if (fileName == null || fileName.isEmpty() || logOrOutput == null || logOrOutput.isEmpty()) return ""
+		String baseName = fileName.contains(".") ? fileName.substring(0, fileName.lastIndexOf(".")) : fileName
+		String[] lines = logOrOutput.split("[\r\n]+")
+		String firstErrorLine = null
+		for (String line : lines) {
+			String trimmed = line.trim()
+			if (trimmed.isEmpty()) continue
+				boolean hasErrorPhrase = false
+			for (String phrase : CLI_ERROR_LINE_SUBSTRINGS) {
+				if (trimmed.toLowerCase().contains(phrase.toLowerCase())) {
+					hasErrorPhrase = true
+					break
+				}
+			}
+			if (!hasErrorPhrase) continue
+				boolean hasFileName = trimmed.contains(fileName) || trimmed.contains(baseName)
+			if (hasFileName) return trimmed
+			if (singleFileFallback && trimmed.length() > 40 && firstErrorLine == null) firstErrorLine = trimmed
+		}
+		return firstErrorLine != null ? firstErrorLine : ""
+	}
+
 	/**
 	 * Verify CLI error messages: reads the latest upload-report-*.tsv from CLI tmp folder,
 	 * reads expected TSV(s) from InputFiles/CRDC/MetadataData/<testCaseName>/expected/,
@@ -592,10 +730,10 @@ ${manifestBlock}               retries: ${retries}
 			return
 		}
 		String reportHeader = reportLines.get(0)
-		int actualErrorsIdx = findColumnIndex(reportHeader, ACTUAL_ERRORS_COLUMN)
+		int actualErrorsIdx = findColumnIndex(reportHeader, ACTUAL_ERRORS_COLUMN_CANDIDATES)
 		int reportFileNameIdx = findColumnIndex(reportHeader, FILE_NAME_COLUMN_CANDIDATES)
 		if (actualErrorsIdx < 0) {
-			KeywordUtil.markFailed("CliUploader.verifyCliErrorMessages: Report has no '" + ACTUAL_ERRORS_COLUMN + "' column: " + latestReport.getName())
+			KeywordUtil.markFailed("CliUploader.verifyCliErrorMessages: Report has no errors column (tried: " + ACTUAL_ERRORS_COLUMN_CANDIDATES.join(", ") + "). Header: " + reportHeader + " in " + latestReport.getName())
 			return
 		}
 		if (reportFileNameIdx < 0) {
@@ -616,6 +754,13 @@ ${manifestBlock}               retries: ${retries}
 			String actualRaw = actualErrorsIdx < cols.length ? cols[actualErrorsIdx].trim() : ""
 			reportRows.add([file_name: fileName, actual_error: actualRaw])
 		}
+		File logFile = findCliLogFileForReport(cliDir, latestReport)
+		String logContent = readCliLogContent(logFile)
+		if (logFile != null && (logContent == null || logContent.isEmpty())) {
+			KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: CLI log file empty or unreadable: " + logFile.getAbsolutePath())
+		} else if (logFile != null) {
+			KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: using CLI log for this run: " + logFile.getAbsolutePath())
+		}
 		List<String> mismatches = []
 		List<String> reportLinesOut = [
 			"file_name\tactual_error\texpected_error\tmatch_status"
@@ -623,6 +768,23 @@ ${manifestBlock}               retries: ${retries}
 		for (Map<String, String> row : reportRows) {
 			String fileName = row.get("file_name", "")
 			String actualRaw = row.get("actual_error", "")
+			if (actualRaw.isEmpty() && logContent != null && !logContent.isEmpty()) {
+				boolean singleFileFallback = (reportRows.size() == 1)
+				String fromLog = extractErrorFromCliOutput(fileName, logContent, singleFileFallback)
+				if (!fromLog.isEmpty()) {
+					actualRaw = stripLogPrefixToMessage(fromLog)
+					KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: errors column empty for " + fileName + "; using error line from CLI log " + (logFile != null ? logFile.getName() : "") + (logFile != null ? " (" + logFile.getAbsolutePath() + ")" : ""))
+				} else if (expectedMap.get(fileName) != null && !expectedMap.get(fileName).isEmpty()) {
+					String[] logLines = logContent.split("[\r\n]+")
+					KeywordUtil.logInfo("CliUploader.verifyCliErrorMessages: no matching error line in CLI log for " + fileName + " (log has " + logLines.length + " lines). Log file contents:")
+					int maxLineLen = 500
+					for (int idx = 0; idx < logLines.length; idx++) {
+						String ln = logLines[idx] != null ? logLines[idx].trim() : ""
+						String truncated = (ln.length() > maxLineLen) ? ln.substring(0, maxLineLen) + "..." : ln
+						KeywordUtil.logInfo("  [CLI log line " + (idx + 1) + "] " + truncated)
+					}
+				}
+			}
 			String expectedRaw = expectedMap.get(fileName)
 			if (expectedRaw == null) expectedRaw = ""
 			String actualNorm = normalizeErrorCell(actualRaw)
@@ -858,9 +1020,15 @@ ${manifestBlock}               retries: ${retries}
 	/**
 	 * Upload files via CLI: data files (with manifest) or metadata (TSV/TXT folder).
 	 * dataType: "datafile" | "data file" | "metadata" (case-insensitive).
+	 * @param options Optional map. When options.expectValidationErrors == true: the step does not fail on CLI validation
+	 *        failure and does not call verifyCliUploadOutput (caller should use verifyCliErrorMessages). When in addition
+	 *        options.omitArchiveManifest == true: archive manifest is omitted for datafile+zip so the CLI emits
+	 *        "No archive manifest found for X.zip..." (e.g. TC30). When expectValidationErrors is true but omitArchiveManifest
+	 *        is not set, the archive manifest is included if present (e.g. TC31/TC32 bad md5/size in manifest).
 	 */
 	@Keyword
-	static void uploadFilesViaCli(String testCaseName, String dataType) {
+	static void uploadFilesViaCli(String testCaseName, String dataType, Map options = null) {
+		boolean expectValidationErrors = (options != null && options.get('expectValidationErrors') == true)
 		String apiUrl = getApiUrl()
 		String token = getApiToken()
 		String submissionId = getSubmissionId()
@@ -933,16 +1101,24 @@ ${manifestBlock}               retries: ${retries}
 
 		String archiveManifestPath = null
 		if (TYPE_DATA_FILE.equals(type) && hasZipFiles(dataDir)) {
-			KeywordUtil.logInfo("CliUploader: Detected .zip files in data path; requiring zip-archive-manifest.tsv.")
-			archiveManifestPath = getZipArchiveManifestPath(testCaseName)
-			if (archiveManifestPath == null || archiveManifestPath.trim().isEmpty()) {
-				KeywordUtil.markFailed("CliUploader: zip-archive-manifest.tsv is required when uploading .zip files.")
-				return
-			}
-			File archiveManifestFile = new File(toAbsolutePath(archiveManifestPath))
-			if (!archiveManifestFile.exists() || !archiveManifestFile.isFile()) {
-				KeywordUtil.markFailed("CliUploader: archive manifest file does not exist: " + archiveManifestFile.getAbsolutePath())
-				return
+			boolean omitArchiveManifest = (options != null && options.get('omitArchiveManifest') == true)
+			if (expectValidationErrors && omitArchiveManifest) {
+				KeywordUtil.logInfo("CliUploader: expectValidationErrors=true and omitArchiveManifest=true; omitting archive manifest so CLI emits 'No archive manifest' errors.")
+			} else {
+				KeywordUtil.logInfo("CliUploader: Detected .zip files in data path; requiring zip-archive-manifest.tsv.")
+				archiveManifestPath = getZipArchiveManifestPath(testCaseName)
+				if (archiveManifestPath == null || archiveManifestPath.trim().isEmpty()) {
+					if (!expectValidationErrors) {
+						KeywordUtil.markFailed("CliUploader: zip-archive-manifest.tsv is required when uploading .zip files.")
+						return
+					}
+				} else {
+					File archiveManifestFile = new File(toAbsolutePath(archiveManifestPath))
+					if (!archiveManifestFile.exists() || !archiveManifestFile.isFile()) {
+						KeywordUtil.markFailed("CliUploader: archive manifest file does not exist: " + archiveManifestFile.getAbsolutePath())
+						return
+					}
+				}
 			}
 		}
 		int retries = getRetries()
@@ -959,6 +1135,11 @@ ${manifestBlock}               retries: ${retries}
 			List<Object> result = runUploaderProcess(configFile, cliDir, DEFAULT_TIMEOUT_MINUTES)
 			int exitCode = ((Number) result.get(0)).intValue()
 			String output = (String) result.get(1)
+			if (expectValidationErrors) {
+				KeywordUtil.logInfo("CliUploader: expectValidationErrors=true; not failing on exit code or output. Call verifyCliErrorMessages to assert expected errors.")
+				WebUI.refresh()
+				return
+			}
 			if (exitCode != 0) {
 				KeywordUtil.logInfo("CliUploader: uploader exit code=" + exitCode + "\nOutput:\n" + output)
 				KeywordUtil.markFailed("CliUploader: upload failed (exit code " + exitCode + "). See log for output.")

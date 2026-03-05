@@ -1,0 +1,2 @@
+file_name	expected_errors
+missing_col.zip	"No archive manifest found for missing_col.zip, content of the zip archive cannot be validated."

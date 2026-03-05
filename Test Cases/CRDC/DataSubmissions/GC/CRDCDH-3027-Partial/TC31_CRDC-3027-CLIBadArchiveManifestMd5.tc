@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Verifies that when a zip file is uploaded with an archive manifest that has a wrong MD5 for a file inside the zip, the CLI outputs the expected error (e.g. "Real file md5 ... of file X does not match with that in archive manifest ...!") and no data files are uploaded. Aligns with CRDCDH-3027.</description>
+   <name>TC31_CRDC-3027-CLIBadArchiveManifestMd5</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>c398cd92-f9be-4a94-98f5-a19285171e38</testCaseGuid>
+</TestCaseEntity>
