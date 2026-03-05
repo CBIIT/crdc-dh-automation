@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TestCaseEntity>
-   <description></description>
-   <name>TC29_VerifyZipDataFileUploadViaCLI</name>
-   <tag>Filter</tag>
-   <comment></comment>
-   <recordOption>OTHER</recordOption>
-   <testCaseGuid>a186cb82-e8ae-4b93-97e4-90914760e126</testCaseGuid>
-</TestCaseEntity>

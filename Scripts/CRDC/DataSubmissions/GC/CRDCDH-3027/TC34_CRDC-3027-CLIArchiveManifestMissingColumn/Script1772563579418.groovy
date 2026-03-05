@@ -14,44 +14,31 @@ import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
-import org.openqa.selenium.By as By
-import org.openqa.selenium.WebDriver as WebDriver
-import org.openqa.selenium.WebElement as WebElement
-import org.openqa.selenium.chrome.ChromeDriver as ChromeDriver
-import org.openqa.selenium.chrome.ChromeOptions as ChromeOptions
-import org.openqa.selenium.firefox.FirefoxBinary as FirefoxBinary
-import org.openqa.selenium.firefox.FirefoxDriver as FirefoxDriver
-import org.openqa.selenium.firefox.FirefoxOptions as FirefoxOptions
-import org.openqa.selenium.support.ui.ExpectedConditions as ExpectedConditions
-import org.openqa.selenium.support.ui.WebDriverWait as WebDriverWait
-import java.nio.file.Path as Path
-import java.nio.file.Paths as Paths
-import com.kms.katalon.core.testdata.TestDataFactory
 
-/*This test script:
+/* This test script:
  - Logs in as Submitter
- - Creates DS, uploads unicode character files with zip archive via CLI
- - Verifies upload is successful
+ - Creates a data submission and runs CLI upload with a zip file and archive manifest that is MISSING a required column (e.g. no "md5") (expectValidationErrors mode)
+ - Verifies the CLI outputs the expected error via verifyCliErrorMessages
+ - Aligns with requirement: archive manifest must contain archive_name, file_path, file_size, md5
  */
 WebUI.closeBrowser()
 
-//Login as Submitter
+// Login as Submitter
 CustomKeywords.'utilities.Login.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
 WebUI.delay(2)
 
-//Create DS
+// Create DS and go to upload-activity
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
-CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'both','GC','autoQA - AutomationQA_Study')
+CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'both', 'GC', 'autoQA - AutomationQA_Study')
 CustomKeywords.'utilities.TestRunner.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
-CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC29', 'datafile')
+// Run CLI in "expect validation errors" mode (archive manifest missing required column 'archive_name')
+CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('CRDCDH-3027_TC34', 'datafile', [ expectValidationErrors: true ])
 
-CustomKeywords.'utilities.WebUIUtils.refreshPageAndWaitForLoad'()
+// Verify CLI error messages match expected
+CustomKeywords.'utilities.CliUploader.verifyCliErrorMessages'('CRDCDH-3027_TC34')
 
-//Verify upload is successful
-CustomKeywords.'utilities.DataSubmissions.verifyUploadActivitiesBatchRow'('Metadata', 4, 'Uploaded')
-CustomKeywords.'utilities.DataSubmissions.verifyUploadActivitiesBatchRow'('Data File', 11, 'Uploaded')
-
+CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 WebUI.closeBrowser()

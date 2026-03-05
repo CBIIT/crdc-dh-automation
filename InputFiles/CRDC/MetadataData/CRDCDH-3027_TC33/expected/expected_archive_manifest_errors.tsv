@@ -1,0 +1,2 @@
+file_name	expected_errors
+wrong_columns.zip	"No archive manifest found for wrong_columns.zip, content of the zip archive cannot be validated."

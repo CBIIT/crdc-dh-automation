@@ -514,10 +514,7 @@ ${manifestBlock}               retries: ${retries}
 	/** Column names in actual CLI report for errors (first found wins). CLI may use "error", "errors", etc. */
 	private static final List<String> ACTUAL_ERRORS_COLUMN_CANDIDATES = [
 		"errors",
-		"error",
-		"validation_errors",
-		"error_message",
-		"message"
+		"error"
 	]
 	/** Column names to match rows between actual and expected (first found wins). */
 	private static final List<String> FILE_NAME_COLUMN_CANDIDATES = [
@@ -623,9 +620,9 @@ ${manifestBlock}               retries: ${retries}
 		File tmpDir = new File(cliDir, "tmp")
 		for (File dir : [cliDir, tmpDir]) {
 			if (!dir.exists() || !dir.isDirectory()) continue
-			File[] files = dir.listFiles({ File f ->
-				f.isFile() && f.name.toLowerCase().endsWith(".log")
-			} as FileFilter)
+				File[] files = dir.listFiles({ File f ->
+					f.isFile() && f.name.toLowerCase().endsWith(".log")
+				} as FileFilter)
 			if (files != null) candidates.addAll(files.toList())
 		}
 		if (candidates.isEmpty()) {
@@ -684,7 +681,7 @@ ${manifestBlock}               retries: ${retries}
 		for (String line : lines) {
 			String trimmed = line.trim()
 			if (trimmed.isEmpty()) continue
-			boolean hasErrorPhrase = false
+				boolean hasErrorPhrase = false
 			for (String phrase : CLI_ERROR_LINE_SUBSTRINGS) {
 				if (trimmed.toLowerCase().contains(phrase.toLowerCase())) {
 					hasErrorPhrase = true
@@ -692,7 +689,7 @@ ${manifestBlock}               retries: ${retries}
 				}
 			}
 			if (!hasErrorPhrase) continue
-			boolean hasFileName = trimmed.contains(fileName) || trimmed.contains(baseName)
+				boolean hasFileName = trimmed.contains(fileName) || trimmed.contains(baseName)
 			if (hasFileName) return trimmed
 			if (singleFileFallback && trimmed.length() > 40 && firstErrorLine == null) firstErrorLine = trimmed
 		}
