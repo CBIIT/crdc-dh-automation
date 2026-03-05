@@ -1,0 +1,4 @@
+type	expected_errors	 participant.study_participant_id	treatment_id	treatment_type	days_to_treatment	therapeutic_agents	response
+treatment	"""GC_treatment_v10.0.0.tsv:2"": all properties (participant.study_participant_id, therapeutic_agents) needed for composite ID are missing."						
+treatment							
+treatment							
