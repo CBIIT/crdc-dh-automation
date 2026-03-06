@@ -12,17 +12,24 @@
    <rerunImmediately>false</rerunImmediately>
    <testSuiteGuid>8c7eb854-80ed-412f-b27c-bddd095d94d0</testSuiteGuid>
    <testCaseLink>
+      <guid>80ed470f-e81c-4186-97a4-b4f8bcb28ddf</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/SuiteSetup/EnableAllPermissions</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
       <guid>2ea4f1d8-e445-4db5-b5ec-e3f663e8b5d5</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1032-Partial/TC01_CRDC-DataSubmissions-DataView</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1032/TC01_CRDC-DataSubmissions-DataView</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>bd0f8f7c-15a2-4d48-a35d-03db9e6cf8aa</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1032-Partial/TC02_CRDC-DataSubmissions-DataView</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1032/TC02_CRDC-DataSubmissions-DataView</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>

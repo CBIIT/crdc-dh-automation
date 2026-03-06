@@ -12,6 +12,13 @@
    <rerunImmediately>false</rerunImmediately>
    <testSuiteGuid>d45babf5-ad28-43cb-ab98-2b3e689c6d73</testSuiteGuid>
    <testCaseLink>
+      <guid>536c80e3-9c29-492c-a326-607b094eb427</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/SuiteSetup/EnableAllPermissions</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
       <guid>da03d8ec-7be0-41d1-8abe-4010e07498d3</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
