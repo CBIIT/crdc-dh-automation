@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CLI metadata upload with invalid file_id - Essential Validation batch error (GC)</description>
+   <name>TC108_CRDC-1405-UploadActivitiesBatchErrorsCTDC</name>
+   <tag>CRDCDH-1405,CLI,file_id,essential_validation,GC</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>0422c57e-8807-47a6-8f18-2f40785edd2a</testCaseGuid>
+</TestCaseEntity>

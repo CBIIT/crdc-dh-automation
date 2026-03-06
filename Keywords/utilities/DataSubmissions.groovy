@@ -406,6 +406,10 @@ class DataSubmissions extends TestRunner {
 		String expectedDisplay = expectedSorted.size() + " error(s)"
 		String actualDisplay = actualSorted.size() + " error(s)" + (match ? "" : " (mismatch)")
 		ValidationReport.addValidationReportItem("Upload Errors Modal", "Errors vs expected (" + tcName + ")", expectedDisplay, actualDisplay, status)
+		if (match) {
+			KeywordUtil.logInfo("[Upload Errors Modal] Expected: " + expectedSorted)
+			KeywordUtil.logInfo("[Upload Errors Modal] Actual: " + actualSorted)
+		}
 		if (!match) {
 			List<String> missing = expectedSorted.findAll { !actualSorted.contains(it) }
 			List<String> extra = actualSorted.findAll { !expectedSorted.contains(it) }

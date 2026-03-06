@@ -1,0 +1,2 @@
+type	expected_errors	 study.study_short_name	 cohort.cohort_record_id	 consent_group.consent_group_id	participant_id	biomarker_results_available	radiology_report_available	radiology_images_available	histology_images_available	
+participant	"""CTDC_participant_v1.22.1.tsv: line 2"": extra columns/cells found."	autoQA	co_rec_1		ctdc_part_1	yes	NO	unknown	YES	no
