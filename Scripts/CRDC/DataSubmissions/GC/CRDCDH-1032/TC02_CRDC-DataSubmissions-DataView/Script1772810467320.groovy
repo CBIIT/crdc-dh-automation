@@ -65,6 +65,12 @@ CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 //Download Data View export TSV files for each node and compare to expected TSVs
 CustomKeywords.'utilities.DataSubmissions.downloadAndCompareExpectedForTC'('TC02')
 
+//Verify rows per page options
+CustomKeywords.'utilities.WebUIUtils.verifyRowsPerPageOptions'([5, 10, 20, 50])
+
+//Verify default rows per page is 20
+CustomKeywords.'utilities.WebUIUtils.verifyDefaultRowsPerPage'(20)
+
 //Generate HTML report
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 

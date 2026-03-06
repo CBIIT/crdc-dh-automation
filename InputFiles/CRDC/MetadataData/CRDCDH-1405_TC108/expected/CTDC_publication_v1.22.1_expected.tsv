@@ -1,0 +1,2 @@
+type	expected_errors	 study.study_short_name	digital_object_id	digital_object_id	pubmed_id	publication_title	authorship	year_of_publication	journal_citation
+publication	"""CTDC_publication_v1.22.1.tsv"": multiple columns with the same header (""digital_object_id"") is not allowed."	autoQA	DOI1		4	Publish	authr	1999	journa;cit

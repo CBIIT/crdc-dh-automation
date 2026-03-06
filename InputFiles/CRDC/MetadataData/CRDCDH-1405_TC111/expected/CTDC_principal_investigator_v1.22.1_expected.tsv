@@ -1,0 +1,2 @@
+type	expected_errors	 study.study_short_name	person_record_id	person_first_name	person_last_name	person_middle_name	person_orcid
+principal_investigator1	"""CTDC_principal_investigator_v1.22.1.tsv: 2"": Node type “principal_investigator1” is not defined."	autoQA	auto_person_rec	jasmine	david	Jad	87654321
