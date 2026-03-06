@@ -1,0 +1,2 @@
+type	expected_errors	 study.study_short_name	consent_group_id	consent_group_number
+consent_group	"""CTDC_consent_group_v1.22.1.tsv"": Property ""consent_group_name"" is required."	autoQA	grp id	5

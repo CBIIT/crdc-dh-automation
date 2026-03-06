@@ -12,17 +12,24 @@
    <rerunImmediately>false</rerunImmediately>
    <testSuiteGuid>d1b0be45-f326-49c0-a78d-fb006ac54f30</testSuiteGuid>
    <testCaseLink>
+      <guid>b53ce76f-6c37-412a-8dc2-2ebef192965b</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/EnableAllPermissions</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
       <guid>a06b9ed0-3956-4b04-bf83-9f54097cf839</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/SampleTestCases/TC11_MongoDBQuerySubmissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/SampleTestCases/TC11_MongoDBQuerySubmissions</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>5cf2a530-292e-4f9c-af5b-f04584f3eb9e</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1032-Partial/TC02_CRDC-DataSubmissions-DataView</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1032/TC02_CRDC-DataSubmissions-DataView</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
@@ -50,7 +57,7 @@
       <guid>d19a8ad3-7c7d-4954-b3e1-2b2ad3816e83</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1032-Partial/TC01_CRDC-DataSubmissions-DataView</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1032/TC01_CRDC-DataSubmissions-DataView</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>

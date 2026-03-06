@@ -1,0 +1,3 @@
+type	expected_errors	 study.study_short_name	 cohort.cohort_record_id	 consent_group.consent_group_id	participant_id	biomarker_results_available	radiology_report_available	radiology_images_available	histology_images_available
+participant	"""CTDC_participant_v1.22.1.tsv:2"": duplicated data detected: “participant_id”: ctdc_part_1."	autoQA	co_rec_1		ctdc_part_1	yes	NO	unknown	YES
+participant	"""CTDC_participant_v1.22.1.tsv:3"": duplicated data detected: “participant_id”: ctdc_part_1."	autoQA	co_rec_1		ctdc_part_1	yes	NO	unknown	YES
