@@ -15,14 +15,14 @@
       <guid>b53ce76f-6c37-412a-8dc2-2ebef192965b</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/SuiteSetup/EnableAllPermissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/EnableAllPermissions</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>a06b9ed0-3956-4b04-bf83-9f54097cf839</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/SampleTestCases/TC11_MongoDBQuerySubmissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/SampleTestCases/TC11_MongoDBQuerySubmissions</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
