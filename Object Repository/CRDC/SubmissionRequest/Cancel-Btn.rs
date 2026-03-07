@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//*[contains(@id, ':r') and @type='button']</value>
+         <value>//*[@data-testid='cancel-restore-application-button']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//*[contains(@id, ':r') and @type='button']</value>
-      <webElementGuid>6aff58be-edfb-401a-b410-7b00a4f37759</webElementGuid>
+      <value>//*[@data-testid='cancel-restore-application-button']</value>
+      <webElementGuid>4ac7de5e-6bef-428f-8fe2-48d2fb5f7280</webElementGuid>
    </webElementProperties>
 </WebElementEntity>

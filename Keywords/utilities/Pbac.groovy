@@ -680,7 +680,8 @@ class Pbac extends TestRunner {
 			try {
 				SubmissionRequest.clickHome()
 				TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
-				return WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn"), 5, FailureHandling.OPTIONAL)
+				//return WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn"), 5, FailureHandling.OPTIONAL)
+				return WebUIUtils.fastElementPresent('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
 			} catch (Exception e) {
 				KeywordUtil.logInfo("Error verifying permission - submission_request:create -> ${e.message}")
 				return false
@@ -792,7 +793,8 @@ class Pbac extends TestRunner {
 			try {
 				SubmissionRequest.clickHome()
 				TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
-				return WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Cancel-Btn"), 5, FailureHandling.OPTIONAL)
+				//return WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Cancel-Btn"), 5, FailureHandling.OPTIONAL)
+				return WebUIUtils.fastElementPresent('CRDC/SubmissionRequest/Cancel-Btn')
 			} catch (Exception e) {
 				KeywordUtil.logInfo("Error verifying permission - submission_request:cancel -> ${e.message}")
 				return false
