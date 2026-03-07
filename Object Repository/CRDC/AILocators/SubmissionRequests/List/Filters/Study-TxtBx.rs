@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Study-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>c4a2b3d4-e5f6-4a7b-8c9d-0e1f2a3b4c07</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id='study-name-filter']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id='study-name-filter']</value>
+      <webElementGuid>c4a2b3d4-e5f6-4a7b-8c9d-0e1f2a3b4c08</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

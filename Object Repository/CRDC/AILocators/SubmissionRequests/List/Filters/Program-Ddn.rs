@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Program-Ddn</name>
+   <tag></tag>
+   <elementGuidId>c3a2b3d4-e5f6-4a7b-8c9d-0e1f2a3b4c05</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id='programName-filter']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id='programName-filter']</value>
+      <webElementGuid>c3a2b3d4-e5f6-4a7b-8c9d-0e1f2a3b4c06</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

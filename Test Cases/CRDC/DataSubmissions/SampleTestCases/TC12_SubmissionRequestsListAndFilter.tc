@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Sample test for Submission Requests list: navigate to list, verify list page, apply filters (status multi-select), verify results, reset filters. Uses SubmissionRequestList keywords with mixed data strategy (existing records).</description>
+   <name>TC12_SubmissionRequestsListAndFilter</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>d7e8f9a0-b1c2-4d3e-a5f6-071829304050</testCaseGuid>
+</TestCaseEntity>

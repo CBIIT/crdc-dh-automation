@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Review-Btn</name>
+   <tag></tag>
+   <elementGuidId>8f26715b-61a5-48c2-bc9a-b3df3879e4c1</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid='progress-bar-section-4']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid='progress-bar-section-4']</value>
+      <webElementGuid>b3b10e0a-1581-4117-b1be-b11ef2bf9635</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

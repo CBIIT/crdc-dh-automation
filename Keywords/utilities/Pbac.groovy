@@ -680,7 +680,8 @@ class Pbac extends TestRunner {
 			try {
 				SubmissionRequest.clickHome()
 				TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
-				return WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn"), 5, FailureHandling.OPTIONAL)
+				//return WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn"), 5, FailureHandling.OPTIONAL)
+				return WebUIUtils.fastElementPresent('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
 			} catch (Exception e) {
 				KeywordUtil.logInfo("Error verifying permission - submission_request:create -> ${e.message}")
 				return false
@@ -691,8 +692,25 @@ class Pbac extends TestRunner {
 			try {
 				SubmissionRequest.clickHome()
 				TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
-				//only run the create SR flow if the Create button is available
+				//only run the create SR flow if the Create button is available -- verify the Resume button is displayed in SR list and the Submit button during SR creation
 				if (WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn"), 5, FailureHandling.OPTIONAL)) {
+					boolean srSubmitExists = false, srListResume = false;
+					//SR resume flow
+					TestRunner.clickTab('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
+					WebUI.delay(1)
+					TestRunner.clickTab('CRDC/SubmissionRequest/readAndAcceptPopUp-Btn')
+					WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
+					TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
+					String loggedInUserName = WebUIUtils.getProfileName()
+					SubmissionRequestList.applySubmissionRequestsListFilters([
+						submitterName: loggedInUserName,
+						program: '',
+						study: '',
+						status: 'In Progress'
+					])
+					srListResume = WebUI.verifyElementPresent(findTestObject("CRDC/AILocators/SubmissionRequests/List/Resume-Btn"), 5, FailureHandling.OPTIONAL)
+					
+					//SR create/submit flow
 					TestRunner.clickTab('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
 					WebUI.delay(1)
 					TestRunner.clickTab('CRDC/SubmissionRequest/readAndAcceptPopUp-Btn')
@@ -726,7 +744,9 @@ class Pbac extends TestRunner {
 					WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
 					WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
 
-					return WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Submit-Btn"), 5, FailureHandling.OPTIONAL)
+					srSubmitExists = WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Submit-Btn"), 5, FailureHandling.OPTIONAL)
+					
+					return srListResume && srSubmitExists;
 				}
 				return false
 			} catch (Exception e) {
@@ -737,11 +757,32 @@ class Pbac extends TestRunner {
 		permissionToCheck["submission_request:review"] = {
 			KeywordUtil.logInfo("Verifying SR Review...")
 			try {
+				//Verify the Review button on SR list page exists and the Approve, Reject, Request Additional Information buttons on SR form review page exists
+				boolean srReviewExists = false, srApproveRejectRequestInfoExist = false;
+				//Review button flow
 				Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 30)
 				WebUI.delay(1) //Race condition upon login
 				SubmissionRequest.clickHome()
-				TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
-				return WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Review-Btn"), 5, FailureHandling.OPTIONAL)
+				clickTab('CRDC/NavBar/SubmissionRequest-Tab')
+				SubmissionRequestList.applySubmissionRequestsListFilters([
+					submitterName: '',
+					program: '',
+					study: '',
+					status: 'Submitted, In Review'
+				])
+				srReviewExists = WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Review-Btn"), 5, FailureHandling.OPTIONAL)
+				
+				//only run if the Review button is available
+				if (srReviewExists) {
+					//Approve, Reject, Request Additional Information buttons flow
+					clickTab('CRDC/SubmissionRequest/Review-Btn')
+					clickTab('CRDC/AILocators/SubmissionRequests/Form/Navigation/Review-Btn')
+					srApproveRejectRequestInfoExist = WebUI.verifyElementPresent(findTestObject("CRDC/AILocators/SubmissionRequests/Form/Navigation/Approve-Btn"), 5, FailureHandling.OPTIONAL) &&
+					WebUI.verifyElementPresent(findTestObject("CRDC/AILocators/SubmissionRequests/Form/Navigation/Reject-Btn"), 5, FailureHandling.OPTIONAL) &&
+					WebUI.verifyElementPresent(findTestObject("CRDC/AILocators/SubmissionRequests/Form/Navigation/Inquire-Btn"), 5, FailureHandling.OPTIONAL);
+					return srReviewExists && srApproveRejectRequestInfoExist;
+				}
+				return srReviewExists;
 			} catch (Exception e) {
 				KeywordUtil.logInfo("Error verifying permission - submission_request:review -> ${e.message}")
 				return false
@@ -752,7 +793,8 @@ class Pbac extends TestRunner {
 			try {
 				SubmissionRequest.clickHome()
 				TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
-				return WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Cancel-Btn"), 5, FailureHandling.OPTIONAL)
+				//return WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Cancel-Btn"), 5, FailureHandling.OPTIONAL)
+				return WebUIUtils.fastElementPresent('CRDC/SubmissionRequest/Cancel-Btn')
 			} catch (Exception e) {
 				KeywordUtil.logInfo("Error verifying permission - submission_request:cancel -> ${e.message}")
 				return false
@@ -761,8 +803,8 @@ class Pbac extends TestRunner {
 		permissionToCheck["data_submission:view"] = {
 			KeywordUtil.logInfo("Verifying DS View...")
 			try {
+				//Check if data submissions exist on DS list page and if studies exist on Data Explorer list page
 				boolean dataSubmissionsExist = true, dataExplorerExist = true;
-
 				SubmissionRequest.clickHome()
 				TestRunner.clickTab('CRDC/NavBar/DataSubmissions-Tab')
 				WebUI.delay(3)
@@ -792,9 +834,15 @@ class Pbac extends TestRunner {
 		permissionToCheck["data_submission:create"] = {
 			KeywordUtil.logInfo("Verifying DS Create...")
 			try {
+				//Check if Data Submission Create button exists and API Token menu exists
+				boolean dataSubmissionCreateExist = false, apiTokenExist = false;
 				SubmissionRequest.clickHome()
 				TestRunner.clickTab('CRDC/NavBar/DataSubmissions-Tab')
-				return WebUI.verifyElementPresent(findTestObject("CRDC/DataSubmissions/Create/CreateADataSubmission-Btn"), 5, FailureHandling.OPTIONAL)
+				dataSubmissionCreateExist = WebUI.verifyElementPresent(findTestObject("CRDC/DataSubmissions/Create/CreateADataSubmission-Btn"), 5, FailureHandling.OPTIONAL)
+				clickTab('CRDC/Login/UserProfile-Dd')
+				apiTokenExist = WebUI.verifyElementPresent(findTestObject("CRDC/AILocators/Global/Header/Desktop/APIToken-Btn"), 5, FailureHandling.OPTIONAL)
+				SubmissionRequest.clickHome()
+				return dataSubmissionCreateExist && apiTokenExist;
 			} catch (Exception e) {
 				KeywordUtil.logInfo("Error verifying permission - data_submission:create -> ${e.message}")
 				return false
@@ -943,7 +991,8 @@ class Pbac extends TestRunner {
 			try {
 				SubmissionRequest.clickHome()
 				SubmissionRequest.clickAccountDropdown()
-				return WebUI.verifyElementPresent(findTestObject("CRDC/NavBar/ManagePrograms-Btn"), 5, FailureHandling.OPTIONAL)
+				//return WebUI.verifyElementPresent(findTestObject("CRDC/NavBar/ManagePrograms-Btn"), 5, FailureHandling.OPTIONAL)
+				return WebUIUtils.fastElementPresent('CRDC/NavBar/ManagePrograms-Btn')
 			} catch (Exception e) {
 				KeywordUtil.logInfo("Error verifying permission - program:manage -> ${e.message}")
 				return false
@@ -954,7 +1003,8 @@ class Pbac extends TestRunner {
 			try {
 				SubmissionRequest.clickHome()
 				SubmissionRequest.clickAccountDropdown()
-				return WebUI.verifyElementPresent(findTestObject("CRDC/NavBar/ManageStudies-Btn"), 5, FailureHandling.OPTIONAL)
+				//return WebUI.verifyElementPresent(findTestObject("CRDC/NavBar/ManageStudies-Btn"), 5, FailureHandling.OPTIONAL)
+				return WebUIUtils.fastElementPresent('CRDC/NavBar/ManageStudies-Btn')
 			} catch (Exception e) {
 				KeywordUtil.logInfo("Error verifying permission - study:manage -> ${e.message}")
 				return false
@@ -965,7 +1015,8 @@ class Pbac extends TestRunner {
 			try {
 				SubmissionRequest.clickHome()
 				SubmissionRequest.clickAccountDropdown()
-				return WebUI.verifyElementPresent(findTestObject("CRDC/NavBar/ManageInstitutions-Btn"), 5, FailureHandling.OPTIONAL)
+				//return WebUI.verifyElementPresent(findTestObject("CRDC/NavBar/ManageInstitutions-Btn"), 5, FailureHandling.OPTIONAL)
+				return WebUIUtils.fastElementPresent('CRDC/NavBar/ManageInstitutions-Btn')
 			} catch (Exception e) {
 				KeywordUtil.logInfo("Error verifying permission - institution:manage -> ${e.message}")
 				return false
@@ -976,7 +1027,8 @@ class Pbac extends TestRunner {
 			try {
 				SubmissionRequest.clickHome()
 				SubmissionRequest.clickAccountDropdown()
-				return WebUI.verifyElementPresent(findTestObject("CRDC/NavBar/ManageUsers-Btn"), 5, FailureHandling.OPTIONAL)
+				//return WebUI.verifyElementPresent(findTestObject("CRDC/NavBar/ManageUsers-Btn"), 5, FailureHandling.OPTIONAL)
+				return WebUIUtils.fastElementPresent('CRDC/NavBar/ManageUsers-Btn')
 			} catch (Exception e) {
 				KeywordUtil.logInfo("Error verifying permission - user:manage -> ${e.message}")
 				return false
@@ -987,7 +1039,8 @@ class Pbac extends TestRunner {
 			try {
 				SubmissionRequest.clickHome()
 				SubmissionRequest.clickAccountDropdown()
-				return WebUI.verifyElementPresent(findTestObject("CRDC/NavBar/OperationDashboard-Btn"), 5, FailureHandling.OPTIONAL)
+				//return WebUI.verifyElementPresent(findTestObject("CRDC/NavBar/OperationDashboard-Btn"), 5, FailureHandling.OPTIONAL)
+				return WebUIUtils.fastElementPresent('CRDC/NavBar/OperationDashboard-Btn')
 			} catch (Exception e) {
 				KeywordUtil.logInfo("Error verifying permission - dashboard:view -> ${e.message}")
 				return false
@@ -999,7 +1052,8 @@ class Pbac extends TestRunner {
 				SubmissionRequest.clickHome()
 				SubmissionRequest.clickAccountDropdown()
 				TestRunner.clickTab('CRDC/Login/UserProfile-Link')
-				return WebUI.verifyElementPresent(findTestObject("CRDC/ManageUsers/RequestAccess-Btn"), 5, FailureHandling.OPTIONAL)
+				//return WebUI.verifyElementPresent(findTestObject("CRDC/ManageUsers/RequestAccess-Btn"), 5, FailureHandling.OPTIONAL)
+				return WebUIUtils.fastElementPresent('CRDC/ManageUsers/RequestAccess-Btn')
 			} catch (Exception e) {
 				KeywordUtil.logInfo("Error verifying permission - access:request -> ${e.message}")
 				return false
