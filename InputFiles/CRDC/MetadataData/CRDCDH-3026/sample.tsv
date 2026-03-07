@@ -1,0 +1,6 @@
+type	sample_id	sample_type	sample_tumor_status
+sample	auto_sample1	Cells	Normal
+sample	auto_sample2	Mouth Rinse	Not Reported
+sample	auto_sample3	Bone Marrow	Tumor
+sample	auto_sample4	Cells	Peritumoral
+sample	auto_sample5	Tissue	Unknown

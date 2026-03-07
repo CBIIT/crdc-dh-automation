@@ -1,0 +1,2 @@
+type	study_id	study_name	study_acronym	study_description	study_external_url	phs_accession	bioproject_accession
+study	hello1	AutomationQA_Study	autoQA	std dec	https://study1	phs94567	
