@@ -1042,4 +1042,69 @@ class WebUIUtils {
 			KeywordUtil.markFailed("verifyRowsPerPageChange: one or more checks failed for " + rowsPerPage)
 		}
 	}
+
+	/**
+	 * Fast presence check that bypasses heavier Katalon wait behavior while still
+	 * allowing a short bounded wait for positive scenarios. The check polls using
+	 * Selenium with implicit wait temporarily set to 0 and only returns true when
+	 * a matching element is displayed.
+	 *
+	 * @param locatorKey Object Repository path (e.g. 'CRDC/SubmissionRequest/Review-Btn')
+	 * @param timeoutSeconds maximum number of seconds to poll before returning false
+	 * @return true if a displayed matching element is found within the timeout, false otherwise
+	 */
+	@Keyword
+	static boolean fastElementPresent(String locatorKey, int timeoutSeconds = 5) {
+		WebDriver driver = DriverFactory.getWebDriver()
+		String xpath = TestRunner.givexpath(locatorKey)
+		long deadline = System.currentTimeMillis() + (timeoutSeconds * 1000L)
+		try {
+			driver.manage().timeouts().implicitlyWait(0, java.util.concurrent.TimeUnit.SECONDS)
+			while (System.currentTimeMillis() <= deadline) {
+				List<WebElement> matches = driver.findElements(By.xpath(xpath))
+				boolean displayed = matches.any { WebElement el ->
+					try {
+						return el != null && el.isDisplayed()
+					} catch (Exception ignored) {
+						return false
+					}
+				}
+				if (displayed) {
+					return true
+				}
+				Thread.sleep(250)
+			}
+			return false
+		} catch (Exception e) {
+			KeywordUtil.logInfo("fastElementPresent: " + e.getMessage())
+			return false
+		} finally {
+			driver.manage().timeouts().implicitlyWait(10, java.util.concurrent.TimeUnit.SECONDS)
+		}
+	}
+
+	/**
+	 * Returns the display name from the profile button in the top-right header (element #navbar-dropdown-name).
+	 * Waits up to {@code timeoutSeconds} for the element to be present, then reads its text.
+	 *
+	 * @param timeoutSeconds Max seconds to wait for the profile button (default 10)
+	 * @return The trimmed text of the profile name element, or empty string if not found
+	 */
+	@Keyword
+	static String getProfileName(int timeoutSeconds = 10) {
+		try {
+			def profileTo = findTestObject('CRDC/AILocators/Global/Header/Desktop/UserName-Btn')
+			boolean present = WebUI.waitForElementPresent(profileTo, timeoutSeconds)
+			if (!present) {
+				KeywordUtil.logInfo("getProfileName: profile button not found within " + timeoutSeconds + "s")
+				return ''
+			}
+			String name = WebUI.getText(profileTo)?.trim() ?: ''
+			KeywordUtil.logInfo("getProfileName: " + name)
+			return name
+		} catch (Exception e) {
+			KeywordUtil.logInfo("getProfileName: " + e.getMessage())
+			return ''
+		}
+	}
 }
