@@ -1,0 +1,49 @@
+# AI Triage Agent Configuration
+# Adjust model_id to any Amazon Bedrock-supported model
+
+bedrock:
+  model_id: "us.anthropic.claude-3-haiku-20240307-v1:0"
+  region: "us-east-1"
+  max_tokens: 5000
+  # Set to false to run purely rule-based (no LLM calls)
+  enabled: true
+
+reports:
+  # Katalon report root (contains timestamped run dirs and ValidationReport HTML)
+  katalon_reports_dir: "Reports"
+  # CLI uploader log/report directory
+  cli_logs_dir: "Tools/crdc-datahub-cli-uploader-src/tmp"
+  # Where the triage report will be written
+  output_dir: "Reports/AI_Triage"
+  output_format: "markdown"
+
+classification:
+  flaky_patterns:
+    - "StaleElementReferenceException"
+    - "ElementClickInterceptedException"
+    - "ElementNotInteractableException"
+    - "element is not attached to the page document"
+    - "element click intercepted"
+    - "Loading-Icon"
+    - "waitForElementToDisappear"
+    - "OTP failed"
+    - "Grant button not found"
+    - "likely OTP failed"
+    - "Unable to click on object"
+    - "Object is not clickable at point"
+    - "TimeoutException"
+    - "NoSuchSessionException"
+    - "WebDriverException: disconnected"
+  environment_patterns:
+    - "path does not exist"
+    - "metadata_encoding"
+    - "pip install"
+    - "connection refused"
+    - "Connection reset"
+    - "ERR_CONNECTION_REFUSED"
+    - "ERR_NAME_NOT_RESOLVED"
+    - "unable to connect to renderer"
+    - "session not created"
+    - "cannot find Chrome binary"
+  # When true, failures not matching any rule-based pattern are sent to Bedrock
+  use_llm_for_unknown: true
