@@ -254,6 +254,47 @@ public class DatabaseUtils {
 	}
 
 	/**
+	 * Verifies that the table total displayed in the UI (from pagination "X–Y of Z") matches the
+	 * document count in a MongoDB collection. Reusable for Manage Users (users), Manage Programs
+	 * (organization), Manage Studies (approvedStudies), or any other list page with pagination.
+	 * Manages connection lifecycle (connect, verify, close).
+	 *
+	 * @param uiCount Total entry count from the UI (e.g. WebUIUtils.getTableTotalEntryCount()). If &lt; 0, the keyword fails and does not connect to MongoDB.
+	 * @param collectionName MongoDB collection name (e.g. "users", "organization", "approvedStudies").
+	 * @param filter Optional filter Map for the count query; use null or [:] for all documents.
+	 * @param reportSection Optional section label for ValidationReport (default "MongoDB").
+	 * @param reportLabel Optional label for the report item (default "Table vs &lt;collectionName&gt; collection").
+	 */
+	@Keyword
+	public static void verifyTableCountMatchesMongoCollection(int uiCount, String collectionName, Map filter = null, String reportSection = "MongoDB", String reportLabel = null) {
+		if (uiCount < 0) {
+			KeywordUtil.markFailed("verifyTableCountMatchesMongoCollection: UI count is invalid (${uiCount}). Cannot compare to MongoDB.")
+			return
+		}
+		if (collectionName == null || collectionName.isEmpty()) {
+			KeywordUtil.markFailed("verifyTableCountMatchesMongoCollection: collectionName must not be null or empty.")
+			return
+		}
+		String label = (reportLabel != null && !reportLabel.isEmpty()) ? reportLabel : "Table vs ${collectionName} collection"
+		connectFromGlobalVariable()
+		try {
+			long mongoCount = count(collectionName, filter)
+			String expectedStr = String.valueOf(mongoCount)
+			String actualStr = String.valueOf(uiCount)
+			boolean match = (uiCount == mongoCount)
+			String status = match ? "Pass" : "Fail"
+			ValidationReport.addValidationReportItem(reportSection, label, expectedStr, actualStr, status)
+			if (!match) {
+				KeywordUtil.markFailed("verifyTableCountMatchesMongoCollection: count mismatch for ${collectionName}. UI=${uiCount}, MongoDB=${mongoCount}")
+			} else {
+				KeywordUtil.logInfo("verifyTableCountMatchesMongoCollection: ${collectionName} count verified. UI and MongoDB both ${uiCount}")
+			}
+		} finally {
+			close()
+		}
+	}
+
+	/**
 	 * Verifies that no records exist in the dataRecords collection for the given submission ID.
 	 * Used for negative scenarios (e.g. failed essential validation, no data loaded).
 	 * Manages connection lifecycle (connect, verify, close).
