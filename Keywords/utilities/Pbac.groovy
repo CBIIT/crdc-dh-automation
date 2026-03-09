@@ -709,7 +709,7 @@ class Pbac extends TestRunner {
 						status: 'In Progress'
 					])
 					srListResume = WebUI.verifyElementPresent(findTestObject("CRDC/AILocators/SubmissionRequests/List/Resume-Btn"), 5, FailureHandling.OPTIONAL)
-					
+
 					//SR create/submit flow
 					TestRunner.clickTab('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
 					WebUI.delay(1)
@@ -745,7 +745,7 @@ class Pbac extends TestRunner {
 					WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
 
 					srSubmitExists = WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Submit-Btn"), 5, FailureHandling.OPTIONAL)
-					
+
 					return srListResume && srSubmitExists;
 				}
 				return false
@@ -771,15 +771,15 @@ class Pbac extends TestRunner {
 					status: 'Submitted, In Review'
 				])
 				srReviewExists = WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Review-Btn"), 5, FailureHandling.OPTIONAL)
-				
+
 				//only run if the Review button is available
 				if (srReviewExists) {
 					//Approve, Reject, Request Additional Information buttons flow
 					clickTab('CRDC/SubmissionRequest/Review-Btn')
 					clickTab('CRDC/AILocators/SubmissionRequests/Form/Navigation/Review-Btn')
 					srApproveRejectRequestInfoExist = WebUI.verifyElementPresent(findTestObject("CRDC/AILocators/SubmissionRequests/Form/Navigation/Approve-Btn"), 5, FailureHandling.OPTIONAL) &&
-					WebUI.verifyElementPresent(findTestObject("CRDC/AILocators/SubmissionRequests/Form/Navigation/Reject-Btn"), 5, FailureHandling.OPTIONAL) &&
-					WebUI.verifyElementPresent(findTestObject("CRDC/AILocators/SubmissionRequests/Form/Navigation/Inquire-Btn"), 5, FailureHandling.OPTIONAL);
+							WebUI.verifyElementPresent(findTestObject("CRDC/AILocators/SubmissionRequests/Form/Navigation/Reject-Btn"), 5, FailureHandling.OPTIONAL) &&
+							WebUI.verifyElementPresent(findTestObject("CRDC/AILocators/SubmissionRequests/Form/Navigation/Inquire-Btn"), 5, FailureHandling.OPTIONAL);
 					return srReviewExists && srApproveRejectRequestInfoExist;
 				}
 				return srReviewExists;

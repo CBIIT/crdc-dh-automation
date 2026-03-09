@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC17_CRDC-PbacManageScope-Fedlead</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>ec4f7425-c3c6-4c5c-94f0-632e71e30847</testCaseGuid>
+</TestCaseEntity>

@@ -622,6 +622,65 @@ class WebUIUtils {
 	}
 
 	/**
+	 * Reads the pagination "X–Y of Z" text (e.g. "1–20 of 193") and returns the total number of table entries (Z).
+	 * Uses the Object Repository locator CRDC/AILocators/GenericTable/Pagination/TablePagination-DisplayedRows
+	 * unless a custom TestObject is provided.
+	 * When waitForNonZeroTimeoutSeconds &gt; 0 and the initial total is 0, polls until the total becomes non-zero
+	 * (table data loaded) or the timeout is reached, to avoid race conditions on slow-loading list pages.
+	 *
+	 * @param displayedRowsTo (Optional) TestObject for the displayed-rows element. If null, uses findTestObject('CRDC/AILocators/GenericTable/Pagination/TablePagination-DisplayedRows').
+	 * @param waitForNonZeroTimeoutSeconds (Optional) If &gt; 0 and parsed total is 0, poll every 2 seconds until total &gt; 0 or this many seconds elapsed. Default 0 = no waiting.
+	 * @return Total entry count (e.g. 193), or -1 if the element is not found or the text is unparseable.
+	 */
+	@Keyword
+	static int getTableTotalEntryCount(int waitForNonZeroTimeoutSeconds = 15, TestObject displayedRowsTo = null) {
+		WebUI.delay(1)
+		TestObject to = displayedRowsTo != null ? displayedRowsTo : findTestObject('CRDC/AILocators/GenericTable/Pagination/TablePagination-DisplayedRows')
+		if (!WebUI.waitForElementPresent(to, DEFAULT_TIMEOUT)) {
+			KeywordUtil.logInfo("getTableTotalEntryCount: displayed-rows element not found")
+			return -1
+		}
+		int total = parseTotalFromDisplayedRows(to)
+		if (total < 0) return -1
+		if (total == 0 && waitForNonZeroTimeoutSeconds > 0) {
+			int waited = 0
+			int pollIntervalSeconds = 2
+			while (waited < waitForNonZeroTimeoutSeconds) {
+				WebUI.delay(pollIntervalSeconds)
+				waited += pollIntervalSeconds
+				total = parseTotalFromDisplayedRows(to)
+				if (total < 0) return -1
+				if (total > 0) {
+					KeywordUtil.logInfo("getTableTotalEntryCount: total = " + total + " (after " + waited + "s wait for table load)")
+					return total
+				}
+			}
+			KeywordUtil.logInfo("getTableTotalEntryCount: total still 0 after waiting " + waitForNonZeroTimeoutSeconds + "s")
+		} else {
+			KeywordUtil.logInfo("getTableTotalEntryCount: total = " + total)
+		}
+		return total
+	}
+
+	/**
+	 * Parses the "X–Y of Z" text from the displayed-rows element and returns Z (total), or -1 if not found/unparseable.
+	 */
+	private static int parseTotalFromDisplayedRows(TestObject to) {
+		String text = WebUI.getText(to)?.trim() ?: ""
+		if (text.isEmpty()) {
+			KeywordUtil.logInfo("getTableTotalEntryCount: displayed-rows text is empty")
+			return -1
+		}
+		// Expected format: "1–10 of 50" (MUI uses en-dash \u2013 or hyphen)
+		def m = (text =~ /(\d+)\s*[\u2013\-]\s*(\d+)\s+of\s+(\d+)/)
+		if (!m.find()) {
+			KeywordUtil.logInfo("getTableTotalEntryCount: could not parse text '" + text + "'")
+			return -1
+		}
+		return Integer.parseInt(m.group(3))
+	}
+
+	/**
 	 * Returns the currently active page number (1-based) by inspecting the pagination buttons.
 	 * Looks for the button with aria-current="true" inside the pagination nav.
 	 *

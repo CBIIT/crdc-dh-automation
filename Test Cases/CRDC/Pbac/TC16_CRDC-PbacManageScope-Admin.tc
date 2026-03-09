@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC16_CRDC-PbacManageScope-Admin</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>58312595-6d24-49ea-a456-100aa2c44d3c</testCaseGuid>
+</TestCaseEntity>
