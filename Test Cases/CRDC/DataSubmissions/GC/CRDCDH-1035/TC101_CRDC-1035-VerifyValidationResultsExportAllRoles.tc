@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC101_CRDC-1035-VerifyValidationResultsExportAllRoles</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>dcaa25b7-c001-4d71-99ea-b07b14ddcdbd</testCaseGuid>
+</TestCaseEntity>

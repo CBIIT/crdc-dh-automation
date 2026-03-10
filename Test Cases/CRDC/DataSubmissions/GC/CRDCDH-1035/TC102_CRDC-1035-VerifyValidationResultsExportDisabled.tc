@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC102_CRDC-1035-VerifyValidationResultsExportDisabled</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>8bba9fcf-34ff-4a62-a54d-57d5175df7a4</testCaseGuid>
+</TestCaseEntity>
