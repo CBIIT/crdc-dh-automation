@@ -690,6 +690,64 @@ class DataSubmissions extends TestRunner {
 			}
 	}
 
+	/**
+	 * Normalizes a submission name the same way the UI does for the export filename:
+	 * trim, replace spaces with hyphen, then keep only alphanumeric and hyphen (matches filterAlphaNumeric(..., "-")).
+	 */
+	private static String normalizeSubmissionNameForExport(String name) {
+		if (name == null) return ""
+		return name.trim().replaceAll(" ", "-").replaceAll("[^a-zA-Z0-9-]", "")
+	}
+
+	/**
+	 * Clicks the Validation Results export button (export-validation-button) and verifies that the
+	 * downloaded file name follows the expected pattern: {submissionName}-{YYYY-MM-DDThhmmss}.csv
+	 * (e.g. "auto-test20260309142645-2026-03-09T151725.csv"). File is expected in project Downloads folder.
+	 * Assumes caller is on the Data Submission detail page with Validation Results tab in aggregated view.
+	 *
+	 * @param expectedSubmissionName The expected data submission name (first part of filename before the hyphen and timestamp).
+	 *        If null or empty, only the timestamp pattern (YYYY-MM-DDThhmmss) is verified.
+	 */
+	@Keyword
+	void clickValidationResultsExportAndVerifyDownloadedFileName(String expectedSubmissionName) {
+		TestObject exportBtn = findTestObject("CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults")
+		if (!WebUIUtils.waitForElementClickableWithStaleRetry(exportBtn, 60)) {
+			return
+		}
+		WebUI.click(exportBtn)
+		WebUI.delay(8)
+		File projectDownloads = getProjectDownloadsDir()
+		File latest = findLatestFile(projectDownloads)
+		if (latest == null) {
+			KeywordUtil.markFailed("clickValidationResultsExportAndVerifyDownloadedFileName: no file found in project Downloads (${projectDownloads.absolutePath}) after clicking export")
+			return
+		}
+		String fileName = latest.name
+		// Pattern: {submissionName}-{YYYY-MM-DDThhmmss}.csv or without extension
+		def matcher = (fileName =~ /^(.+)-(\d{4}-\d{2}-\d{2}T\d{6})(\.csv)?$/)
+		if (!matcher.find()) {
+			ValidationReport.addValidationReportItem("Validation Results Export", "Downloaded file name", "pattern: {submissionName}-YYYY-MM-DDThhmmss.csv", fileName, "Fail")
+			KeywordUtil.markFailed("clickValidationResultsExportAndVerifyDownloadedFileName: downloaded file name does not match pattern. Got: " + fileName)
+			return
+		}
+		String namePart = matcher.group(1)
+		String timestampPart = matcher.group(2)
+		if (expectedSubmissionName != null && !expectedSubmissionName.isEmpty()) {
+			String normalizedExpected = normalizeSubmissionNameForExport(expectedSubmissionName)
+			// Prefix match: UI label may be truncated while export uses full name; verify name part starts with expected
+			if (!namePart.startsWith(normalizedExpected)) {
+				ValidationReport.addValidationReportItem("Validation Results Export", "Submission name in filename", "starts with " + normalizedExpected, namePart, "Fail")
+				KeywordUtil.markFailed("clickValidationResultsExportAndVerifyDownloadedFileName: filename submission name '" + namePart + "' does not start with expected '" + normalizedExpected + "'")
+				return
+			}
+		}
+		String expectedLabel = (expectedSubmissionName != null && !expectedSubmissionName.isEmpty())
+			? "pattern match, submission: ${namePart}"
+			: "pattern match (submission + timestamp)"
+		ValidationReport.addValidationReportItem("Validation Results Export", "Downloaded file name", expectedLabel, fileName, "Pass")
+		KeywordUtil.logInfo("clickValidationResultsExportAndVerifyDownloadedFileName: verified downloaded file: ${fileName} (submission name: ${namePart})")
+	}
+
 	// ------------------------------- Validation Results vs expected TSV -------------------------------
 
 	/**
