@@ -2,6 +2,7 @@ package utilities
 
 import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
 import com.kms.katalon.core.annotation.Keyword
+import com.kms.katalon.core.exception.StepFailedException
 import com.kms.katalon.core.util.KeywordUtil
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import internal.GlobalVariable
@@ -137,6 +138,34 @@ class WebUIUtils {
 		if (status == "Fail") {
 			KeywordUtil.markFailed("verifyButtonEnabled: expected ${expectedState}, actual ${actualState}")
 		}
+	}
+
+	/**
+	 * Waits for the element to be clickable, retrying on StaleElementReferenceException (e.g. after tab switch when DOM re-renders).
+	 * Up to 5 attempts; each attempt uses the full timeout so we re-find the element on retry.
+	 * @param to TestObject for the element
+	 * @param timeoutSeconds Timeout in seconds per attempt
+	 * @return true if element became clickable, false if all attempts failed (and marks test failed)
+	 */
+	@Keyword
+	static boolean waitForElementClickableWithStaleRetry(TestObject to, int timeoutSeconds) {
+		int maxAttempts = 5
+		Throwable lastCause = null
+		for (int i = 0; i < maxAttempts; i++) {
+			try {
+				WebUI.waitForElementClickable(to, timeoutSeconds)
+				return true
+			} catch (StepFailedException e) {
+				lastCause = e.getCause()
+				if (lastCause instanceof StaleElementReferenceException) {
+					KeywordUtil.logInfo("waitForElementClickableWithStaleRetry: Stale element, retrying (attempt ${i + 1}/${maxAttempts})...")
+				} else {
+					throw e
+				}
+			}
+		}
+		KeywordUtil.markFailed("waitForElementClickableWithStaleRetry: element not clickable after ${maxAttempts} attempts (last: ${lastCause?.getMessage()})")
+		return false
 	}
 
 	/**
