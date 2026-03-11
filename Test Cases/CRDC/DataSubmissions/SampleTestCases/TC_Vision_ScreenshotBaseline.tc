@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Vision baseline: compare data submission page screenshot to baseline image via Claude on Bedrock. Requires baseline at InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline.png and profile vars AwsAccessKeyId, AwsSecretAccessKey (optional AwsRegion).</description>
+   <name>TC_Vision_ScreenshotBaseline</name>
+   <tag>Vision</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a7b8c9d0-e1f2-4356-7890-b1c2d3e4f5a6</testCaseGuid>
+</TestCaseEntity>

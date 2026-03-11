@@ -17,6 +17,10 @@ import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.Select
 import org.openqa.selenium.support.ui.WebDriverWait
+import java.util.concurrent.TimeUnit
+import java.nio.file.Path
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 /**
  * Generic, reusable web UI verification helpers (tooltips, element count, etc.).
@@ -1193,6 +1197,96 @@ class WebUIUtils {
 		} catch (Exception e) {
 			KeywordUtil.logInfo("getProfileName: " + e.getMessage())
 			return ''
+		}
+	}
+
+	/**
+	 * Compare current screenshot to a baseline image using Claude on AWS Bedrock.
+	 * Runs PythonFiles/CRDC/CompareScreenshotToBaseline.py with current and baseline paths.
+	 * Adds result to ValidationReport and marks test failed if comparison is FAIL.
+	 * <p>
+	 * AWS credentials: If the Katalon profile defines AwsAccessKeyId and AwsSecretAccessKey,
+	 * they are passed into the Python process so Bedrock can authenticate. Optional AwsRegion
+	 * (e.g. us-east-1) can be set to override the script default. Otherwise the script uses
+	 * the standard AWS chain (environment variables or ~/.aws/credentials).
+	 * </p>
+	 * @param currentScreenshotPath Full path to the screenshot just captured (e.g. Reports/... or temp path)
+	 * @param baselineScreenshotPath Full path to the expected baseline image (e.g. InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline.png)
+	 * @param reportSection Section name for ValidationReport (e.g. "Data Submission Charts")
+	 * @param verbose if true, pass --verbose to the Python script and log the full output (Bedrock call info and raw LLM response) to the Katalon log
+	 * @return true if PASS, false if FAIL
+	 */
+	@Keyword
+	static boolean verifyScreenshotMatchesBaseline(String currentScreenshotPath, String baselineScreenshotPath, String reportSection = "Screenshot vs baseline", boolean verbose = false) {
+		String pythonExe = Utils.getPythonExecutablePath()
+		Path scriptPath = Utils.getPythonFilePath("CompareScreenshotToBaseline.py")
+		if (scriptPath == null || !scriptPath.toFile().exists()) {
+			KeywordUtil.logInfo("verifyScreenshotMatchesBaseline: script not found at " + scriptPath)
+			ValidationReport.addValidationReportItem(reportSection, "Screenshot vs baseline", "Match baseline", "Script not found", "Fail")
+			KeywordUtil.markFailed("CompareScreenshotToBaseline.py not found. Check AppKey=CRDC and PythonFiles/CRDC/.")
+			return false
+		}
+		List<String> cmd = [pythonExe, scriptPath.toString(), currentScreenshotPath, baselineScreenshotPath]
+		if (verbose) {
+			cmd.add("--verbose")
+		}
+		ProcessBuilder pb = new ProcessBuilder(cmd)
+		pb.redirectErrorStream(true)
+		// Pass AWS credentials from Katalon profile into the Python process when set (e.g. for Jenkins or shared profiles)
+		try {
+			String accessKey = GlobalVariable.AwsAccessKeyId?.toString()?.trim()
+			String secretKey = GlobalVariable.AwsSecretAccessKey?.toString()?.trim()
+			if (accessKey && secretKey) {
+				pb.environment().put("AWS_ACCESS_KEY_ID", accessKey)
+				pb.environment().put("AWS_SECRET_ACCESS_KEY", secretKey)
+				String region = GlobalVariable.AwsRegion?.toString()?.trim()
+				if (region) {
+					pb.environment().put("AWS_DEFAULT_REGION", region)
+				}
+			}
+		} catch (MissingPropertyException e) {
+			// Profile variables not defined; boto3 will use env or ~/.aws/credentials
+		}
+		try {
+			Process proc = pb.start()
+			BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()))
+			StringBuilder output = new StringBuilder()
+			String line
+			while ((line = reader.readLine()) != null) {
+				output.append(line).append("\n")
+			}
+			boolean finished = proc.waitFor(90, TimeUnit.SECONDS)
+			if (!finished) {
+				proc.destroyForcibly()
+				ValidationReport.addValidationReportItem(reportSection, "Screenshot vs baseline", "Match baseline", "Timeout (90s)", "Fail")
+				KeywordUtil.markFailed("Screenshot comparison timed out after 90s")
+				return false
+			}
+			String out = output.toString().trim()
+			if (verbose) {
+				KeywordUtil.logInfo("Screenshot comparison (verbose) output:\n" + out)
+			}
+			// Result and reason are always the last two lines of the script output
+			String[] lines = out.split("\n")
+			String result = (lines.length >= 2) ? lines[lines.length - 2].trim().toUpperCase() : (lines.length == 1 ? lines[0].trim().toUpperCase() : "FAIL")
+			String reason = (lines.length >= 2) ? lines[lines.length - 1].trim() : (lines.length == 1 ? lines[0].trim() : "No output")
+			if (!result.startsWith("PASS") && !result.startsWith("FAIL")) {
+				result = "FAIL"
+				reason = out.take(200)
+			}
+			String status = result.startsWith("PASS") ? "Pass" : "Fail"
+			ValidationReport.addValidationReportItem(reportSection, "Screenshot vs baseline", "Match baseline", reason, status)
+			if (status == "Fail") {
+				KeywordUtil.markFailed("Screenshot does not match baseline: " + reason)
+				return false
+			}
+			KeywordUtil.logInfo("Screenshot matches baseline: " + reason)
+			return true
+		} catch (Exception e) {
+			KeywordUtil.logInfo("verifyScreenshotMatchesBaseline: " + e.getMessage())
+			ValidationReport.addValidationReportItem(reportSection, "Screenshot vs baseline", "Match baseline", e.getMessage(), "Fail")
+			KeywordUtil.markFailed("Screenshot comparison failed: " + e.getMessage())
+			return false
 		}
 	}
 }
