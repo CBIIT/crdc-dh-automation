@@ -1420,6 +1420,7 @@ class DataSubmissions extends TestRunner {
 				])
 			}
 		}
+		TestRunner.clickTab("Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn")
 		KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: completed")
 	}
 
