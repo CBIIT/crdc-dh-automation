@@ -19,9 +19,7 @@ import java.nio.file.Paths
 import java.util.ArrayList
 import java.util.Arrays
 import java.util.Collections
-import java.util.LinkedHashMap
 import java.util.List
-import java.util.Map
 
 /**
  * Data Explorer verification keywords. Standalone class (does not extend TestRunner).
@@ -36,6 +34,8 @@ class DataExplorer {
 	private static final String REPORT_SECTION = "Data Explorer"
 	private static final String NODE_TYPE_DROPDOWN_OR = "CRDC/AILocators/DataExplorer/StudyView/NodeType-Ddn"
 	private static final String STUDY_VIEW_CONTAINER_OR = "CRDC/AILocators/DataExplorer/StudyView/Container"
+	private static final String COLUMN_VISIBILITY_BTN_OR = "CRDC/AILocators/DataExplorer/StudyView/ColumnVisibility-Btn"
+	private static final String SHOW_ALL_CHKBX_OR = "CRDC/AILocators/DataExplorer/StudyView/ShowAll-Chkbx"
 	private static final int DEFAULT_TIMEOUT = 20
 	private static final String METADATA_BASE = "InputFiles/CRDC/MetadataData"
 
@@ -66,6 +66,14 @@ class DataExplorer {
 
 				// 1. Select node type in dropdown
 				selectNodeType(driver, node)
+
+			// 1b. Open column visibility and select Show All so all columns are visible
+			WebUI.waitForElementClickable(findTestObject(COLUMN_VISIBILITY_BTN_OR), DEFAULT_TIMEOUT)
+			WebUI.click(findTestObject(COLUMN_VISIBILITY_BTN_OR))
+			WebUI.delay(1)
+			WebUI.waitForElementClickable(findTestObject(SHOW_ALL_CHKBX_OR), DEFAULT_TIMEOUT)
+			WebUI.check(findTestObject(SHOW_ALL_CHKBX_OR))
+			WebUI.delay(1)
 
 			// 2. Wait for table and verify structure
 			WebUI.delay(2)
@@ -108,25 +116,27 @@ class DataExplorer {
 				KeywordUtil.markFailed("Data Explorer node '${node}': expected ${expectedRowCount} rows, actual ${actualRowCount}.")
 			}
 
-			// 4. Map expected columns to UI column indices and compare cell-by-cell
-			// Match rows by first-column value (primary key) so order doesn't matter
+			// 3b. Verify each expected column header is present in the UI table
+			int[] expectedToUiIndex = mapExpectedHeadersToUiIndices(expectedHeaderNames, uiHeaders)
+			boolean allHeadersMatch = true
+			for (int c = 0; c < expectedHeaderNames.size(); c++) {
+				String expHeader = expectedHeaderNames.get(c) != null ? expectedHeaderNames.get(c).trim() : ""
+				int uiIdx = c < expectedToUiIndex.length ? expectedToUiIndex[c] : -1
+				String actHeader = (uiIdx >= 0 && uiIdx < uiHeaders.size()) ? (uiHeaders.get(uiIdx) != null ? uiHeaders.get(uiIdx).trim() : "") : ""
+				boolean found = uiIdx >= 0 && actHeader != null && !actHeader.isEmpty()
+				if (!found) allHeadersMatch = false
+				ValidationReport.addValidationReportItem(REPORT_SECTION, "Node '${node}' – column '${expHeader}'", "present in table", found ? actHeader : "missing", found ? "Pass" : "Fail")
+			}
+			if (!allHeadersMatch) {
+				KeywordUtil.markFailed("Data Explorer node '${node}': one or more expected column headers missing in table. See validation report.")
+			}
+
+			// 4. Map expected columns to UI column indices and compare cell-by-cell by row index
 			if (actualRows != null && expectedRows != null && actualRowCount == expectedRowCount && expectedRowCount > 0) {
-				int[] expectedToUiIndex = mapExpectedHeadersToUiIndices(expectedHeaderNames, uiHeaders)
-				Map<String, List<String>> expectedByKey = new LinkedHashMap<>()
-				for (List<String> row : expectedRows) {
-					String key = (row != null && !row.isEmpty() && row.get(0) != null) ? row.get(0).trim() : ""
-					expectedByKey.put(key, row)
-				}
 				boolean anyFail = false
-				for (int r = 0; r < actualRowCount; r++) {
+				for (int r = 0; r < expectedRowCount; r++) {
+					List<String> expRow = expectedRows.get(r)
 					List<String> actRow = actualRows.get(r)
-					String actKey = (actRow != null && !actRow.isEmpty() && actRow.get(0) != null) ? actRow.get(0).trim() : ""
-					List<String> expRow = expectedByKey.get(actKey)
-					if (expRow == null) {
-						ValidationReport.addValidationReportItem(REPORT_SECTION, "Node '${node}' row ${r + 1} (key=${actKey})", "expected row with this key", "no matching expected row", "Fail")
-						anyFail = true
-						continue
-					}
 					for (int c = 0; c < expRow.size(); c++) {
 						String exp = expRow.get(c) != null ? expRow.get(c).trim() : ""
 						int uiIdx = c < expectedToUiIndex.length ? expectedToUiIndex[c] : -1
@@ -264,11 +274,11 @@ class DataExplorer {
 	 */
 	private static void sortExpectedRowsByFirstColumn(List<List<String>> expectedRows) {
 		if (expectedRows == null || expectedRows.size() < 2) return
-		Collections.sort(expectedRows, { List<String> a, List<String> b ->
-			String va = (a != null && !a.isEmpty()) ? (a.get(0) != null ? a.get(0).trim() : "") : ""
-			String vb = (b != null && !b.isEmpty()) ? (b.get(0) != null ? b.get(0).trim() : "") : ""
-			return va.compareToIgnoreCase(vb)
-		})
+			Collections.sort(expectedRows, { List<String> a, List<String> b ->
+				String va = (a != null && !a.isEmpty()) ? (a.get(0) != null ? a.get(0).trim() : "") : ""
+				String vb = (b != null && !b.isEmpty()) ? (b.get(0) != null ? b.get(0).trim() : "") : ""
+				return va.compareToIgnoreCase(vb)
+			})
 	}
 
 	/**

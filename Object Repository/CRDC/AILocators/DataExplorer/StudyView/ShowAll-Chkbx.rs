@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>ShowAll-Chkbx</name>
+   <tag></tag>
+   <elementGuidId>44cb0d5d-026c-40e7-b696-a83bf0ac4635</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&quot;toggle-all-checkbox&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&quot;toggle-all-checkbox&quot;]</value>
+      <webElementGuid>8725cbcf-dabc-4fd1-9d58-33ca40a3a2bd</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
