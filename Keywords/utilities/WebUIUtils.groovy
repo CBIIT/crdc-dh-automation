@@ -1201,23 +1201,23 @@ class WebUIUtils {
 	}
 
 	/**
-	 * Compare current screenshot to a baseline image using Claude on AWS Bedrock.
-	 * Runs PythonFiles/CRDC/CompareScreenshotToBaseline.py with current and baseline paths.
-	 * Adds result to ValidationReport and marks test failed if comparison is FAIL.
+	 * Compare current screenshot to a baseline image using SSIM (structural similarity) locally.
+	 * Pass/fail is deterministic; no LLM is used for the decision. Optionally on FAIL, call Bedrock to get a short explanation.
+	 * Runs PythonFiles/CRDC/CompareScreenshotToBaseline.py. Adds result to ValidationReport and marks test failed if comparison is FAIL.
 	 * <p>
-	 * AWS credentials: If the Katalon profile defines AwsAccessKeyId and AwsSecretAccessKey,
-	 * they are passed into the Python process so Bedrock can authenticate. Optional AwsRegion
-	 * (e.g. us-east-1) can be set to override the script default. Otherwise the script uses
-	 * the standard AWS chain (environment variables or ~/.aws/credentials).
+	 * AWS credentials are only needed when explainWithLlm is true (to get a one-sentence description of the difference on failure).
 	 * </p>
 	 * @param currentScreenshotPath Full path to the screenshot just captured (e.g. Reports/... or temp path)
 	 * @param baselineScreenshotPath Full path to the expected baseline image (e.g. InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline.png)
 	 * @param reportSection Section name for ValidationReport (e.g. "Data Submission Charts")
-	 * @param verbose if true, pass --verbose to the Python script and log the full output (Bedrock call info and raw LLM response) to the Katalon log
+	 * @param verbose if true, pass --verbose to the Python script (SSIM score and dimensions in log)
+	 * @param threshold SSIM threshold for PASS (e.g. 0.99); null = use script default (0.99)
+	 * @param explainWithLlm if true, on FAIL call Bedrock to get a one-sentence explanation (requires AWS profile vars)
+	 * @param saveDiffPath if non-null, on FAIL save diff image to this path (e.g. Reports/vision_diff.png)
 	 * @return true if PASS, false if FAIL
 	 */
 	@Keyword
-	static boolean verifyScreenshotMatchesBaseline(String currentScreenshotPath, String baselineScreenshotPath, String reportSection = "Screenshot vs baseline", boolean verbose = false) {
+	static boolean verifyScreenshotMatchesBaseline(String currentScreenshotPath, String baselineScreenshotPath, String reportSection = "Screenshot vs baseline", boolean verbose = false, Double threshold = null, boolean explainWithLlm = false, String saveDiffPath = null) {
 		String pythonExe = Utils.getPythonExecutablePath()
 		Path scriptPath = Utils.getPythonFilePath("CompareScreenshotToBaseline.py")
 		if (scriptPath == null || !scriptPath.toFile().exists()) {
@@ -1229,6 +1229,17 @@ class WebUIUtils {
 		List<String> cmd = [pythonExe, scriptPath.toString(), currentScreenshotPath, baselineScreenshotPath]
 		if (verbose) {
 			cmd.add("--verbose")
+		}
+		if (threshold != null) {
+			cmd.add("--threshold")
+			cmd.add(threshold.toString())
+		}
+		if (explainWithLlm) {
+			cmd.add("--explain-with-llm")
+		}
+		if (saveDiffPath != null && !saveDiffPath.isEmpty()) {
+			cmd.add("--save-diff")
+			cmd.add(saveDiffPath)
 		}
 		ProcessBuilder pb = new ProcessBuilder(cmd)
 		pb.redirectErrorStream(true)

@@ -1,137 +1,163 @@
 #!/usr/bin/env python3
 """
-Compare a current screenshot to a baseline image using Claude on AWS Bedrock.
+Compare a current screenshot to a baseline image using SSIM (structural similarity).
+Pass/fail is deterministic; no LLM is used for the decision.
+Optionally, on FAIL, call Claude on Bedrock to get a short explanation of the difference.
+
 Prints to stdout: line 1 = PASS or FAIL, line 2 = reason.
 Used by Katalon keyword WebUIUtils.verifyScreenshotMatchesBaseline().
 """
 import argparse
 import base64
+import io
 import json
 import sys
+from typing import Optional, Tuple
 
+import numpy as np
+from PIL import Image
+
+try:
+    from skimage.metrics import structural_similarity as ssim
+except ImportError:
+    ssim = None  # type: ignore
+
+# Optional: only needed when --explain-with-llm is used
 try:
     import boto3
 except ImportError:
-    print("FAIL", file=sys.stderr)
-    print("boto3 not installed", file=sys.stderr)
-    sys.exit(1)
+    boto3 = None  # type: ignore
 
+DEFAULT_THRESHOLD = 0.99
 DEFAULT_REGION = "us-east-1"
 DEFAULT_MODEL = "anthropic.claude-3-sonnet-20240229-v1:0"
 
 
-def encode_image(path: str) -> str:
+def load_grayscale_array(path: str) -> np.ndarray:
+    """Load image from path, convert to grayscale, return numpy array (uint8)."""
     with open(path, "rb") as f:
-        return base64.b64encode(f.read()).decode("utf-8")
+        data = f.read()
+    img = Image.open(io.BytesIO(data))
+    if img.mode not in ("L", "RGB", "RGBA"):
+        img = img.convert("RGB")
+    if img.mode != "L":
+        img = img.convert("L")
+    return np.array(img, dtype=np.uint8)
 
 
-def compare_screenshots(
-    baseline_path: str, current_path: str, region: str, model_id: str, verbose: bool = False
-) -> tuple[str, str, str]:
+def compute_ssim(baseline_path: str, current_path: str) -> Tuple[float, Optional[np.ndarray]]:
     """
-    Send both images to Bedrock, get PASS/FAIL + reason.
-    Returns (result, reason, raw_response) where result is "PASS" or "FAIL".
-    raw_response is the full model text when verbose=True, else "".
+    Load baseline and current, align sizes (resize current to baseline), compute SSIM.
+    Returns (score, diff_image). diff_image is the absolute difference (0-255); can be used to save a diff PNG.
     """
-    baseline_b64 = encode_image(baseline_path)
-    current_b64 = encode_image(current_path)
+    gray_baseline = load_grayscale_array(baseline_path)
+    gray_current = load_grayscale_array(current_path)
 
-    prompt = """You are a QA visual verification assistant. You will see two screenshots.
+    if gray_baseline.shape != gray_current.shape:
+        # Resize current to baseline dimensions
+        pil_current = Image.fromarray(gray_current)
+        pil_baseline = Image.fromarray(gray_baseline)
+        try:
+            resample = Image.Resampling.LANCZOS
+        except AttributeError:
+            resample = getattr(Image, "LANCZOS", Image.LINEAR)
+        pil_current = pil_current.resize((pil_baseline.width, pil_baseline.height), resample)
+        gray_current = np.array(pil_current, dtype=np.uint8)
 
-Image 1 (first image): BASELINE - the expected reference.
-Image 2 (second image): CURRENT - the screenshot to verify.
+    if ssim is None:
+        raise RuntimeError("scikit-image is required; install with: pip install scikit-image")
 
-Task: Decide if the CURRENT screenshot shows the SAME page/screen as the BASELINE.
+    score, ssim_map = ssim(
+        gray_baseline,
+        gray_current,
+        data_range=255,
+        full=True,
+    )
+    # ssim_map is similarity per pixel (1 = same). For a "diff" image we use 1 - similarity so differences are bright.
+    diff_uint8 = (np.clip(1.0 - ssim_map, 0, 1) * 255).astype(np.uint8) if ssim_map is not None else None
+    return float(score), diff_uint8
 
-You MUST reply FAIL if:
-- The current image is a different page, application, or website (e.g. login page, different app, unrelated content).
-- The current image shows clearly different subject matter, layout, or structure from the baseline.
-- The two images are not the same type of screen (e.g. baseline is a data submission page with charts but current is something else).
-When in doubt, or if the two images show clearly different content or layout, reply FAIL.
 
-Reply PASS only if both images are clearly the same screen/page: same application, same section, same type of charts and content. Minor differences in non-essential text (e.g. timestamps, counts that are expected to change) are acceptable for PASS.
+def explain_with_llm(baseline_path: str, current_path: str, region: str, model_id: str) -> str:
+    """Call Bedrock with both images; ask for one short sentence describing the difference. Returns that text or a fallback."""
+    if boto3 is None:
+        return "boto3 not installed; cannot get LLM explanation."
+    try:
+        with open(baseline_path, "rb") as f:
+            baseline_b64 = base64.b64encode(f.read()).decode("utf-8")
+        with open(current_path, "rb") as f:
+            current_b64 = base64.b64encode(f.read()).decode("utf-8")
+    except Exception as e:
+        return str(e)
 
-Reply with exactly two lines:
-Line 1: Either the word PASS or the word FAIL (all caps, nothing else on that line).
-Line 2: One short reason (e.g. "Charts and layout match" or "Current shows different page than baseline").
-"""
+    prompt = "These two screenshots differ. In one short sentence, describe the main visual difference (e.g. layout change, different content, missing element). Reply with only that sentence, no preamble."
 
     content = [
+        {
+            "type": "image",
+            "source": {"type": "base64", "media_type": "image/png", "data": baseline_b64},
+        },
+        {
+            "type": "image",
+            "source": {"type": "base64", "media_type": "image/png", "data": current_b64},
+        },
         {"type": "text", "text": prompt},
-        {
-            "type": "image",
-            "source": {
-                "type": "base64",
-                "media_type": "image/png",
-                "data": baseline_b64,
-            },
-        },
-        {
-            "type": "image",
-            "source": {
-                "type": "base64",
-                "media_type": "image/png",
-                "data": current_b64,
-            },
-        },
     ]
-
     body = {
         "anthropic_version": "bedrock-2023-05-31",
-        "messages": [
-            {
-                "role": "user",
-                "content": content,
-            }
-        ],
-        "max_tokens": 500,
+        "messages": [{"role": "user", "content": content}],
+        "max_tokens": 200,
     }
+    try:
+        client = boto3.client("bedrock-runtime", region_name=region)
+        response = client.invoke_model(
+            body=json.dumps(body).encode("utf-8"),
+            modelId=model_id,
+            accept="application/json",
+            contentType="application/json",
+        )
+        raw = response["body"].read().decode("utf-8")
+        parsed = json.loads(raw)
+        text = ""
+        if "content" in parsed and isinstance(parsed["content"], list):
+            for item in parsed["content"]:
+                if item.get("type") == "text":
+                    text += item.get("text", "")
+        return text.strip() or "LLM returned no text"
+    except Exception as e:
+        return f"LLM explanation failed: {e}"
 
-    client = boto3.client("bedrock-runtime", region_name=region)
-    response = client.invoke_model(
-        body=json.dumps(body).encode("utf-8"),
-        modelId=model_id,
-        accept="application/json",
-        contentType="application/json",
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Compare current screenshot to baseline using SSIM. Pass/fail is local; optional LLM explains on fail."
     )
-
-    raw = response["body"].read().decode("utf-8")
-    parsed = json.loads(raw)
-    text = ""
-    if "content" in parsed and isinstance(parsed["content"], list):
-        for item in parsed["content"]:
-            if item.get("type") == "text":
-                text += item.get("text", "")
-
-    lines = [line.strip() for line in text.strip().splitlines() if line.strip()]
-    if not lines:
-        return "FAIL", "No response from model", text if verbose else ""
-
-    first = lines[0].upper()
-    if first.startswith("PASS"):
-        result = "PASS"
-    elif first.startswith("FAIL"):
-        result = "FAIL"
-    else:
-        result = "FAIL"
-
-    reason = lines[1] if len(lines) > 1 else (lines[0] if result == "FAIL" else "Match")
-    return result, reason, text if verbose else ""
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Compare current screenshot to baseline via Claude on Bedrock")
     parser.add_argument("current_path", help="Path to current screenshot (PNG)")
     parser.add_argument("baseline_path", help="Path to baseline/reference screenshot (PNG)")
-    parser.add_argument("--region", default=DEFAULT_REGION, help="AWS region for Bedrock")
-    parser.add_argument("--model", default=DEFAULT_MODEL, help="Bedrock model ID")
-    parser.add_argument("--verbose", action="store_true", help="Print LLM call info and full model response to stdout")
+    parser.add_argument(
+        "--threshold",
+        type=float,
+        default=DEFAULT_THRESHOLD,
+        help=f"SSIM threshold for PASS (default {DEFAULT_THRESHOLD}). Score >= threshold -> PASS.",
+    )
+    parser.add_argument(
+        "--explain-with-llm",
+        action="store_true",
+        help="On FAIL, call Bedrock to get a one-sentence description of the difference (requires AWS creds).",
+    )
+    parser.add_argument("--region", default=DEFAULT_REGION, help="AWS region for Bedrock (only if --explain-with-llm)")
+    parser.add_argument("--model", default=DEFAULT_MODEL, help="Bedrock model ID (only if --explain-with-llm)")
+    parser.add_argument(
+        "--save-diff",
+        metavar="PATH",
+        default=None,
+        help="On FAIL, save diff image to this path (e.g. Reports/vision_diff.png).",
+    )
+    parser.add_argument("--verbose", action="store_true", help="Print SSIM score and dimensions to stderr")
     args = parser.parse_args()
 
     try:
-        result, reason, raw_response = compare_screenshots(
-            args.baseline_path, args.current_path, args.region, args.model, verbose=args.verbose
-        )
+        score, diff_image = compute_ssim(args.baseline_path, args.current_path)
     except FileNotFoundError as e:
         print("FAIL")
         print(str(e))
@@ -142,12 +168,33 @@ def main():
         sys.exit(1)
 
     if args.verbose:
-        print("VERBOSE: Calling Bedrock (region={}, model={}) with baseline and current image.".format(args.region, args.model))
-        print("VERBOSE: Raw model response:")
-        print(raw_response)
+        print(f"VERBOSE: SSIM score = {score:.4f}, threshold = {args.threshold}", file=sys.stderr)
+
+    passed = score >= args.threshold
+    if passed:
+        result = "PASS"
+        reason = f"SSIM {score:.3f}"
+    else:
+        result = "FAIL"
+        if args.explain_with_llm and boto3:
+            reason = explain_with_llm(
+                args.baseline_path, args.current_path, args.region, args.model
+            )
+        else:
+            reason = f"SSIM {score:.3f} below threshold {args.threshold}"
+
+        if args.save_diff and diff_image is not None:
+            try:
+                Image.fromarray(diff_image).save(args.save_diff)
+                if args.verbose:
+                    print(f"VERBOSE: Diff image saved to {args.save_diff}", file=sys.stderr)
+            except Exception as e:
+                if args.verbose:
+                    print(f"VERBOSE: Could not save diff: {e}", file=sys.stderr)
+
     print(result)
     print(reason)
-    sys.exit(0 if result == "PASS" else 1)
+    sys.exit(0 if passed else 1)
 
 
 if __name__ == "__main__":
