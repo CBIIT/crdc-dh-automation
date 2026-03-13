@@ -995,7 +995,6 @@ class DataSubmissions extends TestRunner {
 		}
 		WebUI.delay(1)
 		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"), 15)
-		//Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
 		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"))
 		WebUI.delay(1)
 		WebDriver driver = DriverFactory.getWebDriver()
@@ -1006,7 +1005,6 @@ class DataSubmissions extends TestRunner {
 		nodeOpt.click()
 		WebUI.delay(1)
 		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn"), 10)
-		//Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
 		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn"))
 		WebUI.delay(1)
 		WebElement sevOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + severity + "']"))
