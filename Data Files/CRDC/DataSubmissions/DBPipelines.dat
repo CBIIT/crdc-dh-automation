@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataFileEntity>
+   <description>MongoDB aggregation pipelines. Same workbook as DBQueries (MongoQueries.xlsx), sheet "Pipelines". Columns: key, collection, pipeline (JSON array of stages). Used by DataExplorer.verifyDataExplorerStudyListMatchesReleaseAggregate for key ReleaseStudies.</description>
+   <name>DBPipelines</name>
+   <tag></tag>
+   <connectionProperties/>
+   <containsHeaders>true</containsHeaders>
+   <csvSeperator></csvSeperator>
+   <dataFileGUID>a2b3c4d5-e6f7-48b9-c0d1-e2f3a4b5c6d7</dataFileGUID>
+   <dataSourceUrl>InputFiles/CRDC/DBQueries/MongoQueries.xlsx</dataSourceUrl>
+   <driver>ExcelFile</driver>
+   <isInternalPath>true</isInternalPath>
+   <query></query>
+   <secureUserAccount>false</secureUserAccount>
+   <sheetName>Pipelines</sheetName>
+   <usingGlobalDBSetting>false</usingGlobalDBSetting>
+</DataFileEntity>

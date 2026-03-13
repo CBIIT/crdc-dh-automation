@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC101_CRDC-699-VerifyValidationResultsLongFormErrorsCTDC</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>0a72a8d6-2934-43be-a659-b41046bb32b4</testCaseGuid>
+</TestCaseEntity>

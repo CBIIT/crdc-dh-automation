@@ -19,7 +19,11 @@ import java.nio.file.Paths
 import java.util.ArrayList
 import java.util.Arrays
 import java.util.Collections
+import java.util.LinkedHashSet
 import java.util.List
+import java.util.Set
+
+import org.bson.Document
 
 /**
  * Data Explorer verification keywords. Standalone class (does not extend TestRunner).
@@ -301,5 +305,139 @@ class DataExplorer {
 			}
 		}
 		return map
+	}
+
+	/** Data Explorer list table: column index for Study Abbreviation (first column). */
+	private static final int LIST_COL_STUDY_ABBREVIATION = 0
+	/** Data Explorer list table: column index for Study Name (second column). */
+	private static final int LIST_COL_STUDY_NAME = 1
+	/** Data file path for MongoDB aggregation pipelines (Excel sheet "Pipelines" in MongoQueries.xlsx). Columns: key, collection, pipeline (JSON array). */
+	private static final String DBPIPELINES_DATA_FILE = "Data Files/CRDC/DataSubmissions/DBPipelines"
+	private static final String RELEASE_STUDIES_PIPELINE_KEY = "ReleaseStudies"
+
+	/**
+	 * Verifies that the Data Explorer list page table (Study Name and Study Abbreviation columns) matches exactly
+	 * the records returned by the release aggregation. Pipeline is loaded from the Pipelines sheet (key "ReleaseStudies").
+	 * Caller must already be on the Data Explorer list page. Uses DatabaseUtils for MongoDB (connect, aggregate, close).
+	 * Compares set of (studyName, studyAbbreviation) pairs; count and content must match with no extra or missing rows.
+	 */
+	@Keyword
+	static void verifyDataExplorerStudyListMatchesMongo() {
+		KeywordUtil.logInfo("--- Data Explorer study list vs release aggregation verification ---")
+		WebDriver driver = DriverFactory.getWebDriver()
+
+		// 1. MongoDB: run aggregation from MongoQueries excel, Pipelines sheet (key ReleaseStudies), build expected set
+		DatabaseUtils.connectFromGlobalVariable()
+		List<Document> mongoDocs
+		try {
+			mongoDocs = DatabaseUtils.aggregateFromDataFile(DBPIPELINES_DATA_FILE, RELEASE_STUDIES_PIPELINE_KEY)
+			if (mongoDocs == null) {
+				KeywordUtil.markFailed("ReleaseStudies pipeline not found. Ensure MongoQueries.xlsx has a 'Pipelines' sheet with key 'ReleaseStudies', collection, and pipeline (JSON array).")
+				return
+			}
+		} finally {
+			DatabaseUtils.close()
+		}
+
+		// Raw MongoDB response (full document per record)
+		KeywordUtil.logInfo("--- Raw MongoDB aggregation response (${mongoDocs.size()} document(s)) ---")
+		for (int i = 0; i < mongoDocs.size(); i++) {
+			Document doc = mongoDocs.get(i)
+			KeywordUtil.logInfo("  [${i + 1}] " + doc.toJson())
+		}
+
+		Set<String> expectedPairs = new LinkedHashSet<>()
+		List<String> mongoLogLines = []
+		for (Document doc : mongoDocs) {
+			String studyName = doc.get("studyName") != null ? doc.get("studyName").toString().trim() : ""
+			String studyAbbreviation = doc.get("studyAbbreviation") != null ? doc.get("studyAbbreviation").toString().trim() : ""
+			expectedPairs.add(studyName + "|" + studyAbbreviation)
+			mongoLogLines.add("  studyAbbreviation=${studyAbbreviation}, studyName=${studyName}")
+		}
+		int expectedCount = expectedPairs.size()
+		KeywordUtil.logInfo("MongoDB release aggregation – derived (studyAbbreviation, studyName) – ${expectedCount} record(s):")
+		for (String line : mongoLogLines) {
+			KeywordUtil.logInfo(line)
+		}
+
+		// 2. UI: get total, optionally increase rows per page, collect all rows (with pagination if needed)
+		int total = WebUIUtils.getTableTotalEntryCount(15, null)
+		if (total < 0) {
+			ValidationReport.addValidationReportItem(REPORT_SECTION, "Data Explorer list – table total", ">= 0", "could not read", "Fail")
+			KeywordUtil.markFailed("verifyDataExplorerStudyListMatchesReleaseAggregate: could not get table total from UI.")
+			return
+		}
+
+		if (total > 20) {
+			boolean changed = WebUIUtils.changeRowsPerPage(100)
+			if (!changed && total > 50) {
+				WebUIUtils.changeRowsPerPage(50)
+			}
+			WebUI.delay(2)
+		}
+
+		List<List<String>> allRows = new ArrayList<>()
+		while (allRows.size() < total) {
+			List<String> headers = getTableHeaderNames(driver)
+			List<List<String>> pageRows = readTableRows(driver, headers)
+			if (pageRows.isEmpty() && allRows.isEmpty()) {
+				break
+			}
+			for (List<String> row : pageRows) {
+				allRows.add(new ArrayList<>(row))
+			}
+			if (allRows.size() >= total) break
+			List<WebElement> nextButtons = driver.findElements(By.cssSelector("button[aria-label='Go to next page']"))
+			if (nextButtons.isEmpty() || !nextButtons.get(0).isEnabled()) {
+				break
+			}
+			nextButtons.get(0).click()
+			WebUI.delay(2)
+		}
+
+		// Raw UI table (headers + full row data)
+		List<String> headers = getTableHeaderNames(driver)
+		KeywordUtil.logInfo("--- Raw UI Data Explorer table – headers: ${headers} – ${allRows.size()} row(s) ---")
+		for (int i = 0; i < allRows.size(); i++) {
+			KeywordUtil.logInfo("  [${i + 1}] ${allRows.get(i)}")
+		}
+
+		Set<String> actualPairs = new LinkedHashSet<>()
+		List<String> uiLogLines = []
+		for (List<String> row : allRows) {
+			String studyAbbreviation = (row.size() > LIST_COL_STUDY_ABBREVIATION && row.get(LIST_COL_STUDY_ABBREVIATION) != null) ? row.get(LIST_COL_STUDY_ABBREVIATION).trim() : ""
+			String studyName = (row.size() > LIST_COL_STUDY_NAME && row.get(LIST_COL_STUDY_NAME) != null) ? row.get(LIST_COL_STUDY_NAME).trim() : ""
+			actualPairs.add(studyName + "|" + studyAbbreviation)
+			uiLogLines.add("  studyAbbreviation=${studyAbbreviation}, studyName=${studyName}")
+		}
+		KeywordUtil.logInfo("UI Data Explorer table – derived (studyAbbreviation, studyName) – ${allRows.size()} row(s):")
+		for (String line : uiLogLines) {
+			KeywordUtil.logInfo(line)
+		}
+		// 3. Compare count (UI table total vs Mongo aggregation result count)
+		boolean countMatch = (expectedCount == total)
+		ValidationReport.addValidationReportItem(REPORT_SECTION, "Study list row count (Mongo vs UI)", String.valueOf(expectedCount), String.valueOf(total), countMatch ? "Pass" : "Fail")
+		if (!countMatch) {
+			KeywordUtil.markFailed("verifyDataExplorerStudyListMatchesReleaseAggregate: count mismatch. Expected ${expectedCount}, actual UI total ${total}.")
+		}
+
+		// 4. Compare sets
+		Set<String> onlyInMongo = new LinkedHashSet<>(expectedPairs)
+		onlyInMongo.removeAll(actualPairs)
+		Set<String> onlyInUi = new LinkedHashSet<>(actualPairs)
+		onlyInUi.removeAll(expectedPairs)
+		boolean setsMatch = onlyInMongo.isEmpty() && onlyInUi.isEmpty()
+		ValidationReport.addValidationReportItem(REPORT_SECTION, "Study list matches release aggregation", "exact match", setsMatch ? "exact match" : "mismatch", setsMatch ? "Pass" : "Fail")
+		if (!setsMatch) {
+			if (!onlyInMongo.isEmpty()) {
+				KeywordUtil.logInfo("Only in MongoDB (${onlyInMongo.size()}): " + onlyInMongo.take(10))
+			}
+			if (!onlyInUi.isEmpty()) {
+				KeywordUtil.logInfo("Only in UI (${onlyInUi.size()}): " + onlyInUi.take(10))
+			}
+			KeywordUtil.markFailed("verifyDataExplorerStudyListMatchesReleaseAggregate: study list content does not match release aggregation. See report and log.")
+		}
+
+		KeywordUtil.logInfo("--- Data Explorer study list verification complete ---")
 	}
 }
