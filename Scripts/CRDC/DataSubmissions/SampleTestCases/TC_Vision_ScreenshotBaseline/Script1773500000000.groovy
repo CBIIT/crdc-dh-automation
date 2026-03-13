@@ -26,14 +26,14 @@ CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 //Upload data via folder
-CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC04')
+CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC05')
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Statistics/Charts-Container')
 WebUI.delay(3)
 
 String projectDir = RunConfiguration.getProjectDir()
 String currentPath = "${projectDir}/Reports/vision_current.png"
-String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline-original.png"
+String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline-TC05.png"
 String diffPath = "${projectDir}/Reports/vision_diff.png"
 
 WebUI.takeScreenshot(currentPath)
