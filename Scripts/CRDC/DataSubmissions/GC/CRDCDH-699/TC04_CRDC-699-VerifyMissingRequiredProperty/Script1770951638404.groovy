@@ -54,6 +54,9 @@ CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC04')
 //Validate data
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
+//Verify See details longform errors
+CustomKeywords.'utilities.DataSubmissions.verifyErrorDetailsForSubmittedIdForTC'('TC04')
+
 //Verify Validation Results table in the UI matches the expected TSV files for each node with error(s) or warning(s)
 CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsVsExpectedForTC'("TC04")
 

@@ -254,6 +254,96 @@ public class DatabaseUtils {
 	}
 
 	/**
+	 * Run an aggregation pipeline on a collection.
+	 * Each element of pipeline is a Map representing one stage (e.g. [$match: [...], $sort: [...]]).
+	 * Converts each Map to BSON via mapToDocument and returns all result documents.
+	 *
+	 * @param collectionName Collection name (e.g. "release")
+	 * @param pipeline List of Map, each a pipeline stage (e.g. [$match: [nodeType: "study"]], [$sort: [updatedAt: 1]])
+	 * @return List of Document (empty list if none or not connected)
+	 */
+	@Keyword
+	public static List<Document> aggregate(String collectionName, List<Map> pipeline) {
+		if (database == null) {
+			KeywordUtil.markFailed("Not connected to MongoDB. Call connectFromGlobalVariable() first.")
+			return []
+		}
+		if (pipeline == null || pipeline.isEmpty()) {
+			KeywordUtil.markFailed("aggregate: pipeline must not be null or empty.")
+			return []
+		}
+		MongoCollection<Document> collection = database.getCollection(collectionName)
+		List<Bson> stages = pipeline.collect { Map stage -> mapToDocument(stage) }
+		List<Document> results = collection.aggregate(stages).into(new ArrayList<>())
+		KeywordUtil.logInfo("aggregate(${collectionName}) returned ${results.size()} document(s)")
+		return results
+	}
+
+	/**
+	 * Run an aggregation pipeline loaded from a data file (e.g. Pipelines sheet) by key.
+	 * Data file must have columns: key, collection, pipeline. The pipeline column is a JSON array string
+	 * of pipeline stages (e.g. [{"$match":{...}},{"$sort":{...}}]).
+	 *
+	 * @param dataFilePath Data file path (e.g. "Data Files/CRDC/DataSubmissions/DBPipelines")
+	 * @param pipelineKey Key to look up (e.g. "ReleaseStudies")
+	 * @return List of Document, or null if data file / key not found or pipeline invalid (caller may fall back to built-in pipeline)
+	 */
+	@Keyword
+	public static List<Document> aggregateFromDataFile(String dataFilePath, String pipelineKey) {
+		if (database == null) {
+			KeywordUtil.markFailed("Not connected to MongoDB. Call connectFromGlobalVariable() first.")
+			return null
+		}
+		def testData
+		try {
+			testData = TestDataFactory.findTestData(dataFilePath)
+		} catch (Exception e) {
+			KeywordUtil.logInfo("aggregateFromDataFile: data file not found or invalid: ${dataFilePath}. ${e.message}")
+			return null
+		}
+		int rows = testData.getRowNumbers()
+		String[] colNames = testData.getColumnNames()
+		String keyCol = (colNames != null && colNames.length >= 1) ? colNames[0] : null
+		String collectionCol = (colNames != null && colNames.length >= 2) ? colNames[1] : null
+		String pipelineCol = (colNames != null && colNames.length >= 3) ? colNames[2] : null
+		if (keyCol == null || collectionCol == null || pipelineCol == null) {
+			KeywordUtil.logInfo("aggregateFromDataFile: data file must have at least 3 columns: key, collection, pipeline.")
+			return null
+		}
+		String collectionName = null
+		String pipelineStr = null
+		for (int i = 1; i <= rows; i++) {
+			String keyVal = testData.getValue(keyCol, i)?.toString()?.trim()
+			if (pipelineKey != null && pipelineKey == keyVal) {
+				collectionName = testData.getValue(collectionCol, i)?.toString()?.trim()
+				pipelineStr = testData.getValue(pipelineCol, i)?.toString()?.trim()
+				break
+			}
+		}
+		if (collectionName == null || pipelineStr == null || pipelineStr.isEmpty()) {
+			KeywordUtil.logInfo("aggregateFromDataFile: pipeline key '${pipelineKey}' not found or pipeline empty in ${dataFilePath}.")
+			return null
+		}
+		List<Map> pipeline
+		try {
+			def parsed = new JsonSlurper().parseText(pipelineStr)
+			if (!(parsed instanceof List)) {
+				KeywordUtil.logInfo("aggregateFromDataFile: pipeline for key '${pipelineKey}' must be a JSON array.")
+				return null
+			}
+			pipeline = parsed.collect { it instanceof Map ? it : [:] }
+		} catch (Exception e) {
+			KeywordUtil.logInfo("aggregateFromDataFile: invalid JSON pipeline for key '${pipelineKey}': ${e.message}")
+			return null
+		}
+		if (pipeline.isEmpty()) {
+			KeywordUtil.logInfo("aggregateFromDataFile: pipeline for key '${pipelineKey}' is empty.")
+			return null
+		}
+		return aggregate(collectionName, pipeline)
+	}
+
+	/**
 	 * Verifies that the table total displayed in the UI (from pagination "X–Y of Z") matches the
 	 * document count in a MongoDB collection. Reusable for Manage Users (users), Manage Programs
 	 * (organization), Manage Studies (approvedStudies), or any other list page with pagination.

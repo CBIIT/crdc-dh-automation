@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Log in, open Data Explorer tab, verify the study list table (Study Name and Study Abbreviation) matches exactly the MongoDB release aggregation (release collection: study nodeType, Released/Deleted, CDS/CTDC/ICDC). Requires G_MongoUri and G_MongoDatabase in profile.</description>
+   <name>TC202_VerifyDataExplorerStudyListVsMongo</name>
+   <tag>Data Explorer;MongoDB</tag>
+   <comment>Assumes the logged-in user can see all studies returned by the aggregation (e.g. appropriate role or test data).</comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d</testCaseGuid>
+</TestCaseEntity>
