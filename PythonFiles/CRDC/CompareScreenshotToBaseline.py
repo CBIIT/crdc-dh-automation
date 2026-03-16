@@ -28,7 +28,7 @@ try:
 except ImportError:
     boto3 = None  # type: ignore
 
-DEFAULT_THRESHOLD = 0.99
+DEFAULT_THRESHOLD = 1.0
 DEFAULT_REGION = "us-east-1"
 DEFAULT_MODEL = "anthropic.claude-3-sonnet-20240229-v1:0"
 

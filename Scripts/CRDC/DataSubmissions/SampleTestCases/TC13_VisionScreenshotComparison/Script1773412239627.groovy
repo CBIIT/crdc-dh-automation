@@ -1,16 +1,17 @@
 import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import com.kms.katalon.core.configuration.RunConfiguration
+import com.kms.katalon.core.util.KeywordUtil
 import internal.GlobalVariable as GlobalVariable
 
 /**
  * Example: Screenshot comparison against baseline using SSIM (structural similarity).
  * - Logs in as Submitter, navigates to a data submission, takes a screenshot.
- * - Compares to InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline.png locally (no LLM for pass/fail).
+ * - Uses Utils.isJenkinsRun() to select baseline: TC05 for Jenkins, TC05-local for local (no LLM for pass/fail).
  * - On failure, saves a diff image to Reports/vision_diff.png. Optional: set explainWithLlm true for a one-sentence LLM explanation.
  *
  * Prerequisites:
- * - Baseline exists: InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline.png
+ * - Baselines: DataSubmission_Summary_baseline-TC05.png (Jenkins), DataSubmission_Summary_baseline-TC05-local.png (local).
  * - Python with Pillow, numpy, scikit-image (see requirements.txt). AWS only if explainWithLlm is true.
  */
 WebUI.closeBrowser()
@@ -28,17 +29,22 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmiss
 //Upload data via folder
 CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC05')
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
+WebUI.refresh()
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Statistics/Charts-Container')
+// Wait for "Validation process is starting" snackbar message to disappear before screenshot
+//CustomKeywords.'utilities.Utils.waitForElementNotVisible'('CRDC/AILocators/Global/Notistack-Snackbar', 60)
 WebUI.delay(3)
 
 String projectDir = RunConfiguration.getProjectDir()
 String currentPath = "${projectDir}/Reports/vision_current.png"
+//String baselineSuffix = utilities.Utils.isJenkinsRun() ? "TC05" : "TC05-local"
+//String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline-${baselineSuffix}.png"
 String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline-TC05.png"
-String diffPath = "${projectDir}/Reports/vision_diff.png"
+//KeywordUtil.logInfo("Using baseline: ${baselineSuffix} (Jenkins=${utilities.Utils.isJenkinsRun()})")
 
-WebUI.takeScreenshot(currentPath)
-// verbose=true; saveDiffPath so failures write Reports/vision_diff.png; explainWithLlm=true for LLM reason on fail
-CustomKeywords.'utilities.WebUIUtils.verifyScreenshotMatchesBaseline'(currentPath, baselinePath, "Data Submission Charts", true, null, true, diffPath)
+//Take screenshot of element and verify the chart matches baseline image -- can also take screenshot of entire page via WebUI.takeScreenshot(currentPath)
+WebUI.takeElementScreenshot(currentPath, findTestObject('CRDC/AILocators/DataSubmissions/Detail/Statistics/Charts-Container'))
+CustomKeywords.'utilities.WebUIUtils.verifyScreenshotMatchesBaseline'(currentPath, baselinePath, "Data Submission Charts", null, true)
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 WebUI.closeBrowser()

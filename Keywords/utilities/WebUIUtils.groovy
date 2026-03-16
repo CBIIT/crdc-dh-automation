@@ -19,6 +19,7 @@ import org.openqa.selenium.support.ui.Select
 import org.openqa.selenium.support.ui.WebDriverWait
 import java.util.concurrent.TimeUnit
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -1204,20 +1205,19 @@ class WebUIUtils {
 	 * Compare current screenshot to a baseline image using SSIM (structural similarity) locally.
 	 * Pass/fail is deterministic; no LLM is used for the decision. Optionally on FAIL, call Bedrock to get a short explanation.
 	 * Runs PythonFiles/CRDC/CompareScreenshotToBaseline.py. Adds result to ValidationReport and marks test failed if comparison is FAIL.
+	 * Always runs with --verbose (SSIM score and dimensions in log) and always saves the diff image on FAIL to vision_diff.png in the same directory as the current screenshot.
 	 * <p>
 	 * AWS credentials are only needed when explainWithLlm is true (to get a one-sentence description of the difference on failure).
 	 * </p>
 	 * @param currentScreenshotPath Full path to the screenshot just captured (e.g. Reports/... or temp path)
 	 * @param baselineScreenshotPath Full path to the expected baseline image (e.g. InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline.png)
 	 * @param reportSection Section name for ValidationReport (e.g. "Data Submission Charts")
-	 * @param verbose if true, pass --verbose to the Python script (SSIM score and dimensions in log)
 	 * @param threshold SSIM threshold for PASS (e.g. 0.99); null = use script default (0.99)
 	 * @param explainWithLlm if true, on FAIL call Bedrock to get a one-sentence explanation (requires AWS profile vars)
-	 * @param saveDiffPath if non-null, on FAIL save diff image to this path (e.g. Reports/vision_diff.png)
 	 * @return true if PASS, false if FAIL
 	 */
 	@Keyword
-	static boolean verifyScreenshotMatchesBaseline(String currentScreenshotPath, String baselineScreenshotPath, String reportSection = "Screenshot vs baseline", boolean verbose = false, Double threshold = null, boolean explainWithLlm = false, String saveDiffPath = null) {
+	static boolean verifyScreenshotMatchesBaseline(String currentScreenshotPath, String baselineScreenshotPath, String reportSection = "Screenshot vs baseline", Double threshold = null, boolean explainWithLlm = false) {
 		String pythonExe = Utils.getPythonExecutablePath()
 		Path scriptPath = Utils.getPythonFilePath("CompareScreenshotToBaseline.py")
 		if (scriptPath == null || !scriptPath.toFile().exists()) {
@@ -1226,20 +1226,15 @@ class WebUIUtils {
 			KeywordUtil.markFailed("CompareScreenshotToBaseline.py not found. Check AppKey=CRDC and PythonFiles/CRDC/.")
 			return false
 		}
-		List<String> cmd = [pythonExe, scriptPath.toString(), currentScreenshotPath, baselineScreenshotPath]
-		if (verbose) {
-			cmd.add("--verbose")
-		}
+		String defaultDiffPath = Paths.get(currentScreenshotPath).getParent().resolve("vision_diff.png").toString()
+		KeywordUtil.logInfo("verifyScreenshotMatchesBaseline: current=" + currentScreenshotPath + ", baseline=" + baselineScreenshotPath)
+		List<String> cmd = [pythonExe, scriptPath.toString(), currentScreenshotPath, baselineScreenshotPath, "--verbose", "--save-diff", defaultDiffPath]
 		if (threshold != null) {
 			cmd.add("--threshold")
 			cmd.add(threshold.toString())
 		}
 		if (explainWithLlm) {
 			cmd.add("--explain-with-llm")
-		}
-		if (saveDiffPath != null && !saveDiffPath.isEmpty()) {
-			cmd.add("--save-diff")
-			cmd.add(saveDiffPath)
 		}
 		ProcessBuilder pb = new ProcessBuilder(cmd)
 		pb.redirectErrorStream(true)
@@ -1274,9 +1269,7 @@ class WebUIUtils {
 				return false
 			}
 			String out = output.toString().trim()
-			if (verbose) {
-				KeywordUtil.logInfo("Screenshot comparison (verbose) output:\n" + out)
-			}
+			KeywordUtil.logInfo("Screenshot comparison (verbose) output:\n" + out)
 			// Result and reason are always the last two lines of the script output
 			String[] lines = out.split("\n")
 			String result = (lines.length >= 2) ? lines[lines.length - 2].trim().toUpperCase() : (lines.length == 1 ? lines[0].trim().toUpperCase() : "FAIL")

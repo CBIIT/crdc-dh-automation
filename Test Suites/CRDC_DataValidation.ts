@@ -116,4 +116,46 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-887/TC102_CRDC-887-ExtraConflictDuplicateBatchErrors</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>0f2049cd-fe24-48a5-82ba-37bb1afcb0e9</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1035/TC101_CRDC-1035-VerifyValidationResultsExportAllRoles</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>4bf6ccc1-aa4c-4985-9ffe-94b91e341b52</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1035/TC102_CRDC-1035-VerifyValidationResultsExportDisabled</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>0c660135-f19b-4b50-8b6d-b7897c0348e8</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-2864/TC101_CRDC-2864-BatchErrorsCompositeIdAllProperties</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>bf52fad9-1ac8-4acc-8d0c-adc6e331d3e2</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-2864/TC102_CRDC-2864-BatchErrorsCompositeIdRequiredProperty</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>9e827339-6f92-42fa-bed0-5d193bd8e26a</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-2864/TC103_CRDC-2864-DataViewGeneratedCompositeId</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>180bf68f-797e-45ca-bb48-a8f7fb5f51da</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-2864/TC104_CRDC-2864-DataViewGeneratedCompositeIdBlanks</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>

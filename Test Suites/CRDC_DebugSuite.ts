@@ -33,6 +33,13 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
+      <guid>88d3184c-6434-4ac7-9ebc-6180d37c6019</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-2765-Partial/TC28_VerifyUnicodeDataFileUploadViaCLI</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
       <guid>d9a74094-5b83-4af5-ae95-b83f3000381e</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
