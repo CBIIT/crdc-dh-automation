@@ -19,18 +19,21 @@ WebUI.delay(2)
 
 CustomKeywords.'utilities.ManageStudies.navigateToManageStudies'()
 WebUI.delay(2)
-CustomKeywords.'utilities.ManageStudies.addNewStudy'([
-	name: 'AutoStudy-TC13-7',
-	acronym: 'AutoStudy-7',
-	accessTypes: 'Open',
-	dbGaPID: 'phs001333',
-	gpa: 'QA Auto Agent',
-	gpa: 'QA Auto Agent2',
-	ORCID: '0000-0001-2345-6789',
-	program: 'auto_program',
-	DataConcierge: 'Same as the Program Data Concierge'
-	
-])
+//CustomKeywords.'utilities.ManageStudies.addNewStudy'([
+//	name: 'AutoStudy-TC13-7',
+//	acronym: 'AutoStudy-7',
+//	accessTypes: 'Open',
+//	dbGaPID: 'phs001333',
+//	gpa: 'QA Auto Agent',
+//	gpa: 'QA Auto Agent2',
+//	ORCID: '0000-0001-2345-6789',
+//	program: 'auto_program',
+//	DataConcierge: 'Same as the Program Data Concierge'
+//	
+//])
+
+CustomKeywords.'utilities.ManageStudies.addNewStudy'()
+
 WebUI.delay(2)
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()

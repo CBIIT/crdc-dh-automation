@@ -10,7 +10,10 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.StaleElementReferenceException
 
+import java.text.SimpleDateFormat
 import java.util.ArrayList
+import java.util.Date
+import java.util.LinkedHashMap
 import java.util.List
 import java.util.Map
 
@@ -378,6 +381,51 @@ class ManageStudies extends TestRunner {
 			// Verify by row count: filter by full name returns 1+ row (Name column may be truncated in UI)
 			verifyManageStudiesFilterResults([ expectAtLeastRows: 1 ])
 			ValidationReport.addValidationReportItem(SECTION_MANAGE_STUDIES, "Study created", "visible in list", name, "Pass")
+			KeywordUtil.logInfo("addNewStudy: completed and verified for '" + name + "'")
+		} catch (Exception e) {
+			KeywordUtil.markFailed("addNewStudy: " + e.getMessage())
+		}
+	}
+
+	/** Hardcoded program name, dbGaP ID, and GPA for parameterless addNewStudy. */
+	private static final String AUTO_PROGRAM = "auto_program"
+	private static final String AUTO_PROGRAM_DBGAP_ID = "phs000001"
+	private static final String AUTO_GPA = "Auto-GPA"
+
+	/**
+	 * Create a new study with no parameters: unique name "autoQA-Study-&lt;yyyyMMdd-HHmmss&gt;", acronym "autoQA-&lt;yyyyMMdd-HHmmss&gt;",
+	 * program "auto_program", dbGaP ID phs000001, access Open. Optional fields left empty. Caller must navigate to Manage Studies first.
+	 *
+	 * Usage: CustomKeywords.'utilities.ManageStudies.addNewStudy'()
+	 */
+	@Keyword
+	void addNewStudy() {
+		String ts = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date())
+		String name = "autoQA-Study-" + ts
+		String acronym = "autoQA-" + ts
+		Map<String, Object> studyData = new LinkedHashMap<>()
+		studyData.put("name", name)
+		studyData.put("acronym", acronym)
+		studyData.put("gpa", AUTO_GPA)
+		studyData.put("program", "auto_program")
+		studyData.put("accessTypes", "Open")
+		studyData.put("dbGaPID", "phs000001")
+		KeywordUtil.logInfo("--- addNewStudy: creating study '" + name + "' ---")
+		try {
+			WebUI.waitForElementPresent(findTestObject("CRDC/AILocators/Studies/List/AddStudy-Btn"), 10)
+			WebUI.waitForElementClickable(findTestObject("CRDC/AILocators/Studies/List/AddStudy-Btn"), 5)
+			WebUI.click(findTestObject("CRDC/AILocators/Studies/List/AddStudy-Btn"))
+			WebUI.waitForElementPresent(findTestObject("CRDC/AILocators/Studies/Detail/Container"), 15)
+			WebUI.delay(1)
+			fillStudyForm(studyData, false)
+			WebUI.waitForElementClickable(findTestObject("CRDC/AILocators/Studies/Detail/Save-Btn"), 5)
+			WebUI.click(findTestObject("CRDC/AILocators/Studies/Detail/Save-Btn"))
+			WebUI.waitForElementPresent(findTestObject("CRDC/AILocators/Studies/List/Container"), 15)
+			WebUI.delay(2)
+			applyManageStudiesFilters([ studyName: name ])
+			WebUI.delay(2)
+			verifyManageStudiesFilterResults([ expectAtLeastRows: 1 ])
+			ValidationReport.addValidationReportItem(SECTION_MANAGE_STUDIES, "Study created (autoQA)", "visible in list", name, "Pass")
 			KeywordUtil.logInfo("addNewStudy: completed and verified for '" + name + "'")
 		} catch (Exception e) {
 			KeywordUtil.markFailed("addNewStudy: " + e.getMessage())
