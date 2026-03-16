@@ -36,9 +36,13 @@ WebUI.delay(3)
 
 String projectDir = RunConfiguration.getProjectDir()
 String currentPath = "${projectDir}/Reports/vision_current.png"
+String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline-TC05.png"
+
+//Option for having different versions of screenshot
+//String projectDir = RunConfiguration.getProjectDir()
+//String currentPath = "${projectDir}/Reports/vision_current.png"
 //String baselineSuffix = utilities.Utils.isJenkinsRun() ? "TC05" : "TC05-local"
 //String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline-${baselineSuffix}.png"
-String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline-TC05.png"
 //KeywordUtil.logInfo("Using baseline: ${baselineSuffix} (Jenkins=${utilities.Utils.isJenkinsRun()})")
 
 //Take screenshot of element and verify the chart matches baseline image -- can also take screenshot of entire page via WebUI.takeScreenshot(currentPath)
