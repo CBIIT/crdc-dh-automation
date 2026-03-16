@@ -4,10 +4,9 @@ import com.kms.katalon.core.configuration.RunConfiguration
 import com.kms.katalon.core.util.KeywordUtil
 import internal.GlobalVariable as GlobalVariable
 
-/**
+/** RUN IN HEADLESS MODE
  * Example: Screenshot comparison against baseline using SSIM (structural similarity).
  * - Logs in as Submitter, navigates to a data submission, takes a screenshot.
- * - Uses Utils.isJenkinsRun() to select baseline: TC05 for Jenkins, TC05-local for local (no LLM for pass/fail).
  * - On failure, saves a diff image to Reports/vision_diff.png. Optional: set explainWithLlm true for a one-sentence LLM explanation.
  *
  * Prerequisites:
@@ -27,7 +26,7 @@ CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 //Upload data via folder
-CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC04')
+CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC05')
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 WebUI.refresh()
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Statistics/Charts-Container')
