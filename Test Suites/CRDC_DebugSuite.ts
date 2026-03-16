@@ -43,7 +43,7 @@
       <guid>d9a74094-5b83-4af5-ae95-b83f3000381e</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SampleTestCases/TC13_VisionScreenshotComparison</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/SampleTestCases/TC17_VisionScreenshotComparison</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>
