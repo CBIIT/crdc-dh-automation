@@ -7,11 +7,11 @@ CustomKeywords.'utilities.DatabaseUtils.connectFromGlobalVariable'()
 
 // POC test
 
-// Substitute with actual values for your test -- below values are for QA environment
+// Substitute with actual values for your test -- below values are for Stage environment
 Map params = [
 	status       : "Deleted",
-	submissionID : "79cca77d-f313-4ab5-9f02-eb259f12d43e",
-	nodeID       : "GC-TREATMENT-20705900"
+	submissionID : "0ff5bf86-6297-412a-940f-2c5f2829eecd",
+	nodeID       : "openaccess"
 ]
 
 def doc = CustomKeywords.'utilities.DatabaseUtils.findRecordFromDataFile'(
