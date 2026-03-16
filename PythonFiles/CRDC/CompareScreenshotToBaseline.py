@@ -90,7 +90,7 @@ def explain_with_llm(baseline_path: str, current_path: str, region: str, model_i
     except Exception as e:
         return str(e)
 
-    prompt = "These two screenshots differ. In one short sentence, describe the main visual difference (e.g. layout change, different content, missing element). Reply with only that sentence, no preamble."
+    prompt = "These two screenshots differ. The first image is the baseline. In one short sentence, describe the main visual difference (e.g. layout change, different content, missing element). Reply with only that sentence, no preamble."
 
     content = [
         {

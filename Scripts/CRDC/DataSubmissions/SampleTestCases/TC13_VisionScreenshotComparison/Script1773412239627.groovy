@@ -27,7 +27,7 @@ CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 //Upload data via folder
-CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC05')
+CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC04')
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 WebUI.refresh()
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Statistics/Charts-Container')
