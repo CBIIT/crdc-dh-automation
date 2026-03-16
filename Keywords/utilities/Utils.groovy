@@ -122,7 +122,7 @@ public class Utils {
 	 * @param PythonFileName
 	 */
 	public static Path getPythonFilePath(String pyFileName) {
-		String pyPath;
+		Path pyPath = null
 		if(appKey.equals("CDS")) {
 			pyPath = Paths.get(usrDir, "PythonFiles", "CDS", pyFileName)
 		}else if(appKey.equals("ICDC")) {
@@ -135,13 +135,14 @@ public class Utils {
 			pyPath = Paths.get(usrDir, "PythonFiles", "INS", pyFileName)
 		}else if(appKey.equals("Bento")) {
 			pyPath = Paths.get(usrDir, "PythonFiles", "Bento", pyFileName)
-		}else if(appKey.equals("Bento")) {
+		}else if(appKey.equals("CRDC")) {
 			pyPath = Paths.get(usrDir, "PythonFiles", "CRDC", pyFileName)
 		}else if(appKey.equals("CTDC")) {
 			pyPath = Paths.get(usrDir, "PythonFiles", "CTDC", pyFileName)
 		}else {
 			KeywordUtil.markFailed("Invalid App Key: Check getPythonScriptPath function")
 		}
+		return pyPath
 	}
 
 
@@ -674,7 +675,7 @@ public class Utils {
 		// Clean up any trailing whitespace left by the removals
 		return out.trim()
 	}
-	
+
 	/**
 	 * Polls until an element is present in the DOM.
 	 * Mirror of waitForElementToDisappear — resolves xpath from Object Repository key,
@@ -688,23 +689,23 @@ public class Utils {
 		WebDriver driver = DriverFactory.getWebDriver();
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		long start = System.currentTimeMillis();
-	
+
 		KeywordUtil.logInfo("Polling for appearance of: " + xpath);
-	
+
 		while ((System.currentTimeMillis() - start) / 1000 < timeoutSeconds) {
 			String script = "return document.evaluate(\"" + xpath + "\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue != null;";
 			boolean isPresent = (Boolean) js.executeScript(script);
-	
+
 			long elapsed = (System.currentTimeMillis() - start) / 1000;
 			KeywordUtil.logInfo("Loop at " + elapsed + "s. Found: " + isPresent);
-	
+
 			if (isPresent) {
 				KeywordUtil.logInfo("Element appeared after " + elapsed + " seconds.");
 				return;
 			}
 			Thread.sleep(2000);
 		}
-	
+
 		throw new AssertionError("Element did not appear within " + timeoutSeconds + " seconds: " + xpath);
 	}
 }
