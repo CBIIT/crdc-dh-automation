@@ -102,4 +102,32 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1405/TC107_CRDC-1405-UploadActivitiesBatchErrorsGC</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>cf256fa4-9e1e-4f9c-97c7-3fe5208a0630</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027-Partial/TC31_CRDC-3027-CLIBadArchiveManifestMd5</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>e7e8109a-d75d-4b13-af0b-1cf9ea2ad616</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027-Partial/TC32_CRDC-3027-CLIBadArchiveManifestFileSize</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>2fd7f647-503d-4d09-9cef-11e0e942bc5a</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027-Partial/TC33_CRDC-3027-CLIArchiveManifestWrongColumns</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>87e6f690-dd7c-4ee3-929d-f800da54f9f9</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027-Partial/TC34_CRDC-3027-CLIArchiveManifestMissingColumn</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>
