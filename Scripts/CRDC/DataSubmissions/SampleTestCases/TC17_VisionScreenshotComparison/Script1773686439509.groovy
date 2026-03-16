@@ -4,7 +4,7 @@ import com.kms.katalon.core.configuration.RunConfiguration
 import com.kms.katalon.core.util.KeywordUtil
 import internal.GlobalVariable as GlobalVariable
 
-/** RUN IN HEADLESS MODE
+/** RUN IN JENKINS
  * Example: Screenshot comparison against baseline using SSIM (structural similarity).
  * - Logs in as Submitter, navigates to a data submission, takes a screenshot.
  * - On failure, saves a diff image to Reports/vision_diff.png. Optional: set explainWithLlm true for a one-sentence LLM explanation.
