@@ -98,6 +98,8 @@ CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submiss
 CustomKeywords.'utilities.Utils.waitForElementToAppear'('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl', 30)
 CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Rejected")
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
+//Handle the persistent validation purple alert that never disappears and blocks the dropdown selection in the next step unless the focus is moved-- unique to this CTDC test data
+CustomKeywords.'utilities.WebUIUtils.scrollToElement'(findTestObject('CRDC/NavBar/DataSubmissions-Tab'))
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'), 30)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Submit-Btn')
 WebUI.delay(2) //race condition for Yes button
