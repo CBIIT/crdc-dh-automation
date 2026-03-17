@@ -26,41 +26,41 @@ import org.openqa.selenium.support.ui.ExpectedConditions as ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait as WebDriverWait
 import java.nio.file.Path as Path
 import java.nio.file.Paths as Paths
+import com.kms.katalon.core.testdata.TestDataFactory
 
 /*This test script:
  - Opens the browser of choice: Chrome, Firefox or Edge
  - Driver opened by Katalon is used in Selenium.
- - Logs in as Admin
- - Goes to Manage Users and Edit the user being tested
- - Verifies the default permissions 
+ - Logs in as Submitter
+ - Creates DS, uploads, and validates
+ - Verifies data submission dashboard
  */
 WebUI.closeBrowser()
 
-CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
+//Login as Submitter
+CustomKeywords.'utilities.Login.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
+CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
+WebUI.delay(2)
 
-//Login as Admin
-CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Admin')
+//Create DS
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
+CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata only', 'CTDC','autoQA - AutomationQA_Study')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
-//Navigate to Manage Users
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/Login/UserProfile-Dd')
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/ManageUsers-Btn')
+//Upload data via folder
+CustomKeywords.'utilities.DataSubmissions.uploadFolder'('CRDCDH-699_TC101')
 
-//Edit user permissions and write expected checkbox statuses to output sheet 
-CustomKeywords.'utilities.Pbac.editPbacPermissions'('Admin', 'positive')
-CustomKeywords.'utilities.Pbac.editPbacPermissions'('Fedlead', 'positive')
+//Validate data
+CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
-//Run verifications (wait up to 15s for each table to load before reading pagination total)
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/ManageUsers-Btn')
-int uiCountUsers = CustomKeywords.'utilities.WebUIUtils.getTableTotalEntryCount'(null, 15)
-CustomKeywords.'utilities.DatabaseUtils.verifyTableCountMatchesMongoCollection'(uiCountUsers, "users")
+//Verify See details longform errors
+CustomKeywords.'utilities.DataSubmissions.verifyErrorDetailsForSubmittedIdForTC'('CRDCDH-699_TC101')
 
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/ManagePrograms-Btn')
-int uiCountPrograms = CustomKeywords.'utilities.WebUIUtils.getTableTotalEntryCount'(null, 15)
-CustomKeywords.'utilities.DatabaseUtils.verifyTableCountMatchesMongoCollection'(uiCountPrograms, "organization")
+//Verify Validation Results table in the UI matches the expected TSV files for each node with error(s) or warning(s)
+CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsVsExpectedForTC'("CRDCDH-699_TC101")
 
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/ManageStudies-Btn')
-int uiCountStudies = CustomKeywords.'utilities.WebUIUtils.getTableTotalEntryCount'(null, 15)
-CustomKeywords.'utilities.DatabaseUtils.verifyTableCountMatchesMongoCollection'(uiCountStudies, "approvedStudies")
+//Generate HTML report
+CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
 WebUI.closeBrowser()

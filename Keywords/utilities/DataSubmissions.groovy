@@ -1012,6 +1012,7 @@ class DataSubmissions extends TestRunner {
 		sevOpt.click()
 		WebUI.delay(1)
 		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn"), 10)
+		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
 		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn"))
 		WebUI.delay(1)
 		WebElement issueOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + issueType + "']"))
@@ -1421,6 +1422,7 @@ class DataSubmissions extends TestRunner {
 				])
 			}
 		}
+		TestRunner.clickTab("Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn")
 		KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: completed")
 	}
 

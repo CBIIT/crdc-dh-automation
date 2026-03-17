@@ -20,9 +20,9 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab'
 CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'both', 'CTDC', 'autoQA - AutomationQA_Study')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
-CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('CRDCDH-1405_TC113', 'datafile')
+CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('CRDCDH-699_TC102', 'datafile')
 
-CustomKeywords.'utilities.DataSubmissions.uploadFolder'('CRDCDH-1405_TC113')
+CustomKeywords.'utilities.DataSubmissions.uploadFolder'('CRDCDH-699_TC102')
 
 CustomKeywords.'utilities.DataSubmissions.deleteRowsFromDataView'('data file', 1)
 

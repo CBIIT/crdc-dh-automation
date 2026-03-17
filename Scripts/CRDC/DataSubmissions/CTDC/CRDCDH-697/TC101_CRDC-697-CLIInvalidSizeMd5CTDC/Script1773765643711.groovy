@@ -24,9 +24,9 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab'
 CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'both', 'CTDC', 'autoQA - AutomationQA_Study')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
-CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('CRDCDH-1405_TC112', 'datafile')
+CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('CRDCDH-697_TC101', 'datafile')
 
-CustomKeywords.'utilities.CliUploader.verifyCliErrorMessages'('CRDCDH-1405_TC112')
+CustomKeywords.'utilities.CliUploader.verifyCliErrorMessages'('CRDCDH-697_TC101')
 
 CustomKeywords.'utilities.DatabaseUtils.verifyNoRecordsInMongoForSubmission'()
 
