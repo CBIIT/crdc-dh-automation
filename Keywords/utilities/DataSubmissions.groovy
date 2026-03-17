@@ -766,19 +766,7 @@ class DataSubmissions extends TestRunner {
 	/** Load node -> submitted-identifier column name from Data File (Data Files/CRDC/DataSubmissions/ValidationResults-Mappings). Falls back to Excel if Data File not available. Used by DatabaseUtils.verifyRecordsInMongo. */
 	public static Map<String, String> loadValidationResultsMappings() {
 		Map<String, String> nodeToColumn = new HashMap<>()
-		try {
-			def data = findTestData("Data Files/CRDC/DataSubmissions/ValidationResults-Mappings")
-			int rows = data.getRowNumbers()
-			String[] colNames = data.getColumnNames()
-			String nodeCol = (colNames != null && colNames.length >= 1) ? colNames[0] : null
-			String columnCol = (colNames != null && colNames.length >= 2) ? colNames[1] : null
-			for (int i = 1; i <= rows; i++) {
-				String nodeVal = nodeCol ? data.getValue(nodeCol, i) : data.getValue(1, i)
-				String colVal = columnCol ? data.getValue(columnCol, i) : data.getValue(2, i)
-				if (nodeVal != null && colVal != null) nodeToColumn.put(nodeVal.trim(), colVal.trim())
-			}
-		} catch (Exception e) {
-
+		try {			
 			String testCaseId = RunConfiguration.getExecutionSourceId()
 			String sheetName = "GC" // default
 
@@ -816,7 +804,10 @@ class DataSubmissions extends TestRunner {
 					KeywordUtil.markWarning("Sheet not found: " + sheetName)
 				}
 				wb.close()
+			
 			}
+		} catch (Exception e) {
+			KeywordUtil.markWarning("Not able to get mapping from DSV_ValidationResults-mappings.xlsx - " + e.message)
 		}
 		return nodeToColumn
 	}

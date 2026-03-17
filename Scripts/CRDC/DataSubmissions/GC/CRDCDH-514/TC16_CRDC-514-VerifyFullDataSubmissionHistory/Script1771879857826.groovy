@@ -101,6 +101,7 @@ WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'),
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Submit-Btn')
 WebUI.delay(2) //race condition for Yes button
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/SubmitYes-Btn')
+WebUI.delay(2)
 
 //Logout
 CustomKeywords.'utilities.SubmissionRequest.logoutFromCrdc'()
