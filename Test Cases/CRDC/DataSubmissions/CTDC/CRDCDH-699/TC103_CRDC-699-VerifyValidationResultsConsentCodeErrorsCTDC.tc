@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC103_CRDC-699-VerifyValidationResultsConsentCodeErrorsCTDC</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>b55bc6c8-8c49-49a1-9a71-3ad510416e34</testCaseGuid>
+</TestCaseEntity>

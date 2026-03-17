@@ -98,11 +98,12 @@ CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submiss
 CustomKeywords.'utilities.Utils.waitForElementToAppear'('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl', 30)
 CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Rejected")
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
+WebUI.refresh()
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'), 30)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Submit-Btn')
 WebUI.delay(2) //race condition for Yes button
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/SubmitYes-Btn')
-WebUI.delay(2)
+WebUI.delay(15)
 String projectDir = RunConfiguration.getProjectDir()
 String currentPath = "${projectDir}/Reports/debug.png"
 WebUI.takeScreenshot(currentPath)
