@@ -27,6 +27,7 @@ import org.openqa.selenium.support.ui.WebDriverWait as WebDriverWait
 import java.nio.file.Path as Path
 import java.nio.file.Paths as Paths
 import com.kms.katalon.core.testdata.TestDataFactory
+import com.kms.katalon.core.configuration.RunConfiguration
 
 /*This test script:
  - Opens the browser of choice: Chrome, Firefox or Edge
@@ -101,6 +102,10 @@ WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'),
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Submit-Btn')
 WebUI.delay(2) //race condition for Yes button
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/SubmitYes-Btn')
+WebUI.delay(2)
+String projectDir = RunConfiguration.getProjectDir()
+String currentPath = "${projectDir}/Reports/debug.png"
+WebUI.takeScreenshot(currentPath)
 
 //Logout
 CustomKeywords.'utilities.SubmissionRequest.logoutFromCrdc'()

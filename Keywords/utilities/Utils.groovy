@@ -172,6 +172,16 @@ public class Utils {
 
 
 	/**
+	 * Returns true if the run is in a Jenkins environment (JENKINS_HOME set), false otherwise.
+	 * Use for environment-specific behavior such as baseline image selection.
+	 * @return boolean - true when running under Jenkins, false when running locally
+	 */
+	public static boolean isJenkinsRun() {
+		return System.getenv("JENKINS_HOME") != null;
+	}
+
+
+	/**
 	 * This function creates directory in the project path
 	 * @param dirName
 	 */
