@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>UI metadata upload with invalid file_id - Essential Validation batch error (GC)</description>
+   <name>TC101_CRDC-697-CLIInvalidSizeMd5CTDC</name>
+   <tag>CRDCDH-1405,UI,file_id,essential_validation,GC</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>19b456a8-e909-47cb-89ff-3725f112548f</testCaseGuid>
+</TestCaseEntity>

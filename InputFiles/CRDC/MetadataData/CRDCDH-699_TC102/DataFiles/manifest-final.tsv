@@ -1,0 +1,6 @@
+type	specimen.specimen_record_id	diagnosis.diagnosis_record_id	study.study_short_name	participant.participant_id	data_file_name	data_file_type	data_file_description	data_file_format	data_file_size	data_file_checksum_value	data_file_checksum_type	data_file_compression_status	data_file_location	internal_file_name	data_file_uuid
+file	ctdc_spec_1		autoQA	ctdc_part_1	ctdc1.docx	Chromatin	sofia-des1	CSV	13198	f96436054c22d3f71b6d32390932516a	md5sum			ctdc1.docx	dg.4DFC/98c32917-0f79-5e49-9e19-bbd2e3a50cec
+file	ctdc_spec_2		autoQA	ctdc_part_2	ctdc2.pdf	Copy Number Variation	sofia-des2	DOC	16465	9f1c4e8c6325c82d835fd7f757f86c66	md5sum			ctdc2.pdf	dg.4DFC/e3f98072-9f7b-5b5a-ab04-340e5034f447
+file	ctdc_spec_3		autoQA	ctdc_part_3	ctdc3.pdf	Quality Control	sofia-des3	MAT	16465	9f1c4e8c6325c82d835fd7f757f86c66	md5sum			ctdc3.pdf	dg.4DFC/112dc5dc-28df-5995-8952-7d39d316591b
+file	ctdc_spec_4		autoQA	ctdc_part_4	ctdc4.docx	Gene Expression Analysis	sofia-des4	ODS	13198	f96436054c22d3f71b6d32390932516a	md5sum			ctdc4.docx	dg.4DFC/8268a86c-2d0a-5a93-bb1f-99720b4e2db9
+file	ctdc_spec_5		autoQA	ctdc_part_5	ctdc5.docx	Supplemental	sofia-des5	CRAM	13257	b0108193dcaefb5389b509bbfdad504f	md5sum			ctdc5.docx	dg.4DFC/ed5c56eb-5c64-5fd3-90da-da67384c4fed
