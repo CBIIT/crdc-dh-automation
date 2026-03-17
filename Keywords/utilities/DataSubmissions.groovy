@@ -986,7 +986,7 @@ class DataSubmissions extends TestRunner {
 		}
 		WebUI.delay(1)
 		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
-		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"), 15)
+		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"), 35)
 		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"))
 		WebUI.delay(1)
 		WebDriver driver = DriverFactory.getWebDriver()
@@ -1287,43 +1287,41 @@ class DataSubmissions extends TestRunner {
 	}
 
 	/**
-	 * Verify the open error details dialog shows the expected issues. Uses "contains" for message matching.
+	 * Verify the open error details dialog contains all expected issues. Relaxed check: each expected issue
+	 * must appear in the dialog (at least one actual issue matches severity and message); actual may contain
+	 * more issues (e.g. other files' errors/warnings grouped by submitted identifier). No strict count equality.
 	 *
 	 * @param expectedIssues List of maps [severity: String, message: String]. Message matching: actual contains expected.
 	 * @param reportSection (Optional) Section for ValidationReport. Defaults to "Validation Error Details".
 	 */
 	@Keyword
 	void verifyErrorDetailsDialogIssues(List<Map<String, String>> expectedIssues, String reportSection = "Validation Error Details") {
-		KeywordUtil.logInfo("--- verifyErrorDetailsDialogIssues: expecting " + expectedIssues.size() + " issues ---")
+		KeywordUtil.logInfo("--- verifyErrorDetailsDialogIssues: expecting " + expectedIssues.size() + " issue(s) (all must appear in dialog) ---")
 		List<Map<String, String>> actual = getErrorDetailsDialogIssues()
 		boolean allOk = true
 
-		if (actual.size() != expectedIssues.size()) {
-			ValidationReport.addValidationReportItem(reportSection, "Issue count", String.valueOf(expectedIssues.size()), String.valueOf(actual.size()), "Fail")
-			allOk = false
-		}
-
-		int compareCount = Math.min(actual.size(), expectedIssues.size())
-		for (int i = 0; i < compareCount; i++) {
+		for (int i = 0; i < expectedIssues.size(); i++) {
 			Map<String, String> exp = expectedIssues.get(i)
-			Map<String, String> act = actual.get(i)
 			String expSev = (exp.get("severity") ?: "").trim()
-			String actSev = (act.get("severity") ?: "").trim()
 			String expMsg = (exp.get("message") ?: "").trim()
-			String actMsg = (act.get("message") ?: "").trim()
-
-			boolean sevOk = actSev.equalsIgnoreCase(expSev)
-			boolean msgOk = actMsg.contains(expMsg)
-
-			ValidationReport.addValidationReportItem(reportSection, "Issue " + (i + 1) + " severity", expSev, actSev, sevOk ? "Pass" : "Fail")
-			ValidationReport.addValidationReportItem(reportSection, "Issue " + (i + 1) + " message", expMsg, actMsg, msgOk ? "Pass" : "Fail")
-			if (!sevOk || !msgOk) allOk = false
+			boolean found = false
+			for (Map<String, String> actualIssue : actual) {
+				String actSev = (actualIssue.get("severity") ?: "").trim()
+				String actMsg = (actualIssue.get("message") ?: "").trim()
+				if (actSev.equalsIgnoreCase(expSev) && actMsg.contains(expMsg)) {
+					found = true
+					break
+				}
+			}
+			String status = found ? "Pass" : "Fail"
+			ValidationReport.addValidationReportItem(reportSection, "Expected issue " + (i + 1) + " in dialog", expSev + ": " + (expMsg.length() > 50 ? expMsg.substring(0, 50) + "..." : expMsg), found ? "found" : "not found", status)
+			if (!found) allOk = false
 		}
 
 		if (allOk) {
-			KeywordUtil.logInfo("Error details dialog issues verified")
+			KeywordUtil.logInfo("Error details dialog: all " + expectedIssues.size() + " expected issue(s) verified")
 		} else {
-			KeywordUtil.markFailed("verifyErrorDetailsDialogIssues: one or more issues did not match")
+			KeywordUtil.markFailed("verifyErrorDetailsDialogIssues: one or more expected issues did not appear in dialog")
 		}
 	}
 

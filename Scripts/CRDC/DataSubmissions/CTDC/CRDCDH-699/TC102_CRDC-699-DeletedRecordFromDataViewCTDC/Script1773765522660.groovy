@@ -34,11 +34,11 @@ CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 //Handle the persistent validation purple alert that never disappears and blocks the dropdown selection in the next step unless the focus is moved-- unique to this CTDC test data
 CustomKeywords.'utilities.WebUIUtils.scrollToElement'(findTestObject('CRDC/NavBar/DataSubmissions-Tab'))
 
-CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsVsExpectedForTC'("CRDCDH-1405_TC113")
+CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsVsExpectedForTC'("CRDCDH-699_TC102")
 
 CustomKeywords.'utilities.WebUIUtils.clickTab'("Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn")
 
-CustomKeywords.'utilities.DataSubmissions.verifyErrorDetailsForSubmittedIdForTC'('CRDCDH-1405_TC113')
+CustomKeywords.'utilities.DataSubmissions.verifyErrorDetailsForSubmittedIdForTC'('CRDCDH-699_TC102')
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
