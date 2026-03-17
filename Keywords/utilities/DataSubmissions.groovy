@@ -156,7 +156,7 @@ class DataSubmissions extends TestRunner {
 		for (String cand : candidates) {
 			String c = cand != null ? cand.trim() : ""
 			if (c.isEmpty()) continue
-			int idx = headers.findIndexOf { it != null && it.trim().equalsIgnoreCase(c) }
+				int idx = headers.findIndexOf { it != null && it.trim().equalsIgnoreCase(c) }
 			if (idx >= 0) return idx
 		}
 		return -1
@@ -201,15 +201,15 @@ class DataSubmissions extends TestRunner {
 		for (File tsv : tsvs) {
 			List<String> lines = Files.readAllLines(tsv.toPath(), StandardCharsets.UTF_8)
 			if (lines.size() < 2) continue
-			String header = lines.get(0)
+				String header = lines.get(0)
 			int expectedColIdx = findColumnIndexForExpectedTsv(header, EXPECTED_ERROR_COLUMN_CANDIDATES_UI)
 			if (expectedColIdx < 0) continue
-			for (int i = 1; i < lines.size(); i++) {
-				String[] cols = lines.get(i).split("\t", -1)
-				String expectedVal = expectedColIdx < cols.length ? cols[expectedColIdx].trim() : ""
-				if (expectedVal.isEmpty()) continue
-				aggregated.addAll(parseExpectedErrorsToList(expectedVal))
-			}
+				for (int i = 1; i < lines.size(); i++) {
+					String[] cols = lines.get(i).split("\t", -1)
+					String expectedVal = expectedColIdx < cols.length ? cols[expectedColIdx].trim() : ""
+					if (expectedVal.isEmpty()) continue
+						aggregated.addAll(parseExpectedErrorsToList(expectedVal))
+				}
 		}
 		return aggregated
 	}
@@ -742,8 +742,8 @@ class DataSubmissions extends TestRunner {
 			}
 		}
 		String expectedLabel = (expectedSubmissionName != null && !expectedSubmissionName.isEmpty())
-			? "pattern match, submission: ${namePart}"
-			: "pattern match (submission + timestamp)"
+				? "pattern match, submission: ${namePart}"
+				: "pattern match (submission + timestamp)"
 		ValidationReport.addValidationReportItem("Validation Results Export", "Downloaded file name", expectedLabel, fileName, "Pass")
 		KeywordUtil.logInfo("clickValidationResultsExportAndVerifyDownloadedFileName: verified downloaded file: ${fileName} (submission name: ${namePart})")
 	}
@@ -994,6 +994,7 @@ class DataSubmissions extends TestRunner {
 			KeywordUtil.logInfo("--- applyValidationResultsFilters: node=" + node + ", severity=" + severity + ", issueType=" + issueType + " ---")
 		}
 		WebUI.delay(1)
+		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
 		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"), 15)
 		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"))
 		WebUI.delay(1)
@@ -1989,9 +1990,10 @@ class DataSubmissions extends TestRunner {
 			KeywordUtil.logInfo("Confirming deletion in dialog")
 			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'), 10)
 			WebUI.click(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'))
+			WebUI.delay(3)
 
-			KeywordUtil.logInfo("Waiting for deletion to complete (up to 120s)")
-			Utils.waitForElementNotVisible('CRDC/AILocators/DataSubmissions/Detail/DataView/DeletionAlert', 120)
+			KeywordUtil.logInfo("Waiting for deletion to complete")
+			Utils.waitForElementNotVisible('CRDC/AILocators/DataSubmissions/Detail/DataView/DeletionAlert', 60)
 
 			KeywordUtil.logInfo("deleteRowsFromDataView: Successfully deleted " + toSelect + " row(s) for node '" + node + "'")
 		} catch (Exception e) {

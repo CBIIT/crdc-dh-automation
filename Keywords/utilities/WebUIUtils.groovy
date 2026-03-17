@@ -224,6 +224,20 @@ class WebUIUtils {
 	}
 
 	/**
+	 * Scroll the page so the given element is in view.
+	 * Uses Selenium Actions moveToElement, which scrolls the element into view as part of moving the virtual cursor to it.
+	 * Use before click or verification when the element may be off-screen.
+	 * @param to TestObject for the element to scroll to (e.g. findTestObject('CRDC/...'))
+	 * @param timeoutSeconds Optional timeout in seconds to wait for the element (default DEFAULT_TIMEOUT)
+	 */
+	@Keyword
+	static void scrollToElement(TestObject to, int timeoutSeconds = DEFAULT_TIMEOUT) {
+		WebDriver driver = DriverFactory.getWebDriver()
+		WebElement element = WebUI.findWebElement(to, timeoutSeconds)
+		new Actions(driver).moveToElement(element).perform()
+	}
+
+	/**
 	 * Navigate to a submission's upload-activity page.
 	 * Builds URL from G_Urlname (profile) and the given submission ID.
 	 * @param submissionId Submission UUID (e.g. from getSubmissionIdFromUploadActivityUrl)
@@ -1228,7 +1242,15 @@ class WebUIUtils {
 		}
 		String defaultDiffPath = Paths.get(currentScreenshotPath).getParent().resolve("vision_diff.png").toString()
 		KeywordUtil.logInfo("verifyScreenshotMatchesBaseline: current=" + currentScreenshotPath + ", baseline=" + baselineScreenshotPath)
-		List<String> cmd = [pythonExe, scriptPath.toString(), currentScreenshotPath, baselineScreenshotPath, "--verbose", "--save-diff", defaultDiffPath]
+		List<String> cmd = [
+			pythonExe,
+			scriptPath.toString(),
+			currentScreenshotPath,
+			baselineScreenshotPath,
+			"--verbose",
+			"--save-diff",
+			defaultDiffPath
+		]
 		if (threshold != null) {
 			cmd.add("--threshold")
 			cmd.add(threshold.toString())
