@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Upload Errors modal content matches expected TSV after negative-scenario CLI upload</description>
+   <name>TC103_CRDC-887-ColumnRequiredBatchErrorsICDC</name>
+   <tag>CRDCDH-1405,Upload Activities,Upload Errors,modal,expected_errors</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>156dcfe4-26b9-4689-8058-eb9672c050c6</testCaseGuid>
+</TestCaseEntity>

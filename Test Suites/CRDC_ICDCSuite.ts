@@ -25,4 +25,39 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-1405-ICDC/TC106_CRDC-1405-UploadActivitiesBatchErrorsICDC</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>bce62ac9-f01c-4e57-961a-4f6569a7756f</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-887-ICDC/TC104_CRDC-887-ExtraConflictDuplicateBatchErrorsICDC</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>03d40c06-5739-4f2d-be35-0801e0fa18ed</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-887-ICDC/TC103_CRDC-887-ColumnRequiredBatchErrorsICDC</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>3a31f608-f97d-4727-bf45-c338a1511d33</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-699-ICDC/TC36_CRDC-699-RequiredRelatedPropertyMissingICDC</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>d998ceaf-16b5-4493-89c0-ad5ed2cc5aa8</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-699-ICDC/TC35_CRDC-699-InvalidDateIntegerPvICDC</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>e42173e1-3fd7-4f7d-a409-6ed69bafd442</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-699-ICDC/TC37_CRDC-699-ControlledAccessOpenConsentCodeICDC</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>
