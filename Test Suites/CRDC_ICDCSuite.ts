@@ -60,4 +60,11 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-699-ICDC/TC37_CRDC-699-ControlledAccessOpenConsentCodeICDC</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>f59dd902-2ca9-4017-91cf-7bddc9af3848</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-1051-ICDC/TC39_CRDC-VerifyCrossValidationICDC</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>

@@ -81,4 +81,11 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/CTDC/CRDCDH-699-CTDC/TC103_CRDC-699-VerifyValidationResultsConsentCodeErrorsCTDC</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>be4f4a14-9a04-4414-a430-aa18e35e8d6e</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/CTDC/CRDCDH-1051-CTDC/TC38_CRDC-VerifyCrossValidationCTDC</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>
