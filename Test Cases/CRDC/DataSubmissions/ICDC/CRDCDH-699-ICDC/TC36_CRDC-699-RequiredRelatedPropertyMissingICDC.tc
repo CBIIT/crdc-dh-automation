@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC36_CRDC-699-RequiredRelatedPropertyMissingICDC</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>90b1435f-9917-44fd-950f-a766d10a8f5d</testCaseGuid>
+</TestCaseEntity>

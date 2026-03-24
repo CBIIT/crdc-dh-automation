@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC37_CRDC-699-ControlledAccessOpenConsentCodeICDC</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>bd8b8f28-6a9c-4442-886a-337f5864c369</testCaseGuid>
+</TestCaseEntity>
