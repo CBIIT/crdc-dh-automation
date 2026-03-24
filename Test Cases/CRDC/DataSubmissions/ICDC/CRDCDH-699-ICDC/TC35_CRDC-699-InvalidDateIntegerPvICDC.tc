@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC35_CRDC-699-InvalidDateIntegerPvICDC</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>864a10ea-235a-4ecf-9057-d100b0e1ec39</testCaseGuid>
+</TestCaseEntity>

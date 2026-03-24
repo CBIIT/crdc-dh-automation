@@ -1,0 +1,2 @@
+type1	expected_errors	 study.clinical_study_designation	person_record_id	pi_first_name	pi_last_name	pi_middle_initial
+principal_investigator	"""ICDC_principal_investigator_v2.0.0.tsv"": “type” column is required."	autoQA	ctdcper_1			
