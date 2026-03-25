@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Verifies Release button state around Cross Validation. After validate and submit, Release is disabled; after Cross Validate, Release becomes enabled.</description>
+   <name>TC39_CRDC-VerifyCrossValidationICDC</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>226ff831-78db-4bf7-bb7c-d462c5ce8efe</testCaseGuid>
+</TestCaseEntity>
