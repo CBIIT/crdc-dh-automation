@@ -15,7 +15,7 @@
       <guid>8bd7db1b-a071-4760-9de1-35514f717843</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/TC02_CRDC_Submission_Request-RequiredFields</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-332/TC02_CRDC_Submission_Request-RequiredFields</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>
