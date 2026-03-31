@@ -98,6 +98,8 @@ class GraphQlApiClient {
 				String q = data.getValue("queryInline", r)?.toString()?.trim()
 				if (!q) {
 					KeywordUtil.markFailed("GraphQlApiClient.loadGraphQlDocument: empty queryInline for operationKey '${key}'.")
+					// Do not cache or return an empty query; signal error via null.
+					return null
 				}
 				graphqlDocumentCache.put(key, q)
 				return q
