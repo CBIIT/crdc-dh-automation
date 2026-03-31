@@ -745,10 +745,13 @@ class GraphQlApiClient {
 				safeUrlPreview = "<unparsable URL>"
 			}
 			KeywordUtil.logInfo("S3 PUT ${fn} (url preview: ${safeUrlPreview})")
-			putTsvToPresignedUrl(localTsv, signed)
-			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "S3 PUT presigned upload: ${fn}", "HTTP 2xx success",
-				"succeeded", "Pass")
-			uploadResults.add([fileName: fn, succeeded: true])
+			boolean success = putTsvToPresignedUrl(localTsv, signed)
+			String message = success ? "HTTP 2xx success" : "HTTP non-2xx or network failure (see S3 PUT logs)"
+			String status = success ? "succeeded" : "failed"
+			String result = success ? "Pass" : "Fail"
+			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "S3 PUT presigned upload: ${fn}", message,
+				status, result)
+			uploadResults.add([fileName: fn, succeeded: success])
 		}
 		return uploadResults
 	}
