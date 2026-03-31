@@ -165,9 +165,10 @@ class GraphQlApiClient {
 				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Local metadata file: ${basename}", "file exists",
 					"missing: ${f.absolutePath}", "Fail")
 				KeywordUtil.markFailed("Missing input file for metadata upload: ${f.absolutePath}")
+			} else {
+				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Local metadata file: ${basename}", "file exists",
+					f.absolutePath, "Pass")
 			}
-			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Local metadata file: ${basename}", "file exists",
-				f.absolutePath, "Pass")
 		}
 	}
 
