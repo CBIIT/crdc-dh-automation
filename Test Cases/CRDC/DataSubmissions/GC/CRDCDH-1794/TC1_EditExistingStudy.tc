@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC1_EditExistingStudy</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>bfa3dc5e-a95c-4cb5-bfb6-11a37c17ce09</testCaseGuid>
+</TestCaseEntity>
