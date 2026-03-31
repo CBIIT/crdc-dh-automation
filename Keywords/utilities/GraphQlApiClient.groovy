@@ -660,12 +660,21 @@ class GraphQlApiClient {
 		// Call-site checks: batch echoes submission, has status string, type matches caller request.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Batch submissionID matches request", submissionID,
 			respSubId ?: "(empty)", submissionID == respSubId ? "Pass" : "Fail")
+		if (submissionID != respSubId) {
+			KeywordUtil.markFailed("GraphQlApiClient.createBatch: response submissionID '${respSubId}' does not match request '${submissionID}'.")
+		}
 		String batchStatCreate = batchNode?.get('status')?.toString() ?: ""
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Batch status (createBatch)", "non-empty",
 			batchStatCreate?.trim() ?: "(empty)", batchStatCreate?.trim() ? "Pass" : "Fail")
+		if (!batchStatCreate?.trim()) {
+			KeywordUtil.markFailed("GraphQlApiClient.createBatch: response status is empty or missing.")
+		}
 		String respType = batchNode?.get('type')?.toString() ?: "(empty)"
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Batch type matches request", type, respType,
 			type == respType?.trim() ? "Pass" : "Fail")
+		if (type != respType?.trim()) {
+			KeywordUtil.markFailed("GraphQlApiClient.createBatch: response batch type '${respType?.trim()}' does not match request '${type}'.")
+		}
 		return result
 	}
 
