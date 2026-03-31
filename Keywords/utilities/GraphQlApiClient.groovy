@@ -239,6 +239,9 @@ class GraphQlApiClient {
 		// Verify fileCount matches length of files array from API (internal consistency).
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Batch fileCount vs files list", "fileCount equals files.size()",
 			"fileCount=${fcActual}, files.size()=${fcExpectedFromRows}", countOk ? "Pass" : "Fail")
+		if (!countOk) {
+			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateBatch: fileCount ${fcActual} does not match files list size ${fcExpectedFromRows}")
+		}
 		if (filesList) {
 			for (Object fo : filesList) {
 				Map fr = fo as Map
@@ -249,6 +252,9 @@ class GraphQlApiClient {
 				String urlSummary = urlOk ? "(non-empty URL)" : su.length() > 0 ? "(invalid scheme)" : "(empty)"
 				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "createBatch signedURL: ${fn}", "non-empty http(s) URL",
 					urlSummary, urlOk ? "Pass" : "Fail")
+				if (!urlOk) {
+					KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateBatch: file '${fn}' has invalid or missing signedURL (${urlSummary})")
+				}
 			}
 		}
 		return payload
