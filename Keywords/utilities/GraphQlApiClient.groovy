@@ -139,9 +139,11 @@ class GraphQlApiClient {
 		String dir = directory?.toString()?.trim()
 		if (!dir) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyLocalFilesExist: directory is required.")
+			return
 		}
 		if (!(fileBasenames instanceof List) || fileBasenames.isEmpty()) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyLocalFilesExist: fileBasenames must be a non-empty list.")
+			return
 		}
 		fileBasenames.each { def name ->
 			String basename = name?.toString()?.trim()
