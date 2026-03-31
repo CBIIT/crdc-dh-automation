@@ -38,16 +38,17 @@ class GraphQlApiClient {
 
 	/**
 	 * HTTP PUT entire file body to presignedUrl. No Authorization header. Succeeds on HTTP 2xx.
+	 * @return true if HTTP 2xx; false after {@code markFailed} (invalid args or non-2xx response).
 	 */
-	private void putTsvToPresignedUrl(File file, String presignedUrl) {
+	private boolean putTsvToPresignedUrl(File file, String presignedUrl) {
 		if (file == null || !file.isFile()) {
 			KeywordUtil.markFailed("GraphQlApiClient.putTsvToPresignedUrl: file is missing or not a regular file: ${file}")
-			return
+			return false
 		}
 		String url = presignedUrl?.trim()
 		if (!url) {
 			KeywordUtil.markFailed("GraphQlApiClient.putTsvToPresignedUrl: presignedUrl is required.")
-			return
+			return false
 		}
 		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection()
 		try {
@@ -69,7 +70,9 @@ class GraphQlApiClient {
 			}
 			if (code < 200 || code >= 300) {
 				KeywordUtil.markFailed("GraphQlApiClient.putTsvToPresignedUrl: HTTP ${code} for ${file.name}. Body: ${text}")
+				return false
 			}
+			return true
 		} finally {
 			conn.disconnect()
 		}
@@ -106,6 +109,7 @@ class GraphQlApiClient {
 			}
 		}
 		KeywordUtil.markFailed("GraphQlApiClient.loadGraphQlDocument: no row for operationKey '${key}' in ${GRAPHQL_OPERATIONS_DATA}.")
+		return null
 	}
 
 	private void requireApiConfig() {
@@ -156,10 +160,11 @@ class GraphQlApiClient {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyLocalFilesExist: fileBasenames must be a non-empty list.")
 			return
 		}
-		fileBasenames.each { def name ->
-			String basename = name?.toString()?.trim()
+		for (Object nameObj : fileBasenames) {
+			String basename = nameObj?.toString()?.trim()
 			if (!basename) {
 				KeywordUtil.markFailed("GraphQlApiClient.verifyLocalFilesExist: each basename must be non-empty.")
+				return
 			}
 			File f = new File(dir, basename)
 			// Each basename must exist as a file; report Fail then abort on first missing.
@@ -167,10 +172,10 @@ class GraphQlApiClient {
 				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Local metadata file: ${basename}", "file exists",
 					"missing: ${f.absolutePath}", "Fail")
 				KeywordUtil.markFailed("Missing input file for metadata upload: ${f.absolutePath}")
-			} else {
-				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Local metadata file: ${basename}", "file exists",
-					f.absolutePath, "Pass")
+				return
 			}
+			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Local metadata file: ${basename}", "file exists",
+				f.absolutePath, "Pass")
 		}
 	}
 
@@ -185,7 +190,7 @@ class GraphQlApiClient {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "createBatch presigned file rows", "non-empty",
 				"(empty)", "Fail")
 			KeywordUtil.markFailed("createBatch returned no files with signedURL; cannot upload metadata.")
-			return rows
+			return null
 		}
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "createBatch presigned file rows", "non-empty",
 			String.valueOf(rows.size()) + " row(s)", "Pass")
@@ -204,6 +209,7 @@ class GraphQlApiClient {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.createSubmission", "present in response",
 				"missing", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateSubmission: missing data.createSubmission in ${result}")
+			return null
 		}
 		String id = payload?.get('_id')?.toString() ?: ""
 		String st = payload?.get('status')?.toString() ?: ""
@@ -219,9 +225,11 @@ class GraphQlApiClient {
 			st?.trim() ?: "(empty)", statusIsNew ? "Pass" : "Fail")
 		if (!id?.trim()) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateSubmission: submission _id is empty.")
+			return null
 		}
 		if (!statusIsNew) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateSubmission: expected status New, got: ${st}")
+			return null
 		}
 		return payload
 	}
@@ -238,6 +246,7 @@ class GraphQlApiClient {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.createBatch", "present in response",
 				"missing", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateBatch: missing data.createBatch in ${result}")
+			return null
 		}
 		String batchId = payload?.get('_id')?.toString() ?: ""
 		// Verify batch _id returned and non-empty.
@@ -245,6 +254,7 @@ class GraphQlApiClient {
 			batchId?.trim() ?: "(empty)", batchId?.trim() ? "Pass" : "Fail")
 		if (!batchId?.trim()) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateBatch: batch _id is empty.")
+			return null
 		}
 		List filesList = payload?.get('files') as List
 		int filesSize = filesList ? filesList.size() : 0
@@ -256,6 +266,7 @@ class GraphQlApiClient {
 			"fileCount=${fcActual}, files.size()=${fcExpectedFromRows}", countOk ? "Pass" : "Fail")
 		if (!countOk) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateBatch: fileCount ${fcActual} does not match files list size ${fcExpectedFromRows}")
+			return null
 		}
 		if (filesList) {
 			for (Object fo : filesList) {
@@ -269,6 +280,7 @@ class GraphQlApiClient {
 					urlSummary, urlOk ? "Pass" : "Fail")
 				if (!urlOk) {
 					KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateBatch: file '${fn}' has invalid or missing signedURL (${urlSummary})")
+					return null
 				}
 			}
 		}
@@ -288,6 +300,7 @@ class GraphQlApiClient {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.updateBatch", "present in response",
 				"missing", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackUpdateBatch: missing data.updateBatch in ${result}")
+			return null
 		}
 		String expBid = expectedBatchId?.toString()?.trim()
 		if (expBid) {
@@ -297,6 +310,7 @@ class GraphQlApiClient {
 				pBid ?: "(empty)", expBid == pBid ? "Pass" : "Fail")
 			if (expBid != pBid) {
 				KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackUpdateBatch: expected batch _id '${expBid}' but got '${pBid}'")
+				return null
 			}
 		}
 		String pSub = payload?.get('submissionID')?.toString()?.trim() ?: ""
@@ -336,6 +350,7 @@ class GraphQlApiClient {
 					"status set, no errors; size may be null", actualFile, fileOk ? "Pass" : "Fail")
 				if (!fileOk) {
 					KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackUpdateBatch: file '${fn}' failed validation (${actualFile})")
+					return null
 				}
 			}
 		} else {
@@ -343,6 +358,7 @@ class GraphQlApiClient {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Batch files after updateBatch", "non-empty list",
 				"(missing or empty)", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackUpdateBatch: files list is missing or empty in updateBatch response")
+			return null
 		}
 		return payload
 	}
@@ -368,13 +384,16 @@ class GraphQlApiClient {
 		// Preconditions: caller must supply submission id, batch id, and non-empty expected file name list.
 		if (!expSub || !expBid) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: expectedSubmissionId and expectedBatchId are required.")
+			return null
 		}
 		if (!(expectedFileNames instanceof List) || expectedFileNames.isEmpty()) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: expectedFileNames must be a non-empty list.")
+			return null
 		}
 		List<String> expFiles = expectedFileNames.collect { it?.toString()?.trim() }.findAll { it }
 		if (expFiles.size() != expectedFileNames.size()) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: each expected file name must be non-empty.")
+			return null
 		}
 		Object totalObj = payload.get('total')
 		String totalStr = totalObj != null ? totalObj.toString() : "(missing)"
@@ -394,6 +413,7 @@ class GraphQlApiClient {
 			batchesNonEmpty ? "Pass" : "Fail")
 		if (!totalOk || !batchesNonEmpty) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: total or batches invalid.")
+			return null
 		}
 		Map matched = null
 		// Locate the batch created in the test by _id (within first page / request window).
@@ -409,6 +429,7 @@ class GraphQlApiClient {
 			matched ? "found" : "not found", matched ? "Pass" : "Fail")
 		if (!matched) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: no batch with _id ${expBid} in listBatches.")
+			return null
 		}
 		String pSub = matched?.get('submissionID')?.toString()?.trim() ?: ""
 		boolean subOk = expSub == pSub
@@ -417,6 +438,7 @@ class GraphQlApiClient {
 			pSub ?: "(empty)", subOk ? "Pass" : "Fail")
 		if (!subOk) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: submissionID mismatch.")
+			return null
 		}
 		String expType = expectedBatchType?.toString()?.trim()
 		if (expType) {
@@ -426,6 +448,7 @@ class GraphQlApiClient {
 				pType ?: "(empty)", expType == pType ? "Pass" : "Fail")
 			if (expType != pType) {
 				KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: expected type ${expType}, got ${pType}")
+				return null
 			}
 		}
 		int expFc = expFiles.size()
@@ -437,6 +460,7 @@ class GraphQlApiClient {
 			fcActual, fcOk ? "Pass" : "Fail")
 		if (!fcOk) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: fileCount expected ${expFc}, got ${fcActual}")
+			return null
 		}
 		String bStat = matched?.get('status')?.toString()?.trim() ?: ""
 		// Verify batch-level status string present.
@@ -444,6 +468,7 @@ class GraphQlApiClient {
 			bStat ?: "(empty)", bStat ? "Pass" : "Fail")
 		if (!bStat) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: batch status is empty.")
+			return null
 		}
 		Object bErrs = matched.get('errors')
 		boolean batchNoErrs = bErrs == null || (bErrs instanceof List && ((List) bErrs).isEmpty())
@@ -452,6 +477,7 @@ class GraphQlApiClient {
 			bErrs != null ? bErrs.toString() : "(absent)", batchNoErrs ? "Pass" : "Fail")
 		if (!batchNoErrs) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: batch has errors: ${bErrs}")
+			return null
 		}
 		Object disp = matched.get('displayID')
 		boolean dispOk = disp != null && disp.toString().trim()
@@ -460,6 +486,7 @@ class GraphQlApiClient {
 			disp != null ? disp.toString() : "(missing)", dispOk ? "Pass" : "Fail")
 		if (!dispOk) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: batch displayID missing.")
+			return null
 		}
 		String cr = matched?.get('createdAt')?.toString()?.trim() ?: ""
 		String up = matched?.get('updatedAt')?.toString()?.trim() ?: ""
@@ -470,6 +497,7 @@ class GraphQlApiClient {
 			up ?: "(empty)", up ? "Pass" : "Fail")
 		if (!cr || !up) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: batch createdAt or updatedAt empty.")
+			return null
 		}
 		String submName = matched?.get('submitterName')?.toString()?.trim() ?: ""
 		// Verify submitter display name populated (Upload Activity parity with UI).
@@ -477,6 +505,7 @@ class GraphQlApiClient {
 			submName ?: "(empty)", submName ? "Pass" : "Fail")
 		if (!submName) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: submitterName empty.")
+			return null
 		}
 		List batchFiles = matched.get('files') as List
 		boolean filesOk = batchFiles && !batchFiles.isEmpty()
@@ -485,6 +514,7 @@ class GraphQlApiClient {
 			filesOk ? String.valueOf(batchFiles.size()) + " file(s)" : "(missing or empty)", filesOk ? "Pass" : "Fail")
 		if (!filesOk) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: batch files list missing or empty.")
+			return null
 		}
 		for (String expFn : expFiles) {
 			Map found = null
@@ -501,6 +531,7 @@ class GraphQlApiClient {
 				found ? "found" : "missing", found ? "Pass" : "Fail")
 			if (!found) {
 				KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: file ${expFn} not in batch.files.")
+				return null
 			}
 			String st = found?.get('status')?.toString()?.trim() ?: ""
 			Object ferrs = found.get('errors')
@@ -536,9 +567,11 @@ class GraphQlApiClient {
 				"status set, no errors; size may be null (if returned, must be > 0)", detail, fileRowOk ? "Pass" : "Fail")
 			if (!st || !fNoErrs) {
 				KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: file ${expFn} status/errors invalid.")
+				return null
 			}
 			if (!sizePass) {
 				KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: file ${expFn} size present but not > 0.")
+				return null
 			}
 		}
 		return payload
@@ -553,6 +586,10 @@ class GraphQlApiClient {
 	@Keyword
 	Map post(String operationName, String query, Map variables) {
 		requireApiConfig()
+		if (!query?.toString()?.trim()) {
+			KeywordUtil.markFailed("GraphQlApiClient.post: query is required.")
+			return null
+		}
 		URL url = new URL(GlobalVariable.ApiUrl.toString().trim())
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection()
 		InputStream stream = null
@@ -583,6 +620,7 @@ class GraphQlApiClient {
 				code == 200 ? "Pass" : "Fail")
 			if (code < 200 || code >= 300) {
 				KeywordUtil.markFailed("GraphQlApiClient: HTTP ${code}. Body: ${text}")
+				return null
 			}
 
 			def slurper = new JsonSlurper()
@@ -597,6 +635,7 @@ class GraphQlApiClient {
 				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "GraphQL errors key", "absent on success",
 					String.valueOf(parsed.errors), "Fail")
 				KeywordUtil.markFailed("GraphQlApiClient: GraphQL errors: ${parsed.errors}")
+				return null
 			} else {
 				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "GraphQL errors key", "absent on success", "absent", "Pass")
 			}
@@ -643,11 +682,17 @@ class GraphQlApiClient {
 		]
 		if (vars.values().any { !it }) {
 			KeywordUtil.markFailed("GraphQlApiClient.createSubmission: studyID, dataCommons, name, intention, and dataType are required.")
+			return null
 		}
-		Map result = post("createSubmission", loadGraphQlDocument("createSubmission"), vars)
+		String queryDoc = loadGraphQlDocument("createSubmission")
+		if (!queryDoc) {
+			return null
+		}
+		Map result = post("createSubmission", queryDoc, vars)
 		// Minimal response sanity before verifyAndUnpackCreateSubmission.
-		if (!result.data || !result.data.get('createSubmission')) {
+		if (!result || !result.data || !result.data.get('createSubmission')) {
 			KeywordUtil.markFailed("GraphQlApiClient.createSubmission: expected data.createSubmission in response: ${result}")
+			return null
 		}
 		return result
 	}
@@ -667,22 +712,31 @@ class GraphQlApiClient {
 		def filesRaw = args.files
 		if (!(filesRaw instanceof List) || filesRaw.isEmpty()) {
 			KeywordUtil.markFailed("GraphQlApiClient.createBatch: files must be a non-empty list of file names.")
+			return null
 		}
 		List<String> files = filesRaw.collect { it?.toString()?.trim() }.findAll { it }
 		if (files.size() != filesRaw.size()) {
 			KeywordUtil.markFailed("GraphQlApiClient.createBatch: each file name must be non-empty.")
+			return null
 		}
 		if (!submissionID) {
 			KeywordUtil.markFailed("GraphQlApiClient.createBatch: submissionID is required.")
+			return null
 		}
 		if (!type) {
 			KeywordUtil.markFailed("GraphQlApiClient.createBatch: type is required.")
+			return null
+		}
+		String queryDoc = loadGraphQlDocument("createBatch")
+		if (!queryDoc) {
+			return null
 		}
 		Map vars = [submissionID: submissionID, type: type, files: files]
-		Map result = post("createBatch", loadGraphQlDocument("createBatch"), vars)
-		Map data = result.data as Map
+		Map result = post("createBatch", queryDoc, vars)
+		Map data = result?.data as Map
 		if (!data || !data.get('createBatch')) {
 			KeywordUtil.markFailed("GraphQlApiClient.createBatch: expected data.createBatch in response: ${result}")
+			return null
 		}
 		Map batchNode = data.get('createBatch') as Map
 		String respSubId = batchNode?.get('submissionID')?.toString()?.trim() ?: ""
@@ -691,18 +745,21 @@ class GraphQlApiClient {
 			respSubId ?: "(empty)", submissionID == respSubId ? "Pass" : "Fail")
 		if (submissionID != respSubId) {
 			KeywordUtil.markFailed("GraphQlApiClient.createBatch: response submissionID '${respSubId}' does not match request '${submissionID}'.")
+			return null
 		}
 		String batchStatCreate = batchNode?.get('status')?.toString() ?: ""
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Batch status (createBatch)", "non-empty",
 			batchStatCreate?.trim() ?: "(empty)", batchStatCreate?.trim() ? "Pass" : "Fail")
 		if (!batchStatCreate?.trim()) {
 			KeywordUtil.markFailed("GraphQlApiClient.createBatch: response status is empty or missing.")
+			return null
 		}
 		String respType = batchNode?.get('type')?.toString() ?: "(empty)"
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Batch type matches request", type, respType,
 			type == respType?.trim() ? "Pass" : "Fail")
 		if (type != respType?.trim()) {
 			KeywordUtil.markFailed("GraphQlApiClient.createBatch: response batch type '${respType?.trim()}' does not match request '${type}'.")
+			return null
 		}
 		return result
 	}
@@ -714,16 +771,18 @@ class GraphQlApiClient {
 	 *
 	 * @param fileRows List of Maps from data.createBatch.files
 	 * @param apiInputDir Project directory path to folder containing local TSVs (e.g. .../InputFiles/CRDC/API)
-	 * @return List of [fileName: String, succeeded: true] maps for updateBatch variables
+	 * @return List of [fileName: String, succeeded: boolean] maps for updateBatch variables
 	 */
 	@Keyword
 	List<Map> putMetadataTsvsAndBuildUploadResults(List fileRows, String apiInputDir) {
 		if (!(fileRows instanceof List) || fileRows.isEmpty()) {
 			KeywordUtil.markFailed("GraphQlApiClient.putMetadataTsvsAndBuildUploadResults: fileRows must be a non-empty list.")
+			return []
 		}
 		String dir = apiInputDir?.toString()?.trim()
 		if (!dir) {
 			KeywordUtil.markFailed("GraphQlApiClient.putMetadataTsvsAndBuildUploadResults: apiInputDir is required.")
+			return []
 		}
 		KeywordUtil.logInfo(
 			"putMetadataTsvsAndBuildUploadResults: S3 PUT log lines below show a redacted URL preview (scheme+host+path only, truncated); " +
@@ -735,12 +794,13 @@ class GraphQlApiClient {
 			String signed = row?.get('signedURL')?.toString()
 			if (!fn || !signed) {
 				KeywordUtil.markFailed("GraphQlApiClient.putMetadataTsvsAndBuildUploadResults: row missing fileName or signedURL: ${row}")
-				continue
+				return uploadResults
 			}
 			File localTsv = new File(dir, fn)
 			// Local file must exist before PUT; then upload bytes to presigned URL (no Hub auth on S3).
 			if (!localTsv.isFile()) {
 				KeywordUtil.markFailed("GraphQlApiClient.putMetadataTsvsAndBuildUploadResults: no local file for ${fn}: ${localTsv.absolutePath}")
+				return uploadResults
 			}
 			String safeUrlPreview
 			try {
@@ -776,28 +836,38 @@ class GraphQlApiClient {
 		def filesRaw = args.files
 		if (!batchID) {
 			KeywordUtil.markFailed("GraphQlApiClient.updateBatch: batchID is required.")
+			return null
 		}
 		if (!(filesRaw instanceof List) || filesRaw.isEmpty()) {
 			KeywordUtil.markFailed("GraphQlApiClient.updateBatch: files must be a non-empty list of UploadResult maps.")
+			return null
 		}
 		List<Map> files = filesRaw.collect { it instanceof Map ? it as Map : null }.findAll { it != null }
 		if (files.size() != filesRaw.size()) {
 			KeywordUtil.markFailed("GraphQlApiClient.updateBatch: each item in files must be a Map.")
+			return null
 		}
 		for (Map f : files) {
 			if (!f.get('fileName')?.toString()?.trim()) {
 				KeywordUtil.markFailed("GraphQlApiClient.updateBatch: each file entry needs fileName.")
+				return null
 			}
 			if (f.get('succeeded') == null) {
 				KeywordUtil.markFailed("GraphQlApiClient.updateBatch: each file entry needs succeeded (boolean).")
+				return null
 			}
 		}
+		String queryDoc = loadGraphQlDocument("updateBatch")
+		if (!queryDoc) {
+			return null
+		}
 		Map vars = [batchID: batchID, files: files]
-		Map result = post("updateBatch", loadGraphQlDocument("updateBatch"), vars)
-		Map data = result.data as Map
+		Map result = post("updateBatch", queryDoc, vars)
+		Map data = result?.data as Map
 		// Minimal response sanity before verifyAndUnpackUpdateBatch.
 		if (!data || !data.get('updateBatch')) {
 			KeywordUtil.markFailed("GraphQlApiClient.updateBatch: expected data.updateBatch in response: ${result}")
+			return null
 		}
 		return result
 	}
@@ -815,6 +885,11 @@ class GraphQlApiClient {
 		String submissionID = args.submissionID?.toString()?.trim()
 		if (!submissionID) {
 			KeywordUtil.markFailed("GraphQlApiClient.listBatches: submissionID is required.")
+			return null
+		}
+		String queryDoc = loadGraphQlDocument("listBatches")
+		if (!queryDoc) {
+			return null
 		}
 		Map vars = [submissionID: submissionID]
 		// Optional pagination / sort (omit keys to use API defaults).
@@ -830,11 +905,12 @@ class GraphQlApiClient {
 		if (args.sortDirection != null && args.sortDirection.toString().trim()) {
 			vars.sortDirection = args.sortDirection.toString().trim()
 		}
-		Map result = post("listBatches", loadGraphQlDocument("listBatches"), vars)
-		Map data = result.data as Map
+		Map result = post("listBatches", queryDoc, vars)
+		Map data = result?.data as Map
 		// Minimal response sanity before verifyAndUnpackListBatches.
 		if (!data || !data.get('listBatches')) {
 			KeywordUtil.markFailed("GraphQlApiClient.listBatches: expected data.listBatches in response: ${result}")
+			return null
 		}
 		return result
 	}
