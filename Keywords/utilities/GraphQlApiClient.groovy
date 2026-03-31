@@ -713,8 +713,15 @@ class GraphQlApiClient {
 			if (!localTsv.isFile()) {
 				KeywordUtil.markFailed("GraphQlApiClient.putMetadataTsvsAndBuildUploadResults: no local file for ${fn}: ${localTsv.absolutePath}")
 			}
-			String urlPreview = signed.length() > 80 ? signed.substring(0, 80) + "..." : signed
-			KeywordUtil.logInfo("S3 PUT ${fn} (url preview: ${urlPreview})")
+			String safeUrlPreview
+			try {
+				URL signedUrlObj = new URL(signed)
+				String baseUrl = "${signedUrlObj.protocol}://${signedUrlObj.host}${signedUrlObj.path}"
+				safeUrlPreview = baseUrl.length() > 80 ? baseUrl.substring(0, 80) + "..." : baseUrl
+			} catch (Exception e) {
+				safeUrlPreview = "<unparsable URL>"
+			}
+			KeywordUtil.logInfo("S3 PUT ${fn} (url preview: ${safeUrlPreview})")
 			putTsvToPresignedUrl(localTsv, signed)
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "S3 PUT presigned upload: ${fn}", "HTTP 2xx success",
 				"succeeded", "Pass")
