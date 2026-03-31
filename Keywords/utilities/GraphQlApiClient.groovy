@@ -105,11 +105,17 @@ class GraphQlApiClient {
 
 	private void requireApiConfig() {
 		// Execution profile must define GraphQL endpoint and API JWT.
+		boolean hasError = false
 		if (!GlobalVariable.ApiUrl || GlobalVariable.ApiUrl.toString().trim().isEmpty()) {
 			KeywordUtil.markFailed("GraphQlApiClient: ApiUrl is not set in profile.")
+			hasError = true
 		}
 		if (!GlobalVariable.SubmitterApiToken || GlobalVariable.SubmitterApiToken.toString().trim().isEmpty()) {
 			KeywordUtil.markFailed("GraphQlApiClient: SubmitterApiToken is not set in profile.")
+			hasError = true
+		}
+		if (hasError) {
+			KeywordUtil.markFailedAndStop("GraphQlApiClient: required API configuration is missing in profile; see previous failures for details.")
 		}
 	}
 
