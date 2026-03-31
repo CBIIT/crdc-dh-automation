@@ -313,11 +313,15 @@ class GraphQlApiClient {
 				// Per file: non-empty status and empty errors; size only logged (null allowed).
 				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "File after updateBatch: ${fn}",
 					"status set, no errors; size may be null", actualFile, fileOk ? "Pass" : "Fail")
+				if (!fileOk) {
+					KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackUpdateBatch: file '${fn}' failed validation (${actualFile})")
+				}
 			}
 		} else {
 			// Batch must return at least one file row after update.
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Batch files after updateBatch", "non-empty list",
 				"(missing or empty)", "Fail")
+			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackUpdateBatch: files list is missing or empty in updateBatch response")
 		}
 		return payload
 	}
