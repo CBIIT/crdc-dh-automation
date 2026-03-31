@@ -42,10 +42,12 @@ class GraphQlApiClient {
 	private void putTsvToPresignedUrl(File file, String presignedUrl) {
 		if (file == null || !file.isFile()) {
 			KeywordUtil.markFailed("GraphQlApiClient.putTsvToPresignedUrl: file is missing or not a regular file: ${file}")
+			return
 		}
 		String url = presignedUrl?.trim()
 		if (!url) {
 			KeywordUtil.markFailed("GraphQlApiClient.putTsvToPresignedUrl: presignedUrl is required.")
+			return
 		}
 		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection()
 		try {
@@ -80,6 +82,7 @@ class GraphQlApiClient {
 		// Resolve query string from Katalon test data (Excel) by operationKey.
 		if (!operationKey?.toString()?.trim()) {
 			KeywordUtil.markFailed("GraphQlApiClient.loadGraphQlDocument: operationKey is required.")
+			return null
 		}
 		String key = operationKey.toString().trim()
 		if (graphqlDocumentCache.containsKey(key)) {
@@ -105,11 +108,17 @@ class GraphQlApiClient {
 
 	private void requireApiConfig() {
 		// Execution profile must define GraphQL endpoint and API JWT.
+		boolean hasError = false
 		if (!GlobalVariable.ApiUrl || GlobalVariable.ApiUrl.toString().trim().isEmpty()) {
 			KeywordUtil.markFailed("GraphQlApiClient: ApiUrl is not set in profile.")
+			hasError = true
 		}
 		if (!GlobalVariable.SubmitterApiToken || GlobalVariable.SubmitterApiToken.toString().trim().isEmpty()) {
 			KeywordUtil.markFailed("GraphQlApiClient: SubmitterApiToken is not set in profile.")
+			hasError = true
+		}
+		if (hasError) {
+			KeywordUtil.markFailedAndStop("GraphQlApiClient: required API configuration is missing in profile; see previous failures for details.")
 		}
 	}
 
@@ -139,9 +148,11 @@ class GraphQlApiClient {
 		String dir = directory?.toString()?.trim()
 		if (!dir) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyLocalFilesExist: directory is required.")
+			return
 		}
 		if (!(fileBasenames instanceof List) || fileBasenames.isEmpty()) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyLocalFilesExist: fileBasenames must be a non-empty list.")
+			return
 		}
 		fileBasenames.each { def name ->
 			String basename = name?.toString()?.trim()
