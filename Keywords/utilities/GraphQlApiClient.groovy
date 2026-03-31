@@ -706,6 +706,9 @@ class GraphQlApiClient {
 		if (!dir) {
 			KeywordUtil.markFailed("GraphQlApiClient.putMetadataTsvsAndBuildUploadResults: apiInputDir is required.")
 		}
+		KeywordUtil.logInfo(
+			"putMetadataTsvsAndBuildUploadResults: S3 PUT log lines below show a redacted URL preview (scheme+host+path only, truncated); " +
+			"query string and signing parameters are omitted and are not the literal presigned URL.")
 		List<Map> uploadResults = []
 		for (Object rowObj : fileRows) {
 			Map row = rowObj as Map
