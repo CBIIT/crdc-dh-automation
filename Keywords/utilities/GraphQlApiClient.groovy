@@ -263,6 +263,9 @@ class GraphQlApiClient {
 			// When expectedBatchId passed, verify response batch _id matches request.
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "updateBatch batch _id matches request", expBid,
 				pBid ?: "(empty)", expBid == pBid ? "Pass" : "Fail")
+			if (expBid != pBid) {
+				KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackUpdateBatch: expected batch _id '${expBid}' but got '${pBid}'")
+			}
 		}
 		String pSub = payload?.get('submissionID')?.toString()?.trim() ?: ""
 		// Verify parent submission id present on batch node.
