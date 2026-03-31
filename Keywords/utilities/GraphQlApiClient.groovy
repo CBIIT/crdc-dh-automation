@@ -359,6 +359,7 @@ class GraphQlApiClient {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.listBatches", "present in response",
 				"missing", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: missing data.listBatches in ${result}")
+			return payload
 		}
 		String expSub = expectedSubmissionId?.toString()?.trim()
 		String expBid = expectedBatchId?.toString()?.trim()
