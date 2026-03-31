@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataFileEntity>
+   <description>CRDC Hub GraphQL operations (mutation/query bodies) for GraphQlApiClient</description>
+   <name>GraphQLOperations</name>
+   <tag></tag>
+   <connectionProperties/>
+   <containsHeaders>true</containsHeaders>
+   <csvSeperator></csvSeperator>
+   <dataFileGUID>52acb223-f4d8-4b81-8650-dc96f3900ea5</dataFileGUID>
+   <dataSourceUrl>InputFiles/CRDC/API/GraphQLOperations.xlsx</dataSourceUrl>
+   <driver>ExcelFile</driver>
+   <isInternalPath>true</isInternalPath>
+   <query></query>
+   <secureUserAccount>false</secureUserAccount>
+   <sheetName>Operations</sheetName>
+   <usingGlobalDBSetting>false</usingGlobalDBSetting>
+</DataFileEntity>

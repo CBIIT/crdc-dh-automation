@@ -1192,7 +1192,7 @@ class WebUIUtils {
 
 	/**
 	 * Returns the display name from the profile button in the top-right header (element #navbar-dropdown-name).
-	 * Waits up to {@code timeoutSeconds} for the element to be present, then reads its text.
+	 * Waits up to timeoutSeconds for the element to be present, then reads its text.
 	 *
 	 * @param timeoutSeconds Max seconds to wait for the profile button (default 10)
 	 * @return The trimmed text of the profile name element, or empty string if not found

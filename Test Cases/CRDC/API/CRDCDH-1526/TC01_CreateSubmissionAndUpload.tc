@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-1526 — API: createSubmission, createBatch, presigned S3 PUT for InputFiles/CRDC/API TSVs, then updateBatch (no UI). Profile: ApiUrl, SubmitterApiToken. Sets GlobalVariable.LastApiSubmissionId only.</description>
+   <name>TC01_CreateSubmissionAndUpload</name>
+   <tag>API,GraphQL,CRDCDH-1526</tag>
+   <comment>Profile: ApiUrl, SubmitterApiToken. Submitter must have access to the configured study and CDS commons. Listener API_Listener logs when path contains /API/.</comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a7e9b3c1-4d2f-4e8a-9b0c-1a2b3c4d5e6f</testCaseGuid>
+</TestCaseEntity>
