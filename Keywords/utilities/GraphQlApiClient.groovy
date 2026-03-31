@@ -48,17 +48,28 @@ class GraphQlApiClient {
 			KeywordUtil.markFailed("GraphQlApiClient.putTsvToPresignedUrl: presignedUrl is required.")
 		}
 		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection()
-		conn.setRequestMethod("PUT")
-		conn.setRequestProperty("Content-Type", PRESIGNED_TSV_CONTENT_TYPE)
-		conn.setDoOutput(true)
-		byte[] bytes = file.getBytes()
-		conn.outputStream.write(bytes)
-		conn.outputStream.flush()
-		int code = conn.responseCode
-		InputStream stream = code >= 400 ? conn.errorStream : conn.inputStream
-		String text = stream ? stream.getText("UTF-8") : ""
-		if (code < 200 || code >= 300) {
-			KeywordUtil.markFailed("GraphQlApiClient.putTsvToPresignedUrl: HTTP ${code} for ${file.name}. Body: ${text}")
+		try {
+			conn.setRequestMethod("PUT")
+			conn.setRequestProperty("Content-Type", PRESIGNED_TSV_CONTENT_TYPE)
+			conn.setDoOutput(true)
+			byte[] bytes = file.getBytes()
+			conn.outputStream.withCloseable { output ->
+				output.write(bytes)
+				output.flush()
+			}
+			int code = conn.responseCode
+			InputStream stream = code >= 400 ? conn.errorStream : conn.inputStream
+			String text = ""
+			if (stream != null) {
+				stream.withCloseable { input ->
+					text = input.getText("UTF-8")
+				}
+			}
+			if (code < 200 || code >= 300) {
+				KeywordUtil.markFailed("GraphQlApiClient.putTsvToPresignedUrl: HTTP ${code} for ${file.name}. Body: ${text}")
+			}
+		} finally {
+			conn.disconnect()
 		}
 	}
 
