@@ -1,0 +1,10 @@
+type	study.study_id	study_participant_id	participant_id	race	sex	ethnicity	dbGaP_subject_id
+participant	coffee2api	CDS-CASE-1075999api	scientia_et_labor1	White	Unknown	Hispanic or Latino	a_bene_placito
+participant	coffee2api	CDS-CASE-10784999api	a_bene_placito2	Not Reported	Unknown	Not allowed to collect	O_Tite_tute_Tati_tibi_tanta_tyranne_tulisti
+participant	coffee2api	CDS-CASE-10782999api	cacatum_non_est_pictum1	Not allowed to collect	Female	Not Hispanic or Latino	scientia_et_sapientia
+participant	coffee2api	CDS-CASE-1078999999api	haec_olim_meminisse_	White	Unknown	Hispanic or Latino	"scientia,_aere_perennius"
+participant	coffee2api	CDS-CASE-10783439999api	"scientia,_aere_"	Not Reported	Female	Hispanic or Latino	damnant_quod_non_intellegunt
+participant	coffee2api	CDS-CASE-1078324999api	e_causa_	White	Male	Unknown	barba_crescit_caput_nescit
+participant	coffee2api	CDS-CASE-1078567599996api	scientiae__mare	Unknown	Unknown	Not reported	salus_in_arduis
+participant	coffee2api	CDS-CASE-107678969997978api	a_bene_	Unknown	Unknown	Not reported	labor_ipse_voluptas
+participant	coffee2api	CDS-CASE-107853439999api	id_quod__accidit	American Indian or Alaska Native	Female	Unknown	scientia_et_sapientia
