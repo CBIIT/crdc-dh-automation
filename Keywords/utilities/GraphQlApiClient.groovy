@@ -594,8 +594,9 @@ class GraphQlApiClient {
 				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "GraphQL errors key", "absent on success",
 					String.valueOf(parsed.errors), "Fail")
 				KeywordUtil.markFailed("GraphQlApiClient: GraphQL errors: ${parsed.errors}")
+			} else {
+				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "GraphQL errors key", "absent on success", "absent", "Pass")
 			}
-			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "GraphQL errors key", "absent on success", "absent", "Pass")
 			String opLabel = operationName != null && !operationName.isEmpty() ? operationName : "graphql"
 			// Pretty-print full body for debugging (same as manual GraphQL clients).
 			try {
