@@ -529,57 +529,71 @@ class GraphQlApiClient {
 		requireApiConfig()
 		URL url = new URL(GlobalVariable.ApiUrl.toString().trim())
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection()
-		// Single GraphQL POST: JSON body with query, optional operationName, variables.
-		conn.setRequestMethod("POST")
-		conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
-		String jwt = normalizeBearerToken(GlobalVariable.SubmitterApiToken.toString())
-		conn.setRequestProperty("Authorization", "Bearer " + jwt)
-		conn.setDoOutput(true)
-
-		Map payload = [query: query]
-		if (operationName != null && !operationName.isEmpty()) {
-			payload.operationName = operationName
-		}
-		payload.variables = variables != null ? variables : [:]
-		String body = JsonOutput.toJson(payload)
-
-		conn.outputStream.withWriter("UTF-8") { Writer w -> w << body }
-
-		int code = conn.responseCode
-		InputStream stream = code >= 400 ? conn.errorStream : conn.inputStream
-		String text = stream ? stream.getText("UTF-8") : ""
-
-		String httpActual = String.valueOf(code)
-		// Transport: expect HTTP 200 before interpreting JSON.
-		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "GraphQL HTTP status (Jira: 200)", "200", httpActual,
-			code == 200 ? "Pass" : "Fail")
-		if (code < 200 || code >= 300) {
-			KeywordUtil.markFailed("GraphQlApiClient: HTTP ${code}. Body: ${text}")
-		}
-
-		def slurper = new JsonSlurper()
-		Map parsed = (Map) slurper.parseText(text ?: "{}")
-
-		boolean dataKeyPresent = parsed != null && parsed.containsKey("data")
-		// GraphQL success envelope should include top-level data (may be null per field errors).
-		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "JSON body data key", "key present",
-			dataKeyPresent ? "present" : "absent", dataKeyPresent ? "Pass" : "Fail")
-
-		if (parsed.errors) {
-			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "GraphQL errors key", "absent on success",
-				String.valueOf(parsed.errors), "Fail")
-			KeywordUtil.markFailed("GraphQlApiClient: GraphQL errors: ${parsed.errors}")
-		}
-		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "GraphQL errors key", "absent on success", "absent", "Pass")
-		String opLabel = operationName != null && !operationName.isEmpty() ? operationName : "graphql"
-		// Pretty-print full body for debugging (same as manual GraphQL clients).
+		InputStream stream = null
 		try {
-			String pretty = JsonOutput.prettyPrint(JsonOutput.toJson(parsed))
-			KeywordUtil.logInfo("GraphQL response JSON (${opLabel}):\n${pretty}")
-		} catch (Exception e) {
-			KeywordUtil.logInfo("GraphQL response (${opLabel}): ${parsed}")
+			// Single GraphQL POST: JSON body with query, optional operationName, variables.
+			conn.setRequestMethod("POST")
+			conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+			String jwt = normalizeBearerToken(GlobalVariable.SubmitterApiToken.toString())
+			conn.setRequestProperty("Authorization", "Bearer " + jwt)
+			conn.setDoOutput(true)
+
+			Map payload = [query: query]
+			if (operationName != null && !operationName.isEmpty()) {
+				payload.operationName = operationName
+			}
+			payload.variables = variables != null ? variables : [:]
+			String body = JsonOutput.toJson(payload)
+
+			conn.outputStream.withWriter("UTF-8") { Writer w -> w << body }
+
+			int code = conn.responseCode
+			stream = code >= 400 ? conn.errorStream : conn.inputStream
+			String text = stream ? stream.getText("UTF-8") : ""
+
+			String httpActual = String.valueOf(code)
+			// Transport: expect HTTP 200 before interpreting JSON.
+			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "GraphQL HTTP status (Jira: 200)", "200", httpActual,
+				code == 200 ? "Pass" : "Fail")
+			if (code < 200 || code >= 300) {
+				KeywordUtil.markFailed("GraphQlApiClient: HTTP ${code}. Body: ${text}")
+			}
+
+			def slurper = new JsonSlurper()
+			Map parsed = (Map) slurper.parseText(text ?: "{}")
+
+			boolean dataKeyPresent = parsed != null && parsed.containsKey("data")
+			// GraphQL success envelope should include top-level data (may be null per field errors).
+			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "JSON body data key", "key present",
+				dataKeyPresent ? "present" : "absent", dataKeyPresent ? "Pass" : "Fail")
+
+			if (parsed.errors) {
+				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "GraphQL errors key", "absent on success",
+					String.valueOf(parsed.errors), "Fail")
+				KeywordUtil.markFailed("GraphQlApiClient: GraphQL errors: ${parsed.errors}")
+			}
+			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "GraphQL errors key", "absent on success", "absent", "Pass")
+			String opLabel = operationName != null && !operationName.isEmpty() ? operationName : "graphql"
+			// Pretty-print full body for debugging (same as manual GraphQL clients).
+			try {
+				String pretty = JsonOutput.prettyPrint(JsonOutput.toJson(parsed))
+				KeywordUtil.logInfo("GraphQL response JSON (${opLabel}):\n${pretty}")
+			} catch (Exception e) {
+				KeywordUtil.logInfo("GraphQL response (${opLabel}): ${parsed}")
+			}
+			return parsed
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close()
+				} catch (Exception ignored) {
+					// ignore close exception
+				}
+			}
+			if (conn != null) {
+				conn.disconnect()
+			}
 		}
-		return parsed
 	}
 
 	/**
