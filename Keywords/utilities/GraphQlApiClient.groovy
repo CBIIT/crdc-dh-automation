@@ -631,6 +631,7 @@ class GraphQlApiClient {
 	Map createSubmission(Map args) {
 		if (args == null) {
 			KeywordUtil.markFailed("GraphQlApiClient.createSubmission: args map is required.")
+			return null
 		}
 		// Variables map matches Hub createSubmission mutation inputs.
 		Map vars = [
@@ -659,6 +660,7 @@ class GraphQlApiClient {
 	Map createBatch(Map args) {
 		if (args == null) {
 			KeywordUtil.markFailed("GraphQlApiClient.createBatch: args map is required.")
+			return null
 		}
 		String submissionID = args.submissionID?.toString()?.trim()
 		String type = args.type?.toString()?.trim()
@@ -768,6 +770,7 @@ class GraphQlApiClient {
 	Map updateBatch(Map args) {
 		if (args == null) {
 			KeywordUtil.markFailed("GraphQlApiClient.updateBatch: args map is required.")
+			return null
 		}
 		String batchID = args.batchID?.toString()?.trim()
 		def filesRaw = args.files
@@ -807,6 +810,7 @@ class GraphQlApiClient {
 	Map listBatches(Map args) {
 		if (args == null) {
 			KeywordUtil.markFailed("GraphQlApiClient.listBatches: args map is required.")
+			return null
 		}
 		String submissionID = args.submissionID?.toString()?.trim()
 		if (!submissionID) {
