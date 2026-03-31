@@ -42,10 +42,12 @@ class GraphQlApiClient {
 	private void putTsvToPresignedUrl(File file, String presignedUrl) {
 		if (file == null || !file.isFile()) {
 			KeywordUtil.markFailed("GraphQlApiClient.putTsvToPresignedUrl: file is missing or not a regular file: ${file}")
+			return
 		}
 		String url = presignedUrl?.trim()
 		if (!url) {
 			KeywordUtil.markFailed("GraphQlApiClient.putTsvToPresignedUrl: presignedUrl is required.")
+			return
 		}
 		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection()
 		try {
