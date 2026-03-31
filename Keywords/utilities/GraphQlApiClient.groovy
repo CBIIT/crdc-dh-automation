@@ -80,6 +80,7 @@ class GraphQlApiClient {
 		// Resolve query string from Katalon test data (Excel) by operationKey.
 		if (!operationKey?.toString()?.trim()) {
 			KeywordUtil.markFailed("GraphQlApiClient.loadGraphQlDocument: operationKey is required.")
+			return null
 		}
 		String key = operationKey.toString().trim()
 		if (graphqlDocumentCache.containsKey(key)) {
