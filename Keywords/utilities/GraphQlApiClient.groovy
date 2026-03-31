@@ -729,6 +729,7 @@ class GraphQlApiClient {
 			String signed = row?.get('signedURL')?.toString()
 			if (!fn || !signed) {
 				KeywordUtil.markFailed("GraphQlApiClient.putMetadataTsvsAndBuildUploadResults: row missing fileName or signedURL: ${row}")
+				continue
 			}
 			File localTsv = new File(dir, fn)
 			// Local file must exist before PUT; then upload bytes to presigned URL (no Hub auth on S3).
