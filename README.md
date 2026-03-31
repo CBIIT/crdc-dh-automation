@@ -33,7 +33,7 @@ The framework automates end-to-end validation of CRDC Data Hub functionality usi
 | `PythonFiles/CRDC/` | Python utilities (e.g., OTP generation for login) |
 | `Scripts/CRDC/` | Groovy scripts for CRDC test logic |
 | `Test Cases/CRDC/` | Test case definitions (Login, PBAC, DataSubmissions, SubmissionRequest) |
-| `Test Listeners/` | Test lifecycle hooks (e.g., API_Listener, ICDC_Listener) |
+| `Test Listeners/` | Test lifecycle hooks (e.g., ICDC_Listener) |
 | `Test Suites/` | Suite definitions (`.ts` and `.groovy`) |
 | `jenkins/` | Jenkins pipeline and test schedule |
 | `requirements.txt` | Python dependencies for utilities |
