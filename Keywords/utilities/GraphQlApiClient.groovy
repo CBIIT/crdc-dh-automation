@@ -183,6 +183,7 @@ class GraphQlApiClient {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "createBatch presigned file rows", "non-empty",
 				"(empty)", "Fail")
 			KeywordUtil.markFailed("createBatch returned no files with signedURL; cannot upload metadata.")
+			return rows
 		}
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "createBatch presigned file rows", "non-empty",
 			String.valueOf(rows.size()) + " row(s)", "Pass")
