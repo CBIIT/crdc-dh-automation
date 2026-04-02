@@ -211,6 +211,25 @@ class ManagePrograms extends TestRunner {
 	}
 
 	/**
+	 * Filter Manage Programs by program name, then assert at least one row contains that name (reuses
+	 * {@link #applyManageProgramsFilters} and {@link #verifyManageProgramsFilterResults}).
+	 * Caller must already be on the Manage Programs list (e.g. {@link #navigateToManagePrograms()}).
+	 *
+	 * @param programName Full or unique program name string (e.g. {@code utilities.SubmissionRequest#lastEnteredProgramName})
+	 */
+	@Keyword
+	void filterByProgramNameAndVerifyProgramAppearsInList(String programName) {
+		if (programName == null || !programName.trim()) {
+			KeywordUtil.markFailed("filterByProgramNameAndVerifyProgramAppearsInList: programName is required.")
+			return
+		}
+		String name = programName.trim()
+		KeywordUtil.logInfo("--- filterByProgramNameAndVerifyProgramAppearsInList: " + name + " ---")
+		applyManageProgramsFilters([programName: name] as Map<String, String>)
+		verifyManageProgramsFilterResults([expectAtLeastRows: 1, rowContains: name] as Map<String, Object>)
+	}
+
+	/**
 	 * Private helper: fill the Program Add/Edit form with the given fields.
 	 * @param fields Map with keys: name, abbreviation, description, dataConcierge (String), status (String: Active/Inactive; used only when skipStatusDropdown is false)
 	 * @param onlyProvided If true (Edit), only set fields that appear in fields with non-null/non-empty values. If false (Add), set required and any optional present.

@@ -44,7 +44,7 @@ WebUI.closeBrowser()
 
 CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
 
-CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Submitter')
+CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Fedlead')
 
 WebUI.setViewPortSize(1920, 1080)
 

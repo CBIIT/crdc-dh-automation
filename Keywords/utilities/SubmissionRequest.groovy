@@ -345,6 +345,32 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	 */
 	public static String lastEnteredStudyTitle
 
+	/**
+	 * Full program name last produced for **Other** program in {@link #enterProgramInfo(String, int)}
+	 * ({@code program-title} from section-b test data + {@link #programTimeStamp}).
+	 * Set by {@link #recordLastEnteredProgramNameForOtherProgramEntry(int)} after the submitter flow (same row index as {@code programDataRow} in {@link #fillSubmissionRequestAllSections}).
+	 */
+	public static String lastEnteredProgramName
+
+	/**
+	 * Records {@link #lastEnteredProgramName} using the same formula as {@link #enterProgramInfo(String, int)} for the **Other** option:
+	 * {@code section-b} {@code program-title} at {@code sectionBProgramDataRow} + {@link #programTimeStamp}.
+	 * Call after {@link #enterProgramInfo(String, int)} or {@link #fillSubmissionRequestAllSections} has run (so {@link #programTimeStamp} is set).
+	 */
+	@Keyword
+	public static void recordLastEnteredProgramNameForOtherProgramEntry(int sectionBProgramDataRow) {
+		if (programTimeStamp == null || !programTimeStamp.toString().trim()) {
+			KeywordUtil.markFailed("recordLastEnteredProgramNameForOtherProgramEntry: programTimeStamp is empty; run enterProgramInfo with 'Other' (e.g. via fillSubmissionRequestAllSections) first.")
+			return
+		}
+		TestData td = findTestData('CRDC/SubmissionRequest/section-b')
+		String base = td.getValue('program-title', sectionBProgramDataRow)
+		if (base == null) {
+			base = ''
+		}
+		lastEnteredProgramName = (base.toString().trim() + programTimeStamp.toString().trim()).trim()
+		KeywordUtil.logInfo("recordLastEnteredProgramNameForOtherProgramEntry: lastEnteredProgramName=" + lastEnteredProgramName)
+	}
 
 	/**
 	 * This function enters study information into submission request form
@@ -1630,5 +1656,176 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		WebUI.delay(1)
 		btn.click()
 		return true
+	}
+
+	/**
+	 * Same row-matching rules as {@link #clickSubmissionRequestsListReviewForStudyRow(String)}, but clicks the list **View**
+	 * action (e.g. In Progress requests) instead of **Review**.
+	 */
+	private static void clickSubmissionRequestsListViewForStudyRow(String studyToken) {
+		WebDriver driver = DriverFactory.getWebDriver()
+		String tableXpath = TestRunner.givexpath("CRDC/AILocators/GenericTable/Table")
+		WebElement table = driver.findElement(By.xpath(tableXpath))
+		List<WebElement> rows = table.findElements(By.xpath(".//tbody//tr"))
+		if (rows.isEmpty()) {
+			KeywordUtil.markFailed("Submission request list: table has no data rows.")
+			return
+		}
+
+		for (WebElement row : rows) {
+			String rowText = row.getText()
+			if (rowText != null && rowText.contains(studyToken) && clickViewControlInListRow(driver, row)) {
+				KeywordUtil.logInfo("clickSubmissionRequestsListViewForStudyRow: matched row by full study token.")
+				return
+			}
+		}
+
+		List<WebElement> rowsWithView = new ArrayList<>()
+		for (WebElement row : rows) {
+			if (!findViewControlsInListRow(row).isEmpty()) {
+				rowsWithView.add(row)
+			}
+		}
+		if (rowsWithView.size() == 1) {
+			KeywordUtil.logInfo("clickSubmissionRequestsListViewForStudyRow: using single filtered row (study text may be truncated in the grid).")
+			if (clickViewControlInListRow(driver, rowsWithView.get(0))) {
+				return
+			}
+		}
+
+		if (studyToken.length() > 10) {
+			String tailToken = studyToken.substring(studyToken.length() - 10)
+			for (WebElement row : rows) {
+				String rowText = row.getText()
+				if (rowText != null && rowText.contains(tailToken) && clickViewControlInListRow(driver, row)) {
+					KeywordUtil.logInfo("clickSubmissionRequestsListViewForStudyRow: matched row by suffix of study token.")
+					return
+				}
+			}
+		}
+
+		KeywordUtil.markFailed("Submission request list: could not find a View control (full title not in row text and " +
+				(rowsWithView.size() == 0 ? "no row has View." : (rowsWithView.size() + " rows have View—ambiguous; narrow filters.")))
+	}
+
+	private static List<WebElement> findViewControlsInListRow(WebElement row) {
+		return row.findElements(By.xpath(".//button[contains(normalize-space(.), 'View')] | .//a[contains(normalize-space(.), 'View')]"))
+	}
+
+	private static boolean clickViewControlInListRow(WebDriver driver, WebElement row) {
+		List<WebElement> viewControls = findViewControlsInListRow(row)
+		if (viewControls.isEmpty()) {
+			return false
+		}
+		WebElement btn = viewControls.get(0)
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", btn)
+		WebUI.delay(1)
+		btn.click()
+		return true
+	}
+
+	private static void fedLeadClickNextToNextSection() {
+		TestObject nextBtn = findTestObject('CRDC/SubmissionRequest/Next-Btn')
+		WebUI.waitForElementClickable(nextBtn, 20)
+		WebUI.scrollToElement(nextBtn, 10)
+		WebUI.click(nextBtn)
+		WebUI.delay(1)
+	}
+
+	/**
+	 * Federal Lead: filter the list, open the row via **View** (In Progress), walk A→B→C→D using **Next** with one read-only
+	 * spot-check per section, advance to the final step, then submit on behalf (same flow as {@link #clickSubmitButton()}).
+	 * Section B study title is compared to {@link #lastEnteredStudyTitle} (set when the submitter ran {@link #enterStudyInfo(int)}).
+	 *
+	 * @param studyFilterToken Study filter string (same rules as reject/approve list navigation; use {@link #lastEnteredStudyTitle})
+	 * @param sectionARow {@code section-a} row for expected PI first name
+	 * @param sectionCRow {@code section-c} row for expected number of subjects
+	 * @param sectionDRow {@code section-d} row index for expected estimated data size (file row)
+	 */
+	@Keyword
+	public static void fedLeadSubmitSubmissionRequestOnBehalfWithReadOnlySpotChecks(
+			Object studyFilterToken,
+			Object sectionARow,
+			Object sectionCRow,
+			Object sectionDRow
+			) {
+		String token = studyFilterToken != null ? studyFilterToken.toString().trim() : ''
+		if (token.length() < 3) {
+			KeywordUtil.markFailed("fedLeadSubmitSubmissionRequestOnBehalfWithReadOnlySpotChecks: study filter token must be at least 3 characters.")
+			return
+		}
+		if (lastEnteredStudyTitle == null || !lastEnteredStudyTitle.trim()) {
+			KeywordUtil.markFailed("fedLeadSubmitSubmissionRequestOnBehalfWithReadOnlySpotChecks: lastEnteredStudyTitle is empty; submitter flow must call enterStudyInfo first.")
+			return
+		}
+		int aRow = parseTestDataRowIndex(sectionARow, 'fedLeadSubmitSubmissionRequestOnBehalfWithReadOnlySpotChecks')
+		int cRow = parseTestDataRowIndex(sectionCRow, 'fedLeadSubmitSubmissionRequestOnBehalfWithReadOnlySpotChecks')
+		int dRow = parseTestDataRowIndex(sectionDRow, 'fedLeadSubmitSubmissionRequestOnBehalfWithReadOnlySpotChecks')
+
+		KeywordUtil.logInfo("fedLeadSubmitSubmissionRequestOnBehalfWithReadOnlySpotChecks: list navigation for study token")
+		new SubmissionRequestList().navigateToSubmissionRequestsList()
+		SubmissionRequestList.applySubmissionRequestsListFilters([study: token] as Map<String, String>)
+		WebUI.delay(2)
+		clickSubmissionRequestsListViewForStudyRow(token)
+
+		TestData tdA = findTestData('CRDC/SubmissionRequest/section-a')
+		TestData tdC = findTestData('CRDC/SubmissionRequest/section-c')
+		TestData tdD = findTestData('CRDC/SubmissionRequest/section-d')
+
+		WebUI.waitForElementPresent(findTestObject(SR_FORM_BASE + "/Review/ProgressBar-SectionA"), 40)
+
+		// Section A — PI first name (landing page after View)
+		TestObject piFirst = findTestObject('CRDC/SubmissionRequest/Section-A/PI_FirstName-TxtBx')
+		WebUI.waitForElementPresent(piFirst, 15)
+		assertFedLeadFieldReadOnly(piFirst)
+		String expFirst = tdA.getValue('pi-first-name', aRow)?.trim()
+		WebUI.verifyMatch(getSectionAFormDisplayedValue(piFirst), expFirst, false)
+
+		fedLeadClickNextToNextSection()
+
+		// Section B — study title (matches timestamped title from submitter)
+		TestObject studyTitleTo = findTestObject('CRDC/SubmissionRequest/Section-B/StudyTitle-Txtbx')
+		WebUI.waitForElementPresent(studyTitleTo, 15)
+		assertFedLeadFieldReadOnly(studyTitleTo)
+		WebUI.verifyMatch(getSectionAFormDisplayedValue(studyTitleTo), lastEnteredStudyTitle.trim(), false)
+
+		fedLeadClickNextToNextSection()
+
+		// Section C — number of subjects
+		TestObject numSubjTo = findTestObject('CRDC/SubmissionRequest/Section-C/NumOfSubjectsIncludInSub-Txtbx')
+		WebUI.waitForElementPresent(numSubjTo, 15)
+		assertFedLeadFieldReadOnly(numSubjTo)
+		String expNum = tdC.getValue('num-of-subjects-included', cRow)?.trim()
+		WebUI.verifyMatch(getSectionAFormDisplayedValue(numSubjTo), expNum, false)
+
+		fedLeadClickNextToNextSection()
+
+		// Section D — estimated data size (first file row)
+		TestObject estimTo = findTestObject('CRDC/SubmissionRequest/Section-D/EstimDtaSiz-RowOne-Txtbx')
+		WebUI.waitForElementPresent(estimTo, 15)
+		assertFedLeadFieldReadOnly(estimTo)
+		String expEst = tdD.getValue('estimtd-data-size', dRow)?.trim()
+		WebUI.verifyMatch(getSectionAFormDisplayedValue(estimTo), expEst, false)
+
+		// Same as submitter flow: Next after section D opens the final step with Submit (submit on behalf)
+		fedLeadClickNextToNextSection()
+
+		WebUI.scrollToElement(findTestObject('CRDC/SubmissionRequest/Submit-Btn'), 15)
+		clickSubmitButton()
+		KeywordUtil.logInfo('fedLeadSubmitSubmissionRequestOnBehalfWithReadOnlySpotChecks: submit on behalf completed.')
+	}
+
+	private static void assertFedLeadFieldReadOnly(TestObject to) {
+		WebElement el = WebUI.findWebElement(to, 10)
+		if (!el.isEnabled()) {
+			return
+		}
+		String ro = el.getAttribute('readonly')
+		String roCamel = el.getAttribute('readOnly')
+		boolean hasReadonlyAttr = (ro != null && !ro.isEmpty()) || (roCamel != null && !roCamel.isEmpty())
+		boolean ariaDisabled = 'true'.equalsIgnoreCase(el.getAttribute('aria-disabled'))
+		if (!hasReadonlyAttr && !ariaDisabled) {
+			KeywordUtil.markFailed("fedLeadSubmitSubmissionRequestOnBehalfWithReadOnlySpotChecks: expected read-only control is still editable: " + to.getObjectId())
+		}
 	}
 }

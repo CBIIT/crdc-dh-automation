@@ -67,8 +67,9 @@ CustomKeywords.'utilities.SubmissionRequest.fillSubmissionRequestAllSections'(2,
     'Yes', 'Cholangiocarcinoma', 'Homo', 1, 'genomics', 'proteomics', 5, 6, 1, 1)
 
 CustomKeywords.'utilities.SubmissionRequest.clickSubmitButton'()
-
 WebUI.closeBrowser()
+
+//Login as Fedlead and approve submission request
 CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Fedlead')
@@ -82,6 +83,7 @@ WebUI.delay(2)
 CustomKeywords.'utilities.SubmissionRequest.approveSubmissionRequest'(SubmissionRequest.lastEnteredStudyTitle)
 WebUI.closeBrowser()
 
+//Login as a submitter and verify auto pupulated fields
 CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
 CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Submitter')
 WebUI.setViewPortSize(1920, 1080)
