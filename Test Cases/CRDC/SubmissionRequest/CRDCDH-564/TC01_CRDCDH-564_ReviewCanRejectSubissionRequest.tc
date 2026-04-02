@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC01_CRDCDH-564_ReviewCanRejectSubissionRequest</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>f49ad48c-47c0-4d7b-abeb-81f07c20020d</testCaseGuid>
+</TestCaseEntity>

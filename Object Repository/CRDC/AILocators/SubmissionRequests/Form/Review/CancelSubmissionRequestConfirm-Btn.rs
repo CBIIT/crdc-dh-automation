@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CancelSubmissionRequestConfirm-Btn</name>
+   <tag></tag>
+   <elementGuidId>f1e3953f-6701-4ae5-a3ca-8ae31f151859</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;error-dialog-delete-button&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;error-dialog-delete-button&quot;]</value>
+      <webElementGuid>21332663-572a-4caa-924f-8ae0fca53036</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -60,7 +60,9 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.TakesScreenshot;
@@ -334,7 +336,14 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 
 	/**These variables hold date value and reused in verification functions**/
-	public static String studyTimeStamp;
+	public static String studyTimeStamp
+
+	/**
+	 * Full study title last written by {@link #enterStudyInfo(int)} (base text + {@link #studyTimeStamp}).
+	 * Use this when searching the Submission Requests list or calling {@link #rejectSubmissionRequest(String, String)} (second argument optional).
+	 * If the table truncates long titles, pass a substring that still appears in the Study column.
+	 */
+	public static String lastEnteredStudyTitle
 
 
 	/**
@@ -345,14 +354,17 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	public static void enterStudyInfo(int dataRowNum) {
 
 		String objPath = 'CRDC/SubmissionRequest/Section-B/';
-		TestData testData = findTestData('CRDC/SubmissionRequest/section-b');
+		TestData testData = findTestData('CRDC/SubmissionRequest/section-b')
 
 		// Timestamp used to make study title and abbreviation unique
-		studyTimeStamp = Utils.getCurrentDate("M-d-yyyy-HH-mm");
+		studyTimeStamp = Utils.getCurrentDate("M-d-yyyy-HH-mm")
+
+		String studyTitleValue = testData.getValue('study-title', dataRowNum) + studyTimeStamp
+		lastEnteredStudyTitle = studyTitleValue
 
 		// Define mappings of field object names to their data keys
 		Map<String, String> fields = [
-			'StudyTitle-Txtbx'       : testData.getValue('study-title', dataRowNum) + studyTimeStamp,
+			'StudyTitle-Txtbx'       : studyTitleValue,
 			'StudyAbbre-Txtbx'       : testData.getValue('study-abbreviation', dataRowNum) + studyTimeStamp,
 			'StudyDescription-Txtbx' : testData.getValue('study-description', dataRowNum)
 		]
@@ -856,10 +868,10 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		KeywordUtil.logInfo("Actual NCI program officer is: " + actual +" Expected NCI program officer is: "+expctd);
 		WebUI.verifyMatch(actual, expctd, false)
 
-//		actual = WebUI.getText(findTestObject(ePath+'NciGenProgAdmstr-Txt'))
-//		expctd = testData.getValue('nci-genomic-prog-admin', dataRowNum)
-//		KeywordUtil.logInfo("Actual NCI program Administrator is: " + actual +" Expected NCI program Administrator is: "+expctd);
-//		WebUI.verifyMatch(actual, expctd, false)
+		//		actual = WebUI.getText(findTestObject(ePath+'NciGenProgAdmstr-Txt'))
+		//		expctd = testData.getValue('nci-genomic-prog-admin', dataRowNum)
+		//		KeywordUtil.logInfo("Actual NCI program Administrator is: " + actual +" Expected NCI program Administrator is: "+expctd);
+		//		WebUI.verifyMatch(actual, expctd, false)
 
 		//		//Add 'HAS YOUR STUDY BEEN REGISTERED IN dbGaP? Yes No verification here
 		//		actual = WebUI.getText(findTestObject(ePath+'dbGapPHSNumber-Txt'))
@@ -1222,6 +1234,19 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	}
 
 	/**
+	 * This function clicks on submit and confirm submit buttons
+	 */
+	@Keyword
+	public static void cancelSubmissionRequestButton() {
+		findTestObject('Object Repository/CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequest-TxtBx')
+		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelRequest-Btn'))
+		Thread.sleep(1000)
+		WebUI.setText(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequest-TxtBx'), "Auto Test Cancel")
+		Thread.sleep(1000)
+		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequestConfirm-Btn'))
+	}
+	
+	/**
 	 * This function logs in to CRDC via Login.gov 2FA / OTP using a dynamic TOTP secret.
 	 * Delegates to utilities.Login; kept for backward compatibility.
 	 * @param pbacUser Admin, Fedlead, Dcp, Submitter, or User
@@ -1254,5 +1279,209 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	@Keyword
 	public static void clickAccountDropdown() {
 		clickTab('CRDC/Login/UserProfile-Dd')
+	}
+
+	/**
+	 * End-to-end completion of a Submission Request: fills required fields for Sections A through D using the
+	 * same row-driven test data files as the granular keywords ({@code section-a} … {@code section-d}),
+	 * saves and advances after each section, then submits (including the confirmation dialog).
+	 * <p>
+	 * Prerequisites: caller has already opened a new Submission Request and accepted the read/accept dialog
+	 * so that Section A is visible and the status bar shows NEW.
+	 * </p>
+	 * <p>
+	 * This orchestration matches the minimal required path used by {@code TC02_CRDC_Submission_Request-RequiredFields}
+	 * (PI + Primary Contact only in A; Program, Study, Funding in B; access + disease/subjects in C;
+	 * dates, data types, and file row in D). Optional Section A/B blocks such as additional contact,
+	 * publications, or repository are not included—call those keywords separately if your scenario requires them.
+	 * </p>
+	 *
+	 * @param sectionARow Test data row for {@link #enterPrincipalInvestigatorInfo(int)} and {@link #enterPrimaryContactInfo(int)}
+	 * @param programDd Program dropdown value passed to {@link #enterProgramInfo(String, int)} (e.g. {@code Other})
+	 * @param programDataRow Row index for program fields when {@code Other} is selected
+	 * @param studyDataRow Row for {@link #enterStudyInfo(int)}
+	 * @param fundingDataRow Row for {@link #enterFundingAgencyInfo(int)}
+	 * @param dataAccessType {@code open}, {@code controlled}, or {@code both} for {@link #enterDataAccessTypeAndDbGapRegInfo(String, String)}
+	 * @param dbGapRegistered {@code yes} or {@code no}
+	 * @param cancerType Cancer type dropdown label for {@link #enterCancerTypeAndSubjectsInfo(String, String, int)}
+	 * @param speciesOfSubjects Species dropdown label (e.g. {@code Homo})
+	 * @param sectionCDataRow Row for Section C text fields in {@link #enterCancerTypeAndSubjectsInfo(String, String, int)}
+	 * @param firstDataType First data-type toggle label for {@link #selectDataTypes(String...)}
+	 * @param secondDataType Second data-type toggle label
+	 * @param fileTypeRow Row index for file type in {@link #selectFileTypes(int, int, int, int)}
+	 * @param fileExtensionRow Row index for file extension
+	 * @param numOfFilesRow Row index for number of files
+	 * @param estimatedDataSizeRow Row index for estimated data size
+	 */
+	@Keyword
+	public static void fillSubmissionRequestAllSections(
+			int sectionARow,
+			String programDd,
+			int programDataRow,
+			int studyDataRow,
+			int fundingDataRow,
+			String dataAccessType,
+			String dbGapRegistered,
+			String cancerType,
+			String speciesOfSubjects,
+			int sectionCDataRow,
+			String firstDataType,
+			String secondDataType,
+			int fileTypeRow,
+			int fileExtensionRow,
+			int numOfFilesRow,
+			int estimatedDataSizeRow
+	) {
+		KeywordUtil.logInfo('fillCompleteSubmissionRequestAllSectionsAndSubmit: Section A (PI, Primary Contact)')
+		enterPrincipalInvestigatorInfo(sectionARow)
+		enterPrimaryContactInfo(sectionARow)
+		WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
+		WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
+		verifyStatusBar('IN PROGRESS')
+
+		KeywordUtil.logInfo('fillCompleteSubmissionRequestAllSectionsAndSubmit: Section B (Program, Study, Funding)')
+		enterProgramInfo(programDd, programDataRow)
+		enterStudyInfo(studyDataRow)
+		enterFundingAgencyInfo(fundingDataRow)
+		WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
+		WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
+
+		KeywordUtil.logInfo('fillCompleteSubmissionRequestAllSectionsAndSubmit: Section C (Access, cancer, subjects)')
+		enterDataAccessTypeAndDbGapRegInfo(dataAccessType, dbGapRegistered)
+		enterCancerTypeAndSubjectsInfo(cancerType, speciesOfSubjects, sectionCDataRow)
+		WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
+		WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
+
+		KeywordUtil.logInfo('fillCompleteSubmissionRequestAllSectionsAndSubmit: Section D (dates, data types, files)')
+		enterTargetDeliveryAndExpectedPublicationDate()
+		selectDataTypes(firstDataType, secondDataType)
+		selectFileTypes(fileTypeRow, fileExtensionRow, numOfFilesRow, estimatedDataSizeRow)
+		WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
+		WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
+
+		KeywordUtil.logInfo('fillCompleteSubmissionRequestAllSections: finished')
+	}
+
+	private static final String DEFAULT_REJECTION_COMMENT = "Automated test rejection - CRDC submission request."
+	private static final String SR_FORM_BASE = "CRDC/AILocators/SubmissionRequests/Form"
+
+	/**
+	 * Federal-lead (or reviewer) flow: open Submission Requests list, filter by study, open Review for the matching row,
+	 * open the Review section in the form sidebar (progress bar), then Reject with a comment and confirm.
+	 * The list row Review action lands on section A; Approve/Reject appear only after selecting the Review tab.
+	 * <p>
+	 * Prerequisites: logged in as a user who can review (e.g. Fed Lead); the request is in a reviewable status
+	 * (e.g. Submitted). The study filter requires at least three characters—pass a value that appears in the
+	 * Study column (use {@link #lastEnteredStudyTitle} after {@link #enterStudyInfo(int)}). If the list truncates the title,
+	 * the row text may not include the full string; in that case, when the filter yields exactly one data row, Review is
+	 * clicked on that row automatically.
+	 * </p>
+	 *
+	 * @param studyName Study title or substring that matches the list row (must satisfy the Study filter minimum length)
+	 * @param rejectionComment Optional reviewer comment; if omitted or blank, a default automated-test message is used
+	 */
+	@Keyword
+	public static void rejectSubmissionRequest(String studyName, String rejectionComment = DEFAULT_REJECTION_COMMENT) {
+		if (studyName == null || studyName.trim().isEmpty()) {
+			KeywordUtil.markFailed("rejectSubmissionRequest: studyName is required.")
+			return
+		}
+		String token = studyName.trim()
+		if (token.length() < 3) {
+			KeywordUtil.markFailed("rejectSubmissionRequest: studyName must be at least 3 characters (Submission Requests Study filter).")
+			return
+		}
+		String comment = (rejectionComment != null && !rejectionComment.trim().isEmpty()) ? rejectionComment.trim() : DEFAULT_REJECTION_COMMENT
+
+		KeywordUtil.logInfo("rejectSubmissionRequest: navigating to Submission Requests list; study token length=" + token.length())
+		new SubmissionRequestList().navigateToSubmissionRequestsList()
+		SubmissionRequestList.applySubmissionRequestsListFilters([study: token] as Map<String, String>)
+		WebUI.delay(2)
+		clickSubmissionRequestsListReviewForStudyRow(token)
+
+		// List "Review" opens the request on the first section (e.g. PI); Approve/Reject exist only on the final Review step.
+		WebUI.waitForElementPresent(findTestObject(SR_FORM_BASE + "/Review/ProgressBar-Review"), 45)
+		WebUI.waitForElementClickable(findTestObject(SR_FORM_BASE + "/Review/ProgressBar-Review"), 15)
+		WebUI.click(findTestObject(SR_FORM_BASE + "/Review/ProgressBar-Review"))
+		WebUI.delay(2)
+		WebUI.scrollToElement(findTestObject(SR_FORM_BASE + "/Navigation/Reject-Btn"), 15)
+		WebUI.waitForElementVisible(findTestObject(SR_FORM_BASE + "/Navigation/Reject-Btn"), 20)
+		WebUI.waitForElementClickable(findTestObject(SR_FORM_BASE + "/Navigation/Reject-Btn"), 15)
+		WebUI.click(findTestObject(SR_FORM_BASE + "/Navigation/Reject-Btn"))
+		TestObject rejectCommentTo = findTestObject("CRDC/AILocators/SubmissionRequests/RejectDialog/ReviewComment-TxtBx")
+		WebUI.waitForElementPresent(rejectCommentTo, 10)
+		WebUI.waitForElementVisible(rejectCommentTo, 10)
+		WebUI.setText(rejectCommentTo, comment)
+		WebUI.waitForElementClickable(findTestObject("CRDC/AILocators/SubmissionRequests/RejectDialog/ConfirmReject-Btn"), 10)
+		WebUI.click(findTestObject("CRDC/AILocators/SubmissionRequests/RejectDialog/ConfirmReject-Btn"))
+		WebUI.delay(2)
+		KeywordUtil.logInfo("rejectSubmissionRequest: completed for study token.")
+	}
+
+	/**
+	 * Clicks Review on the Submission Requests list: first tries a row whose text contains {@code studyToken}
+	 * (matches full title when the table is not truncated). If none match, the Study column often shows only a short
+	 * prefix plus ellipsis—then when exactly one tbody row has a Review control, that row is used (filter already scoped the result).
+	 */
+	private static void clickSubmissionRequestsListReviewForStudyRow(String studyToken) {
+		WebDriver driver = DriverFactory.getWebDriver()
+		String tableXpath = TestRunner.givexpath("CRDC/AILocators/GenericTable/Table")
+		WebElement table = driver.findElement(By.xpath(tableXpath))
+		List<WebElement> rows = table.findElements(By.xpath(".//tbody//tr"))
+		if (rows.isEmpty()) {
+			KeywordUtil.markFailed("rejectSubmissionRequest: submission requests table has no data rows.")
+			return
+		}
+
+		for (WebElement row : rows) {
+			String rowText = row.getText()
+			if (rowText != null && rowText.contains(studyToken) && clickReviewControlInListRow(driver, row)) {
+				KeywordUtil.logInfo("clickSubmissionRequestsListReviewForStudyRow: matched row by full study token.")
+				return
+			}
+		}
+
+		List<WebElement> rowsWithReview = new ArrayList<>()
+		for (WebElement row : rows) {
+			if (!findReviewControlsInListRow(row).isEmpty()) {
+				rowsWithReview.add(row)
+			}
+		}
+		if (rowsWithReview.size() == 1) {
+			KeywordUtil.logInfo("clickSubmissionRequestsListReviewForStudyRow: using single filtered row (study text may be truncated in the grid).")
+			if (clickReviewControlInListRow(driver, rowsWithReview.get(0))) {
+				return
+			}
+		}
+
+		if (studyToken.length() > 10) {
+			String tailToken = studyToken.substring(studyToken.length() - 10)
+			for (WebElement row : rows) {
+				String rowText = row.getText()
+				if (rowText != null && rowText.contains(tailToken) && clickReviewControlInListRow(driver, row)) {
+					KeywordUtil.logInfo("clickSubmissionRequestsListReviewForStudyRow: matched row by suffix of study token.")
+					return
+				}
+			}
+		}
+
+		KeywordUtil.markFailed("rejectSubmissionRequest: could not find a Review control (full title not in row text and " +
+				(rowsWithReview.size() == 0 ? "no row has Review." : (rowsWithReview.size() + " rows have Review—ambiguous; narrow filters.")))
+	}
+
+	private static List<WebElement> findReviewControlsInListRow(WebElement row) {
+		return row.findElements(By.xpath(".//button[contains(normalize-space(.), 'Review')] | .//a[contains(normalize-space(.), 'Review')]"))
+	}
+
+	private static boolean clickReviewControlInListRow(WebDriver driver, WebElement row) {
+		List<WebElement> reviewControls = findReviewControlsInListRow(row)
+		if (reviewControls.isEmpty()) {
+			return false
+		}
+		WebElement btn = reviewControls.get(0)
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", btn)
+		WebUI.delay(1)
+		btn.click()
+		return true
 	}
 }
