@@ -719,6 +719,102 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	}
 
 	/**
+	 * Verifies Principal Investigator fields on the Section A edit form (not the Review summary) match the
+	 * expected {@code CRDC/SubmissionRequest/section-a} test data for the given row—typically used after starting a new
+	 * Submission Request when the portal auto-populates PI from the logged-in submitter profile.
+	 * <p>
+	 * Waits briefly for the first name field to become non-empty so asynchronous profile hydration does not race the check.
+	 * Text inputs use {@code value}; institution dropdown uses {@code value} or visible text as returned by the control.
+	 * </p>
+	 *
+	 * @param dataRowNum Row number in {@code section-a} test data (same column keys as {@link #enterPrincipalInvestigatorInfo(int)}).
+	 * Accepts {@code int} or {@code Integer} (Katalon often passes boxed {@code Integer} from test scripts).
+	 */
+	@Keyword
+	public static void verifyPrincipalInvestigatorInfoAutoPopulated(Object dataRowNum) {
+		int rowNum = parseTestDataRowIndex(dataRowNum, 'verifyPrincipalInvestigatorInfoAutoPopulated')
+		String objPath = 'CRDC/SubmissionRequest/Section-A/'
+		TestData testData = findTestData('CRDC/SubmissionRequest/section-a')
+		TestObject firstNameTo = findTestObject(objPath + 'PI_FirstName-TxtBx')
+		WebUI.waitForElementPresent(firstNameTo, 25)
+		waitForSectionAFieldPopulated(firstNameTo, 15)
+
+		Map<String, String> fields = [
+			'PI_FirstName-TxtBx'     : 'pi-first-name',
+			'PI_LastName-Txtbx'      : 'pi-last-name',
+			'PI_Position-Txtbx'      : 'position',
+			'PI_Email-Txtbx'         : 'pi-email',
+			'PI_Institution-Dd'      : 'pi-institution',
+			'PI_InstitAddress-Txtbx' : 'pi-instit-address'
+		]
+		fields.each { String testObjectId, String columnName ->
+			TestObject to = findTestObject(objPath + testObjectId)
+			WebUI.waitForElementPresent(to, 15)
+			String expected = testData.getValue(columnName, rowNum)?.trim()
+			if (expected == null) {
+				expected = ''
+			}
+			String actual = getSectionAFormDisplayedValue(to)
+			KeywordUtil.logInfo("verifyPrincipalInvestigatorInfoAutoPopulatedInSectionA: ${columnName} — expected='${expected}', actual='${actual}'")
+			WebUI.verifyMatch(actual, expected, false)
+		}
+		KeywordUtil.logInfo('verifyPrincipalInvestigatorInfoAutoPopulatedInSectionA: all PI fields matched expected test data.')
+	}
+
+	/**
+	 * Same verification as {@link #verifyPrincipalInvestigatorInfoAutoPopulated(Object)}; alternate name for scripts.
+	 */
+	@Keyword
+	public static void verifyPrincipalInvestigatorInfoAutoPopulatedInSectionA(Object dataRowNum) {
+		verifyPrincipalInvestigatorInfoAutoPopulated(dataRowNum)
+	}
+
+	/**
+	 * Coerces Katalon / Groovy row arguments ({@code Integer}, {@code int}, {@code String}) to a 1-based test data row index.
+	 */
+	private static int parseTestDataRowIndex(Object raw, String callerLabel) {
+		if (raw == null) {
+			KeywordUtil.markFailed(callerLabel + ": data row index is null.")
+			return 1
+		}
+		if (raw instanceof Number) {
+			return ((Number) raw).intValue()
+		}
+		try {
+			return Integer.parseInt(String.valueOf(raw).trim())
+		} catch (NumberFormatException e) {
+			KeywordUtil.markFailed(callerLabel + ": invalid data row index: " + raw)
+			return 1
+		}
+	}
+
+	/**
+	 * Polls until the given field has non-empty visible content or {@code maxSeconds} elapses (profile auto-fill).
+	 */
+	private static void waitForSectionAFieldPopulated(TestObject firstFieldTo, int maxSeconds) {
+		for (int s = 0; s < maxSeconds; s++) {
+			String v = getSectionAFormDisplayedValue(firstFieldTo)
+			if (v != null && !v.trim().isEmpty()) {
+				return
+			}
+			WebUI.delay(1)
+		}
+		KeywordUtil.logInfo('verifyPrincipalInvestigatorInfoAutoPopulatedInSectionA: first name still empty after wait; proceeding with assertions.')
+	}
+
+	/**
+	 * Reads value for Section A inputs (text, textarea, MUI-style selects): {@code value} first, then visible text.
+	 */
+	private static String getSectionAFormDisplayedValue(TestObject to) {
+		String v = WebUI.getAttribute(to, 'value')
+		if (v != null && !v.trim().isEmpty()) {
+			return v.trim()
+		}
+		String t = WebUI.getText(to)
+		return t != null ? t.trim() : ''
+	}
+
+	/**
 	 * This function verifies Primary contact info on Review Page
 	 * @param dataFileRowNum Please add data file row number to be read
 	 */
@@ -1363,6 +1459,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	}
 
 	private static final String DEFAULT_REJECTION_COMMENT = "Automated test rejection - CRDC submission request."
+	private static final String DEFAULT_APPROVAL_COMMENT = "Automated test approval - CRDC submission request."
 	private static final String SR_FORM_BASE = "CRDC/AILocators/SubmissionRequests/Form"
 
 	/**
@@ -1419,6 +1516,56 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	}
 
 	/**
+	 * Federal-lead (or reviewer) flow: same navigation as {@link #rejectSubmissionRequest(String, String)}—list filter by study,
+	 * open the row Review action, select the Review section in the form sidebar, then Approve with a comment and confirm.
+	 * <p>
+	 * Prerequisites match {@link #rejectSubmissionRequest(String, String)} (Fed Lead, reviewable status, study filter rules,
+	 * {@link #lastEnteredStudyTitle}, truncated Study column handling via {@link #clickSubmissionRequestsListReviewForStudyRow(String)}).
+	 * </p>
+	 *
+	 * @param studyName Study title or search string for the Study filter (minimum 3 characters)
+	 * @param approvalComment Optional reviewer comment for the approve dialog; if omitted or blank, a default automated-test message is used
+	 */
+	@Keyword
+	public static void approveSubmissionRequest(String studyName, String approvalComment = DEFAULT_APPROVAL_COMMENT) {
+		if (studyName == null || studyName.trim().isEmpty()) {
+			KeywordUtil.markFailed("approveSubmissionRequest: studyName is required.")
+			return
+		}
+		String token = studyName.trim()
+		if (token.length() < 3) {
+			KeywordUtil.markFailed("approveSubmissionRequest: studyName must be at least 3 characters (Submission Requests Study filter).")
+			return
+		}
+		String comment = (approvalComment != null && !approvalComment.trim().isEmpty()) ? approvalComment.trim() : DEFAULT_APPROVAL_COMMENT
+
+		KeywordUtil.logInfo("approveSubmissionRequest: navigating to Submission Requests list; study token length=" + token.length())
+		new SubmissionRequestList().navigateToSubmissionRequestsList()
+		SubmissionRequestList.applySubmissionRequestsListFilters([study: token] as Map<String, String>)
+		WebUI.delay(2)
+		clickSubmissionRequestsListReviewForStudyRow(token)
+
+		WebUI.waitForElementPresent(findTestObject(SR_FORM_BASE + "/Review/ProgressBar-Review"), 45)
+		WebUI.waitForElementClickable(findTestObject(SR_FORM_BASE + "/Review/ProgressBar-Review"), 15)
+		WebUI.click(findTestObject(SR_FORM_BASE + "/Review/ProgressBar-Review"))
+		WebUI.delay(2)
+		WebUI.scrollToElement(findTestObject(SR_FORM_BASE + "/Navigation/Approve-Btn"), 15)
+		WebUI.waitForElementVisible(findTestObject(SR_FORM_BASE + "/Navigation/Approve-Btn"), 20)
+		WebUI.waitForElementClickable(findTestObject(SR_FORM_BASE + "/Navigation/Approve-Btn"), 15)
+		WebUI.click(findTestObject(SR_FORM_BASE + "/Navigation/Approve-Btn"))
+		WebUI.delay(2)
+		TestObject approveCommentTo = findTestObject("CRDC/AILocators/SubmissionRequests/ApproveDialog/ReviewComment-TxtBx")
+		WebUI.waitForElementPresent(approveCommentTo, 10)
+		WebUI.waitForElementVisible(approveCommentTo, 10)
+		WebUI.setText(approveCommentTo, comment)
+		WebUI.delay(1)
+		WebUI.waitForElementClickable(findTestObject("CRDC/AILocators/SubmissionRequests/ApproveDialog/ConfirmApprove-Btn"), 10)
+		WebUI.click(findTestObject("CRDC/AILocators/SubmissionRequests/ApproveDialog/ConfirmApprove-Btn"))
+		WebUI.delay(2)
+		KeywordUtil.logInfo("approveSubmissionRequest: completed for study token.")
+	}
+
+	/**
 	 * Clicks Review on the Submission Requests list: first tries a row whose text contains {@code studyToken}
 	 * (matches full title when the table is not truncated). If none match, the Study column often shows only a short
 	 * prefix plus ellipsis—then when exactly one tbody row has a Review control, that row is used (filter already scoped the result).
@@ -1429,7 +1576,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		WebElement table = driver.findElement(By.xpath(tableXpath))
 		List<WebElement> rows = table.findElements(By.xpath(".//tbody//tr"))
 		if (rows.isEmpty()) {
-			KeywordUtil.markFailed("rejectSubmissionRequest: submission requests table has no data rows.")
+			KeywordUtil.markFailed("Submission request list: table has no data rows.")
 			return
 		}
 
@@ -1465,7 +1612,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			}
 		}
 
-		KeywordUtil.markFailed("rejectSubmissionRequest: could not find a Review control (full title not in row text and " +
+		KeywordUtil.markFailed("Submission request list: could not find a Review control (full title not in row text and " +
 				(rowsWithReview.size() == 0 ? "no row has Review." : (rowsWithReview.size() + " rows have Review—ambiguous; narrow filters.")))
 	}
 
