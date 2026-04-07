@@ -346,31 +346,13 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	public static String lastEnteredStudyTitle
 
 	/**
-	 * Full program name last produced for **Other** program in {@link #enterProgramInfo(String, int)}
-	 * ({@code program-title} from section-b test data + {@link #programTimeStamp}).
-	 * Set by {@link #recordLastEnteredProgramNameForOtherProgramEntry(int)} after the submitter flow (same row index as {@code programDataRow} in {@link #fillSubmissionRequestAllSections}).
+	 * Full study abbreviation last written by {@link #enterStudyInfo(int)} (base text + {@link #studyTimeStamp}).
+	 * Pass with {@link #lastEnteredStudyTitle} into {@link #enterOldStudyInfo(String, String)} to replay a prior submission without rebuilding strings in the test.
 	 */
-	public static String lastEnteredProgramName
+	public static String lastEnteredStudyAbbreviation
 
-	/**
-	 * Records {@link #lastEnteredProgramName} using the same formula as {@link #enterProgramInfo(String, int)} for the **Other** option:
-	 * {@code section-b} {@code program-title} at {@code sectionBProgramDataRow} + {@link #programTimeStamp}.
-	 * Call after {@link #enterProgramInfo(String, int)} or {@link #fillSubmissionRequestAllSections} has run (so {@link #programTimeStamp} is set).
-	 */
-	@Keyword
-	public static void recordLastEnteredProgramNameForOtherProgramEntry(int sectionBProgramDataRow) {
-		if (programTimeStamp == null || !programTimeStamp.toString().trim()) {
-			KeywordUtil.markFailed("recordLastEnteredProgramNameForOtherProgramEntry: programTimeStamp is empty; run enterProgramInfo with 'Other' (e.g. via fillSubmissionRequestAllSections) first.")
-			return
-		}
-		TestData td = findTestData('CRDC/SubmissionRequest/section-b')
-		String base = td.getValue('program-title', sectionBProgramDataRow)
-		if (base == null) {
-			base = ''
-		}
-		lastEnteredProgramName = (base.toString().trim() + programTimeStamp.toString().trim()).trim()
-		KeywordUtil.logInfo("recordLastEnteredProgramNameForOtherProgramEntry: lastEnteredProgramName=" + lastEnteredProgramName)
-	}
+	/** Section-b row last passed to {@link #enterStudyInfo(int)}; used by {@link #enterOldStudyInfo(String, String)} for description. */
+	public static int lastEnteredStudyInfoDataRow
 
 	/**
 	 * This function enters study information into submission request form
@@ -379,6 +361,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	@Keyword
 	public static void enterStudyInfo(int dataRowNum) {
 
+		lastEnteredStudyInfoDataRow = dataRowNum
 		String objPath = 'CRDC/SubmissionRequest/Section-B/';
 		TestData testData = findTestData('CRDC/SubmissionRequest/section-b')
 
@@ -387,11 +370,13 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 		String studyTitleValue = testData.getValue('study-title', dataRowNum) + studyTimeStamp
 		lastEnteredStudyTitle = studyTitleValue
+		String abbrevBase = testData.getValue('study-abbreviation', dataRowNum)
+		lastEnteredStudyAbbreviation = (abbrevBase != null ? abbrevBase.toString() : '') + studyTimeStamp
 
 		// Define mappings of field object names to their data keys
 		Map<String, String> fields = [
 			'StudyTitle-Txtbx'       : studyTitleValue,
-			'StudyAbbre-Txtbx'       : testData.getValue('study-abbreviation', dataRowNum) + studyTimeStamp,
+			'StudyAbbre-Txtbx'       : lastEnteredStudyAbbreviation,
 			'StudyDescription-Txtbx' : testData.getValue('study-description', dataRowNum)
 		]
 
@@ -403,6 +388,38 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		}
 	}
 
+	/**
+	 * Re-enters Section B study title and abbreviation from a prior submission; study description is filled the same way as
+	 * {@link #enterStudyInfo(int)} using {@code study-description} from {@code CRDC/SubmissionRequest/section-b} at
+	 * {@link #lastEnteredStudyInfoDataRow} (set on the last {@code enterStudyInfo} call, typically the prior submission’s row;
+	 * falls back to row {@code 1} if unset).
+	 *
+	 * @param priorStudyName Study title exactly as previously submitted (typically {@link #lastEnteredStudyTitle})
+	 * @param priorStudyAbbreviation Study abbreviation exactly as previously submitted (typically {@link #lastEnteredStudyAbbreviation})
+	 */
+	@Keyword
+	public static void enterOldStudyInfo(String priorStudyName, String priorStudyAbbreviation) {
+		String objPath = 'CRDC/SubmissionRequest/Section-B/'
+		TestData td = findTestData('CRDC/SubmissionRequest/section-b')
+		int descRow = lastEnteredStudyInfoDataRow > 0 ? lastEnteredStudyInfoDataRow : 1
+		String studyDescription = td.getValue('study-description', descRow)
+		if (studyDescription == null) {
+			studyDescription = ''
+		}
+
+		Map<String, String> fields = [
+			'StudyTitle-Txtbx'       : priorStudyName != null ? priorStudyName : '',
+			'StudyAbbre-Txtbx'       : priorStudyAbbreviation != null ? priorStudyAbbreviation : '',
+			'StudyDescription-Txtbx' : studyDescription.toString()
+		]
+		fields.each { testObjectId, value ->
+			TestObject to = findTestObject(objPath + testObjectId)
+			WebUI.waitForElementPresent(to, 20)
+			WebUI.setText(to, clearText() + value)
+			KeywordUtil.logInfo("Successfully entered: " + value + " into " + testObjectId)
+		}
+	}
+	
 	/**
 	 * This function enters funding agency information into the submission request form.
 	 * @param dataRowNum Row number from the test data file
@@ -1367,7 +1384,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		Thread.sleep(1000)
 		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequestConfirm-Btn'))
 	}
-	
+
 	/**
 	 * This function logs in to CRDC via Login.gov 2FA / OTP using a dynamic TOTP secret.
 	 * Delegates to utilities.Login; kept for backward compatibility.
@@ -1487,6 +1504,8 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	private static final String DEFAULT_REJECTION_COMMENT = "Automated test rejection - CRDC submission request."
 	private static final String DEFAULT_APPROVAL_COMMENT = "Automated test approval - CRDC submission request."
 	private static final String SR_FORM_BASE = "CRDC/AILocators/SubmissionRequests/Form"
+	/** ValidationReport section for submission-request UI checks (snackbar, etc.); aligns with list section naming. */
+	private static final String SECTION_SUBMISSION_REQUEST_UI = "Submission Request"
 
 	/**
 	 * Federal-lead (or reviewer) flow: open Submission Requests list, filter by study, open Review for the matching row,
@@ -1589,6 +1608,84 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		WebUI.click(findTestObject("CRDC/AILocators/SubmissionRequests/ApproveDialog/ConfirmApprove-Btn"))
 		WebUI.delay(2)
 		KeywordUtil.logInfo("approveSubmissionRequest: completed for study token.")
+	}
+
+	/**
+	 * Verifies the Notistack/MUI error snackbar shown on Submission Request flows (e.g. after Approve when validation fails).
+	 * Matches the hub DOM: {@code div.notistack-MuiContent-error[role='alert']}; message text is read from {@code #notistack-snackbar} when present, otherwise from the alert container.
+	 * <p>
+	 * Reusable for any submission-request error toast by passing the expected text (substring or full message).
+	 * </p>
+	 *
+	 * @param expectedMessageText Substring that must appear in the snackbar (default), or the full message when {@code exactMatch} is true
+	 * @param timeoutSeconds Max seconds to wait for the error snackbar to become visible
+	 * @param exactMatch If true, normalized snackbar text must equal {@code expectedMessageText} (after trim/collapse whitespace)
+	 * @param reportSection Section name in the HTML ValidationReport (call {@link ValidationReport#generateValidationReport()} at end of test)
+	 */
+	@Keyword
+	public static void verifySubmissionRequestSnackbarError(String expectedMessageText, int timeoutSeconds = 20, boolean exactMatch = false, String reportSection = SECTION_SUBMISSION_REQUEST_UI) {
+		String section = (reportSection != null && !reportSection.trim().isEmpty()) ? reportSection.trim() : SECTION_SUBMISSION_REQUEST_UI
+		if (expectedMessageText == null || expectedMessageText.trim().isEmpty()) {
+			ValidationReport.addValidationReportItem(section, "Error snackbar message", "(non-empty expected text)", "(missing)", "Fail")
+			KeywordUtil.markFailed("verifySubmissionRequestSnackbarError: expectedMessageText is required.")
+			return
+		}
+		WebDriver driver = DriverFactory.getWebDriver()
+		WebDriverWait wait = new WebDriverWait(driver, timeoutSeconds)
+		By snackbarLocator = By.cssSelector("div.notistack-MuiContent-error[role='alert']")
+		WebElement snackbar
+		try {
+			snackbar = wait.until(ExpectedConditions.visibilityOfElementLocated(snackbarLocator))
+		} catch (Exception e) {
+			ValidationReport.addValidationReportItem(section, "Error snackbar (Notistack)", "visible within " + timeoutSeconds + "s", "not found: " + e.getMessage(), "Fail")
+			KeywordUtil.markFailed("verifySubmissionRequestSnackbarError: error snackbar did not appear within " + timeoutSeconds + "s. " + e.getMessage())
+			return
+		}
+
+		String visibleText = readNotistackErrorSnackbarText(wait, snackbarLocator, snackbar)
+		if (visibleText == null) {
+			visibleText = ""
+		}
+		String normalizedVisible = visibleText.replaceAll("\\s+", " ").trim()
+		String expected = expectedMessageText.trim()
+		String expectedForReport = exactMatch ? ("equals: " + expected) : ("contains: " + expected)
+
+		if (exactMatch) {
+			String normalizedExpected = expected.replaceAll("\\s+", " ").trim()
+			if (!normalizedVisible.equals(normalizedExpected)) {
+				ValidationReport.addValidationReportItem(section, "Error snackbar (Notistack)", expectedForReport, visibleText, "Fail")
+				KeywordUtil.markFailed("verifySubmissionRequestSnackbarError: expected exact message '" + expected + "' but got '" + visibleText + "'")
+				return
+			}
+		} else {
+			if (!normalizedVisible.contains(expected)) {
+				ValidationReport.addValidationReportItem(section, "Error snackbar (Notistack)", expectedForReport, visibleText, "Fail")
+				KeywordUtil.markFailed("verifySubmissionRequestSnackbarError: expected snackbar to contain '" + expected + "' but got '" + visibleText + "'")
+				return
+			}
+		}
+		ValidationReport.addValidationReportItem(section, "Error snackbar (Notistack)", expectedForReport, visibleText, "Pass")
+		KeywordUtil.logInfo("verifySubmissionRequestSnackbarError: verified snackbar message.")
+	}
+
+	private static String readNotistackErrorSnackbarText(WebDriverWait wait, By snackbarLocator, WebElement snackbar) {
+		try {
+			return extractSnackbarVisibleText(snackbar)
+		} catch (StaleElementReferenceException e) {
+			WebElement refreshed = wait.until(ExpectedConditions.visibilityOfElementLocated(snackbarLocator))
+			return extractSnackbarVisibleText(refreshed)
+		}
+	}
+
+	private static String extractSnackbarVisibleText(WebElement snackbar) {
+		List<WebElement> inner = snackbar.findElements(By.id("notistack-snackbar"))
+		if (!inner.isEmpty()) {
+			String t = inner.get(0).getText()
+			if (t != null && !t.trim().isEmpty()) {
+				return t
+			}
+		}
+		return snackbar.getText()
 	}
 
 	/**
@@ -1748,7 +1845,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			Object sectionARow,
 			Object sectionCRow,
 			Object sectionDRow
-			) {
+	) {
 		String token = studyFilterToken != null ? studyFilterToken.toString().trim() : ''
 		if (token.length() < 3) {
 			KeywordUtil.markFailed("fedLeadSubmitSubmissionRequestOnBehalfWithReadOnlySpotChecks: study filter token must be at least 3 characters.")
