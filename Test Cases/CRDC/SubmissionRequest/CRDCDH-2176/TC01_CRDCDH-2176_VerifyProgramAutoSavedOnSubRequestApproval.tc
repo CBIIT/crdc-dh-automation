@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC01_CRDCDH-2176_VerifyProgramAutoSavedOnSubRequestApproval</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>cb28c6a2-479c-4e17-9056-bbb0b8845557</testCaseGuid>
+</TestCaseEntity>
