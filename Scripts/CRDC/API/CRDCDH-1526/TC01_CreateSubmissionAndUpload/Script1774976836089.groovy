@@ -1,16 +1,21 @@
 import com.kms.katalon.core.util.KeywordUtil
+import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 
 import internal.GlobalVariable
 
 /*
  * CRDCDH-1526 / TC01_CreateSubmissionAndUpload
  *
- * End-to-end API flow (no browser). Flow order:
+ * API + UI flow:
  *  1. createSubmission — new submission; save _id to GlobalVariable for reuse by other tests.
  *  2. createBatch — Hub returns batch _id + presigned S3 URL per metadata file name.
  *  3. PUT each local TSV to its signedURL (S3), build upload result maps for updateBatch.
  *  4. updateBatch — tell the Hub uploads finished; response reflects per-file and batch status.
- *  5. listBatches — query batches for that submission; verify same batch/files match expectations.
+ *  5. validateSubmission — trigger metadata validation (success = run initialized, not QC outcome).
+ *  6. listBatches — query batches for that submission; verify same batch/files match expectations.
+ *  7. UI — login, navigate to submission, Validation Results tab + expanded view, then {@code DataSubmissions.verifyNoValidationErrors()}.
+ *  8. submissionQCResults — GraphQL query cross-check: no QC rows ({@code total} 0, empty {@code results}) after UI.
+ *  9. (future) submit submission — not implemented here.
  *
  * GlobalVariable.LastApiSubmissionId stores the submission _id for other test cases.
  * Batch _id and signed URLs exist only in this script’s variables (not global).
@@ -18,6 +23,7 @@ import internal.GlobalVariable
  * Prerequisites (execution profile):
  * - ApiUrl — GraphQL endpoint (e.g. .../api/graphql)
  * - SubmitterApiToken — JWT from Data Hub “API token” (sent as Authorization: Bearer ...)
+ * - G_Urlname — Hub base URL for UI (e.g. https://…/bento) for step 7
  * - On disk: InputFiles/CRDC/API/program-stage.tsv, study-stage.tsv, participant-stage.tsv
  */
 
@@ -33,7 +39,7 @@ Map subResp = CustomKeywords.'utilities.GraphQlApiClient.createSubmission'([
 	dataCommons: 'CDS',
 	name       : submissionName,
 	intention  : 'New/Update',
-	dataType   : 'Metadata and Data Files'
+	dataType   : 'Metadata Only'
 ])
 
 Map submission = CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackCreateSubmission'(subResp)
@@ -81,8 +87,21 @@ Map updatedBatch = CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackUpd
 String finalBatchStatus = updatedBatch?.get('status')?.toString()
 KeywordUtil.logInfo("updateBatch final batch status: ${finalBatchStatus}")
 
+WebUI.delay(5) //handle race condition before validation
 
-// Step 5 — listBatches (read back from the Hub)
+// Step 5 — validateSubmission (initialize validation run; success is not QC pass/fail)
+KeywordUtil.logInfo("validateSubmission submissionID=${lastApiSubmissionId} types=[metadata] scope=All")
+
+Map valResp = CustomKeywords.'utilities.GraphQlApiClient.validateSubmission'([
+	_id   : lastApiSubmissionId,
+	types : ['metadata'],
+	scope : 'All'
+])
+
+CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackValidateSubmission'(valResp)
+
+
+// Step 6 — listBatches (read back from the Hub)
 Map listResp = CustomKeywords.'utilities.GraphQlApiClient.listBatches'([
 	submissionID: lastApiSubmissionId,
 	first       : 50
@@ -91,6 +110,44 @@ Map listResp = CustomKeywords.'utilities.GraphQlApiClient.listBatches'([
 Map listPayload = CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackListBatches'(listResp, lastApiSubmissionId, batchId,
 	fileBasenames, 'metadata')
 KeywordUtil.logInfo("listBatches total: ${listPayload?.get('total')}, verified batch _id: ${batchId}")
+
+
+// Step 7 — UI: login, open submission, Validation Results expanded; keyword verifies no QC rows on current page
+WebUI.closeBrowser()
+CustomKeywords.'utilities.Login.navigateToCrdc'()
+WebUI.setViewPortSize(1920, 1080)
+CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
+WebUI.delay(2)
+
+CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(lastApiSubmissionId)
+CustomKeywords.'utilities.Utils.waitForElementToDisappear'('Object Repository/CRDC/DataSubmissions/Loading-Icon', 300)
+
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Validation/ValidationResults-Tab')
+CustomKeywords.'utilities.Utils.waitForElementToDisappear'('Object Repository/CRDC/DataSubmissions/Loading-Icon', 90)
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn')
+CustomKeywords.'utilities.Utils.waitForElementToDisappear'('Object Repository/CRDC/DataSubmissions/Loading-Icon', 90)
+
+CustomKeywords.'utilities.DataSubmissions.verifyNoValidationErrors'()
+
+WebUI.closeBrowser()
+
+
+// Step 8 — submissionQCResults: API cross-check (no QC issues)
+KeywordUtil.logInfo("submissionQCResults submissionID=${lastApiSubmissionId} (post-UI)")
+
+Map qcResp = CustomKeywords.'utilities.GraphQlApiClient.submissionQCResults'([
+	id             : lastApiSubmissionId,
+	first          : -1,
+	offset         : 0,
+	sortDirection  : 'DESC',
+	orderBy        : 'displayID',
+	severities     : 'All'
+])
+
+CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackSubmissionQCResults'(qcResp, 0) //expected 0 errors or warnings
+
+
+// Step 9 — submit submission (future)
 
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()

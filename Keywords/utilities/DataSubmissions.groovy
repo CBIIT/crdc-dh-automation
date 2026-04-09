@@ -1571,6 +1571,32 @@ class DataSubmissions extends TestRunner {
 		WebUI.waitForElementNotHasAttribute(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/CrossValidate-Btn'), 'disabled', 300)
 	}
 
+	private static final String VALIDATION_RESULTS_UI_SECTION = "UI / Validation Results"
+
+	/**
+	 * Verification only: caller must already have navigated to Data Submission → Validation Results → Expanded view
+	 * with default All filters. Counts data rows via {@code Utils.getListWebElements} and Object Repository
+	 * {@code CRDC/AILocators/GenericTable/TableRow} ({@code data-testid='generic-table-row'}); optional empty copy via
+	 * {@code CRDC/DataSubmissions/Validation/ValidationResults-DefaultMesssage}. Records one ValidationReport row.
+	 */
+	@Keyword
+	void verifyNoValidationErrors() {
+		List qcRows = Utils.getListWebElements('CRDC/AILocators/GenericTable/TableRow')
+		int qcDataRows = qcRows != null ? qcRows.size() : 0
+		List emptyMsgEls = Utils.getListWebElements('CRDC/DataSubmissions/Validation/ValidationResults-DefaultMesssage')
+		boolean hasEmptyStateCopy = emptyMsgEls != null && !emptyMsgEls.isEmpty()
+		ValidationReport.addValidationReportItem(VALIDATION_RESULTS_UI_SECTION, 'Validation Results data rows (generic-table-row)',
+			"0", String.valueOf(qcDataRows), qcDataRows == 0 ? "Pass" : "Fail")
+		if (qcDataRows > 0) {
+			KeywordUtil.markFailed("verifyNoValidationErrors: expected 0 Validation Results data rows (generic-table-row), found ${qcDataRows}")
+		} else {
+			KeywordUtil.logInfo("verifyNoValidationErrors: empty-state message (ValidationResults-DefaultMesssage): ${hasEmptyStateCopy}")
+			if (!hasEmptyStateCopy) {
+				KeywordUtil.logInfo("[WARNING] verifyNoValidationErrors: empty-state Test Object not found; 0 data rows may still be valid.")
+			}
+		}
+	}
+
 	/**
 	 * Creates a Data Submission in the CRDC application based on the
 	 * specified submission type, data type, data model, and study.

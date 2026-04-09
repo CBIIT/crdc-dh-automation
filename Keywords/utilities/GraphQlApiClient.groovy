@@ -578,6 +578,50 @@ class GraphQlApiClient {
 	}
 
 	/**
+	 * Verify validateSubmission response: {@code success} indicates the validation run was initialized (queued), not QC outcome.
+	 * @param result Full parsed GraphQL body from validateSubmission
+	 * @param expectSuccess When true, require {@code success == true} (happy path).
+	 * @return data.validateSubmission map or null on failure
+	 */
+	@Keyword
+	Map verifyAndUnpackValidateSubmission(Map result, boolean expectSuccess = true) {
+		Map payload = (result?.data as Map)?.get('validateSubmission') as Map
+		if (!payload) {
+			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.validateSubmission", "present in response",
+				"missing", "Fail")
+			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackValidateSubmission: missing data.validateSubmission in ${result}")
+			return null
+		}
+		Object succObj = payload.get('success')
+		boolean succIsBool = succObj instanceof Boolean
+		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "validateSubmission success (Boolean)", "Boolean",
+			succIsBool ? succObj.toString() : "not Boolean: ${succObj}", succIsBool ? "Pass" : "Fail")
+		if (!succIsBool) {
+			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackValidateSubmission: success is not Boolean: ${succObj}")
+			return null
+		}
+		boolean ok = (Boolean) succObj
+		if (expectSuccess) {
+			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "validateSubmission success (initialized)", "true",
+				ok ? "true" : "false", ok ? "Pass" : "Fail")
+			if (!ok) {
+				String msg = payload.get('message')?.toString()
+				KeywordUtil.markFailed(
+					"GraphQlApiClient.verifyAndUnpackValidateSubmission: expected success true; got false. message: ${msg}")
+				return null
+			}
+		} else {
+			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "validateSubmission success (initialized)", "(any)",
+				ok ? "true" : "false", "Pass")
+		}
+		Object msgObj = payload.get('message')
+		if (msgObj != null && msgObj.toString().trim()) {
+			KeywordUtil.logInfo("validateSubmission message: ${msgObj}")
+		}
+		return payload
+	}
+
+	/**
 	 * POST a GraphQL operation to GlobalVariable.ApiUrl with Authorization: Bearer SubmitterApiToken.
 	 * @param operationName May be null for anonymous operations (not recommended)
 	 * @param variables Map of GraphQL variables (empty map if none)
@@ -910,6 +954,147 @@ class GraphQlApiClient {
 		// Minimal response sanity before verifyAndUnpackListBatches.
 		if (!data || !data.get('listBatches')) {
 			KeywordUtil.markFailed("GraphQlApiClient.listBatches: expected data.listBatches in response: ${result}")
+			return null
+		}
+		return result
+	}
+
+	/**
+	 * Run submissionQCResults query (QC issue rows for a submission).
+	 * Required args: {@code id} (submission ID). Optional: {@code nodeTypes}, {@code batchIDs}, {@code severities},
+	 * {@code first}, {@code offset}, {@code orderBy}, {@code sortDirection} (omit to use API defaults).
+	 */
+	@Keyword
+	Map submissionQCResults(Map args) {
+		if (args == null) {
+			KeywordUtil.markFailed("GraphQlApiClient.submissionQCResults: args map is required.")
+			return null
+		}
+		String sid = args.id?.toString()?.trim()
+		if (!sid) {
+			KeywordUtil.markFailed("GraphQlApiClient.submissionQCResults: id is required.")
+			return null
+		}
+		String queryDoc = loadGraphQlDocument("submissionQCResults")
+		if (!queryDoc) {
+			return null
+		}
+		Map vars = [id: sid]
+		if (args.nodeTypes != null) {
+			vars.nodeTypes = args.nodeTypes
+		}
+		if (args.batchIDs != null) {
+			vars.batchIDs = args.batchIDs
+		}
+		if (args.containsKey('severities') && args.severities != null) {
+			vars.severities = args.severities.toString().trim()
+		}
+		if (args.containsKey('first') && args.first != null) {
+			vars.first = args.first
+		}
+		if (args.containsKey('offset') && args.offset != null) {
+			vars.offset = args.offset
+		}
+		if (args.orderBy != null && args.orderBy.toString().trim()) {
+			vars.orderBy = args.orderBy.toString().trim()
+		}
+		if (args.sortDirection != null && args.sortDirection.toString().trim()) {
+			vars.sortDirection = args.sortDirection.toString().trim()
+		}
+		Map result = post("submissionQCResults", queryDoc, vars)
+		Map data = result?.data as Map
+		if (!data || !data.get('submissionQCResults')) {
+			KeywordUtil.markFailed("GraphQlApiClient.submissionQCResults: expected data.submissionQCResults in response: ${result}")
+			return null
+		}
+		return result
+	}
+
+	/**
+	 * Verify submissionQCResults response: {@code total} and {@code results} list match expectations (e.g. no issues: total 0, empty list).
+	 * @param result Full parsed GraphQL body from submissionQCResults
+	 * @param expectedTotal Expected {@code total} count (e.g. 0 when no QC errors/warnings for filters)
+	 * @return data.submissionQCResults map or null on failure
+	 */
+	@Keyword
+	Map verifyAndUnpackSubmissionQCResults(Map result, int expectedTotal) {
+		Map data = result?.data as Map
+		Map payload = data?.get('submissionQCResults') as Map
+		if (!payload) {
+			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.submissionQCResults", "present in response",
+				"missing", "Fail")
+			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackSubmissionQCResults: missing data.submissionQCResults in ${result}")
+			return null
+		}
+		Object totObj = payload.get('total')
+		int totalVal = totObj instanceof Number ? ((Number) totObj).intValue() : -1
+		def resultsRaw = payload.get('results')
+		boolean listOk = resultsRaw instanceof List
+		int resultSize = listOk ? (resultsRaw as List).size() : -1
+
+		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "submissionQCResults total", String.valueOf(expectedTotal),
+			String.valueOf(totalVal), totalVal == expectedTotal ? "Pass" : "Fail")
+		String expSize = String.valueOf(expectedTotal)
+		String actSize = listOk ? String.valueOf(resultSize) : "(not a list)"
+		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "submissionQCResults results size", expSize,
+			actSize, (listOk && resultSize == expectedTotal) ? "Pass" : "Fail")
+
+		if (totalVal != expectedTotal) {
+			KeywordUtil.markFailed(
+				"GraphQlApiClient.verifyAndUnpackSubmissionQCResults: expected total ${expectedTotal}, got ${totalVal}")
+			return null
+		}
+		if (!listOk) {
+			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackSubmissionQCResults: results is not a list: ${resultsRaw}")
+			return null
+		}
+		if (resultSize != expectedTotal) {
+			KeywordUtil.markFailed(
+				"GraphQlApiClient.verifyAndUnpackSubmissionQCResults: expected results size ${expectedTotal}, got ${resultSize}")
+			return null
+		}
+		return payload
+	}
+
+	/**
+	 * Run validateSubmission mutation (trigger metadata/file validation via Hub).
+	 * Required args: _id (submission ID), types (non-empty list of strings, e.g. {@code ["metadata"]}), scope (e.g. {@code "New"} or {@code "All"}).
+	 */
+	@Keyword
+	Map validateSubmission(Map args) {
+		if (args == null) {
+			KeywordUtil.markFailed("GraphQlApiClient.validateSubmission: args map is required.")
+			return null
+		}
+		String sid = args._id?.toString()?.trim()
+		def typesRaw = args.types
+		String scope = args.scope?.toString()?.trim()
+		if (!sid) {
+			KeywordUtil.markFailed("GraphQlApiClient.validateSubmission: _id is required.")
+			return null
+		}
+		if (!(typesRaw instanceof List) || typesRaw.isEmpty()) {
+			KeywordUtil.markFailed("GraphQlApiClient.validateSubmission: types must be a non-empty list of strings.")
+			return null
+		}
+		List<String> types = typesRaw.collect { it?.toString()?.trim() }.findAll { it }
+		if (types.size() != typesRaw.size()) {
+			KeywordUtil.markFailed("GraphQlApiClient.validateSubmission: each type must be non-empty.")
+			return null
+		}
+		if (!scope) {
+			KeywordUtil.markFailed("GraphQlApiClient.validateSubmission: scope is required.")
+			return null
+		}
+		String queryDoc = loadGraphQlDocument("validateSubmission")
+		if (!queryDoc) {
+			return null
+		}
+		Map vars = [_id: sid, types: types, scope: scope]
+		Map result = post("validateSubmission", queryDoc, vars)
+		Map data = result?.data as Map
+		if (!data || !data.get('validateSubmission')) {
+			KeywordUtil.markFailed("GraphQlApiClient.validateSubmission: expected data.validateSubmission in response: ${result}")
 			return null
 		}
 		return result
