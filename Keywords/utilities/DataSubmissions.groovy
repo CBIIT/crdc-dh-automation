@@ -584,7 +584,7 @@ class DataSubmissions extends TestRunner {
 	private static File findLatestFile(File dir) {
 		List<File> files = dir.listFiles()?.findAll { it.isFile() } ?: []
 		if (files.isEmpty()) return null
-		return files.sort { -it.lastModified() }.get(0)
+		return files.max { it.lastModified() }
 	}
 
 	/**
@@ -897,7 +897,7 @@ class DataSubmissions extends TestRunner {
 		return out
 	}
 
-	/** Load unique non-empty submitted identifier values from a TSV column. Returns List<String>. Used by DatabaseUtils.verifyRecordsInMongo. */
+	/** Load unique non-empty submitted identifier values from a TSV column. Returns a list of strings. Used by DatabaseUtils.verifyRecordsInMongo. */
 	public static List<String> loadSubmittedIdentifiersFromTsv(String tsvPath, String submittedIdentifierColumn) {
 		Set<String> seen = new LinkedHashSet<>()
 		Path path = Paths.get(tsvPath)
@@ -1575,12 +1575,14 @@ class DataSubmissions extends TestRunner {
 
 	/**
 	 * Verification only: caller must already have navigated to Data Submission → Validation Results → Expanded view
-	 * with default All filters. Counts data rows via {@code Utils.getListWebElements} and Object Repository
-	 * {@code CRDC/AILocators/GenericTable/TableRow} ({@code data-testid='generic-table-row'}); optional empty copy via
-	 * {@code CRDC/DataSubmissions/Validation/ValidationResults-DefaultMesssage}. Records one ValidationReport row.
+	 * with default All filters. Waits for CRDC/AILocators/GenericTable/LoadingRow to disappear so row counts
+	 * are not read mid-load. Counts data rows via Utils.getListWebElements and Object Repository
+	 * CRDC/AILocators/GenericTable/TableRow (data-testid='generic-table-row'); optional empty copy via
+	 * CRDC/DataSubmissions/Validation/ValidationResults-DefaultMesssage. Records one ValidationReport row.
 	 */
 	@Keyword
 	void verifyNoValidationErrors() {
+		Utils.waitForElementToDisappear('CRDC/AILocators/GenericTable/LoadingRow', 15)
 		List qcRows = Utils.getListWebElements('CRDC/AILocators/GenericTable/TableRow')
 		int qcDataRows = qcRows != null ? qcRows.size() : 0
 		List emptyMsgEls = Utils.getListWebElements('CRDC/DataSubmissions/Validation/ValidationResults-DefaultMesssage')
@@ -1980,7 +1982,7 @@ class DataSubmissions extends TestRunner {
 			WebUI.delay(1)
 
 			int[] rpOptions = [5, 10, 20, 50]
-			int targetRp = rpOptions.find { it >= rowCount } ?: 50
+			int targetRp = rpOptions.find it >= rowCount  ?: 50
 			KeywordUtil.logInfo("Setting rows per page to " + targetRp + " to accommodate " + rowCount + " row(s)")
 			WebUIUtils.changeRowsPerPage(targetRp)
 			Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)

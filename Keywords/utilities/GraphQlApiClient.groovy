@@ -38,7 +38,7 @@ class GraphQlApiClient {
 
 	/**
 	 * HTTP PUT entire file body to presignedUrl. No Authorization header. Succeeds on HTTP 2xx.
-	 * @return true if HTTP 2xx; false after {@code markFailed} (invalid args or non-2xx response).
+	 * @return true if HTTP 2xx; false after markFailed (invalid args or non-2xx response).
 	 */
 	private boolean putTsvToPresignedUrl(File file, String presignedUrl) {
 		if (file == null || !file.isFile()) {
@@ -578,9 +578,9 @@ class GraphQlApiClient {
 	}
 
 	/**
-	 * Verify validateSubmission response: {@code success} indicates the validation run was initialized (queued), not QC outcome.
+	 * Verify validateSubmission response: success indicates the validation run was initialized (queued), not QC outcome.
 	 * @param result Full parsed GraphQL body from validateSubmission
-	 * @param expectSuccess When true, require {@code success == true} (happy path).
+	 * @param expectSuccess When true, require success == true (happy path).
 	 * @return data.validateSubmission map or null on failure
 	 */
 	@Keyword
@@ -886,7 +886,7 @@ class GraphQlApiClient {
 			KeywordUtil.markFailed("GraphQlApiClient.updateBatch: files must be a non-empty list of UploadResult maps.")
 			return null
 		}
-		List<Map> files = filesRaw.collect { it instanceof Map ? it as Map : null }.findAll { it != null }
+		List<Map> files = filesRaw.collect { (it instanceof Map) ? (it as Map) : null }.findAll { it != null }
 		if (files.size() != filesRaw.size()) {
 			KeywordUtil.markFailed("GraphQlApiClient.updateBatch: each item in files must be a Map.")
 			return null
@@ -961,8 +961,10 @@ class GraphQlApiClient {
 
 	/**
 	 * Run submissionQCResults query (QC issue rows for a submission).
-	 * Required args: {@code id} (submission ID). Optional: {@code nodeTypes}, {@code batchIDs}, {@code severities},
-	 * {@code first}, {@code offset}, {@code orderBy}, {@code sortDirection} (omit to use API defaults).
+	 * Required args: id (submission ID). Optional: nodeTypes, batchIDs, severities,
+	 * first, offset, orderBy, sortDirection (omit to use API defaults).
+	 * Pagination: total is usually the count across all matching rows; results is only the current page.
+	 * With a finite first argument, the results list length may be less than total.
 	 */
 	@Keyword
 	Map submissionQCResults(Map args) {
@@ -1011,9 +1013,11 @@ class GraphQlApiClient {
 	}
 
 	/**
-	 * Verify submissionQCResults response: {@code total} and {@code results} list match expectations (e.g. no issues: total 0, empty list).
+	 * Verify submissionQCResults response: total and results list size both equal expectedTotal.
+	 * Use only for unpaged full-list queries (e.g. first: -1 so the Hub returns all rows). For paginated queries,
+	 * total and page size differ; use different assertions instead of this helper.
 	 * @param result Full parsed GraphQL body from submissionQCResults
-	 * @param expectedTotal Expected {@code total} count (e.g. 0 when no QC errors/warnings for filters)
+	 * @param expectedTotal Expected total and expected results list length (e.g. 0 when no QC rows for filters)
 	 * @return data.submissionQCResults map or null on failure
 	 */
 	@Keyword
@@ -1058,7 +1062,7 @@ class GraphQlApiClient {
 
 	/**
 	 * Run submissionAction mutation (e.g. Submit, Withdraw, Cancel).
-	 * Required args: {@code submissionID}, {@code action} (trimmed strings).
+	 * Required args: submissionID, action (trimmed strings).
 	 */
 	@Keyword
 	Map submissionAction(Map args) {
@@ -1091,10 +1095,10 @@ class GraphQlApiClient {
 	}
 
 	/**
-	 * Verify submissionAction response payload: {@code _id} matches request; optionally {@code status} matches {@code expectedStatus}.
+	 * Verify submissionAction response payload: _id matches request; optionally status matches expectedStatus.
 	 * @param result Full parsed GraphQL body from submissionAction
 	 * @param expectedSubmissionId Submission _id from the request
-	 * @param expectedStatus When non-null/non-blank, require returned {@code status} to equal this (e.g. {@code Submitted} after action Submit)
+	 * @param expectedStatus When non-null/non-blank, require returned status to equal this (e.g. Submitted after action Submit)
 	 * @return data.submissionAction map or null on failure
 	 */
 	@Keyword
@@ -1132,7 +1136,7 @@ class GraphQlApiClient {
 
 	/**
 	 * Run validateSubmission mutation (trigger metadata/file validation via Hub).
-	 * Required args: _id (submission ID), types (non-empty list of strings, e.g. {@code ["metadata"]}), scope (e.g. {@code "New"} or {@code "All"}).
+	 * Required args: _id (submission ID), types (non-empty list of strings, e.g. a one-element list for metadata), scope (e.g. New or All).
 	 */
 	@Keyword
 	Map validateSubmission(Map args) {
@@ -1151,7 +1155,7 @@ class GraphQlApiClient {
 			KeywordUtil.markFailed("GraphQlApiClient.validateSubmission: types must be a non-empty list of strings.")
 			return null
 		}
-		List<String> types = typesRaw.collect { it?.toString()?.trim() }.findAll { it }
+		List<String> types = typesRaw.collect { it?.toString()?.trim() }.findAll { it } 
 		if (types.size() != typesRaw.size()) {
 			KeywordUtil.markFailed("GraphQlApiClient.validateSubmission: each type must be non-empty.")
 			return null
