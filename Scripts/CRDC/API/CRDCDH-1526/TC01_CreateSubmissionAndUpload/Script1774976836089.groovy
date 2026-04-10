@@ -1,5 +1,6 @@
 import com.kms.katalon.core.util.KeywordUtil
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
+import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
 
 import internal.GlobalVariable
 
@@ -15,7 +16,7 @@ import internal.GlobalVariable
  *  6. listBatches — query batches for that submission; verify same batch/files match expectations.
  *  7. UI — login, navigate to submission, Validation Results tab + expanded view, then {@code DataSubmissions.verifyNoValidationErrors()}.
  *  8. submissionQCResults — GraphQL query cross-check: no QC rows ({@code total} 0, empty {@code results}) after UI.
- *  9. (future) submit submission — not implemented here.
+ *  9. submissionAction — Submit; verify {@code status} is Submitted (API check after UI + QC query).
  *
  * GlobalVariable.LastApiSubmissionId stores the submission _id for other test cases.
  * Batch _id and signed URLs exist only in this script’s variables (not global).
@@ -129,8 +130,6 @@ CustomKeywords.'utilities.Utils.waitForElementToDisappear'('Object Repository/CR
 
 CustomKeywords.'utilities.DataSubmissions.verifyNoValidationErrors'()
 
-WebUI.closeBrowser()
-
 
 // Step 8 — submissionQCResults: API cross-check (no QC issues)
 KeywordUtil.logInfo("submissionQCResults submissionID=${lastApiSubmissionId} (post-UI)")
@@ -147,7 +146,33 @@ Map qcResp = CustomKeywords.'utilities.GraphQlApiClient.submissionQCResults'([
 CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackSubmissionQCResults'(qcResp, 0) //expected 0 errors or warnings
 
 
-// Step 9 — submit submission (future)
+// Step 9 — submissionAction (Submit); verify status Submitted
+KeywordUtil.logInfo("submissionAction Submit submissionID=${lastApiSubmissionId}")
 
+//Submit and verify
+Map submitResp = CustomKeywords.'utilities.GraphQlApiClient.submissionAction'([
+	submissionID: lastApiSubmissionId,
+	action       : 'Submit'
+])
+
+CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackSubmissionAction'(submitResp, lastApiSubmissionId, 'Submitted')
+
+CustomKeywords.'utilities.WebUIUtils.refreshPageAndWaitForLoad'()
+CustomKeywords.'utilities.Utils.waitForElementToDisappear'('Object Repository/CRDC/DataSubmissions/Loading-Icon', 90)
+CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Submitted")
+
+//Withdraw and verify
+Map withdrawResp = CustomKeywords.'utilities.GraphQlApiClient.submissionAction'([
+	submissionID: lastApiSubmissionId,
+	action       : 'Withdraw'
+])
+
+CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackSubmissionAction'(withdrawResp, lastApiSubmissionId, 'Withdrawn')
+
+CustomKeywords.'utilities.WebUIUtils.refreshPageAndWaitForLoad'()
+CustomKeywords.'utilities.Utils.waitForElementToDisappear'('Object Repository/CRDC/DataSubmissions/Loading-Icon', 90)
+CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Withdrawn")
+
+WebUI.closeBrowser()
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()

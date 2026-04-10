@@ -1057,6 +1057,80 @@ class GraphQlApiClient {
 	}
 
 	/**
+	 * Run submissionAction mutation (e.g. Submit, Withdraw, Cancel).
+	 * Required args: {@code submissionID}, {@code action} (trimmed strings).
+	 */
+	@Keyword
+	Map submissionAction(Map args) {
+		if (args == null) {
+			KeywordUtil.markFailed("GraphQlApiClient.submissionAction: args map is required.")
+			return null
+		}
+		String submissionID = args.submissionID?.toString()?.trim()
+		String action = args.action?.toString()?.trim()
+		if (!submissionID) {
+			KeywordUtil.markFailed("GraphQlApiClient.submissionAction: submissionID is required.")
+			return null
+		}
+		if (!action) {
+			KeywordUtil.markFailed("GraphQlApiClient.submissionAction: action is required.")
+			return null
+		}
+		String queryDoc = loadGraphQlDocument("submissionAction")
+		if (!queryDoc) {
+			return null
+		}
+		Map vars = [submissionID: submissionID, action: action]
+		Map result = post("submissionAction", queryDoc, vars)
+		Map data = result?.data as Map
+		if (!data || !data.get('submissionAction')) {
+			KeywordUtil.markFailed("GraphQlApiClient.submissionAction: expected data.submissionAction in response: ${result}")
+			return null
+		}
+		return result
+	}
+
+	/**
+	 * Verify submissionAction response payload: {@code _id} matches request; optionally {@code status} matches {@code expectedStatus}.
+	 * @param result Full parsed GraphQL body from submissionAction
+	 * @param expectedSubmissionId Submission _id from the request
+	 * @param expectedStatus When non-null/non-blank, require returned {@code status} to equal this (e.g. {@code Submitted} after action Submit)
+	 * @return data.submissionAction map or null on failure
+	 */
+	@Keyword
+	Map verifyAndUnpackSubmissionAction(Map result, String expectedSubmissionId, String expectedStatus = null) {
+		Map data = result?.data as Map
+		Map payload = data?.get('submissionAction') as Map
+		if (!payload) {
+			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.submissionAction", "present in response",
+				"missing", "Fail")
+			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackSubmissionAction: missing data.submissionAction in ${result}")
+			return null
+		}
+		String expId = expectedSubmissionId?.toString()?.trim()
+		String actId = payload.get('_id')?.toString()?.trim()
+		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "submissionAction _id", expId ?: "(empty)",
+			actId ?: "(empty)", expId && expId == actId ? "Pass" : "Fail")
+		if (!expId || expId != actId) {
+			KeywordUtil.markFailed(
+				"GraphQlApiClient.verifyAndUnpackSubmissionAction: expected _id '${expId}', got '${actId}'")
+			return null
+		}
+		String expSt = expectedStatus?.toString()?.trim()
+		if (expSt) {
+			String actSt = payload.get('status')?.toString()?.trim()
+			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "submissionAction status", expSt,
+				actSt ?: "(empty)", expSt == actSt ? "Pass" : "Fail")
+			if (expSt != actSt) {
+				KeywordUtil.markFailed(
+					"GraphQlApiClient.verifyAndUnpackSubmissionAction: expected status '${expSt}', got '${actSt}'")
+				return null
+			}
+		}
+		return payload
+	}
+
+	/**
 	 * Run validateSubmission mutation (trigger metadata/file validation via Hub).
 	 * Required args: _id (submission ID), types (non-empty list of strings, e.g. {@code ["metadata"]}), scope (e.g. {@code "New"} or {@code "All"}).
 	 */
