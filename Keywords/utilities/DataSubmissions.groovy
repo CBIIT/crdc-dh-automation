@@ -1982,7 +1982,7 @@ class DataSubmissions extends TestRunner {
 			WebUI.delay(1)
 
 			int[] rpOptions = [5, 10, 20, 50]
-			int targetRp = rpOptions.find it >= rowCount  ?: 50
+			int targetRp = rpOptions.find { it >= rowCount } ?: 50
 			KeywordUtil.logInfo("Setting rows per page to " + targetRp + " to accommodate " + rowCount + " row(s)")
 			WebUIUtils.changeRowsPerPage(targetRp)
 			Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
