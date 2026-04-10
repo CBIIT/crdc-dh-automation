@@ -16,7 +16,7 @@ import internal.GlobalVariable
  *  6. listBatches — query batches for that submission; verify same batch/files match expectations.
  *  7. UI — login, navigate to submission, Validation Results tab + expanded view, then DataSubmissions.verifyNoValidationErrors().
  *  8. submissionQCResults — GraphQL query cross-check: no QC rows (total 0, empty results) after UI.
- *  9. submissionAction — Submit; verify status is Submitted (API check after UI + QC query).
+ *  9. submissionAction — Submit and verify status is Submitted, then withdraw and verify status is Withdrawn.
  *
  * GlobalVariable.LastApiSubmissionId stores the submission _id for other test cases.
  * Batch _id and signed URLs exist only in this script’s variables (not global).
