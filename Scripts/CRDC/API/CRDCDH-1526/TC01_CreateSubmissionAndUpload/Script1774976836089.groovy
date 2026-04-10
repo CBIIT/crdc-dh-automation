@@ -146,7 +146,7 @@ Map qcResp = CustomKeywords.'utilities.GraphQlApiClient.submissionQCResults'([
 CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackSubmissionQCResults'(qcResp, 0) //expected 0 errors or warnings
 
 
-// Step 9 — submissionAction (Submit); verify status Submitted
+// Step 9 — submissionAction: Submit and verify status Submitted, then Withdraw and verify status Withdrawn
 KeywordUtil.logInfo("submissionAction Submit submissionID=${lastApiSubmissionId}")
 
 //Submit and verify
