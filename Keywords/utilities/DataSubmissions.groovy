@@ -584,7 +584,7 @@ class DataSubmissions extends TestRunner {
 	private static File findLatestFile(File dir) {
 		List<File> files = dir.listFiles()?.findAll { it.isFile() } ?: []
 		if (files.isEmpty()) return null
-		return files.sort { -it.lastModified() }.get(0)
+		return files.max { it.lastModified() }
 	}
 
 	/**
@@ -897,7 +897,7 @@ class DataSubmissions extends TestRunner {
 		return out
 	}
 
-	/** Load unique non-empty submitted identifier values from a TSV column. Returns List<String>. Used by DatabaseUtils.verifyRecordsInMongo. */
+	/** Load unique non-empty submitted identifier values from a TSV column. Returns a list of strings. Used by DatabaseUtils.verifyRecordsInMongo. */
 	public static List<String> loadSubmittedIdentifiersFromTsv(String tsvPath, String submittedIdentifierColumn) {
 		Set<String> seen = new LinkedHashSet<>()
 		Path path = Paths.get(tsvPath)
@@ -1569,6 +1569,34 @@ class DataSubmissions extends TestRunner {
 		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/CrossValidate-Btn')
 		KeywordUtil.logInfo("Waiting for cross-validation to finish - waiting up to 5 minutes")
 		WebUI.waitForElementNotHasAttribute(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/CrossValidate-Btn'), 'disabled', 300)
+	}
+
+	private static final String VALIDATION_RESULTS_UI_SECTION = "UI / Validation Results"
+
+	/**
+	 * Verification only: caller must already have navigated to Data Submission → Validation Results → Expanded view
+	 * with default All filters. Waits for CRDC/AILocators/GenericTable/LoadingRow to disappear so row counts
+	 * are not read mid-load. Counts data rows via Utils.getListWebElements and Object Repository
+	 * CRDC/AILocators/GenericTable/TableRow (data-testid='generic-table-row'); optional empty copy via
+	 * CRDC/DataSubmissions/Validation/ValidationResults-DefaultMesssage. Records one ValidationReport row.
+	 */
+	@Keyword
+	void verifyNoValidationErrors() {
+		Utils.waitForElementToDisappear('CRDC/AILocators/GenericTable/LoadingRow', 15)
+		List qcRows = Utils.getListWebElements('CRDC/AILocators/GenericTable/TableRow')
+		int qcDataRows = qcRows != null ? qcRows.size() : 0
+		List emptyMsgEls = Utils.getListWebElements('CRDC/DataSubmissions/Validation/ValidationResults-DefaultMesssage')
+		boolean hasEmptyStateCopy = emptyMsgEls != null && !emptyMsgEls.isEmpty()
+		ValidationReport.addValidationReportItem(VALIDATION_RESULTS_UI_SECTION, 'Validation Results data rows (generic-table-row)',
+			"0", String.valueOf(qcDataRows), qcDataRows == 0 ? "Pass" : "Fail")
+		if (qcDataRows > 0) {
+			KeywordUtil.markFailed("verifyNoValidationErrors: expected 0 Validation Results data rows (generic-table-row), found ${qcDataRows}")
+		} else {
+			KeywordUtil.logInfo("verifyNoValidationErrors: empty-state message (ValidationResults-DefaultMesssage): ${hasEmptyStateCopy}")
+			if (!hasEmptyStateCopy) {
+				KeywordUtil.logInfo("[WARNING] verifyNoValidationErrors: empty-state Test Object not found; 0 data rows may still be valid.")
+			}
+		}
 	}
 
 	/**
