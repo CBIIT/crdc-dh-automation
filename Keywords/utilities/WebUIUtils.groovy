@@ -29,7 +29,8 @@ import java.io.InputStreamReader
  */
 class WebUIUtils {
 
-	private static final String REPORT_SECTION = "Export Buttons"
+	/** ValidationReport section for generic helpers (element text, tooltips, buttons, etc.); same label as Data Submissions validation-results UI checks. */
+	private static final String REPORT_SECTION = "UI / Validation Results"
 	private static final int DEFAULT_TIMEOUT = 20
 
 	/**
