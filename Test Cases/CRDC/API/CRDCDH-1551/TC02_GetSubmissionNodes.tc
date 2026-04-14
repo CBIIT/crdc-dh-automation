@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
-   <description>CRDCDH-1551 — API: createSubmission through listBatches (same metadata as CRDCDH-1526 TC01), then getSubmissionNodes for program, study, participant with ValidationReport. Profiles: ApiUrl, SubmitterApiToken. Sets GlobalVariable.LastApiSubmissionId.</description>
+   <description>CRDCDH-1551 — API: upload pipeline + getSubmissionNodes (program/study/participant), deleteDataRecords (one participant), delay then getSubmissionNodes verify 8 participants. Profiles: ApiUrl, SubmitterApiToken. Sets GlobalVariable.LastApiSubmissionId.</description>
    <name>TC02_GetSubmissionNodes</name>
    <tag>API,GraphQL,CRDCDH-1551</tag>
-   <comment>Profile: ApiUrl, SubmitterApiToken. Submitter access to study 2ef65a9b-7f9f-42e9-8e65-d45c7b3ca74e and CDS. GraphQLOperations.xlsx must include getSubmissionNodes.</comment>
+   <comment>Profile: ApiUrl, SubmitterApiToken. GraphQLOperations.xlsx: getSubmissionNodes, deleteDataRecords.</comment>
    <recordOption>OTHER</recordOption>
    <testCaseGuid>b8f0c4d2-5e3a-4f9b-ac1d-2b3c4d5e6f70</testCaseGuid>
 </TestCaseEntity>

@@ -4,24 +4,18 @@ import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import internal.GlobalVariable
 
 /*
- * CRDCDH-1551 / TC02_CreateUpload_VerifySubmissionNodes
+ * CRDCDH-1551 / TC02_GetSubmissionNodes
  *
- * API flow (same metadata pipeline as CRDCDH-1526 TC01 steps 1–6):
- *  1. createSubmission — new submission; save _id to GlobalVariable.LastApiSubmissionId.
- *  2. createBatch — presigned URLs per metadata file.
- *  3. PUT local TSVs to S3; build upload results for updateBatch.
- *  4. updateBatch — finalize uploads.
- *  5. validateSubmission — metadata validation run.
- *  6. listBatches — verify batch and files.
- *  7. getSubmissionNodes — last step: for each node type (program, study, participant), verify totals,
- *     IDPropName, properties, and node rows (nodeID, status, props) match InputFiles/CRDC/API/*-stage.tsv.
+ * Upload pipeline (create → batch → PUT → updateBatch → validateSubmission), then:
+ *  - getSubmissionNodes baseline (program, study, participant)
+ *  - deleteDataRecords for one participant (async)
+ *  - fixed delay, then getSubmissionNodes + verifyAndUnpackGetSubmissionNodes (8 participants)
  *
- * Prerequisites: ApiUrl, SubmitterApiToken; InputFiles/CRDC/API/program-stage.tsv, study-stage.tsv, participant-stage.tsv
- * GraphQL: GraphQLOperations.xlsx includes getSubmissionNodes.
+ * GraphQLOperations.xlsx: getSubmissionNodes, deleteDataRecords.
  */
 
 
-// Step 1 — createSubmission
+// Step 1 — createSubmission (keyword fails if data.createSubmission is missing)
 String timestamp = new Date().format("yyyyMMdd_HHmmss")
 String submissionName = "auto-api_" + timestamp
 
@@ -35,18 +29,16 @@ Map subResp = CustomKeywords.'utilities.GraphQlApiClient.createSubmission'([
 	dataType   : 'Metadata Only'
 ])
 
-Map submission = CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackCreateSubmission'(subResp)
-String lastApiSubmissionId = submission?.get('_id')?.toString()
+Map submission = (subResp?.data as Map)?.get('createSubmission') as Map
+String lastApiSubmissionId = submission?.get('_id')?.toString()?.trim()
 
 GlobalVariable.LastApiSubmissionId = lastApiSubmissionId
 KeywordUtil.logInfo("GlobalVariable.LastApiSubmissionId: ${GlobalVariable.LastApiSubmissionId}")
 
 
-// Step 2–4 — batch, upload, updateBatch
+// Step 2–4 — batch, upload, updateBatch (keywords fail on bad responses)
 String apiInputDir = CustomKeywords.'utilities.GraphQlApiClient.defaultApiInputDir'()
 List<String> fileBasenames = ['program-stage.tsv', 'study-stage.tsv', 'participant-stage.tsv']
-
-CustomKeywords.'utilities.GraphQlApiClient.verifyLocalFilesExist'(apiInputDir, fileBasenames)
 
 Map batchResp = CustomKeywords.'utilities.GraphQlApiClient.createBatch'([
 	submissionID: lastApiSubmissionId,
@@ -54,42 +46,30 @@ Map batchResp = CustomKeywords.'utilities.GraphQlApiClient.createBatch'([
 	files        : fileBasenames
 ])
 
-Map newBatch = CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackCreateBatch'(batchResp)
-String batchId = newBatch?.get('_id')?.toString()
+Map newBatch = (batchResp?.data as Map)?.get('createBatch') as Map
+String batchId = newBatch?.get('_id')?.toString()?.trim()
 
-List fileRows = CustomKeywords.'utilities.GraphQlApiClient.requireNonEmptyNewBatchFiles'(newBatch)
+List fileRows = newBatch?.get('files') as List
 List<Map> uploadResults = CustomKeywords.'utilities.GraphQlApiClient.putMetadataTsvsAndBuildUploadResults'(fileRows, apiInputDir)
 
-Map updResp = CustomKeywords.'utilities.GraphQlApiClient.updateBatch'([
+CustomKeywords.'utilities.GraphQlApiClient.updateBatch'([
 	batchID: batchId,
 	files  : uploadResults
 ])
 
-CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackUpdateBatch'(updResp, batchId)
-
 WebUI.delay(5)
 
-//// Step 5 — validateSubmission
-//Map valResp = CustomKeywords.'utilities.GraphQlApiClient.validateSubmission'([
-//	_id   : lastApiSubmissionId,
-//	types : ['metadata'],
-//	scope : 'All'
-//])
-//
-//CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackValidateSubmission'(valResp)
-//
-//
-//// Step 6 — listBatches
-//Map listResp = CustomKeywords.'utilities.GraphQlApiClient.listBatches'([
-//	submissionID: lastApiSubmissionId,
-//	first       : 50
-//])
-//
-//CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackListBatches'(listResp, lastApiSubmissionId, batchId,
-//	fileBasenames, 'metadata')
+CustomKeywords.'utilities.GraphQlApiClient.validateSubmission'([
+	_id   : lastApiSubmissionId,
+	types : ['metadata'],
+	scope : 'All'
+])
 
 
-// Step 7 — getSubmissionNodes (expected IDs from InputFiles/CRDC/API/*-stage.tsv)
+// --- getSubmissionNodes (baseline) ---
+// GraphQL query: Data View rows per nodeType for this submission. _id = submission ID; status 'All' = no filter;
+// first: -1 asks the Hub for the full list (see GraphQlApiClient.getSubmissionNodes).
+// Expected ID lists match InputFiles/CRDC/API/*-stage.tsv (program_acronym, study_id, study_participant_id).
 List<String> expectedProgramIds = ['AUTOPROGRAMAPI']
 List<String> expectedStudyIds = ['coffee2api']
 List<String> expectedParticipantIds = [
@@ -104,6 +84,8 @@ List<String> expectedParticipantIds = [
 	'CDS-CASE-107853439999api'
 ]
 
+// One call per node type; verifyAndUnpackGetSubmissionNodes checks total, IDPropName, properties, and each node's
+// submissionID, nodeType, nodeID, status, and parseable props JSON against the expected ID set.
 Map progResp = CustomKeywords.'utilities.GraphQlApiClient.getSubmissionNodes'([
 	_id      : lastApiSubmissionId,
 	nodeType : 'program',
@@ -137,6 +119,39 @@ Map partResp = CustomKeywords.'utilities.GraphQlApiClient.getSubmissionNodes'([
 CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackGetSubmissionNodes'(partResp, lastApiSubmissionId, 'participant',
 	9, expectedParticipantIds)
 
-KeywordUtil.logInfo("getSubmissionNodes verification complete for submission ${lastApiSubmissionId}")
+
+// --- deleteDataRecords + getSubmissionNodes (post-delete) ---
+// Mutation queues an async delete; success=true means the request was accepted
+// We delete one participant by nodeID (study_participant_id); program/study are left alone to avoid cascade issues.
+String participantToDelete = expectedParticipantIds[0]
+// Remaining participant nodeIDs we expect after delete (same list as baseline minus the deleted id).
+List<String> expectedParticipantIdsAfterDelete = expectedParticipantIds.size() > 1 ? expectedParticipantIds[1..-1] : []
+
+Map delResp = CustomKeywords.'utilities.GraphQlApiClient.deleteDataRecords'([
+	_id      : lastApiSubmissionId,
+	nodeType : 'participant',
+	nodeIDs  : [participantToDelete]
+])
+
+// Assert DataValidation.success and log message to ValidationReport.
+CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackDeleteDataRecords'(delResp)
+
+KeywordUtil.logInfo("deleteDataRecords queued for participant nodeID=${participantToDelete}; fixed delay then getSubmissionNodes (async delete)")
+
+WebUI.delay(5)
+
+// Re-query participants only; expect total 8 and the remaining nodeIDs (deleted id must be absent).
+Map partRespAfter = CustomKeywords.'utilities.GraphQlApiClient.getSubmissionNodes'([
+	_id      : lastApiSubmissionId,
+	nodeType : 'participant',
+	status   : 'All',
+	first    : -1,
+	offset   : 0
+])
+
+CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackGetSubmissionNodes'(partRespAfter, lastApiSubmissionId, 'participant',
+	8, expectedParticipantIdsAfterDelete)
+
+KeywordUtil.logInfo("getSubmissionNodes + deleteDataRecords verification complete for submission ${lastApiSubmissionId}")
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()

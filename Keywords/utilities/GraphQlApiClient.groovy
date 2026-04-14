@@ -1163,6 +1163,90 @@ class GraphQlApiClient {
 	}
 
 	/**
+	 * Run deleteDataRecords mutation (async delete of metadata nodes or data-file rows per Hub rules).
+	 * Required args: _id or submissionID, nodeType (e.g. participant, or "data file" for file deletes), nodeIDs (non-empty list of node IDs or file names).
+	 * Optional: deleteAll (Boolean), exclusiveIDs (list of strings) — see GraphQL schema.
+	 */
+	@Keyword
+	Map deleteDataRecords(Map args) {
+		if (args == null) {
+			KeywordUtil.markFailed("GraphQlApiClient.deleteDataRecords: args map is required.")
+			return null
+		}
+		String sid = args._id?.toString()?.trim() ?: args.submissionID?.toString()?.trim()
+		String nodeType = args.nodeType?.toString()?.trim()
+		def idsRaw = args.nodeIDs
+		if (!sid) {
+			KeywordUtil.markFailed("GraphQlApiClient.deleteDataRecords: _id or submissionID is required.")
+			return null
+		}
+		if (!nodeType) {
+			KeywordUtil.markFailed("GraphQlApiClient.deleteDataRecords: nodeType is required.")
+			return null
+		}
+		if (!(idsRaw instanceof List) || idsRaw.isEmpty()) {
+			KeywordUtil.markFailed("GraphQlApiClient.deleteDataRecords: nodeIDs must be a non-empty list.")
+			return null
+		}
+		List nodeIDs = idsRaw.collect {
+			it?.toString()?.trim()
+		}.findAll {
+			it
+		}
+		if (nodeIDs.isEmpty()) {
+			KeywordUtil.markFailed("GraphQlApiClient.deleteDataRecords: each nodeID must be non-empty.")
+			return null
+		}
+		String queryDoc = loadGraphQlDocument("deleteDataRecords")
+		if (!queryDoc) {
+			return null
+		}
+		Map vars = [_id: sid, nodeType: nodeType, nodeIDs: nodeIDs]
+		if (args.containsKey('deleteAll') && args.deleteAll != null) {
+			vars.deleteAll = args.deleteAll
+		}
+		if (args.exclusiveIDs != null) {
+			vars.exclusiveIDs = args.exclusiveIDs
+		}
+		Map result = post("deleteDataRecords", queryDoc, vars)
+		Map data = result?.data as Map
+		if (!data || !data.get('deleteDataRecords')) {
+			KeywordUtil.markFailed("GraphQlApiClient.deleteDataRecords: expected data.deleteDataRecords in response: ${result}")
+			return null
+		}
+		return result
+	}
+
+	/**
+	 * Verify deleteDataRecords returns DataValidation: success true and log message.
+	 * @param result Full GraphQL body from deleteDataRecords
+	 * @return data.deleteDataRecords map or null on failure
+	 */
+	@Keyword
+	Map verifyAndUnpackDeleteDataRecords(Map result) {
+		Map data = result?.data as Map
+		Map payload = data?.get('deleteDataRecords') as Map
+		if (!payload) {
+			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.deleteDataRecords", "present in response",
+			"missing", "Fail")
+			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackDeleteDataRecords: missing data.deleteDataRecords in ${result}")
+			return null
+		}
+		Object succObj = payload.get('success')
+		boolean ok = succObj instanceof Boolean ? (Boolean) succObj : Boolean.TRUE.equals(succObj)
+		String msg = payload.get('message')?.toString() ?: ""
+		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "deleteDataRecords success", "true",
+		String.valueOf(succObj), ok ? "Pass" : "Fail")
+		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "deleteDataRecords message", "(logged)",
+		msg ?: "(empty)", ok ? "Pass" : "Fail")
+		if (!ok) {
+			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackDeleteDataRecords: success is not true. message: ${msg}")
+			return null
+		}
+		return payload
+	}
+
+	/**
 	 * Run submissionQCResults query (QC issue rows for a submission).
 	 * Required args: id (submission ID). Optional: nodeTypes, batchIDs, severities,
 	 * first, offset, orderBy, sortDirection (omit to use API defaults).
