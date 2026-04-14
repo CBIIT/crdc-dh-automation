@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
-   <description>CRDCDH-1526 — API: createSubmission through listBatches; UI: Validation Results + verifyNoValidationErrors; API: submissionQCResults (0 issues); API: submissionAction Submit (status Submitted) then Withdraw (status Withdrawn). Profiles: ApiUrl, SubmitterApiToken, G_Urlname. Sets GlobalVariable.LastApiSubmissionId.</description>
+   <description>CRDCDH-1551 — TC01: API createSubmission (sets GlobalVariable.LastApiSubmissionId); UI download CLI uploader zips; GraphQL retrieveCLIConfig with verifyAndUnpackRetrieveCLIConfig (YAML). Profiles: ApiUrl, SubmitterApiToken, G_Urlname.</description>
    <name>TC01_DownloadCliAndConfig</name>
-   <tag>API,GraphQL,CRDCDH-1526</tag>
-   <comment>Profile: ApiUrl, SubmitterApiToken, G_Urlname (UI step). Submitter must have access to the configured study and CDS commons. GraphQL operations: GraphQLOperations.xlsx (Operations), including submissionQCResults and submissionAction.</comment>
+   <tag>API,GraphQL,UI,CRDCDH-1551</tag>
+   <comment>CRDCDH-1551: Submitter access to study and CDS. GraphQLOperations.xlsx must include retrieveCLIConfig. Katalon Downloads folder used for CLI zip files.</comment>
    <recordOption>OTHER</recordOption>
    <testCaseGuid>a924e26d-0c8a-4fef-bbbd-213386160ee3</testCaseGuid>
 </TestCaseEntity>

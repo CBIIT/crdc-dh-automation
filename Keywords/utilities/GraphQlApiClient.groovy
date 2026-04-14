@@ -1165,7 +1165,8 @@ class GraphQlApiClient {
 	/**
 	 * Run deleteDataRecords mutation (async delete of metadata nodes or data-file rows per Hub rules).
 	 * Required args: _id or submissionID, nodeType (e.g. participant, or "data file" for file deletes), nodeIDs (non-empty list of node IDs or file names).
-	 * Optional: deleteAll (Boolean), exclusiveIDs (list of strings) — see GraphQL schema.
+	 * Optional passthrough: deleteAll, exclusiveIDs (included in variables when provided).
+	 * Note: This keyword always requires non-empty nodeIDs. The GraphQL API also allows empty nodeIDs with deleteAll; that combination is not supported here.
 	 */
 	@Keyword
 	Map deleteDataRecords(Map args) {
