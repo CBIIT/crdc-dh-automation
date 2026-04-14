@@ -175,3 +175,7 @@ When implementing or modifying functions in this project:
 - Only use `JavascriptExecutor` when standard Selenium cannot achieve the goal — for example, when React does not detect Selenium's native events on a specific element, or when bulk DOM reads in a loop would cause performance hangs.
 - When `JavascriptExecutor` is necessary, add a comment in the Javadoc or inline explaining **why** standard Selenium is insufficient for that specific case.
 
+### Comment style (Groovy keywords and scripts)
+
+- Do not use Javadoc `{@code ...}` inline tags in block comments. Write identifiers and file names in plain text (e.g. `Downloads`, `CustomBrowserDriver`, `crdc-datahub-cli-uploader-src.zip`) without `{@code ...}` wrappers.
+

@@ -49,9 +49,10 @@ public class CustomBrowserDriver {
 	}
 
 	/**
-	 * This method is used to instantiate a new driver based 
-	 * on the user input from Profile
-	 * @return
+	 * Instantiates a WebDriver from the execution profile (Chrome, headless Chrome, Firefox, etc.).
+	 * Chrome prefs set the project Downloads folder, suppress the Save As prompt, and allow
+	 * automatic downloads so repeated file downloads from the same origin (e.g. CLI package links) do not show Block/Allow.
+	 * @return WebDriver instance registered with DriverFactory
 	 */
 	@Keyword
 	public static WebDriver createWebDriver() {
@@ -68,6 +69,7 @@ public class CustomBrowserDriver {
 				Map<String, Object> chromePrefs = new HashMap<String, Object>()
 				chromePrefs.put("download.prompt_for_download", false)
 				chromePrefs.put("download.default_directory", projectDownloadsDir.getAbsolutePath())
+				chromePrefs.put("profile.default_content_setting_values.automatic_downloads", 1)
 				options.setExperimentalOption("prefs", chromePrefs)
 				options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/18.1.1");
 				options.setExperimentalOption("useAutomationExtension", false);
@@ -94,6 +96,7 @@ public class CustomBrowserDriver {
 				Map<String, Object> chromePrefs = new HashMap<String, Object>()
 				chromePrefs.put("download.prompt_for_download", false)
 				chromePrefs.put("download.default_directory", projectDownloadsDir.getAbsolutePath())
+				chromePrefs.put("profile.default_content_setting_values.automatic_downloads", 1)
 				options.setExperimentalOption("prefs", chromePrefs)
 				options.addArguments("--force-time-zone=America/Chicago");
 				options.merge(dc);

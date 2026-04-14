@@ -1,5 +1,6 @@
 package utilities;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
@@ -717,5 +718,46 @@ public class Utils {
 		}
 
 		throw new AssertionError("Element did not appear within " + timeoutSeconds + " seconds: " + xpath);
+	}
+
+	/**
+	 * Waits until a file appears under the project Downloads folder (same path Chrome uses via
+	 * CustomBrowserDriver). Polls until Chrome finishes: ignores partial downloads (.crdownload)
+	 * and requires the target file size to be stable between reads.
+	 *
+	 * @param fileName exact file name (e.g. crdc-datahub-cli-uploader-src.zip)
+	 * @param timeoutSeconds max wait time
+	 */
+	@Keyword
+	public static void waitForFileInProjectDownloads(String fileName, int timeoutSeconds) {
+		File dir = new File(RunConfiguration.getProjectDir(), "Downloads");
+		if (!dir.exists()) {
+			dir.mkdirs();
+		}
+		File target = new File(dir, fileName);
+		File partial = new File(dir, fileName + ".crdownload");
+		long deadline = System.currentTimeMillis() + (long) timeoutSeconds * 1000L;
+		KeywordUtil.logInfo("waitForFileInProjectDownloads: expecting " + target.getAbsolutePath());
+
+		while (System.currentTimeMillis() < deadline) {
+			if (partial.exists()) {
+				Thread.sleep(400);
+				continue;
+			}
+			if (target.isFile() && target.length() > 0L) {
+				long len1 = target.length();
+				Thread.sleep(500);
+				if (partial.exists()) {
+					continue;
+				}
+				long len2 = target.length();
+				if (len1 == len2) {
+					KeywordUtil.markPassed("Downloaded file ready: " + target.getAbsolutePath() + " (" + len1 + " bytes)");
+					return;
+				}
+			}
+			Thread.sleep(400);
+		}
+		KeywordUtil.markFailed("waitForFileInProjectDownloads: timeout after " + timeoutSeconds + "s for '" + fileName + "' in " + dir.getAbsolutePath());
 	}
 }
