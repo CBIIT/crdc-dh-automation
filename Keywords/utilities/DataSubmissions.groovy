@@ -56,6 +56,8 @@ class DataSubmissions extends TestRunner {
 	static String expectedCollaboratorsTooltip = "Click to add new collaborators or view existing ones."
 	static String expectedDataCommons = null
 	static String expectedDataConcierge = "pbac.dcp-automation Please Do Not Edit"
+	/** Set by readCrossValidationResultsTableFromUI — total Cross Validation table rows across pages (for export CSV row-count checks). */
+	static int lastCrossValidationTableRowCount = -1
 	/** Maps tab internal name (e.g. UploadActivities, DataView) to section name used in ValidationReport. */
 	private static String tabToSectionName(String tab) {
 		if (tab == "UploadActivities") return "Upload Activities"
@@ -747,6 +749,8 @@ class DataSubmissions extends TestRunner {
 		ValidationReport.addValidationReportItem("Validation Results Export", "Downloaded file name", expectedLabel, fileName, "Pass")
 		KeywordUtil.logInfo("clickValidationResultsExportAndVerifyDownloadedFileName: verified downloaded file: ${fileName} (submission name: ${namePart})")
 	}
+
+	
 
 	// ------------------------------- Validation Results vs expected TSV -------------------------------
 
@@ -2055,6 +2059,7 @@ class DataSubmissions extends TestRunner {
 		if (idxIssues < 0) idxIssues = headerNames.findIndexOf { it.toLowerCase().contains("issue") }
 
 		if (idxSubmitted < 0 || idxNodeType < 0 || idxSeverity < 0) {
+			lastCrossValidationTableRowCount = 0
 			KeywordUtil.markFailed("Cross Validation table missing required columns (Submitted Identifier, Node Type, Severity). Headers: " + headerNames)
 			return Collections.emptyList()
 		}
@@ -2111,6 +2116,7 @@ class DataSubmissions extends TestRunner {
 			}
 		}
 
+		lastCrossValidationTableRowCount = allRows.size()
 		KeywordUtil.logInfo("readCrossValidationResultsTableFromUI: read " + allRows.size() + " total row(s)")
 		return allRows
 	}
@@ -2304,5 +2310,120 @@ class DataSubmissions extends TestRunner {
 		} else {
 			KeywordUtil.logInfo("Cross Validation Results match expected for TC: " + tcName)
 		}
+	}
+
+	
+	private static final String CROSS_VAL_EXPORT_SECTION = "Cross Validation Export"
+
+	/**
+	 * Clicks the Cross Validation Results export button (export-cross-validation-button), then verifies the
+	 * downloaded file name matches {submissionName}-cross-validation-results-YYYY-MM-DD.csv in project Downloads.
+	 * Assumes caller is on Cross Validation Results tab with export enabled.
+	 *
+	 * @param expectedSubmissionName Submission display name (normalized prefix must match UI export filename).
+	 */
+	@Keyword
+	void clickCrossValidationExportAndVerifyDownloadedFileName(String expectedSubmissionName) {
+		TestObject exportBtn = findTestObject("CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Filters/ExportCrossValidation-Btn")
+		if (!WebUIUtils.waitForElementClickableWithStaleRetry(exportBtn, 60)) {
+			return
+		}
+		WebUI.click(exportBtn)
+		WebUI.delay(8)
+		File projectDownloads = getProjectDownloadsDir()
+		File latest = findLatestFile(projectDownloads)
+		if (latest == null) {
+			KeywordUtil.markFailed("clickCrossValidationExportAndVerifyDownloadedFileName: no file found in project Downloads (${projectDownloads.absolutePath}) after clicking export")
+			return
+		}
+		String fileName = latest.name
+		def matcher = (fileName =~ /(?i)^(.+)-cross-validation-results-(\d{4}-\d{2}-\d{2})\.csv$/)
+		if (!matcher.find()) {
+			ValidationReport.addValidationReportItem(CROSS_VAL_EXPORT_SECTION, "Downloaded file name",
+					"pattern: {submissionName}-cross-validation-results-YYYY-MM-DD.csv", fileName, "Fail")
+			KeywordUtil.markFailed("clickCrossValidationExportAndVerifyDownloadedFileName: downloaded file name does not match pattern. Got: " + fileName)
+			return
+		}
+		String namePart = matcher.group(1)
+		if (expectedSubmissionName != null && !expectedSubmissionName.isEmpty()) {
+			String normalizedExpected = normalizeSubmissionNameForExport(expectedSubmissionName)
+			if (!namePart.startsWith(normalizedExpected)) {
+				ValidationReport.addValidationReportItem(CROSS_VAL_EXPORT_SECTION, "Submission name in filename",
+						"starts with " + normalizedExpected, namePart, "Fail")
+				KeywordUtil.markFailed("clickCrossValidationExportAndVerifyDownloadedFileName: filename submission name '" + namePart + "' does not start with expected '" + normalizedExpected + "'")
+				return
+			}
+		}
+		ValidationReport.addValidationReportItem(CROSS_VAL_EXPORT_SECTION, "Downloaded file name",
+				"pattern match, submission: ${namePart}", fileName, "Pass")
+		KeywordUtil.logInfo("clickCrossValidationExportAndVerifyDownloadedFileName: verified downloaded file: ${fileName}")
+	}
+	
+	/**
+	 * Counts data rows in a UTF-8 CSV file (first row treated as header). Uses quote-aware record boundaries
+	 * so commas inside quoted fields do not inflate the count. Suitable for any hub CSV with that shape;
+	 * used by verifyCrossValidationExportCsvRowCountMatchesUi.
+	 */
+	private static int countCsvDataRowsExcludingHeader(File csvFile) {
+		String text = new String(Files.readAllBytes(csvFile.toPath()), StandardCharsets.UTF_8)
+		if (text == null || text.isEmpty()) return 0
+		List<String> records = new ArrayList<>()
+		StringBuilder cur = new StringBuilder()
+		boolean inQuotes = false
+		for (int i = 0; i < text.length(); i++) {
+			char c = text.charAt(i)
+			if (c == '"') {
+				if (inQuotes && i + 1 < text.length() && text.charAt(i + 1) == '"') {
+					cur.append('"')
+					i++
+				} else {
+					inQuotes = !inQuotes
+					cur.append(c)
+				}
+			} else if (!inQuotes && (c == '\n' || c == '\r')) {
+				if (c == '\r' && i + 1 < text.length() && text.charAt(i + 1) == '\n') {
+					i++
+				}
+				String rec = cur.toString().trim()
+				if (!rec.isEmpty()) records.add(rec)
+				cur.setLength(0)
+			} else {
+				cur.append(c)
+			}
+		}
+		String last = cur.toString().trim()
+		if (!last.isEmpty()) records.add(last)
+		if (records.isEmpty()) return 0
+		return Math.max(0, records.size() - 1)
+	}
+
+	/**
+	 * Verifies the most recently downloaded Cross Validation CSV has the same number of data rows as the
+	 * Cross Validation table in the UI. Uses lastCrossValidationTableRowCount set by
+	 * readCrossValidationResultsTableFromUI (e.g. inside verifyCrossValidationResultsVsExpected).
+	 * If that was never set, re-reads the table. Call after clickCrossValidationExportAndVerifyDownloadedFileName.
+	 */
+	@Keyword
+	void verifyCrossValidationExportCsvRowCountMatchesUi() {
+		int uiRows = lastCrossValidationTableRowCount
+		if (uiRows < 0) {
+			KeywordUtil.logInfo("verifyCrossValidationExportCsvRowCountMatchesUi: lastCrossValidationTableRowCount unset; re-reading Cross Validation table")
+			uiRows = readCrossValidationResultsTableFromUI().size()
+		}
+		File projectDownloads = getProjectDownloadsDir()
+		File latest = findLatestFile(projectDownloads)
+		if (latest == null) {
+			KeywordUtil.markFailed("verifyCrossValidationExportCsvRowCountMatchesUi: no file in Downloads")
+			return
+		}
+		int csvDataRows = countCsvDataRowsExcludingHeader(latest)
+		String status = (csvDataRows == uiRows) ? "Pass" : "Fail"
+		ValidationReport.addValidationReportItem(CROSS_VAL_EXPORT_SECTION, "CSV data rows vs UI table rows",
+				String.valueOf(uiRows), String.valueOf(csvDataRows), status)
+		if (status == "Fail") {
+			KeywordUtil.markFailed("verifyCrossValidationExportCsvRowCountMatchesUi: UI had ${uiRows} row(s), CSV has ${csvDataRows} data row(s) in ${latest.name}")
+			return
+		}
+		KeywordUtil.logInfo("verifyCrossValidationExportCsvRowCountMatchesUi: ${csvDataRows} CSV data row(s) matches ${uiRows} UI row(s) in ${latest.name}")
 	}
 }

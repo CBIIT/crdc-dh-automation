@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
-   <description>Verifies Release button state around Cross Validation. After validate and submit, Release is disabled; after Cross Validate, Release becomes enabled.</description>
+   <description>CRDCDH-3138: Release button state around cross-validation (incl. Confirm Release). CRDCDH-1390: Export disabled and tooltip when no CV issues (former TC02 merged here; TC01 covers export with issues).</description>
    <name>TC27_CRDC-VerifyCrossValidationImprovements</name>
    <tag></tag>
    <comment></comment>

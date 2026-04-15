@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-1390: DCP exports Cross Validation Results to CSV when issues exist — tooltip, filename, row count vs expected TSV.</description>
+   <name>TC01_CRDC-CrossValidationExport_WithIssues</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>f1390a01-0001-40c0-a000-000000000001</testCaseGuid>
+</TestCaseEntity>
