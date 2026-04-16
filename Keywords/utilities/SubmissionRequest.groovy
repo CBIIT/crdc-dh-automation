@@ -567,9 +567,12 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 
 		WebUI.takeScreenshot("./OutputFiles/BeforeEnteringData2.png")
-		WebUI.setText(findTestObject('CRDC/SubmissionRequest/Section-D/TragetSubmDelivryDate-TxtBx'), clearText() + "05/12/2026");
-
-		WebUI.setText(findTestObject('CRDC/SubmissionRequest/Section-D/ExpctdPublicationDate-TxtBx'), clearText() + "05/12/2026");
+		TestObject targetedDeliveryDate = findTestObject('CRDC/SubmissionRequest/Section-D/TragetSubmDelivryDate-TxtBx')
+		TestObject expectedPublicationDate = findTestObject('CRDC/SubmissionRequest/Section-D/ExpctdPublicationDate-TxtBx')
+		WebUI.clearText(targetedDeliveryDate)
+		WebUI.setText(targetedDeliveryDate, "05/12/2026")
+		WebUI.clearText(expectedPublicationDate)
+		WebUI.setText(expectedPublicationDate, "05/12/2026")
 		//TestObject targetSubDeDate = findTestObject('CRDC/SubmissionRequest/Section-D/TragetSubmDelivryDate-TxtBx');
 
 		//		WebUI.scrollToElement(targetSubDeDate, 10)
