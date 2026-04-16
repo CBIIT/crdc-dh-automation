@@ -22,7 +22,7 @@
       <guid>a06b9ed0-3956-4b04-bf83-9f54097cf839</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SampleTestCases/TC11_MongoDBQuerySubmissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC11_MongoDBQuerySubmissions</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
