@@ -106,7 +106,7 @@
       <guid>ac6430d0-dd0f-49e2-bd16-63ae4796f188</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-514/TC16_CRDC-514-VerifyFullDataSubmissionHistory</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-514/TC06_CRDC-514-VerifyFullDataSubmissionHistory</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>

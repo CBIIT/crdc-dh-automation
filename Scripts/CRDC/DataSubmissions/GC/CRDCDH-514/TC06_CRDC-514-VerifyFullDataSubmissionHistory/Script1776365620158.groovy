@@ -93,6 +93,7 @@ WebUI.closeBrowser()
 
 //Log back in as a submitter revalidate and submit
 CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
+WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
 CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submissionIdMetadataOnly)
 CustomKeywords.'utilities.Utils.waitForElementToAppear'('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl', 30)
@@ -103,11 +104,7 @@ WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'),
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Submit-Btn')
 WebUI.delay(2) //race condition for Yes button
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/SubmitYes-Btn')
-WebUI.delay(15)
-String projectDir = RunConfiguration.getProjectDir()
-String currentPath = "${projectDir}/Reports/debug.png"
-WebUI.takeScreenshot(currentPath)
-
+WebUI.delay(2)
 //Logout
 CustomKeywords.'utilities.SubmissionRequest.logoutFromCrdc'()
 WebUI.closeBrowser()
