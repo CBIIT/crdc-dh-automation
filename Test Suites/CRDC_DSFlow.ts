@@ -92,7 +92,7 @@
       <guid>18fddf8f-cd09-4527-8bf2-1884f22aa266</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1804/TC28_CRDC-VerifyDataViewDeleteRecordsTooltips</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1804/TC14_CRDC-VerifyDataViewDeleteRecordsTooltips</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
