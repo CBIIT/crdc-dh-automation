@@ -173,9 +173,11 @@ When implementing or modifying functions in this project:
 
 - Use standard Selenium/Katalon APIs (`driver.findElements`, `element.click()`, `element.getText()`, `element.isEnabled()`, `new Select(element)`, etc.) for readability and consistency.
 - Only use `JavascriptExecutor` when standard Selenium cannot achieve the goal — for example, when React does not detect Selenium's native events on a specific element, or when bulk DOM reads in a loop would cause performance hangs.
-- When `JavascriptExecutor` is necessary, add a comment in the Javadoc or inline explaining **why** standard Selenium is insufficient for that specific case.
+- When `JavascriptExecutor` is necessary, add a comment in a block comment or inline explaining **why** standard Selenium is insufficient for that specific case.
 
 ### Comment style (Groovy keywords and scripts)
 
-- Do not use Javadoc `{@code ...}` inline tags in block comments. Write identifiers and file names in plain text (e.g. `Downloads`, `CustomBrowserDriver`, `crdc-datahub-cli-uploader-src.zip`) without `{@code ...}` wrappers.
+- Do **not** use Javadoc **linking** or **inline** tags — they are not rendered in Groovy/Katalon and clutter comments. Avoid: `@link`, `@see`, `{@link ...}`, `{@code ...}`, `{@literal ...}`, and any `{@...}` wrapper.
+- Refer to other methods or fields by **name in plain text** (e.g. “see readCrossValidationResultsTableFromUI”, “uses lastCrossValidationTableRowCount”).
+- Simple `@param` / `@return` lines are acceptable where they already match project style (e.g. `Libs/CustomKeywords.groovy`); prefer plain sentences for new keywords when either style works.
 

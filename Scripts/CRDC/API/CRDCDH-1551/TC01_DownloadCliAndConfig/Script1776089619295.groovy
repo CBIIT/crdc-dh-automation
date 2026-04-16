@@ -8,7 +8,7 @@ import internal.GlobalVariable
  * CRDCDH-1551 — TC01 Download CLI and config
  *
  *  1. createSubmission — new submission; save _id to GlobalVariable.LastApiSubmissionId.
- *  2. UI — login, open Uploader CLI dialog, download four platform zips to project Downloads; close dialog.
+ *  2. UI — clear project Downloads, open Uploader CLI dialog, download four platform zips; close dialog.
  *  3. retrieveCLIConfig — GraphQL query; verify YAML contains api-url, submission, placeholder paths, and profile token.
  *  4. generateValidationReport
  *
@@ -42,8 +42,6 @@ KeywordUtil.logInfo("GlobalVariable.LastApiSubmissionId: ${GlobalVariable.LastAp
 KeywordUtil.logInfo("New submission status: ${submissionStatus}")
 
 
-
-
 // Step 2 — UI: login, navigate to created DS, download CLI tool
 WebUI.closeBrowser()
 CustomKeywords.'utilities.Login.navigateToCrdc'()
@@ -59,6 +57,8 @@ final String CLI_ZIP_WIN = 'crdc-datahub-cli-uploader-windows.zip'
 final String CLI_ZIP_MAC_X64 = 'crdc-datahub-cli-uploader-mac-x64.zip'
 final String CLI_ZIP_MAC_ARM = 'crdc-datahub-cli-uploader-mac-arm.zip'
 final int CLI_DOWNLOAD_TIMEOUT_SEC = 120
+
+CustomKeywords.'utilities.Utils.clearProjectDownloadsFolder'()
 
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/DataUpload/CLIDownload-Link')
 WebUI.delay(1)

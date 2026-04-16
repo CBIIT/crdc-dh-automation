@@ -47,6 +47,13 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
+      <guid>a1390c01-1111-4a7b-9c00-139000000001</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1390/TC40_CRDC-CrossValidationExport_WithIssues</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
       <guid>3895be6f-f2ca-4ff9-8c22-f434a9836f1f</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
@@ -85,7 +92,7 @@
       <guid>18fddf8f-cd09-4527-8bf2-1884f22aa266</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1804/TC28_CRDC-VerifyDataViewDeleteRecordsTooltips</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1804/TC14_CRDC-VerifyDataViewDeleteRecordsTooltips</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
