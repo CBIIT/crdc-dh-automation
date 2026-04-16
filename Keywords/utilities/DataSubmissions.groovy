@@ -751,8 +751,6 @@ class DataSubmissions extends TestRunner {
 		KeywordUtil.logInfo("clickValidationResultsExportAndVerifyDownloadedFileName: verified downloaded file: ${fileName} (submission name: ${namePart})")
 	}
 
-	
-
 	// ------------------------------- Validation Results vs expected TSV -------------------------------
 
 	/**
