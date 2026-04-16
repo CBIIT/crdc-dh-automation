@@ -53,8 +53,7 @@ WebUI.click(findTestObject('CRDC/NavBar/SubmissionRequest-Tab'))
 WebUI.waitForElementPresent(findTestObject('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn'), 5)
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn'))
 WebUI.delay(1)
-WebUI.waitForElementPresent(findTestObject('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn'), 5)
-WebUI.click(findTestObject('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn'))
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn')
 
 CustomKeywords.'utilities.SubmissionRequest.verifyStatusBar'('NEW')
 
