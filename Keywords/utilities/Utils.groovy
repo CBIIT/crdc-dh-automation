@@ -760,4 +760,39 @@ public class Utils {
 		}
 		KeywordUtil.markFailed("waitForFileInProjectDownloads: timeout after " + timeoutSeconds + "s for '" + fileName + "' in " + dir.getAbsolutePath());
 	}
+
+	/**
+	 * Deletes every file in the project Downloads directory (same path as waitForFileInProjectDownloads
+	 * and CustomBrowserDriver). Subdirectories are not removed; only direct child files are deleted
+	 * (including *.crdownload partial downloads). No-op when the folder is empty or missing (creates the folder if absent).
+	 */
+	@Keyword
+	public static void clearProjectDownloadsFolder() {
+		File dir = new File(RunConfiguration.getProjectDir(), "Downloads");
+		if (!dir.exists()) {
+			dir.mkdirs();
+			KeywordUtil.logInfo("clearProjectDownloadsFolder: created empty " + dir.getAbsolutePath());
+			return;
+		}
+		if (!dir.isDirectory()) {
+			KeywordUtil.logError("clearProjectDownloadsFolder: path exists but is not a directory: " + dir.getAbsolutePath());
+			return;
+		}
+		File[] entries = dir.listFiles();
+		if (entries == null) {
+			KeywordUtil.logInfo("clearProjectDownloadsFolder: could not list " + dir.getAbsolutePath());
+			return;
+		}
+		int removed = 0;
+		for (File f : entries) {
+			if (f.isFile()) {
+				if (f.delete()) {
+					removed++;
+				} else {
+					KeywordUtil.logError("clearProjectDownloadsFolder: failed to delete " + f.getAbsolutePath());
+				}
+			}
+		}
+		KeywordUtil.logInfo("clearProjectDownloadsFolder: removed " + removed + " file(s) under " + dir.getAbsolutePath());
+	}
 }

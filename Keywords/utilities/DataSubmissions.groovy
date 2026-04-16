@@ -712,6 +712,7 @@ class DataSubmissions extends TestRunner {
 	 */
 	@Keyword
 	void clickValidationResultsExportAndVerifyDownloadedFileName(String expectedSubmissionName) {
+		Utils.clearProjectDownloadsFolder()
 		TestObject exportBtn = findTestObject("CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults")
 		if (!WebUIUtils.waitForElementClickableWithStaleRetry(exportBtn, 60)) {
 			return
@@ -2318,12 +2319,14 @@ class DataSubmissions extends TestRunner {
 	/**
 	 * Clicks the Cross Validation Results export button (export-cross-validation-button), then verifies the
 	 * downloaded file name matches {submissionName}-cross-validation-results-YYYY-MM-DD.csv in project Downloads.
+	 * Clears project Downloads first (Utils.clearProjectDownloadsFolder) so the new export is unambiguous.
 	 * Assumes caller is on Cross Validation Results tab with export enabled.
 	 *
 	 * @param expectedSubmissionName Submission display name (normalized prefix must match UI export filename).
 	 */
 	@Keyword
 	void clickCrossValidationExportAndVerifyDownloadedFileName(String expectedSubmissionName) {
+		Utils.clearProjectDownloadsFolder()
 		TestObject exportBtn = findTestObject("CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Filters/ExportCrossValidation-Btn")
 		if (!WebUIUtils.waitForElementClickableWithStaleRetry(exportBtn, 60)) {
 			return
@@ -2401,7 +2404,13 @@ class DataSubmissions extends TestRunner {
 	 * Verifies the most recently downloaded Cross Validation CSV has the same number of data rows as the
 	 * Cross Validation table in the UI. Uses lastCrossValidationTableRowCount set by
 	 * readCrossValidationResultsTableFromUI (e.g. inside verifyCrossValidationResultsVsExpected).
-	 * If that was never set, re-reads the table. Call after clickCrossValidationExportAndVerifyDownloadedFileName.
+	 * If that was never set (still -1), re-reads the table. Call after clickCrossValidationExportAndVerifyDownloadedFileName.
+	 * Clears project Downloads in a finally block after reading the CSV.
+	 *
+	 * Note: lastCrossValidationTableRowCount is static. If another test in the same Katalon run set it and
+	 * this keyword runs without a prior readCrossValidationResultsTableFromUI in that test, the count could
+	 * be stale. Export coverage (e.g. CRDCDH-1390 TC40) is intended to run standalone or early in a suite;
+	 * reorder or force a table re-read if you chain many CV tests in one session.
 	 */
 	@Keyword
 	void verifyCrossValidationExportCsvRowCountMatchesUi() {
@@ -2414,16 +2423,21 @@ class DataSubmissions extends TestRunner {
 		File latest = findLatestFile(projectDownloads)
 		if (latest == null) {
 			KeywordUtil.markFailed("verifyCrossValidationExportCsvRowCountMatchesUi: no file in Downloads")
+			Utils.clearProjectDownloadsFolder()
 			return
 		}
-		int csvDataRows = countCsvDataRowsExcludingHeader(latest)
-		String status = (csvDataRows == uiRows) ? "Pass" : "Fail"
-		ValidationReport.addValidationReportItem(CROSS_VAL_EXPORT_SECTION, "CSV data rows vs UI table rows",
-				String.valueOf(uiRows), String.valueOf(csvDataRows), status)
-		if (status == "Fail") {
-			KeywordUtil.markFailed("verifyCrossValidationExportCsvRowCountMatchesUi: UI had ${uiRows} row(s), CSV has ${csvDataRows} data row(s) in ${latest.name}")
-			return
+		try {
+			int csvDataRows = countCsvDataRowsExcludingHeader(latest)
+			String status = (csvDataRows == uiRows) ? "Pass" : "Fail"
+			ValidationReport.addValidationReportItem(CROSS_VAL_EXPORT_SECTION, "CSV data rows vs UI table rows",
+					String.valueOf(uiRows), String.valueOf(csvDataRows), status)
+			if (status == "Fail") {
+				KeywordUtil.markFailed("verifyCrossValidationExportCsvRowCountMatchesUi: UI had ${uiRows} row(s), CSV has ${csvDataRows} data row(s) in ${latest.name}")
+				return
+			}
+			KeywordUtil.logInfo("verifyCrossValidationExportCsvRowCountMatchesUi: ${csvDataRows} CSV data row(s) matches ${uiRows} UI row(s) in ${latest.name}")
+		} finally {
+			Utils.clearProjectDownloadsFolder()
 		}
-		KeywordUtil.logInfo("verifyCrossValidationExportCsvRowCountMatchesUi: ${csvDataRows} CSV data row(s) matches ${uiRows} UI row(s) in ${latest.name}")
 	}
 }

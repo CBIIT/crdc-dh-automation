@@ -50,7 +50,7 @@
       <guid>a1390c01-1111-4a7b-9c00-139000000001</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1390/TC01_CRDC-CrossValidationExport_WithIssues</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1390/TC40_CRDC-CrossValidationExport_WithIssues</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>

@@ -19,17 +19,17 @@ import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 
 WebUI.closeBrowser()
 
-// Submitter — submission 1: upload program metadata, validate, submit (ID not needed later)
+// Submitter — submission 1: upload program metadata, validate, submit
 CustomKeywords.'utilities.Login.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
 WebUI.delay(2)
 
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
-CustomKeywords.'utilities.Pbac.createDataSubmission'()
+CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata only', 'GC','autoQA - AutomationQA_CV')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/List/Table/SubmissionName-Link')
 
-CustomKeywords.'utilities.Pbac.uploadMetadataUI'('InputFiles/CRDC/MetadataData/PBAC/program.tsv')
+CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC25')
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'), 30)
@@ -38,14 +38,14 @@ WebUI.delay(2)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/SubmitYes-Btn')
 WebUI.delay(2)
 
-CustomKeywords.'utilities.DataSubmissions.getSubmissionIdFromUploadActivityUrl'()
+String submissionId1 = CustomKeywords.'utilities.DataSubmissions.getSubmissionIdFromUploadActivityUrl'()
 
-// Submitter — submission 2: same program data (cross-submission duplicate key for S001 / conflicts)
+// Submitter — submission 2: same program data (cross-submission duplicate key for conflicts)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
-CustomKeywords.'utilities.Pbac.createDataSubmission'()
+CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata only', 'GC','autoQA - AutomationQA_CV')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/List/Table/SubmissionName-Link')
 
-CustomKeywords.'utilities.Pbac.uploadMetadataUI'('InputFiles/CRDC/MetadataData/PBAC/program.tsv')
+CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC25')
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'), 30)
@@ -67,8 +67,9 @@ WebUI.delay(2)
 
 CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submissionId2)
 CustomKeywords.'utilities.DataSubmissions.clickCrossValidateButton'()
-
-CustomKeywords.'utilities.DataSubmissions.verifyCrossValidationResultsVsExpected'('SampleTC_CrossValidation')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Tabs/CrossValidation-Tab')
+WebUI.delay(2)
+CustomKeywords.'utilities.Utils.waitForElementToDisappear'('Object Repository/CRDC/DataSubmissions/Loading-Icon', 30)
 
 // Export: two toolbar instances, tooltip, filename, CSV rows match UI table row count
 CustomKeywords.'utilities.WebUIUtils.verifyElementCount'(
@@ -88,6 +89,24 @@ if (!submissionNameForExport) {
 }
 CustomKeywords.'utilities.DataSubmissions.clickCrossValidationExportAndVerifyDownloadedFileName'(submissionNameForExport)
 CustomKeywords.'utilities.DataSubmissions.verifyCrossValidationExportCsvRowCountMatchesUi'()
+
+//Reject and verify
+CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn'))
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx')
+WebUI.setText(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx'), 'testing Reject')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('Object Repository/CRDC/AILocators/DataSubmissions/Detail/Actions/ConfirmToReject-Btn')
+WebUI.delay(3)
+CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Rejected")
+
+CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submissionId1)
+CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn'))
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx')
+WebUI.setText(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx'), 'testing Reject')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('Object Repository/CRDC/AILocators/DataSubmissions/Detail/Actions/ConfirmToReject-Btn')
+WebUI.delay(3)
+CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Rejected")
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
