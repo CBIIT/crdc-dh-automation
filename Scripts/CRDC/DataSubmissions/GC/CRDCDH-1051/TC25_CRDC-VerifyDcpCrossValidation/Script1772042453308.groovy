@@ -46,11 +46,11 @@ CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
 WebUI.delay(2)
 
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
-CustomKeywords.'utilities.Pbac.createDataSubmission'()
+CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata only', 'GC','autoQA - AutomationQA_CV')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/List/Table/SubmissionName-Link')
 
 // Upload program metadata -- same program_acronym across both submissions (cross-validation key)
-CustomKeywords.'utilities.Pbac.uploadMetadataUI'('InputFiles/CRDC/MetadataData/PBAC/program.tsv')
+CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC25')
 
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
@@ -66,11 +66,11 @@ String submissionId1 = CustomKeywords.'utilities.DataSubmissions.getSubmissionId
 
 // Ccreate Submission 2, upload the SAME program data, validate, submit
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
-CustomKeywords.'utilities.Pbac.createDataSubmission'()
+CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata only', 'GC','autoQA - AutomationQA_CV')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/List/Table/SubmissionName-Link')
 
 // Upload program metadata again -- program_acronym values are identical to Submission 1, which will trigger cross-validation conflicts
-CustomKeywords.'utilities.Pbac.uploadMetadataUI'('InputFiles/CRDC/MetadataData/PBAC/program.tsv')
+CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC25')
 
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
@@ -100,9 +100,18 @@ CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submiss
 CustomKeywords.'utilities.DataSubmissions.clickCrossValidateButton'()
 
 // Verify the Cross Validation Results tab shows the expected conflicts.
-CustomKeywords.'utilities.DataSubmissions.verifyCrossValidationResultsVsExpected'('SampleTC_CrossValidation')
+CustomKeywords.'utilities.DataSubmissions.verifyCrossValidationResultsVsExpected'('TC25')
 
 //Reject and verify
+CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn'))
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx')
+WebUI.setText(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx'), 'testing Reject')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('Object Repository/CRDC/AILocators/DataSubmissions/Detail/Actions/ConfirmToReject-Btn')
+WebUI.delay(3)
+CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Rejected")
+
+CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submissionId1)
 CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn'))
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx')

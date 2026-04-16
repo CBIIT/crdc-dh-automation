@@ -18,4 +18,18 @@
       <testCaseId>Test Cases/CRDC/API/CRDCDH-1526/TC01_CreateSubmissionAndUpload</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>7f7daf0c-b576-4d8e-bbcd-13c6324d4a32</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/API/CRDCDH-1551/TC01_DownloadCliAndConfig</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>d1f0bea6-8e57-4ecd-8a73-4dd85fd7e980</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/API/CRDCDH-1551/TC02_GetSubmissionNodes</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>
