@@ -64,6 +64,7 @@ CustomKeywords.'utilities.SubmissionRequest.enterAdditionalContactInfo'(2)
 
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
+WebUI.delay(1)
 
 CustomKeywords.'utilities.SubmissionRequest.verifyStatusBar'('IN PROGRESS')
 

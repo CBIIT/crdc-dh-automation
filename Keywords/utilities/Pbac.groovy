@@ -794,6 +794,13 @@ class Pbac extends TestRunner {
 				SubmissionRequest.clickHome()
 				TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
 				//return WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Cancel-Btn"), 5, FailureHandling.OPTIONAL)
+				String loggedInUserName = WebUIUtils.getProfileName()
+				SubmissionRequestList.applySubmissionRequestsListFilters([
+					submitterName: loggedInUserName,
+					program: '',
+					study: '',
+					status: 'In Progress'
+				])
 				return WebUIUtils.fastElementPresent('CRDC/SubmissionRequest/Cancel-Btn')
 			} catch (Exception e) {
 				KeywordUtil.logInfo("Error verifying permission - submission_request:cancel -> ${e.message}")
