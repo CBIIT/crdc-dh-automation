@@ -698,7 +698,7 @@ class Pbac extends TestRunner {
 					//SR resume flow
 					TestRunner.clickTab('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
 					WebUI.delay(1)
-					TestRunner.clickTab('CRDC/SubmissionRequest/readAndAcceptPopUp-Btn')
+					TestRunner.clickTab('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn')
 					WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
 					TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
 					String loggedInUserName = WebUIUtils.getProfileName()
@@ -713,7 +713,7 @@ class Pbac extends TestRunner {
 					//SR create/submit flow
 					TestRunner.clickTab('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
 					WebUI.delay(1)
-					TestRunner.clickTab('CRDC/SubmissionRequest/readAndAcceptPopUp-Btn')
+					TestRunner.clickTab('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn')
 
 					SubmissionRequest.enterPrincipalInvestigatorInfo(2)
 					SubmissionRequest.enterPrimaryContactInfo(2)
