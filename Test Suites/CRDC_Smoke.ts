@@ -5,10 +5,10 @@
    <tag>smoke</tag>
    <isRerun>false</isRerun>
    <mailRecipient></mailRecipient>
-   <numberOfRerun>0</numberOfRerun>
+   <numberOfRerun>2</numberOfRerun>
    <pageLoadTimeout>30</pageLoadTimeout>
    <pageLoadTimeoutDefault>true</pageLoadTimeoutDefault>
-   <rerunFailedTestCasesOnly>false</rerunFailedTestCasesOnly>
+   <rerunFailedTestCasesOnly>true</rerunFailedTestCasesOnly>
    <rerunImmediately>false</rerunImmediately>
    <testSuiteGuid>f100d0c0-dead-4000-a000-0000c0dec001</testSuiteGuid>
    <testCaseLink>
