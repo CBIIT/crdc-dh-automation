@@ -74,7 +74,7 @@ CustomKeywords.'utilities.SubmissionRequest.enterFundingAgencyInfo'(1)
 
 CustomKeywords.'utilities.SubmissionRequest.enterExistingAndPlannedPublicationsInfo'(1)
 
-CustomKeywords.'utilities.SubmissionRequest.enterRepositoryInfo'('Clinical', 1)
+CustomKeywords.'utilities.SubmissionRequest.enterRepositoryInfo'(1)
 
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
@@ -110,7 +110,7 @@ CustomKeywords.'utilities.SubmissionRequest.verifyFundingAgencyAndDbGaPInfo'(1)
 
 CustomKeywords.'utilities.SubmissionRequest.verifyPublicationsInfo'(1)
 
-CustomKeywords.'utilities.SubmissionRequest.verifyRepositoryInfo'('Clinical', 1)
+CustomKeywords.'utilities.SubmissionRequest.verifyRepositoryInfo'(1)
 
 CustomKeywords.'utilities.SubmissionRequest.verifyDataAccessAndDiseaseInfo'('Cholangiocarcinoma', 'lung', 'Homo', 1)
 

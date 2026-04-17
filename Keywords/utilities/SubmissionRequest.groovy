@@ -56,7 +56,6 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
@@ -450,22 +449,37 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	}
 
 	/**
-	 * This function enters Repository information into the submission request form.
-	 * @param dropDownValue The value to select from the Data Types Submitted dropdown
-	 * @param dataRowNum Row number to read from the test data file
+	 * Enters Section B repository row: name, study id; if other-data-types is non-empty,
+	 * selects "Other" in Data Type(s) Submitted (MUI listbox) and fills Other Data Type(s).
+	 * If that column is empty, selects dataTypeWhenNoOtherText (default Clinical) only.
+	 * @param dataRowNum Row in CRDC/SubmissionRequest/section-b test data
 	 */
 	@Keyword
-	public static void enterRepositoryInfo(String dropDownValue, int dataRowNum) {
-		String objPath = 'CRDC/SubmissionRequest/Section-B/';
-		TestData testData = findTestData('CRDC/SubmissionRequest/section-b');
+	public static void enterRepositoryInfo(int dataRowNum) {
+		enterRepositoryInfo(dataRowNum, 'Clinical')
+	}
+
+	/**
+	 * @param dataRowNum Row in test data
+	 * @param dataTypeWhenNoOtherText Visible menu label when other-data-types is blank (e.g. Clinical)
+	 * When other-data-types is non-empty, tries listbox option Other first; if absent (older UI), selects Clinical then still fills Other Data Type(s) text.
+	 */
+	@Keyword
+	public static void enterRepositoryInfo(int dataRowNum, String dataTypeWhenNoOtherText) {
+		String objPath = 'CRDC/SubmissionRequest/Section-B/'
+		TestData testData = findTestData('CRDC/SubmissionRequest/section-b')
+		final String OTHER_DATA_TYPE_SUBMITTED_LABEL = 'Other'
+		final String FALLBACK_DATA_TYPE_SUBMITTED_LABEL = 'Clinical'
 
 		WebUI.click(findTestObject(objPath + 'AddRepository-Btn'))
 		Thread.sleep(1000)
 
+		String otherDtRaw = testData.getValue('other-data-types', dataRowNum)
+		String otherDt = (otherDtRaw != null) ? otherDtRaw.trim() : ''
+
 		Map<String, String> fields = [
 			'RepositoryName-Txtbx'   : 'repository-name',
 			'StudyID-Txtbx'          : 'study-id',
-			'OtherDataTypes-Txtbx'   : 'other-data-types'
 		]
 
 		fields.each { testObjectId, columnName ->
@@ -476,13 +490,50 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			KeywordUtil.logInfo("Successfully entered: " + value +" into "+ columnName+" field.");
 		}
 
-		// Handle dropdown selection
-		WebUI.click(findTestObject(objPath + 'DataTypesSubmitd-Dd'))
-		Thread.sleep(500)
-		GlobalVariable.CrdcUiElement = dropDownValue
-		WebUI.click(findTestObject('CRDC/SubmissionRequest/CrdcDdValue'))
-		GlobalVariable.CrdcUiElement="Proteomics";
-		WebUI.sendKeys(findTestObject('CRDC/SubmissionRequest/CrdcDdValue'), Keys.chord(Keys.TAB))
+		WebDriver driver = DriverFactory.getWebDriver()
+
+		if (!otherDt.isEmpty()) {
+			WebUI.click(findTestObject(objPath + 'DataTypesSubmitd-Dd'))
+			Thread.sleep(500)
+			TestObject dataTypesMenuOptionOther = new TestObject('SectionB_DataTypesSubmitted_Other')
+			dataTypesMenuOptionOther.addProperty('xpath', ConditionType.EQUALS,
+					"(//*[@role='listbox'])[last()]//li[normalize-space()='" + OTHER_DATA_TYPE_SUBMITTED_LABEL + "']", true)
+			boolean otherOptionVisible = WebUI.waitForElementVisible(dataTypesMenuOptionOther, 10, FailureHandling.OPTIONAL)
+			if (otherOptionVisible) {
+				WebUI.click(dataTypesMenuOptionOther)
+			} else {
+				KeywordUtil.logInfo(
+						"Data Type(s) Submitted: \"Other\" option not found; selecting \"" + FALLBACK_DATA_TYPE_SUBMITTED_LABEL + "\" for backward compatibility.")
+				TestObject dataTypesMenuOptionFallback = new TestObject('SectionB_DataTypesSubmitted_Clinical')
+				dataTypesMenuOptionFallback.addProperty('xpath', ConditionType.EQUALS,
+						"(//*[@role='listbox'])[last()]//li[normalize-space()='" + FALLBACK_DATA_TYPE_SUBMITTED_LABEL + "']", true)
+				WebUI.waitForElementVisible(dataTypesMenuOptionFallback, 10)
+				WebUI.click(dataTypesMenuOptionFallback)
+			}
+			new Actions(driver).sendKeys(Keys.ESCAPE).perform()
+			WebUI.delay(1)
+
+			TestObject otherTo = findTestObject(objPath + 'OtherDataTypes-Txtbx')
+			WebUI.waitForElementPresent(otherTo, 10)
+			WebUI.waitForElementClickable(otherTo, 15)
+			WebUI.scrollToElement(otherTo, 10)
+			WebElement otherInput = WebUI.findWebElement(otherTo, 10)
+			new Actions(driver).moveToElement(otherInput).click().perform()
+			otherInput.clear()
+			otherInput.sendKeys(otherDt)
+			otherInput.sendKeys(Keys.TAB)
+			WebUI.delay(1)
+			KeywordUtil.logInfo("Successfully entered: " + otherDt +" into other-data-types field.");
+		} else {
+			WebUI.click(findTestObject(objPath + 'DataTypesSubmitd-Dd'))
+			Thread.sleep(500)
+			TestObject dataTypesMenuOption = new TestObject('SectionB_DataTypesSubmitted_' + dataTypeWhenNoOtherText)
+			dataTypesMenuOption.addProperty('xpath', ConditionType.EQUALS,
+					"(//*[@role='listbox'])[last()]//li[normalize-space()='" + dataTypeWhenNoOtherText + "']", true)
+			WebUI.waitForElementVisible(dataTypesMenuOption, 10)
+			WebUI.click(dataTypesMenuOption)
+			new Actions(driver).sendKeys(Keys.ESCAPE).perform()
+		}
 	}
 
 
@@ -912,11 +963,11 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	}
 
 	/**
-	 *  This function verifies Repository information on the review page
-	 * @param dataFileRowNum Please add data file row number to be read
+	 * Verifies Repository information on the review page (name, study id, other data types text).
+	 * @param dataRowNum Row in CRDC/SubmissionRequest/section-b test data
 	 */
 	@Keyword
-	public static void verifyRepositoryInfo(String dropDownVlue, int dataRowNum) {
+	public static void verifyRepositoryInfo(int dataRowNum) {
 
 		ePath = "CRDC/SubmissionRequest/ReviewSubmit/";
 		TestData testData = findTestData("CRDC/SubmissionRequest/section-b");
@@ -930,16 +981,6 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		expctd = testData.getValue('study-id', dataRowNum)
 		KeywordUtil.logInfo("Actual Study ID is: " + actual +" Expected Study ID is: "+expctd);
 		WebUI.verifyMatch(actual, expctd, false)
-
-
-		//Add code to verify DATA TYPE(S) SUBMITTED. Add if condition. i.e. if is clinical then do.... by checking current ui value
-		//See below code to come up with a logic
-		//WebUI.click(findTestObject(ePath+'DataTypesSubmitd-Dd'));
-		//Thread.sleep(500);
-		//GlobalVariable.CrdcUiElement=dropDownVlue;
-		//WebUI.click(findTestObject('CRDC/SubmissionRequest/CrdcDdValue'));
-		//GlobalVariable.CrdcUiElement="Proteomics";
-		//WebUI.sendKeys(findTestObject('CRDC/SubmissionRequest/CrdcDdValue'), Keys.chord(Keys.TAB))
 
 		actual = WebUI.getText(findTestObject(ePath+'RepositoryOtherDataTypes-Txt'))
 		expctd = testData.getValue('other-data-types', dataRowNum)
