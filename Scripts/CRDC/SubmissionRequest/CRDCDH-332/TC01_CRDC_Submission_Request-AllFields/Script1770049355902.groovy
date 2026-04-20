@@ -42,9 +42,9 @@ import java.nio.file.Paths as Paths
 WebUI.closeBrowser()
 
 CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
+WebUI.setViewPortSize(1920, 1080)
 
 CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Submitter')
-WebUI.setViewPortSize(1920, 1080)
 
 WebUI.delay(2)
 WebUI.waitForElementPresent(findTestObject('CRDC/NavBar/SubmissionRequest-Tab'), 10)
@@ -64,7 +64,6 @@ CustomKeywords.'utilities.SubmissionRequest.enterAdditionalContactInfo'(2)
 
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
-WebUI.delay(1)
 
 CustomKeywords.'utilities.SubmissionRequest.verifyStatusBar'('IN PROGRESS')
 
