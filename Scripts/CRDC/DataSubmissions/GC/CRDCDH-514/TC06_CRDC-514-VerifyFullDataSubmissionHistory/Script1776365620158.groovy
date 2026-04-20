@@ -48,6 +48,7 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab'
 CustomKeywords.'utilities.Pbac.createDataSubmission'()
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 WebUI.delay(2)
+CustomKeywords.'utilities.Utils.waitForElementToDisappear'('CRDC/DataSubmissions/Loading-Icon', 60)
 CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "New")
 //Upload metadata file
 CustomKeywords.'utilities.Pbac.prepareUniqueMetadataAndUpload'('InputFiles/CRDC/MetadataData/PBAC/program.tsv', "program_acronym")
@@ -139,6 +140,5 @@ CustomKeywords.'utilities.DataSubmissions.verifyFullSubmissionHistory'(expectedH
 
 //Generate HTML report
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
-
 
 WebUI.closeBrowser()
