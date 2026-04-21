@@ -130,4 +130,11 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027-Partial/TC34_CRDC-3027-CLIArchiveManifestMissingColumn</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>373473f2-4f71-4bb2-b6d8-9df28591c905</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3027-Partial/TC30_CRDC-3027-CLIMissingArchiveManifest</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>
