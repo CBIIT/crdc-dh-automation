@@ -60,6 +60,7 @@ CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/Dat
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'), 30)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Submit-Btn')
 WebUI.delay(2) //race condition for Yes button
+CustomKeywords.'utilities.Utils.waitForElementToAppear'('CRDC/DataSubmissions/SubmitYes-Btn', 30)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/SubmitYes-Btn')
 //Get Submission ID
 String submissionIdMetadataOnly = CustomKeywords.'utilities.DataSubmissions.getSubmissionIdFromUploadActivityUrl'()
