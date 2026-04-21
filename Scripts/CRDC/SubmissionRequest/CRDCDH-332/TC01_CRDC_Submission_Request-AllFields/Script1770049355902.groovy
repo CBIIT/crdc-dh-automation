@@ -42,9 +42,9 @@ import java.nio.file.Paths as Paths
 WebUI.closeBrowser()
 
 CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
+WebUI.setViewPortSize(1920, 1080)
 
 CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Submitter')
-WebUI.setViewPortSize(1920, 1080)
 
 WebUI.delay(2)
 WebUI.waitForElementPresent(findTestObject('CRDC/NavBar/SubmissionRequest-Tab'), 10)
@@ -53,8 +53,7 @@ WebUI.click(findTestObject('CRDC/NavBar/SubmissionRequest-Tab'))
 WebUI.waitForElementPresent(findTestObject('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn'), 5)
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn'))
 WebUI.delay(1)
-WebUI.waitForElementPresent(findTestObject('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn'), 5)
-WebUI.click(findTestObject('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn'))
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn')
 
 CustomKeywords.'utilities.SubmissionRequest.verifyStatusBar'('NEW')
 
@@ -75,7 +74,7 @@ CustomKeywords.'utilities.SubmissionRequest.enterFundingAgencyInfo'(1)
 
 CustomKeywords.'utilities.SubmissionRequest.enterExistingAndPlannedPublicationsInfo'(1)
 
-CustomKeywords.'utilities.SubmissionRequest.enterRepositoryInfo'('Clinical', 1)
+CustomKeywords.'utilities.SubmissionRequest.enterRepositoryInfo'(1)
 
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
@@ -111,7 +110,7 @@ CustomKeywords.'utilities.SubmissionRequest.verifyFundingAgencyAndDbGaPInfo'(1)
 
 CustomKeywords.'utilities.SubmissionRequest.verifyPublicationsInfo'(1)
 
-CustomKeywords.'utilities.SubmissionRequest.verifyRepositoryInfo'('Clinical', 1)
+CustomKeywords.'utilities.SubmissionRequest.verifyRepositoryInfo'(1)
 
 CustomKeywords.'utilities.SubmissionRequest.verifyDataAccessAndDiseaseInfo'('Cholangiocarcinoma', 'lung', 'Homo', 1)
 

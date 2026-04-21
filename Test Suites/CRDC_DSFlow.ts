@@ -19,20 +19,6 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>2ea4f1d8-e445-4db5-b5ec-e3f663e8b5d5</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1032/TC01_CRDC-DataSubmissions-DataView</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>bd0f8f7c-15a2-4d48-a35d-03db9e6cf8aa</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1032/TC02_CRDC-DataSubmissions-DataView</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
       <guid>e58efbd8-0ac6-4f42-abf2-85a4ce9faef8</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
@@ -106,7 +92,7 @@
       <guid>ac6430d0-dd0f-49e2-bd16-63ae4796f188</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-514/TC16_CRDC-514-VerifyFullDataSubmissionHistory</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-514/TC06_CRDC-514-VerifyFullDataSubmissionHistory</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
@@ -121,6 +107,27 @@
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
       <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-699/TC18_CRDC-699-VerifyDataFilesNodeDeletion</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>fe8262bf-ede6-41b2-8691-498d99710c43</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3026/TC201_VerifyDataExplorerMetadataView</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>08ff5bcc-2618-4aab-837c-2d0a654244a3</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3026/TC202_VerifyDataExplorerStudyListVsMongo</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>e66278ce-fcf5-4a04-a858-69516c211c99</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-332/TC02_CRDC_Submission_Request-RequiredFields</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>

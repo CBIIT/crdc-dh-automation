@@ -42,10 +42,9 @@ import java.nio.file.Paths as Paths
 WebUI.closeBrowser()
 
 CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
-
-CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Submitter')
 WebUI.setViewPortSize(1920, 1080)
 
+CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Submitter')
 
 WebUI.delay(2)
 WebUI.waitForElementVisible(findTestObject('CRDC/NavBar/SubmissionRequest-Tab'), 10)
@@ -55,8 +54,8 @@ WebUI.waitForElementPresent(findTestObject('CRDC/SubmissionRequest/Start_a_Submi
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
 
 WebUI.delay(1)
-WebUI.waitForElementPresent(findTestObject('CRDC/SubmissionRequest/readAndAcceptPopUp-Btn'), 5)
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/SubmissionRequest/readAndAcceptPopUp-Btn')
+WebUI.waitForElementPresent(findTestObject('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn'), 5)
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn')
 
 CustomKeywords.'utilities.SubmissionRequest.verifyStatusBar'('NEW')
 CustomKeywords.'utilities.SubmissionRequest.enterPrincipalInvestigatorInfo'(2)
@@ -73,6 +72,7 @@ CustomKeywords.'utilities.SubmissionRequest.enterStudyInfo'(1)
 CustomKeywords.'utilities.SubmissionRequest.enterFundingAgencyInfo'(1)
 
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
+CustomKeywords.'utilities.SubmissionRequest.waitForSubmissionRequestSaveSuccess'()
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
 
 CustomKeywords.'utilities.SubmissionRequest.enterDataAccessTypeAndDbGapRegInfo'('Controlled', 'Yes')
@@ -80,6 +80,7 @@ CustomKeywords.'utilities.SubmissionRequest.enterDataAccessTypeAndDbGapRegInfo'(
 CustomKeywords.'utilities.SubmissionRequest.enterCancerTypeAndSubjectsInfo'('Cholangiocarcinoma', 'Homo', 1)
 
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
+CustomKeywords.'utilities.SubmissionRequest.waitForSubmissionRequestSaveSuccess'()
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
 WebUI.delay(2)
 //CustomKeywords.'utilities.SubmissionRequest.verifyStatusBar'('IN PROGRESS')
@@ -90,6 +91,7 @@ CustomKeywords.'utilities.SubmissionRequest.selectDataTypes'('genomics', 'proteo
 CustomKeywords.'utilities.SubmissionRequest.selectFileTypes'(5, 6, 1, 1)
 
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
+CustomKeywords.'utilities.SubmissionRequest.waitForSubmissionRequestSaveSuccess'()
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
 
 //Verification starts here

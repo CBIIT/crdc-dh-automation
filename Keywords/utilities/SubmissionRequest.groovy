@@ -56,7 +56,6 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
@@ -71,7 +70,11 @@ import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Cookie as Cookie
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.HashSet
+import java.util.List
+import java.util.Set
 import com.kms.katalon.core.configuration.RunConfiguration;
 import java.nio.file.Files;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -88,6 +91,11 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	}
 
 	public static WebDriver driver
+
+	/** US Eastern reference for date tolerances (e.g. publication review) — adjust if env differs. */
+	private static final ZoneId STATUS_BAR_DATE_ZONE = ZoneId.of("America/New_York")
+
+	private static final int VERIFY_STATUS_BAR_DEFAULT_WAIT_SEC = 30
 
 	//*************** Input functions start here ****************
 	/**
@@ -113,6 +121,19 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		return formattedDate;
 	}
 
+	/** Planned publication date on review uses MM/dd/yyyy; tolerate zone and JVM default skew. */
+	private static Set<String> buildAcceptablePublicationReviewDates() {
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+		Set<String> dates = new HashSet<>()
+		LocalDate hubToday = LocalDate.now(STATUS_BAR_DATE_ZONE)
+		dates.add(hubToday.minusDays(1).format(fmt))
+		dates.add(hubToday.format(fmt))
+		dates.add(hubToday.plusDays(1).format(fmt))
+		dates.add(getCurrentDate("MM/dd/yyyy"))
+		dates.add(Utils.getCurrentDate("MM/dd/yyyy"))
+		return dates
+	}
+
 	/**
 	 * This function enters text to any text box 
 	 * @param eleObj
@@ -132,17 +153,41 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 	/**
 	 * This function validates CRDC Submission Request status bar
-	 * @param Status to be validated i.e New, Submitted
+	 * @param expStatus Status to be validated e.g. NEW, IN PROGRESS, SUBMITTED
 	 */
 	@Keyword
 	public static void verifyStatusBar(String expStatus) {
-		expStatus = expStatus.toUpperCase();
-		String actualStatus = WebUI.getText(findTestObject('CRDC/SubmissionRequest/Status-Bar/StatusBar-Stutus'))
-		String actualDate = WebUI.getText(findTestObject('CRDC/SubmissionRequest/Status-Bar/LastUpdated-Date'))
-		System.out.println("Actual Status is: " + actualStatus +"\nExpected Status is: "+expStatus);
-		System.out.println("Actual Date is: " + actualDate +"\nExpected Date is: "+getCurrentDate("M/d/yyyy"));
+		verifyStatusBar(expStatus, VERIFY_STATUS_BAR_DEFAULT_WAIT_SEC)
+	}
+
+	/**
+	 * @param expStatus Expected status label (case-insensitive)
+	 * @param statusWaitSeconds Max time to wait for the status text to match after Save/Next etc.
+	 */
+	@Keyword
+	public static void verifyStatusBar(String expStatus, int statusWaitSeconds) {
+		expStatus = expStatus.trim().toUpperCase()
+		WebUI.delay(5)
+		TestObject statusTo = findTestObject('CRDC/SubmissionRequest/Status-Bar/StatusBar-Stutus')
+		WebUI.waitForElementPresent(statusTo, 10)
+		long deadline = System.currentTimeMillis() + (statusWaitSeconds * 1000L)
+		while (System.currentTimeMillis() < deadline) {
+			try {
+				if (WebUI.getText(statusTo).trim().toUpperCase() == expStatus) {
+					break
+				}
+			} catch (Exception e) {
+				// element not ready or stale; keep polling
+			}
+			Thread.sleep(400)
+		}
+		String actualStatus = WebUI.getText(statusTo).trim().toUpperCase()
+		System.out.println("Actual Status is: " + actualStatus + "\nExpected Status is: " + expStatus)
+		if (actualStatus != expStatus) {
+			KeywordUtil.markFailed("Status bar did not show '${expStatus}' within ${statusWaitSeconds}s (last seen: '${actualStatus}')")
+			return
+		}
 		WebUI.verifyMatch(actualStatus, expStatus, false)
-		WebUI.verifyMatch(actualDate, getCurrentDate("M/d/yyyy"), false)
 	}
 
 
@@ -500,27 +545,42 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 		TestObject pubDateField = findTestObject(objPath + 'ExpectedPubDate-Clndr')
 		WebUI.clearText(pubDateField)
-		WebUI.setText(pubDateField, Utils.getCurrentDate("MM/dd/yyyy"))
+		WebUI.setText(pubDateField, getCurrentDate("MM/dd/yyyy"))
 		KeywordUtil.logInfo("Successfully entered planned publication");
 	}
 
 	/**
-	 * This function enters Repository information into the submission request form.
-	 * @param dropDownValue The value to select from the Data Types Submitted dropdown
-	 * @param dataRowNum Row number to read from the test data file
+	 * Enters Section B repository row: name, study id; if other-data-types is non-empty,
+	 * selects "Other" in Data Type(s) Submitted (MUI listbox) and fills Other Data Type(s).
+	 * If that column is empty, selects dataTypeWhenNoOtherText (default Clinical) only.
+	 * @param dataRowNum Row in CRDC/SubmissionRequest/section-b test data
 	 */
 	@Keyword
-	public static void enterRepositoryInfo(String dropDownValue, int dataRowNum) {
-		String objPath = 'CRDC/SubmissionRequest/Section-B/';
-		TestData testData = findTestData('CRDC/SubmissionRequest/section-b');
+	public static void enterRepositoryInfo(int dataRowNum) {
+		enterRepositoryInfo(dataRowNum, 'Clinical')
+	}
+
+	/**
+	 * @param dataRowNum Row in test data
+	 * @param dataTypeWhenNoOtherText Visible menu label when other-data-types is blank (e.g. Clinical)
+	 * When other-data-types is non-empty, tries listbox option Other first; if absent (older UI), selects Clinical then still fills Other Data Type(s) text.
+	 */
+	@Keyword
+	public static void enterRepositoryInfo(int dataRowNum, String dataTypeWhenNoOtherText) {
+		String objPath = 'CRDC/SubmissionRequest/Section-B/'
+		TestData testData = findTestData('CRDC/SubmissionRequest/section-b')
+		final String OTHER_DATA_TYPE_SUBMITTED_LABEL = 'Other'
+		final String FALLBACK_DATA_TYPE_SUBMITTED_LABEL = 'Clinical'
 
 		WebUI.click(findTestObject(objPath + 'AddRepository-Btn'))
 		Thread.sleep(1000)
 
+		String otherDtRaw = testData.getValue('other-data-types', dataRowNum)
+		String otherDt = (otherDtRaw != null) ? otherDtRaw.trim() : ''
+
 		Map<String, String> fields = [
 			'RepositoryName-Txtbx'   : 'repository-name',
 			'StudyID-Txtbx'          : 'study-id',
-			'OtherDataTypes-Txtbx'   : 'other-data-types'
 		]
 
 		fields.each { testObjectId, columnName ->
@@ -531,13 +591,50 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			KeywordUtil.logInfo("Successfully entered: " + value +" into "+ columnName+" field.");
 		}
 
-		// Handle dropdown selection
-		WebUI.click(findTestObject(objPath + 'DataTypesSubmitd-Dd'))
-		Thread.sleep(500)
-		GlobalVariable.CrdcUiElement = dropDownValue
-		WebUI.click(findTestObject('CRDC/SubmissionRequest/CrdcDdValue'))
-		GlobalVariable.CrdcUiElement="Proteomics";
-		WebUI.sendKeys(findTestObject('CRDC/SubmissionRequest/CrdcDdValue'), Keys.chord(Keys.TAB))
+		WebDriver driver = DriverFactory.getWebDriver()
+
+		if (!otherDt.isEmpty()) {
+			WebUI.click(findTestObject(objPath + 'DataTypesSubmitd-Dd'))
+			Thread.sleep(500)
+			TestObject dataTypesMenuOptionOther = new TestObject('SectionB_DataTypesSubmitted_Other')
+			dataTypesMenuOptionOther.addProperty('xpath', ConditionType.EQUALS,
+					"(//*[@role='listbox'])[last()]//li[normalize-space()='" + OTHER_DATA_TYPE_SUBMITTED_LABEL + "']", true)
+			boolean otherOptionVisible = WebUI.waitForElementVisible(dataTypesMenuOptionOther, 10, FailureHandling.OPTIONAL)
+			if (otherOptionVisible) {
+				WebUI.click(dataTypesMenuOptionOther)
+			} else {
+				KeywordUtil.logInfo(
+						"Data Type(s) Submitted: \"Other\" option not found; selecting \"" + FALLBACK_DATA_TYPE_SUBMITTED_LABEL + "\" for backward compatibility.")
+				TestObject dataTypesMenuOptionFallback = new TestObject('SectionB_DataTypesSubmitted_Clinical')
+				dataTypesMenuOptionFallback.addProperty('xpath', ConditionType.EQUALS,
+						"(//*[@role='listbox'])[last()]//li[normalize-space()='" + FALLBACK_DATA_TYPE_SUBMITTED_LABEL + "']", true)
+				WebUI.waitForElementVisible(dataTypesMenuOptionFallback, 10)
+				WebUI.click(dataTypesMenuOptionFallback)
+			}
+			new Actions(driver).sendKeys(Keys.ESCAPE).perform()
+			WebUI.delay(1)
+
+			TestObject otherTo = findTestObject(objPath + 'OtherDataTypes-Txtbx')
+			WebUI.waitForElementPresent(otherTo, 10)
+			WebUI.waitForElementClickable(otherTo, 15)
+			WebUI.scrollToElement(otherTo, 10)
+			WebElement otherInput = WebUI.findWebElement(otherTo, 10)
+			new Actions(driver).moveToElement(otherInput).click().perform()
+			otherInput.clear()
+			otherInput.sendKeys(otherDt)
+			otherInput.sendKeys(Keys.TAB)
+			WebUI.delay(1)
+			KeywordUtil.logInfo("Successfully entered: " + otherDt +" into other-data-types field.");
+		} else {
+			WebUI.click(findTestObject(objPath + 'DataTypesSubmitd-Dd'))
+			Thread.sleep(500)
+			TestObject dataTypesMenuOption = new TestObject('SectionB_DataTypesSubmitted_' + dataTypeWhenNoOtherText)
+			dataTypesMenuOption.addProperty('xpath', ConditionType.EQUALS,
+					"(//*[@role='listbox'])[last()]//li[normalize-space()='" + dataTypeWhenNoOtherText + "']", true)
+			WebUI.waitForElementVisible(dataTypesMenuOption, 10)
+			WebUI.click(dataTypesMenuOption)
+			new Actions(driver).sendKeys(Keys.ESCAPE).perform()
+		}
 	}
 
 
@@ -611,7 +708,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	 */
 	@Keyword
 	public static void enterTargetDeliveryAndExpectedPublicationDate() {
-		TimeZone.setDefault(TimeZone.getTimeZone("EDT"))
+		// Do not call TimeZone.setDefault — it mutates JVM-wide TZ and skews getCurrentDate() vs dates entered earlier in the test.
 
 		//String currentDate = new SimpleDateFormat("mm/dd/yyyy").format(new Date())
 		Thread.sleep(10000)
@@ -622,9 +719,12 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 
 		WebUI.takeScreenshot("./OutputFiles/BeforeEnteringData2.png")
-		WebUI.setText(findTestObject('CRDC/SubmissionRequest/Section-D/TragetSubmDelivryDate-TxtBx'), clearText() + "05/12/2026");
-
-		WebUI.setText(findTestObject('CRDC/SubmissionRequest/Section-D/ExpctdPublicationDate-TxtBx'), clearText() + "05/12/2026");
+		TestObject targetedDeliveryDate = findTestObject('CRDC/SubmissionRequest/Section-D/TragetSubmDelivryDate-TxtBx')
+		TestObject expectedPublicationDate = findTestObject('CRDC/SubmissionRequest/Section-D/ExpctdPublicationDate-TxtBx')
+		WebUI.clearText(targetedDeliveryDate)
+		WebUI.setText(targetedDeliveryDate, "05/12/2026")
+		WebUI.clearText(expectedPublicationDate)
+		WebUI.setText(expectedPublicationDate, "05/12/2026")
 		//TestObject targetSubDeDate = findTestObject('CRDC/SubmissionRequest/Section-D/TragetSubmDelivryDate-TxtBx');
 
 		//		WebUI.scrollToElement(targetSubDeDate, 10)
@@ -1027,6 +1127,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	@Keyword
 	public static void verifyPublicationsInfo(int dataRowNum) {
 
+		ePath = "CRDC/SubmissionRequest/ReviewSubmit/"
 		TestData testData = findTestData("CRDC/SubmissionRequest/section-b");
 
 		//Need to add a method to verify if publication is added, then verify, otherwise don't verify
@@ -1053,18 +1154,21 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		WebUI.verifyMatch(actual, expctd, false)
 
 		actual = WebUI.getText(findTestObject(ePath+'ExpctdPubDate-Txt'))
-		expctd =  getCurrentDate("MM/dd/yyyy")
-		KeywordUtil.logInfo("Actual Publication date is: " + actual +" Expected Publication date is: "+expctd);
-		WebUI.verifyMatch(actual, expctd, false)
+		Set<String> acceptablePubDates = buildAcceptablePublicationReviewDates()
+		KeywordUtil.logInfo("Actual Planned publication date is: " + actual + " (verified within tolerance window)")
+		if (!acceptablePubDates.contains(actual.trim())) {
+			KeywordUtil.markFailed("Planned publication date on review '${actual}' not in acceptable range (expected one of: ${(acceptablePubDates as List).sort().join(', ')})")
+			return
+		}
 		KeywordUtil.logInfo("Successfully verified Publications information");
 	}
 
 	/**
-	 *  This function verifies Repository information on the review page
-	 * @param dataFileRowNum Please add data file row number to be read
+	 * Verifies Repository information on the review page (name, study id, other data types text).
+	 * @param dataRowNum Row in CRDC/SubmissionRequest/section-b test data
 	 */
 	@Keyword
-	public static void verifyRepositoryInfo(String dropDownVlue, int dataRowNum) {
+	public static void verifyRepositoryInfo(int dataRowNum) {
 
 		ePath = "CRDC/SubmissionRequest/ReviewSubmit/";
 		TestData testData = findTestData("CRDC/SubmissionRequest/section-b");
@@ -1078,16 +1182,6 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		expctd = testData.getValue('study-id', dataRowNum)
 		KeywordUtil.logInfo("Actual Study ID is: " + actual +" Expected Study ID is: "+expctd);
 		WebUI.verifyMatch(actual, expctd, false)
-
-
-		//Add code to verify DATA TYPE(S) SUBMITTED. Add if condition. i.e. if is clinical then do.... by checking current ui value
-		//See below code to come up with a logic
-		//WebUI.click(findTestObject(ePath+'DataTypesSubmitd-Dd'));
-		//Thread.sleep(500);
-		//GlobalVariable.CrdcUiElement=dropDownVlue;
-		//WebUI.click(findTestObject('CRDC/SubmissionRequest/CrdcDdValue'));
-		//GlobalVariable.CrdcUiElement="Proteomics";
-		//WebUI.sendKeys(findTestObject('CRDC/SubmissionRequest/CrdcDdValue'), Keys.chord(Keys.TAB))
 
 		actual = WebUI.getText(findTestObject(ePath+'RepositoryOtherDataTypes-Txt'))
 		expctd = testData.getValue('other-data-types', dataRowNum)

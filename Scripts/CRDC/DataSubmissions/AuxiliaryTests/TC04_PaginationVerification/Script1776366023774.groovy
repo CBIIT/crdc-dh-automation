@@ -26,7 +26,7 @@ WebUI.closeBrowser()
 // Step 1: Login
 CustomKeywords.'utilities.Login.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
-CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
+CustomKeywords.'utilities.Login.loginToCrdcOtp'('Dcp')
 WebUI.delay(2)
 
 // Step 2: Navigate to Data Submissions list

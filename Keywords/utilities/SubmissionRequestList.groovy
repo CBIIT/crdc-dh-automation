@@ -7,8 +7,10 @@ import com.kms.katalon.core.webui.driver.DriverFactory
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
+import org.openqa.selenium.Keys
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
+import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.openqa.selenium.support.ui.ExpectedConditions
 
@@ -168,8 +170,13 @@ class SubmissionRequestList extends TestRunner {
 								KeywordUtil.logInfo("applySubmissionRequestsListFilters: Status option not found: '" + raw + "' - " + ex.getMessage())
 							}
 						}
-						WebUI.waitForElementClickable(findTestObject(listFilters + "/Status-Ddn"), 5)
-						WebUI.click(findTestObject(listFilters + "/Status-Ddn"))
+						WebUI.delay(1)
+						try {
+							new Actions(driver).sendKeys(Keys.ESCAPE).perform()
+						} catch (Exception ex) {
+							KeywordUtil.logInfo("applySubmissionRequestsListFilters: ESC to close Status dropdown: " + ex.getMessage())
+						}
+						WebUI.delay(1)
 					} else {
 						KeywordUtil.logInfo("applySubmissionRequestsListFilters: listbox not found; using single global li for first status value")
 						String v = statusValues.get(0).replace("'", "''")

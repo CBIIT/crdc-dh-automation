@@ -12,6 +12,7 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.openqa.selenium.support.ui.ExpectedConditions
+import org.openqa.selenium.interactions.Actions
 
 import java.util.ArrayList
 import java.util.List
@@ -147,9 +148,12 @@ class DataSubmissionsList extends TestRunner {
 								KeywordUtil.logInfo("applyDataSubmissionsListFilters: Status option not found: '" + raw + "' - " + ex.getMessage())
 							}
 						}
-						// Close dropdown
-						WebUI.waitForElementClickable(findTestObject(listFilters + "/Status-Ddn"), 5)
-						WebUI.click(findTestObject(listFilters + "/Status-Ddn"))
+						// Close dropdown			
+						try {
+							new Actions(driver).sendKeys(Keys.ESCAPE).perform()
+						} catch (Exception ex) {
+							KeywordUtil.logInfo("applySubmissionRequestsListFilters: ESC to close Status dropdown: " + ex.getMessage())
+						}
 					} else {
 						KeywordUtil.logInfo("applyDataSubmissionsListFilters: listbox not found; using single global li for first status value")
 						String v = statusValues.get(0).replace("'", "''")
