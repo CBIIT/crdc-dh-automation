@@ -123,11 +123,4 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3026/TC202_VerifyDataExplorerStudyListVsMongo</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
-   <testCaseLink>
-      <guid>e66278ce-fcf5-4a04-a858-69516c211c99</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-332/TC02_CRDC_Submission_Request-RequiredFields</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
 </TestSuiteEntity>

@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//*[@id=&apos;progress-bar-section-REVIEW&apos;]</value>
+         <value>//*[@id=&quot;progress-bar-section-review&quot;]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//*[@id=&apos;progress-bar-section-REVIEW&apos;]</value>
-      <webElementGuid>514d4711-7006-4afe-b60e-78238fe246ab</webElementGuid>
+      <value>//*[@id=&quot;progress-bar-section-review&quot;]</value>
+      <webElementGuid>5aa6b3c5-1f91-4921-b46c-378940a42030</webElementGuid>
    </webElementProperties>
 </WebElementEntity>

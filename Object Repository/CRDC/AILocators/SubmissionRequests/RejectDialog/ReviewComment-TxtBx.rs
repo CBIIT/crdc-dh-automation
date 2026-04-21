@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//*[@data-testid=&apos;review-comment&apos;]</value>
+         <value>//*[@name=&quot;reviewComment&quot;]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//*[@data-testid=&apos;review-comment&apos;]</value>
-      <webElementGuid>c30f8300-f3ee-4d70-b176-a9ece11cbbc7</webElementGuid>
+      <value>//*[@name=&quot;reviewComment&quot;]</value>
+      <webElementGuid>f8b5f4cd-a9dd-4e83-949e-fc7038eb7a88</webElementGuid>
    </webElementProperties>
 </WebElementEntity>

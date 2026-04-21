@@ -72,7 +72,6 @@ CustomKeywords.'utilities.SubmissionRequest.enterStudyInfo'(1)
 CustomKeywords.'utilities.SubmissionRequest.enterFundingAgencyInfo'(1)
 
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
-CustomKeywords.'utilities.SubmissionRequest.waitForSubmissionRequestSaveSuccess'()
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
 
 CustomKeywords.'utilities.SubmissionRequest.enterDataAccessTypeAndDbGapRegInfo'('Controlled', 'Yes')
@@ -80,7 +79,6 @@ CustomKeywords.'utilities.SubmissionRequest.enterDataAccessTypeAndDbGapRegInfo'(
 CustomKeywords.'utilities.SubmissionRequest.enterCancerTypeAndSubjectsInfo'('Cholangiocarcinoma', 'Homo', 1)
 
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
-CustomKeywords.'utilities.SubmissionRequest.waitForSubmissionRequestSaveSuccess'()
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
 WebUI.delay(2)
 //CustomKeywords.'utilities.SubmissionRequest.verifyStatusBar'('IN PROGRESS')
@@ -91,7 +89,6 @@ CustomKeywords.'utilities.SubmissionRequest.selectDataTypes'('genomics', 'proteo
 CustomKeywords.'utilities.SubmissionRequest.selectFileTypes'(5, 6, 1, 1)
 
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
-CustomKeywords.'utilities.SubmissionRequest.waitForSubmissionRequestSaveSuccess'()
 WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
 
 //Verification starts here

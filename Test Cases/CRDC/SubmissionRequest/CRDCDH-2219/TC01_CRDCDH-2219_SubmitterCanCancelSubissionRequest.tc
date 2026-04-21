@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC01_CRDCDH-2219_SubmitterCanCancelSubissionRequest</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>b295d45a-1be9-41c1-b213-b0cac447d738</testCaseGuid>
+</TestCaseEntity>

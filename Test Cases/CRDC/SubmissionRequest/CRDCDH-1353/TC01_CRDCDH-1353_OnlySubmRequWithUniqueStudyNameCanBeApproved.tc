@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC01_CRDCDH-1353_OnlySubmRequWithUniqueStudyNameCanBeApproved</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>f52e8a9a-6c27-43fd-9aec-723eae47c1e3</testCaseGuid>
+</TestCaseEntity>

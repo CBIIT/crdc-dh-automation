@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>CancelSubmissionRequest-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>8d87d778-b9b0-49c7-ae84-46c8231d5a27</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@name=&quot;comment&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@name=&quot;comment&quot;]</value>
+      <webElementGuid>9072687c-34eb-4d20-b60e-30ba11273745</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

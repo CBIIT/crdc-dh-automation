@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC01_CRDCDH-304_VerifyPrinInvInformationAutoPopulated</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>ac32054e-71e1-47a8-b2ca-d26b6f99b945</testCaseGuid>
+</TestCaseEntity>

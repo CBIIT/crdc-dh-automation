@@ -391,6 +391,7 @@ class ManageStudies extends TestRunner {
 	private static final String AUTO_PROGRAM = "auto_program"
 	private static final String AUTO_PROGRAM_DBGAP_ID = "phs000001"
 	private static final String AUTO_GPA = "Auto-GPA"
+	public static String autoStudyName
 
 	/**
 	 * Create a new study with no parameters: unique name "autoQA-Study-&lt;yyyyMMdd-HHmmss&gt;", acronym "autoQA-&lt;yyyyMMdd-HHmmss&gt;",
@@ -402,6 +403,7 @@ class ManageStudies extends TestRunner {
 	void addNewStudy() {
 		String ts = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date())
 		String name = "autoQA-Study-" + ts
+		autoStudyName = name
 		String acronym = "autoQA-" + ts
 		Map<String, Object> studyData = new LinkedHashMap<>()
 		studyData.put("name", name)

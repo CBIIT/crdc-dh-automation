@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC02_CRDCDH-2219_FedLeadCanCancelSubissionRequest</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>3e074b3c-9709-4d3e-b675-8f9c329e7e80</testCaseGuid>
+</TestCaseEntity>
