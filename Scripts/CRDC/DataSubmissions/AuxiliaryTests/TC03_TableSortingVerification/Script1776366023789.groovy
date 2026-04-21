@@ -7,12 +7,12 @@ import internal.GlobalVariable as GlobalVariable
  *
  * Target table: Data Submissions list (/data-submissions)
  * - Default sort: "Last Updated" descending
- * - All columns are sortable (no non-sortable columns in this view)
+ * - SRF column (QA2+): not sortable; all other columns are sortable
  *
  * Steps:
  *   1. Login as Submitter
  *   2. Navigate to Data Submissions list
- *   3. verifyTableColumnSortability -- confirm all columns are sortable
+ *   3. verifyTableColumnSortability -- sortable columns have sort control; SRF excluded
  *   4. verifyDefaultSortColumn -- confirm "Last Updated" desc is the default
  *   5. verifyColumnSortOnClick -- click-sort "Status" column (both asc and desc)
  *   6. verifyColumnSortOnClick -- click-sort "Data Commons" column (both asc and desc)
@@ -24,15 +24,15 @@ WebUI.closeBrowser()
 // Step 1: Login
 CustomKeywords.'utilities.Login.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
-CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
+CustomKeywords.'utilities.Login.loginToCrdcOtp'('Dcp')
 WebUI.delay(2)
 
 // Step 2: Navigate to Data Submissions list
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/Global/Header/Desktop/DataSubmissions-Tab')
 WebUI.delay(3)
 
-// Step 3: Verify column sortability (this table has no non-sortable columns)
-CustomKeywords.'utilities.WebUIUtils.verifyTableColumnSortability'([])
+// Step 3: Verify column sortability (New SRF column is not sortable-- added to list of non-sortable columns)
+CustomKeywords.'utilities.WebUIUtils.verifyTableColumnSortability'(['SRF'])
 
 // Step 4: Verify default sort column and direction
 CustomKeywords.'utilities.WebUIUtils.verifyDefaultSortColumn'('Last Updated', 'desc')

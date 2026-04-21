@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description></description>
-   <name>TC201_CRDCDH-3026-VerifyDataExplorerMetadataView</name>
+   <name>TC201_VerifyDataExplorerMetadataView</name>
    <tag>Filter</tag>
    <comment></comment>
    <recordOption>OTHER</recordOption>

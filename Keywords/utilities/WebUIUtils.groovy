@@ -253,6 +253,7 @@ class WebUIUtils {
 		WebUI.navigateToUrl(submissionUrl)
 		WebUI.waitForPageLoad(10)
 		WebUI.delay(2)
+		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 60)
 	}
 
 	/**
