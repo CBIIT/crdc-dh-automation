@@ -423,7 +423,7 @@ class Login extends TestRunner implements Comparator<List<XSSFCell>>{
 
 		WebUI.setText(findTestObject('CRDC/Login/Login.gov_UserEmail-TxtBx'), userEmail)
 		WebUI.setText(findTestObject('CRDC/Login/Login.gov_UserPass-TxtBx'), userPassword)
-		clickTab('CRDC/Login/Login.gov_SignIn-Btn')
+		clickTab('CRDC/Login/Login.gov_SignIn-Btn') 
 
 		String pythonPath = Utils.getPythonExecutablePath();
 		String scriptPath = "${System.getProperty('user.dir')}/PythonFiles/CRDC/GenerateOtp.py"
@@ -444,6 +444,15 @@ class Login extends TestRunner implements Comparator<List<XSSFCell>>{
 			String totpCode = generateTotp(userSecret)
 			println("Attempt ${otpAttempts + 1} - TOTP Code: ${totpCode}")
 
+			//handle the Rules of Use page that rarely comes up when rules are updated, and will block login unless Accepted by account
+			WebUI.delay(2)
+			String textOfPage = WebUI.getText(findTestObject('CRDC/AILocators/Login/RulesOfUseContent'))
+			println("Text of page: " + textOfPage)
+			if (textOfPage.contains("Rules of Use")){
+				clickTab('CRDC/AILocators/Login/RulesOfUseAccept-Chkbx')
+				clickTab('CRDC/AILocators/Login/RulesOfUseSubmit-Btn')
+			}
+			
 			WebUI.setText(findTestObject('CRDC/Login/Login.gov_OneTimeCode-TxtBx'), totpCode)
 			clickTab('CRDC/Login/Login.gov_OneTimeCode_Submit-Btn')
 

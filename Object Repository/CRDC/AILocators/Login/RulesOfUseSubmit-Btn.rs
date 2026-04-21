@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>RulesOfUseSubmit-Btn</name>
+   <tag></tag>
+   <elementGuidId>723e8f50-7578-41c7-8337-367474a9b2cb</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[.='Continue']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//button[.='Continue']</value>
+      <webElementGuid>8522062e-77b2-4af3-ad72-85553df5414e</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

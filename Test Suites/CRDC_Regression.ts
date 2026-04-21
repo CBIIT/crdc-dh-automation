@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestSuiteEntity>
-   <description>Full CRDC regression: all test cases under Test Cases/CRDC except CTDC and ICDC trees, SuiteSetup/EnableAllPermissions, CRDC_NotCompatibleOnJenkins cases, and AuxiliaryTests/TC17_VisionScreenshotComparison. Sorted alphabetically by test case id.</description>
+   <description>Full CRDC regression: all test cases under Test Cases/CRDC except CTDC and ICDC trees, SuiteSetup/EnableAllPermissions, CRDC_NotCompatibleOnJenkins cases, and AuxiliaryTests/TC17_VisionScreenshotComparison. Submission Request folder tests and TC12_SubmissionRequestsListAndFilter are at the top; remaining cases follow prior order.</description>
    <name>CRDC_Regression</name>
    <tag></tag>
    <isRerun>false</isRerun>
@@ -11,6 +11,48 @@
    <rerunFailedTestCasesOnly>false</rerunFailedTestCasesOnly>
    <rerunImmediately>false</rerunImmediately>
    <testSuiteGuid>d1b0be45-f326-49c0-a78d-fb006ac54f30</testSuiteGuid>
+   <testCaseLink>
+      <guid>6a8ff107-32ea-4268-9362-701e3a93f9a9</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-1353/TC01_CRDCDH-1353_OnlySubmRequWithUniqueStudyNameCanBeApproved</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>9018189a-ad2f-44fb-8131-013fdae656fc</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2171/TC01_CRDCDH-2219_FedLeadCanSubmitSubmissionRequest</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>564d99b7-4bfa-4e7d-9978-d7f25dae0aae</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2176/TC01_CRDCDH-2176_VerifyProgramAutoSavedOnSubRequestApproval</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>a02cd687-05e3-45aa-aaf7-a5004563bd2e</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2219/TC01_CRDCDH-2219_SubmitterCanCancelSubissionRequest</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>595275c0-cd4f-44a8-910b-51b3aaeaa1ad</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2219/TC02_CRDCDH-2219_FedLeadCanCancelSubissionRequest</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>bf91a8fd-7283-46e1-a797-771f23c0d38e</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-304/TC01_CRDCDH-304_VerifyPrinInvInformationAutoPopulated</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
    <testCaseLink>
       <guid>c23dd953-080c-4fcf-a552-8dc8b5c794b2</guid>
       <isReuseDriver>false</isReuseDriver>
@@ -23,6 +65,13 @@
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
       <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-332/TC02_CRDC_Submission_Request-RequiredFields</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>b494a1dc-8098-4323-a6a7-5ee704efdab3</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-564/TC01_CRDCDH-564_ReviewCanRejectSubissionRequest</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
@@ -502,6 +551,13 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
+      <guid>e9fb1a2a-78be-4a10-b38f-da22080e1301</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/EnableAllPermissions</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
       <guid>bf7682bd-f843-4ca4-9835-01d4d79f8fd3</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
@@ -618,55 +674,6 @@
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
       <testCaseId>Test Cases/CRDC/Pbac/TC17_CRDC-PbacManageScope-Fedlead</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>6a8ff107-32ea-4268-9362-701e3a93f9a9</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-1353/TC01_CRDCDH-1353_OnlySubmRequWithUniqueStudyNameCanBeApproved</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>9018189a-ad2f-44fb-8131-013fdae656fc</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2171/TC01_CRDCDH-2219_FedLeadCanSubmitSubmissionRequest</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>564d99b7-4bfa-4e7d-9978-d7f25dae0aae</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2176/TC01_CRDCDH-2176_VerifyProgramAutoSavedOnSubRequestApproval</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>a02cd687-05e3-45aa-aaf7-a5004563bd2e</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2219/TC01_CRDCDH-2219_SubmitterCanCancelSubissionRequest</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>595275c0-cd4f-44a8-910b-51b3aaeaa1ad</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2219/TC02_CRDCDH-2219_FedLeadCanCancelSubissionRequest</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>bf91a8fd-7283-46e1-a797-771f23c0d38e</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-304/TC01_CRDCDH-304_VerifyPrinInvInformationAutoPopulated</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>b494a1dc-8098-4323-a6a7-5ee704efdab3</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-564/TC01_CRDCDH-564_ReviewCanRejectSubissionRequest</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>
