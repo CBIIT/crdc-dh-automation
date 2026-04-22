@@ -233,7 +233,12 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			String existingValue = WebUI.getAttribute(to, 'value')
 			String newValue = testData.getValue(columnName, dataRowNum)
 
-			if (existingValue?.trim()) {
+			// Profile auto-fill can pre-populate PI email; Review verification expects test data—always overwrite email.
+			if (columnName == 'pi-email') {
+				WebUI.clearText(to)
+				WebUI.setText(to, newValue)
+				KeywordUtil.logInfo("PI email set from test data (overwrote pre-filled value if any: ${existingValue}): ${newValue}")
+			} else if (existingValue?.trim()) {
 				KeywordUtil.logInfo("Skipping field ${columnName} because it already has value: ${existingValue}")
 			} else {
 				WebUI.clearText(to)
