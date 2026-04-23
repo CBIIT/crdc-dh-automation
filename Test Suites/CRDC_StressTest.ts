@@ -12,87 +12,73 @@
    <rerunImmediately>true</rerunImmediately>
    <testSuiteGuid>520a73fd-4575-400c-a3a4-caf41ed5ffde</testSuiteGuid>
    <testCaseLink>
-      <guid>5a4a7314-51f7-4ff1-b202-1a9cbf25244d</guid>
+      <guid>e579a4da-3331-479b-bc13-ccd314f1dbd5</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/EnableAllPermissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-332/TC01_CRDC_Submission_Request-AllFields</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>1fbece06-3fa4-4bba-a475-f7f8ff8893c9</guid>
+      <guid>ce4557cb-deb6-4ea8-a03d-c1cf1b765242</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/DisableAllPermissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-332/TC01_CRDC_Submission_Request-AllFields</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>ba469a45-6f54-4b83-abd7-c334e711e8e3</guid>
+      <guid>41d11ea7-3d48-4a05-8a5b-62b0084fdee2</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/EnableAllPermissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-332/TC01_CRDC_Submission_Request-AllFields</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>a570de5c-b995-4b91-8627-d981ead824f9</guid>
+      <guid>3fa50f1c-4ada-4ccc-830c-cb0c5e7a18d5</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/DisableAllPermissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-332/TC01_CRDC_Submission_Request-AllFields</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>1cbc593d-a454-45cf-b1b3-0a1d26be5bed</guid>
+      <guid>a9b1c98e-bd20-4f02-9fd5-6f22b8937738</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/EnableAllPermissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-332/TC01_CRDC_Submission_Request-AllFields</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>3f054968-193b-4a02-99b5-74cf7a319ebb</guid>
+      <guid>218e4589-030d-439e-860a-f42be86a9c54</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/DisableAllPermissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1163/TC16_CRDC-1163-DCPValidationAfterSubmissionSubmittedMetadata</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>9f56e4cb-b738-48bd-b868-d38147ee1fcb</guid>
+      <guid>31f174bc-13b2-44e9-b7e3-97588c75aec2</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/EnableAllPermissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1163/TC16_CRDC-1163-DCPValidationAfterSubmissionSubmittedMetadata</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>657fdb44-37a2-4803-874d-085a0c65f8d0</guid>
+      <guid>6a4087f9-48aa-4f62-8c23-801e35643bec</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/DisableAllPermissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1163/TC16_CRDC-1163-DCPValidationAfterSubmissionSubmittedMetadata</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>0d2d95d3-7917-43a4-8e02-c7cb8bbbb3af</guid>
+      <guid>42a3931a-5098-4509-af4e-80445d90eae0</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/EnableAllPermissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1163/TC16_CRDC-1163-DCPValidationAfterSubmissionSubmittedMetadata</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>a05cfdfe-4109-4816-9c68-fc083513f622</guid>
+      <guid>8bb41fd4-056b-47a2-9bd2-796b460f8e92</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/DisableAllPermissions</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>e53496f9-5852-48b5-8446-15e18b34f5d4</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/EnableAllPermissions</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>a2e4938d-d757-49e1-9c1f-1162ff0c6637</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/DisableAllPermissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1163/TC16_CRDC-1163-DCPValidationAfterSubmissionSubmittedMetadata</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>
