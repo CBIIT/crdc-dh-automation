@@ -90,7 +90,7 @@ if (!submissionNameForExport) {
 CustomKeywords.'utilities.DataSubmissions.clickCrossValidationExportAndVerifyDownloadedFileName'(submissionNameForExport)
 CustomKeywords.'utilities.DataSubmissions.verifyCrossValidationExportCsvRowCountMatchesUi'()
 
-//Reject and verify
+//Reject submission2 and verify
 CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn'))
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx')
@@ -99,6 +99,7 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('Object Repository/CRDC/AILocator
 WebUI.delay(3)
 CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Rejected")
 
+//Reject submission1 and verify
 CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submissionId1)
 CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn'))
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn')

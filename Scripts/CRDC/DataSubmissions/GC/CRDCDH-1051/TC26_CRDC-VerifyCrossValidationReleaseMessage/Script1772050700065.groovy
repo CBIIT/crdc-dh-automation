@@ -74,4 +74,4 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('Object Repository/CRDC/AILocator
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
-WebUI.closeBrowser()
+//WebUI.closeBrowser()
