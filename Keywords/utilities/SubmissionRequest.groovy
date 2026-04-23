@@ -235,8 +235,11 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 			// Profile auto-fill can pre-populate PI email; Review verification expects test data—always overwrite email.
 			if (columnName == 'pi-email') {
-				WebUI.clearText(to)
-				WebUI.setText(to, newValue)
+				WebUI.scrollToElement(to, 20)
+				WebUI.waitForElementClickable(to, 20)
+				WebUI.click(to)
+				WebUIUtils.clearTextfieldByOs(to)
+				WebUI.sendKeys(to, newValue?.toString() ?: "")
 				KeywordUtil.logInfo("PI email set from test data (overwrote pre-filled value if any: ${existingValue}): ${newValue}")
 			} else if (existingValue?.trim()) {
 				KeywordUtil.logInfo("Skipping field ${columnName} because it already has value: ${existingValue}")
