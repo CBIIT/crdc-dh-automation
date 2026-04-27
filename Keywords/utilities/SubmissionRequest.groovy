@@ -408,6 +408,31 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	public static int lastEnteredStudyInfoDataRow
 
 	/**
+	 * Program title for an "Other" program last entered via {@link #enterProgramInfo(String, int)}:
+	 * {@code program-title} from test data for that row + {@link #programTimeStamp}.
+	 * Set with {@link #recordLastEnteredProgramNameForOtherProgramEntry(Object)} after the form is filled, for e.g. Manage Programs verification.
+	 */
+	public static String lastEnteredProgramName
+
+	/**
+	 * After {@link #enterProgramInfo(String, int)} with program {@code Other}, stores the program title that was written to the form
+	 * (same as {@code program-title} + {@link #programTimeStamp} at the given data row) into {@link #lastEnteredProgramName}.
+	 * Call with the same row index you passed to {@link #enterProgramInfo} (e.g. the third argument to {@link #fillSubmissionRequestAllSections} for program).
+	 *
+	 * @param programDataRow Row in {@code CRDC/SubmissionRequest/section-b} (accepts int, {@link Integer}, or numeric {@link String} from Katalon)
+	 */
+	@Keyword
+	public static void recordLastEnteredProgramNameForOtherProgramEntry(Object programDataRow) {
+		int programDataRow = parseTestDataRowIndex(programDataRow, 'recordLastEnteredProgramNameForOtherProgramEntry')
+		TestData testData = findTestData('CRDC/SubmissionRequest/section-b')
+		String base = testData.getValue('program-title', programDataRow)
+		base = (base != null) ? base.toString() : ""
+		String ts = (programTimeStamp != null) ? programTimeStamp : ""
+		lastEnteredProgramName = base + ts
+		KeywordUtil.logInfo("recordLastEnteredProgramNameForOtherProgramEntry: lastEnteredProgramName=" + lastEnteredProgramName)
+	}
+
+	/**
 	 * This function enters study information into submission request form
 	 * @param dataRowNum Row number from the test data file
 	 */
