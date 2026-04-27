@@ -54,9 +54,10 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
+import org.openqa.selenium.TimeoutException
+import org.openqa.selenium.ElementClickInterceptedException
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import java.util.HashMap;
 import java.util.Map;
@@ -73,13 +74,60 @@ import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.xssf.usermodel.XSSFCellStyle
 import org.apache.poi.xssf.usermodel.XSSFColor
 import java.awt.Color
-import java.time.Duration
 import utilities.Utils
 
 
 class Pbac extends TestRunner {
 
 	public static WebDriver driver
+
+	private static final String PBAC_NOTISTACK_SNACKBAR_LOC = 'CRDC/AILocators/Global/Notistack-Snackbar'
+	private static final int PBAC_NOTISTACK_WAIT_SEC = 20
+	private static final int PBAC_MANAGE_USERS_TABLE_WAIT_SEC = 25
+
+	/**
+	 * Notistack toasts (e.g. after Save) intercept PBAC checkbox clicks on slow CI; wait until hidden or gone.
+	 * Non-fatal if the snackbar was never shown or Utils times out.
+	 */
+	private static void waitForPbacNotistackDismissed() {
+		try {
+			Utils.waitForElementNotVisible(PBAC_NOTISTACK_SNACKBAR_LOC, PBAC_NOTISTACK_WAIT_SEC)
+		} catch (Throwable t) {
+			KeywordUtil.logInfo("waitForPbacNotistackDismissed: ${t.message}")
+		}
+	}
+
+	private static void waitForManageUsersTable(WebDriver driver) {
+		WebDriverWait wait = new WebDriverWait(driver, PBAC_MANAGE_USERS_TABLE_WAIT_SEC)
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//table//tr[td]")))
+	}
+
+	/**
+	 * Re-open Manage Users when the user list table is not found (e.g. slow redirect after Save on Jenkins).
+	 */
+	private static void navigateBackToManageUsers() {
+		KeywordUtil.logInfo("Re-navigating to Manage Users via header.")
+		WebUIUtils.clickTab('CRDC/Login/UserProfile-Dd')
+		WebUIUtils.clickTab('CRDC/NavBar/ManageUsers-Btn')
+		WebUI.delay(2)
+		WebUI.waitForPageLoad(15)
+	}
+
+	private static void clickPbacPermissionCheckbox(WebElement cb) {
+		try {
+			cb.click()
+		} catch (ElementClickInterceptedException e) {
+			KeywordUtil.logInfo("Checkbox click intercepted (likely Notistack); waiting and retrying once. ${e.message}")
+			WebUI.delay(1)
+			waitForPbacNotistackDismissed()
+			cb.click()
+		}
+		try {
+			Thread.sleep(150)
+		} catch (InterruptedException ie) {
+			Thread.currentThread().interrupt()
+		}
+	}
 
 	//*************** Input functions start here ****************
 
@@ -91,12 +139,24 @@ class Pbac extends TestRunner {
 	public static void findAndEditUserByName(String userRole) {
 		String userNameAutomation = "pbac." + userRole + "-automation"
 		boolean userFound = false
+		boolean manageUsersRenavAttempted = false
 		WebUI.delay(2)
+		WebUI.waitForPageLoad(15)
 
 		while (!userFound) {
 			driver = DriverFactory.getWebDriver()
-			WebDriverWait wait = new WebDriverWait(driver, 10)
-			wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//table//tr[td]")))
+			try {
+				waitForManageUsersTable(driver)
+			} catch (TimeoutException e) {
+				if (!manageUsersRenavAttempted) {
+					manageUsersRenavAttempted = true
+					KeywordUtil.logInfo("Manage Users table wait timed out; retrying after navigation. ${e.message}")
+					navigateBackToManageUsers()
+					waitForManageUsersTable(driver)
+				} else {
+					throw e
+				}
+			}
 
 			List<WebElement> rows = driver.findElements(By.xpath("//table//tr[td]"))
 
@@ -379,6 +439,7 @@ class Pbac extends TestRunner {
 		// Click Save
 		WebUI.click(findTestObject('CRDC/ManageUsers/Save-Btn'))
 		KeywordUtil.logInfo("Clicked Save")
+		waitForPbacNotistackDismissed()
 
 		KeywordUtil.logInfo("Reset permissions by re-selecting role: ${roleDisplay}")
 	}
@@ -409,6 +470,7 @@ class Pbac extends TestRunner {
 			// if verifying self as admin, skip search
 			findAndEditUserByName(userRole)
 			resetPermissions(userRole)
+			WebUI.delay(2)
 			findAndEditUserByName(userRole)
 		}
 
@@ -428,10 +490,11 @@ class Pbac extends TestRunner {
 	 */
 	@Keyword
 	public static void checkAllEnabledPermissionCheckboxes() {
+		waitForPbacNotistackDismissed()
 		List<WebElement> checkboxes = WebUI.findWebElements(findTestObject('CRDC/ManageUsers/PbacOptions-Chkbx'), 10)
 		for (WebElement cb : checkboxes) {
 			if (cb.isEnabled() && !cb.isSelected()) {
-				cb.click()
+				clickPbacPermissionCheckbox(cb)
 				KeywordUtil.logInfo("Checked permission checkbox")
 			}
 		}
@@ -442,10 +505,11 @@ class Pbac extends TestRunner {
 	 */
 	@Keyword
 	public static void uncheckAllEnabledPermissionCheckboxes() {
+		waitForPbacNotistackDismissed()
 		List<WebElement> checkboxes = WebUI.findWebElements(findTestObject('CRDC/ManageUsers/PbacOptions-Chkbx'), 10)
 		for (WebElement cb : checkboxes) {
 			if (cb.isEnabled() && cb.isSelected()) {
-				cb.click()
+				clickPbacPermissionCheckbox(cb)
 				KeywordUtil.logInfo("Unchecked permission checkbox")
 			}
 		}
@@ -460,6 +524,7 @@ class Pbac extends TestRunner {
 
 		findAndEditUserByName(userRole)
 		resetPermissions(userRole)
+		WebUI.delay(2)
 		findAndEditUserByName(userRole)
 
 		//Expand the Permissions panel and Email Notifications panel
@@ -470,12 +535,14 @@ class Pbac extends TestRunner {
 			checkAllEnabledPermissionCheckboxes()
 			WebUI.delay(2)
 			WebUI.click(findTestObject('CRDC/ManageUsers/Save-Btn'))
+			waitForPbacNotistackDismissed()
 		}
 		if (scenario.equals("negative")) {
 			uncheckAllEnabledPermissionCheckboxes()
 			uncheckAllEnabledPermissionCheckboxes() //do it again to uncheck DCP's SR - View permission because it is disabled until higher permissions are unchecked first
 			WebUI.delay(2)
 			WebUI.click(findTestObject('CRDC/ManageUsers/Save-Btn'))
+			waitForPbacNotistackDismissed()
 		}
 
 		//Write expected results to sheet
@@ -545,31 +612,55 @@ class Pbac extends TestRunner {
 		TestRunner.clickTab('CRDC/DataSubmissions/Create/CreateADataSubmission-Btn')
 		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/MetadataOnly-Btn'))
 		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/Study-Ddn'))
-		WebUI.delay(1)
 
-		//Select the study for automation purposes
 		String automationStudy = 'ATS - AutoTest-Study'
+		String normalizedTarget = automationStudy.replaceAll(/\s+/, ' ').trim()
+		String studyOptionXpath = "//div[contains(@class,'MuiMenu-paper')]//li[contains(@data-testid,'study-option')]"
 
 		WebDriver driver = DriverFactory.getWebDriver()
-		List<WebElement> studyDropdownOptions = driver.findElements(By.xpath("//li[contains(@data-testid,'study-option')]"))
-		for (WebElement option : studyDropdownOptions) {
-			String studyName = option.getAttribute("innerText")?.trim()
-			KeywordUtil.logInfo("Dropdown option is: " + studyName)
-		}
-		KeywordUtil.logInfo("Number of study options in dropdown: " + studyDropdownOptions.size())
+		WebDriverWait menuWait = new WebDriverWait(driver, 10)
+		menuWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(studyOptionXpath)))
 
-		WebElement match = studyDropdownOptions.find {it.getAttribute("innerText")?.trim() == automationStudy}
-		if (match != null) {
-			try {
-				new Actions(driver).moveToElement(match).click().perform()
-			} catch (Exception e) {
-				KeywordUtil.logInfo("Click blocked, retrying after overlay removal...")
-				WebUI.executeJavaScript("""document.querySelectorAll('.MuiBackdrop-root, .MuiDialog-container').forEach(e => e.remove())""", null)
-				WebUI.delay(1)
+		List<WebElement> studyDropdownOptions = driver.findElements(By.xpath(studyOptionXpath))
+		WebElement match = studyDropdownOptions.find {
+			String t = it.getAttribute("innerText")
+			(t != null ? t.replaceAll(/\s+/, ' ').trim() : "") == normalizedTarget
+		}
+		if (match == null) {
+			KeywordUtil.markFailed("Study option '${automationStudy}' not found in dropdown.")
+			return
+		}
+		KeywordUtil.logInfo("Found the study to create DS: '${automationStudy}'")
+
+		// Re-query and match again right before interacting so the handle is not stale after React updates.
+		studyDropdownOptions = driver.findElements(By.xpath(studyOptionXpath))
+		match = studyDropdownOptions.find {
+			String t = it.getAttribute("innerText")
+			(t != null ? t.replaceAll(/\s+/, ' ').trim() : "") == normalizedTarget
+		}
+		if (match == null) {
+			KeywordUtil.markFailed("Study option '${automationStudy}' disappeared before click.")
+			return
+		}
+
+		new Actions(driver).moveToElement(match).perform()
+		WebUI.delay(1)
+
+		try {
+			match.click()
+		} catch (Exception e) {
+			KeywordUtil.logInfo("Native study option click failed: ${e.message}. Retrying with Actions move + click...")
+			WebUI.delay(1)
+			studyDropdownOptions = driver.findElements(By.xpath(studyOptionXpath))
+			match = studyDropdownOptions.find {
+				String t = it.getAttribute("innerText")
+				(t != null ? t.replaceAll(/\s+/, ' ').trim() : "") == normalizedTarget
+			}
+			if (match != null) {
+				new Actions(driver).moveToElement(match).perform()
+				WebUI.delay(0.2)
 				new Actions(driver).moveToElement(match).click().perform()
 			}
-		} else {
-			KeywordUtil.markFailed("Study option '${automationStudy}' not found in dropdown.")
 		}
 
 		//Enter the submission name -- setText() is not working, need to use Actions class
@@ -584,7 +675,9 @@ class Pbac extends TestRunner {
 
 		//Create
 		TestRunner.clickTab('CRDC/DataSubmissions/Create/Create-Btn')
-		WebUI.delay(5)
+		WebUI.delay(3)
+		WebUI.sendKeys(findTestObject('CRDC/AILocators/DataSubmissions/List/Filters/SubmissionName-TxtBx'), submissionName)
+		WebUI.delay(1)
 	}
 
 	/**

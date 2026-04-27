@@ -63,7 +63,7 @@ CustomKeywords.'utilities.DatabaseUtils.verifyTableCountMatchesMongoCollection'(
 CustomKeywords.'utilities.SubmissionRequest.clickAccountDropdown'()
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/ManageInstitutions-Btn')
 int uiCountInstitutions = CustomKeywords.'utilities.WebUIUtils.getTableTotalEntryCount'()
-CustomKeywords.'utilities.DatabaseUtils.verifyTableCountMatchesMongoCollection'(uiCountInstitutions, "institutions")
+CustomKeywords.'utilities.DatabaseUtils.verifyTableCountMatchesMongoCollection'(uiCountInstitutions, "institutions", [status: "Active"])
 
 CustomKeywords.'utilities.SubmissionRequest.clickAccountDropdown'()
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/ManageUsers-Btn')

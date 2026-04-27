@@ -99,10 +99,10 @@ CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submiss
 // Click the Cross Validate button and wait for cross-validation to complete.
 CustomKeywords.'utilities.DataSubmissions.clickCrossValidateButton'()
 
-// Verify the Cross Validation Results tab shows the expected conflicts.
-CustomKeywords.'utilities.DataSubmissions.verifyCrossValidationResultsVsExpected'('TC25')
+// Verify CV rows that reference Submission 1 as the conflicting peer (DCP is on Submission 2).
+CustomKeywords.'utilities.DataSubmissions.verifyCrossValidationResultsVsExpected'('TC25', submissionId1)
 
-//Reject and verify
+//Reject submission2 and verify
 CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn'))
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx')
@@ -112,6 +112,7 @@ WebUI.delay(3)
 CustomKeywords.'utilities.Utils.waitForElementToDisappear'('CRDC/DataSubmissions/Loading-Icon', 60)
 CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Rejected")
 
+//Reject submission1 and verify
 CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submissionId1)
 CustomKeywords.'utilities.WebUIUtils.verifyElementDisplayed'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn'))
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn')

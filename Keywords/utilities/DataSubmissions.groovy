@@ -26,6 +26,7 @@ import java.util.ArrayList
 import java.util.Arrays
 import java.util.Collections
 import java.util.HashMap
+import java.util.HashSet
 import java.util.LinkedHashMap
 import java.util.LinkedHashSet
 import java.util.List
@@ -56,7 +57,7 @@ class DataSubmissions extends TestRunner {
 	static String expectedCollaboratorsTooltip = "Click to add new collaborators or view existing ones."
 	static String expectedDataCommons = null
 	static String expectedDataConcierge = "pbac.dcp-automation Please Do Not Edit"
-	/** Set by readCrossValidationResultsTableFromUI — total Cross Validation table rows across pages (for export CSV row-count checks). */
+	/** Set by readCrossValidationResultsTableFromUI (full table) or readCrossValidationRowsForConflictingSubmission (matched rows only). */
 	static int lastCrossValidationTableRowCount = -1
 	/** Maps tab internal name (e.g. UploadActivities, DataView) to section name used in ValidationReport. */
 	private static String tabToSectionName(String tab) {
@@ -2025,16 +2026,36 @@ class DataSubmissions extends TestRunner {
 
 	// ------------------------------- Cross Validation Results Verification -------------------------------
 
+	/** Scope to the GenericTable that exposes Cross Validation column "Submitted Identifier" (avoids document-wide generic-table-row). */
+	private static final String CV_GENERIC_TABLE_XPATH =
+			"//*[@data-testid='generic-table'][.//*[starts-with(@data-testid,'generic-table-header-')][normalize-space()='Submitted Identifier']]"
+	private static final String CV_TABLE_HEADER_CELLS_XPATH = CV_GENERIC_TABLE_XPATH + "//*[starts-with(@data-testid,'generic-table-header-')]"
+	private static final String CV_TABLE_DATA_ROWS_XPATH = CV_GENERIC_TABLE_XPATH + "//*[@data-testid='generic-table-row']"
+
+	private static List<WebElement> findCrossValidationTableHeaderCells(WebDriver driver) {
+		return driver.findElements(By.xpath(CV_TABLE_HEADER_CELLS_XPATH))
+	}
+
+	private static List<WebElement> findCrossValidationTableDataRows(WebDriver driver) {
+		return driver.findElements(By.xpath(CV_TABLE_DATA_ROWS_XPATH))
+	}
+
+	/** Rows in the CV table that reference this peer submission via conflicting-link data-testid (fast path; avoids scanning every td per page). */
+	private static List<WebElement> findCrossValidationRowsWithConflictingLink(WebDriver driver, String conflictingSubmissionId) {
+		if (conflictingSubmissionId == null || conflictingSubmissionId.trim().isEmpty()) {
+			return Collections.emptyList()
+		}
+		String u = conflictingSubmissionId.trim()
+		String xpath = CV_GENERIC_TABLE_XPATH + "//*[@data-testid='generic-table-row'][.//*[@data-testid='conflicting-link-" + u + "']]"
+		return driver.findElements(By.xpath(xpath))
+	}
+
 	/**
-	 * Read all rows from the Cross Validation Results table in the UI.
-	 * Navigates to the Cross Validation tab, maximises visible rows (50 per page),
-	 * stabilises the table, then reads each row's Submitted Identifier, Node Type, Severity, and Issues columns.
-	 * Handles pagination: iterates all pages and collects rows across them.
+	 * Read all rows from the Cross Validation Results table in the UI (full table, all pages).
 	 * @return List of [submittedId, nodeType, severity, issueText] lists
 	 */
 	private List<List<String>> readCrossValidationResultsTableFromUI() {
 		WebDriver driver = DriverFactory.getWebDriver()
-		int pageIndex = 0
 
 		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Tabs/CrossValidation-Tab')
 		WebUI.delay(2)
@@ -2046,7 +2067,7 @@ class DataSubmissions extends TestRunner {
 		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
 		WebUI.delay(1)
 
-		List<WebElement> headerEls = Utils.getListWebElements("CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Table-Headers")
+		List<WebElement> headerEls = findCrossValidationTableHeaderCells(driver)
 		List<String> headerNames = new ArrayList<>()
 		for (WebElement h : headerEls) headerNames.add(h.getText().trim())
 		KeywordUtil.logInfo("Cross Validation table headers: " + headerNames)
@@ -2069,10 +2090,10 @@ class DataSubmissions extends TestRunner {
 		while (hasMorePages) {
 			int rowCount = 0
 			for (int w = 0; w < 5; w++) {
-				List<WebElement> waitRows = Utils.getListWebElements("CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Table-Row")
+				List<WebElement> waitRows = findCrossValidationTableDataRows(driver)
 				int n = waitRows != null ? waitRows.size() : 0
 				WebUI.delay(0.5)
-				waitRows = Utils.getListWebElements("CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Table-Row")
+				waitRows = findCrossValidationTableDataRows(driver)
 				int n2 = waitRows != null ? waitRows.size() : 0
 				if (n == n2) {
 					rowCount = n
@@ -2080,24 +2101,36 @@ class DataSubmissions extends TestRunner {
 				}
 			}
 
-			for (int i = 0; i < rowCount; i++) {
+			List<WebElement> pageRows = findCrossValidationTableDataRows(driver)
+			if (pageRows == null) {
+				pageRows = Collections.emptyList()
+			}
+
+			for (int i = 0; i < pageRows.size(); i++) {
 				boolean done = false
 				for (int attempt = 1; attempt <= 3 && !done; attempt++) {
 					try {
-						List<WebElement> currentRows = Utils.getListWebElements("CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Table-Row")
-						if (i >= (currentRows != null ? currentRows.size() : 0)) break
-							WebElement row = currentRows.get(i)
+						if (i >= pageRows.size()) {
+							break
+						}
+						WebElement row = pageRows.get(i)
 						List<WebElement> cells = row.findElements(By.tagName("td"))
 						String submitted = getCellText(cells, idxSubmitted, false)
 						String nodeType = getCellText(cells, idxNodeType, false)
 						String severity = getCellText(cells, idxSeverity, false)
 						// For Cross Validation issue text, read visible cell text directly.
 						// Using getCellText() here can trigger slow nested element lookups under implicit wait.
-						String issues = idxIssues >= 0 ? cells.get(idxIssues).getText().trim() : ""
+						String issues = (idxIssues >= 0 && idxIssues < cells.size()) ? cells.get(idxIssues).getText().trim() : ""
 						allRows.add(Arrays.asList(submitted, nodeType, severity, issues))
 						done = true
 					} catch (StaleElementReferenceException e) {
-						if (attempt == 3) throw e
+						pageRows = findCrossValidationTableDataRows(driver)
+						if (pageRows == null) {
+							pageRows = Collections.emptyList()
+						}
+						if (attempt == 3) {
+							throw e
+						}
 						WebUI.delay(0.5)
 					}
 				}
@@ -2109,7 +2142,6 @@ class DataSubmissions extends TestRunner {
 				WebUI.delay(1)
 				Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
 				WebUI.delay(1)
-				pageIndex++
 			} else {
 				hasMorePages = false
 			}
@@ -2118,6 +2150,156 @@ class DataSubmissions extends TestRunner {
 		lastCrossValidationTableRowCount = allRows.size()
 		KeywordUtil.logInfo("readCrossValidationResultsTableFromUI: read " + allRows.size() + " total row(s)")
 		return allRows
+	}
+
+	/** Multiset of submitted_id from expected TSV rows (non-empty id only). */
+	private static Map<String, Integer> buildExpectedCountBySubmittedId(List<List<String>> allExpected) {
+		Map<String, Integer> counts = new LinkedHashMap<>()
+		for (List<String> exp : allExpected) {
+			if (exp == null || exp.isEmpty()) continue
+			String id = exp.get(0) != null ? exp.get(0).trim() : ""
+			if (id.isEmpty()) continue
+			counts.put(id, counts.getOrDefault(id, 0) + 1)
+		}
+		return counts
+	}
+
+	/** True when matched rows include at least the expected count per submitted_id. */
+	private static boolean anchoredMatchedCountsSatisfyExpected(Map<String, Integer> expectedCountBySubmittedId, Map<String, Integer> matchedCountBySubmittedId) {
+		for (Map.Entry<String, Integer> e : expectedCountBySubmittedId.entrySet()) {
+			int need = e.getValue() != null ? e.getValue().intValue() : 0
+			int have = matchedCountBySubmittedId.getOrDefault(e.getKey(), 0)
+			if (have < need) return false
+		}
+		return true
+	}
+
+	/**
+	 * Cross Validation rows whose Conflicting Submission matches conflictingSubmissionId.
+	 * Paginates like readCrossValidationResultsTableFromUI. Each page uses one XPath for generic-table-row elements
+	 * that contain a conflicting-link data-testid for the peer UUID (avoids scanning every td). Stops when expected
+	 * per-submitted_id counts are satisfied, or when there is no next page. If the peer row never appears, returns empty after markFailed.
+	 */
+	private List<List<String>> readCrossValidationRowsForConflictingSubmission(String conflictingSubmissionId, Map<String, Integer> expectedCountBySubmittedId) {
+		WebDriver driver = DriverFactory.getWebDriver()
+
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Tabs/CrossValidation-Tab')
+		WebUI.delay(2)
+		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 30)
+		WebUI.delay(1)
+
+		WebUIUtils.changeRowsPerPage(50)
+		WebUI.delay(1)
+		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+		WebUI.delay(1)
+
+		List<WebElement> headerEls = findCrossValidationTableHeaderCells(driver)
+		List<String> headerNames = new ArrayList<>()
+		for (WebElement h : headerEls) {
+			headerNames.add(h.getText().trim())
+		}
+		KeywordUtil.logInfo("readCrossValidationRowsForConflictingSubmission: Cross Validation table headers: " + headerNames)
+
+		int idxSubmitted = headerNames.findIndexOf { it.equalsIgnoreCase("Submitted Identifier") }
+		int idxNodeType = headerNames.findIndexOf { it.equalsIgnoreCase("Node Type") }
+		int idxSeverity = headerNames.findIndexOf { it.equalsIgnoreCase("Severity") }
+		int idxIssues = headerNames.findIndexOf { it.equalsIgnoreCase("Issues") }
+		if (idxIssues < 0) {
+			idxIssues = headerNames.findIndexOf { it.toLowerCase().contains("issue") }
+		}
+
+		if (idxSubmitted < 0 || idxNodeType < 0 || idxSeverity < 0) {
+			lastCrossValidationTableRowCount = 0
+			KeywordUtil.logInfo("readCrossValidationRowsForConflictingSubmission: missing required columns (Submitted Identifier, Node Type, Severity). Headers: " + headerNames)
+			return null
+		}
+
+		List<List<String>> matchedRows = new ArrayList<>()
+		Map<String, Integer> matchedCountBySubmittedId = new HashMap<>()
+		boolean hasMorePages = true
+		boolean stopPagination = false
+
+		while (hasMorePages && !stopPagination) {
+			for (int w = 0; w < 5; w++) {
+				List<WebElement> waitRows = findCrossValidationTableDataRows(driver)
+				int n = waitRows != null ? waitRows.size() : 0
+				WebUI.delay(0.5)
+				waitRows = findCrossValidationTableDataRows(driver)
+				int n2 = waitRows != null ? waitRows.size() : 0
+				if (n == n2) {
+					break
+				}
+			}
+
+			List<WebElement> rowsToProcess = findCrossValidationRowsWithConflictingLink(driver, conflictingSubmissionId)
+			if (rowsToProcess == null) {
+				rowsToProcess = Collections.emptyList()
+			}
+
+			for (int i = 0; i < rowsToProcess.size() && !stopPagination; i++) {
+				boolean done = false
+				for (int attempt = 1; attempt <= 3 && !done; attempt++) {
+					try {
+						if (i >= rowsToProcess.size()) {
+							break
+						}
+						WebElement row = rowsToProcess.get(i)
+						List<WebElement> cells = row.findElements(By.tagName("td"))
+						String submitted = getCellText(cells, idxSubmitted, false)
+						String nodeType = getCellText(cells, idxNodeType, false)
+						String severity = getCellText(cells, idxSeverity, false)
+						String issues = (idxIssues >= 0 && idxIssues < cells.size()) ? cells.get(idxIssues).getText().trim() : ""
+						matchedRows.add(Arrays.asList(submitted, nodeType, severity, issues))
+						if (expectedCountBySubmittedId != null && !expectedCountBySubmittedId.isEmpty()) {
+							String subTrim = submitted != null ? submitted.trim() : ""
+							if (!subTrim.isEmpty()) {
+								matchedCountBySubmittedId.put(subTrim, matchedCountBySubmittedId.getOrDefault(subTrim, 0) + 1)
+							}
+							if (anchoredMatchedCountsSatisfyExpected(expectedCountBySubmittedId, matchedCountBySubmittedId)) {
+								KeywordUtil.logInfo("readCrossValidationRowsForConflictingSubmission: early stop — collected enough matching rows for expected submitted_id counts")
+								stopPagination = true
+							}
+						}
+						done = true
+					} catch (StaleElementReferenceException e) {
+						rowsToProcess = findCrossValidationRowsWithConflictingLink(driver, conflictingSubmissionId)
+						if (rowsToProcess == null) {
+							rowsToProcess = Collections.emptyList()
+						}
+						if (attempt == 3) {
+							throw e
+						}
+						WebUI.delay(0.5)
+					}
+				}
+			}
+
+			if (stopPagination) {
+				hasMorePages = false
+				continue
+			}
+			List<WebElement> nextBtns = driver.findElements(By.cssSelector("[aria-label='Go to next page']:not([disabled])"))
+			if (nextBtns != null && !nextBtns.isEmpty()) {
+				nextBtns.get(0).click()
+				WebUI.delay(1)
+				Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+				WebUI.delay(1)
+			} else {
+				hasMorePages = false
+			}
+		}
+
+		if (expectedCountBySubmittedId != null && !expectedCountBySubmittedId.isEmpty()
+				&& !anchoredMatchedCountsSatisfyExpected(expectedCountBySubmittedId, matchedCountBySubmittedId)) {
+			KeywordUtil.markFailed("readCrossValidationRowsForConflictingSubmission: no conflicting-link row for peer submission " + conflictingSubmissionId
+					+ " after scanning all Cross Validation pages, or submitted identifiers did not match expected counts.")
+			lastCrossValidationTableRowCount = 0
+			return Collections.emptyList()
+		}
+
+		lastCrossValidationTableRowCount = matchedRows.size()
+		KeywordUtil.logInfo("readCrossValidationRowsForConflictingSubmission: collected " + matchedRows.size() + " row(s) for conflicting submission " + conflictingSubmissionId)
+		return matchedRows
 	}
 
 	/**
@@ -2167,46 +2349,37 @@ class DataSubmissions extends TestRunner {
 	}
 
 	/**
-	 * Verify Cross Validation Results in the UI against expected TSV files.
-	 * Discovers all *_expected-CrossValidationResults.tsv files under
-	 * InputFiles/CRDC/MetadataData/&lt;tcName&gt;/expected-CrossValidationResults/,
-	 * loads expected rows, reads actual rows from the UI Cross Validation tab,
-	 * and compares by Submitted Identifier as the matching key.
-	 * Reports each comparison via ValidationReport and marks failed on mismatch.
-	 * @param tcName Test case name (e.g. TC_CrossVal_01)
+	 * Loads all expected CV rows from InputFiles/CRDC/MetadataData/&lt;tcName&gt;/expected-CrossValidationResults.
+	 * @return null if the folder or TSVs are missing (markFailed already called)
 	 */
-	@Keyword
-	void verifyCrossValidationResultsVsExpected(String tcName) {
-		KeywordUtil.logInfo("--- verifyCrossValidationResultsVsExpected for TC: " + tcName + " ---")
-
-		// 1) Resolve the expected-results folder for this test case and validate inputs exist.
+	private List<List<String>> loadAllExpectedCrossValidationRowsForTcOrNull(String tcName) {
 		String baseDir = RunConfiguration.getProjectDir()
 		File dir = new File(baseDir, "InputFiles/CRDC/MetadataData/${tcName}/expected-CrossValidationResults")
 		if (!dir.exists() || !dir.isDirectory()) {
 			KeywordUtil.markFailed("verifyCrossValidationResultsVsExpected: expected-CrossValidationResults folder not found: " + dir.absolutePath)
-			return
+			return null
 		}
-
 		List<File> expectedFiles = dir.listFiles()?.findAll { it.isFile() && it.name.endsWith("_expected-CrossValidationResults.tsv") } ?: []
 		if (expectedFiles.isEmpty()) {
 			KeywordUtil.markFailed("verifyCrossValidationResultsVsExpected: no *_expected-CrossValidationResults.tsv files in " + dir.absolutePath)
-			return
+			return null
 		}
-
-		// 2) Load all expected rows from all expected TSVs for this TC into one list.
-		// Each row shape is: [submittedId, nodeType, severity, issue].
 		List<List<String>> allExpected = new ArrayList<>()
 		for (File f : expectedFiles) {
-			List<List<String>> rows = loadExpectedCrossValidationResultsTsv(f.absolutePath)
-			allExpected.addAll(rows)
+			allExpected.addAll(loadExpectedCrossValidationResultsTsv(f.absolutePath))
 		}
-		KeywordUtil.logInfo("Total expected cross-validation rows: " + allExpected.size())
+		return allExpected
+	}
 
-		// 3) Read actual rows from the UI Cross Validation table (all visible pages).
-		List<List<String>> actualRows = readCrossValidationResultsTableFromUI()
+	/**
+	 * Compares expected TSV rows to actual UI rows (same 4-tuple shape), reports via ValidationReport, and markFailed on any mismatch.
+	 * @param checkUnexpectedUiRows when true, fails on UI submitted IDs not present in expected TSV (full-table mode).
+	 */
+	private void runCrossValidationVerificationAgainstActualRows(String tcName, List<List<String>> allExpected, List<List<String>> actualRows, boolean checkUnexpectedUiRows) {
+		KeywordUtil.logInfo("Total expected cross-validation rows: " + allExpected.size())
 		KeywordUtil.logInfo("Total actual cross-validation rows from UI: " + actualRows.size())
 
-		// 4) Group actual rows by Submitted ID so we can compare expected rows by key.
+		// Group actual rows by Submitted ID so we can compare expected rows by key.
 		// We keep List<List<String>> because one submitted ID can have multiple CV entries.
 		Map<String, List<List<String>>> actualBySubmittedId = new LinkedHashMap<>()
 		for (List<String> row : actualRows) {
@@ -2282,19 +2455,21 @@ class DataSubmissions extends TestRunner {
 		}
 
 		// 6) Flag unexpected UI rows (present in UI but missing from expected files).
-		// This protects against silent extra cross-validation issues not captured in expected data.
-		for (String actualKey : actualBySubmittedId.keySet()) {
-			if (!matchedActualKeys.contains(actualKey)) {
-				List<List<String>> unexpectedRows = actualBySubmittedId.get(actualKey)
-				for (List<String> act : unexpectedRows) {
-					String actNode = act.get(1)
-					String actSev = act.get(2)
-					String actIssue = act.size() >= 4 ? act.get(3) : ""
-					errors.add("Submitted ID '" + actualKey + "': present in UI but not in expected TSV")
-					ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + actualKey,
-							"(not in expected)",
-							"NodeType=" + actNode + ", Severity=" + actSev + ", Issue=" + actIssue,
-							"Fail")
+		// Skipped in anchored mode (only a subset of UI rows was read).
+		if (checkUnexpectedUiRows) {
+			for (String actualKey : actualBySubmittedId.keySet()) {
+				if (!matchedActualKeys.contains(actualKey)) {
+					List<List<String>> unexpectedRows = actualBySubmittedId.get(actualKey)
+					for (List<String> act : unexpectedRows) {
+						String actNode = act.get(1)
+						String actSev = act.get(2)
+						String actIssue = act.size() >= 4 ? act.get(3) : ""
+						errors.add("Submitted ID '" + actualKey + "': present in UI but not in expected TSV")
+						ValidationReport.addValidationReportItem(sectionName, "Submitted ID " + actualKey,
+								"(not in expected)",
+								"NodeType=" + actNode + ", Severity=" + actSev + ", Issue=" + actIssue,
+								"Fail")
+					}
 				}
 			}
 		}
@@ -2311,7 +2486,65 @@ class DataSubmissions extends TestRunner {
 		}
 	}
 
-	
+	/**
+	 * Verify Cross Validation Results in the UI against expected TSV files.
+	 * Discovers all *_expected-CrossValidationResults.tsv files under
+	 * InputFiles/CRDC/MetadataData/&lt;tcName&gt;/expected-CrossValidationResults/,
+	 * loads expected rows, reads the full Cross Validation table from the UI,
+	 * and compares by Submitted Identifier as the matching key.
+	 * Fails on unexpected extra UI rows not present in the expected TSVs.
+	 * @param tcName Test case name (e.g. TC38)
+	 */
+	@Keyword
+	void verifyCrossValidationResultsVsExpected(String tcName) {
+		KeywordUtil.logInfo("--- verifyCrossValidationResultsVsExpected for TC: " + tcName + " (full table) ---")
+		List<List<String>> allExpected = loadAllExpectedCrossValidationRowsForTcOrNull(tcName)
+		if (allExpected == null) {
+			return
+		}
+		List<List<String>> actualRows = readCrossValidationResultsTableFromUI()
+		runCrossValidationVerificationAgainstActualRows(tcName, allExpected, actualRows, true)
+	}
+
+	/**
+	 * Verify Cross Validation rows that reference a peer submission (Conflicting Submission column).
+	 * Use when the active submission is not the one listed as conflicting (e.g. DCP on submission 2 verifying conflicts with submission 1).
+	 * Only matching rows are compared to the expected TSV; other CV rows on the same page are ignored.
+	 * @param tcName Test case folder under MetadataData (e.g. TC25)
+	 * @param conflictingSubmissionId Full UUID of the peer submission (Conflicting Submission link target)
+	 */
+	@Keyword
+	void verifyCrossValidationResultsVsExpected(String tcName, String conflictingSubmissionId) {
+		KeywordUtil.logInfo("--- verifyCrossValidationResultsVsExpected for TC: " + tcName + ", conflictingSubmissionId=" + conflictingSubmissionId + " ---")
+		if (conflictingSubmissionId == null || conflictingSubmissionId.trim().isEmpty()) {
+			KeywordUtil.markFailed("verifyCrossValidationResultsVsExpected: conflictingSubmissionId is required (peer submission UUID).")
+			return
+		}
+		List<List<String>> allExpected = loadAllExpectedCrossValidationRowsForTcOrNull(tcName)
+		if (allExpected == null) {
+			return
+		}
+		if (allExpected.isEmpty()) {
+			KeywordUtil.markFailed("verifyCrossValidationResultsVsExpected: expected TSV has no data rows for TC: " + tcName)
+			return
+		}
+		Map<String, Integer> expectedBySubmittedId = buildExpectedCountBySubmittedId(allExpected)
+		if (expectedBySubmittedId.isEmpty()) {
+			KeywordUtil.markFailed("verifyCrossValidationResultsVsExpected: expected TSV has no submitted_id values for TC: " + tcName)
+			return
+		}
+		List<List<String>> actualRows = readCrossValidationRowsForConflictingSubmission(conflictingSubmissionId, expectedBySubmittedId)
+		if (actualRows == null) {
+			KeywordUtil.markFailed("verifyCrossValidationResultsVsExpected: could not read Cross Validation table (missing required columns).")
+			return
+		}
+		if (actualRows.isEmpty()) {
+			KeywordUtil.markFailed("verifyCrossValidationResultsVsExpected: no Cross Validation rows matched conflicting submission '" + conflictingSubmissionId + "'")
+			return
+		}
+		runCrossValidationVerificationAgainstActualRows(tcName, allExpected, actualRows, false)
+	}
+
 	private static final String CROSS_VAL_EXPORT_SECTION = "Cross Validation Export"
 
 	/**

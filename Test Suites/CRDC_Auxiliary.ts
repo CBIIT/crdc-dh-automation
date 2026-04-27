@@ -89,13 +89,6 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>97498f0c-0f7b-4b30-ad80-ecc3dbaf795a</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC06_CrossValidationResultsVerification</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
       <guid>d585ab3c-dd48-4ef4-976c-048ccd59c24b</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>

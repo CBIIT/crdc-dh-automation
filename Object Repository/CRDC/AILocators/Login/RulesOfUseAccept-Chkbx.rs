@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>RulesOfUseAccept-Chkbx</name>
+   <tag></tag>
+   <elementGuidId>21fa2578-8068-4860-bec7-0d46dcfd12e8</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//input[@id='rules_of_use_form_terms_accepted']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//input[@id='rules_of_use_form_terms_accepted']</value>
+      <webElementGuid>a01f1ffd-f55c-42b4-8f8d-84914ab29c27</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

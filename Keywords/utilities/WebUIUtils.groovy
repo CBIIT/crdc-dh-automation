@@ -9,6 +9,7 @@ import internal.GlobalVariable
 import com.kms.katalon.core.webui.driver.DriverFactory
 import com.kms.katalon.core.testobject.TestObject
 import org.openqa.selenium.By
+import org.openqa.selenium.Keys as Keys
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.StaleElementReferenceException
 import org.openqa.selenium.WebDriver
@@ -32,6 +33,29 @@ class WebUIUtils {
 	/** ValidationReport section for generic helpers (element text, tooltips, buttons, etc.); same label as Data Submissions validation-results UI checks. */
 	private static final String REPORT_SECTION = "UI / Validation Results"
 	private static final int DEFAULT_TIMEOUT = 20
+
+	/**
+	 * Select all and delete in a focused text field using the OS modifier (Command on Mac, Control elsewhere).
+	 * Call WebUI.click on the field first so keys are delivered to the correct input. Katalon WebUI.sendKeys expects a String; Keys.chord satisfies that.
+	 * @param to TestObject for the input
+	 */
+	@Keyword
+	static void clearTextfieldByOs(TestObject to) {
+		String os = System.getProperty("os.name", "").toLowerCase()
+		String stroke = os.contains("mac")
+				? Keys.chord(Keys.COMMAND, "a", Keys.BACK_SPACE)
+				: Keys.chord(Keys.CONTROL, "a", Keys.BACK_SPACE)
+		WebUI.sendKeys(to, stroke)
+	}
+
+	/**
+	 * Same as clearTextfieldByOs(TestObject); resolves the test object from the Object Repository path (see findTestObject).
+	 * @param textfield Repository path, e.g. CRDC/SubmissionRequest/Section-A/PI_Email-Txtbx
+	 */
+	@Keyword
+	static void clearTextfieldByOs(String textfield) {
+		clearTextfieldByOs(findTestObject(textfield))
+	}
 
 	/**
 	 * Verify tooltip text when it is in the element's aria-label attribute.

@@ -2007,19 +2007,13 @@ public class TestRunner implements Comparator<List<XSSFCell>>{
 		}
 	}
 
-	/** vleung
-	 * This function clears the text field with backspace based on operating system
-	 * @param textfield - Text field to be cleared
+	/**
+	 * Clears a text field using the OS-appropriate select-all + backspace. Delegates to WebUIUtils.clearTextfieldByOs for implementation.
+	 * @param textfield Object Repository path passed to findTestObject
 	 */
 	@Keyword
 	public static clearTextfieldByOs(String textfield) {
-		// Get OS name to detect platform
-		String os = System.getProperty("os.name").toLowerCase()
-		if (os.contains("mac")) {
-			WebUI.sendKeys(findTestObject(textfield), Keys.chord(Keys.COMMAND, "a", Keys.BACK_SPACE))
-		} else {
-			WebUI.sendKeys(findTestObject(textfield), Keys.chord(Keys.CONTROL, "a", Keys.BACK_SPACE))
-		}
+		WebUIUtils.clearTextfieldByOs(textfield)
 	}
 
 
