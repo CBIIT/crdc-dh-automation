@@ -419,11 +419,11 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	 * (same as {@code program-title} + {@link #programTimeStamp} at the given data row) into {@link #lastEnteredProgramName}.
 	 * Call with the same row index you passed to {@link #enterProgramInfo} (e.g. the third argument to {@link #fillSubmissionRequestAllSections} for program).
 	 *
-	 * @param programDataRow Row in {@code CRDC/SubmissionRequest/section-b} (accepts int, {@link Integer}, or numeric {@link String} from Katalon)
+	 * @param programDataRowArg Row in {@code CRDC/SubmissionRequest/section-b} (accepts int, {@link Integer}, or numeric {@link String} from Katalon)
 	 */
 	@Keyword
-	public static void recordLastEnteredProgramNameForOtherProgramEntry(Object programDataRow) {
-		int programDataRow = parseTestDataRowIndex(programDataRow, 'recordLastEnteredProgramNameForOtherProgramEntry')
+	public static void recordLastEnteredProgramNameForOtherProgramEntry(Object programDataRowArg) {
+		int programDataRow = parseTestDataRowIndex(programDataRowArg, 'recordLastEnteredProgramNameForOtherProgramEntry')
 		TestData testData = findTestData('CRDC/SubmissionRequest/section-b')
 		String base = testData.getValue('program-title', programDataRow)
 		base = (base != null) ? base.toString() : ""
