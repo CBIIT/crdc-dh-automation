@@ -446,7 +446,7 @@ class Login extends TestRunner implements Comparator<List<XSSFCell>>{
 
 			//handle the Rules of Use page that rarely comes up when rules are updated, and will block login unless Accepted by account
 			WebUI.delay(2)
-			String textOfPage = WebUI.getText(findTestObject('CRDC/AILocators/Login/RulesOfUseContent'))
+			String textOfPage = WebUI.getText(findTestObject('CRDC/AILocators/Login/LoginPageContent'))
 			println("Text of page: " + textOfPage)
 			if (textOfPage.contains("Rules of Use")){
 				clickTab('CRDC/AILocators/Login/RulesOfUseAccept-Chkbx')
@@ -455,6 +455,12 @@ class Login extends TestRunner implements Comparator<List<XSSFCell>>{
 			
 			WebUI.setText(findTestObject('CRDC/Login/Login.gov_OneTimeCode-TxtBx'), totpCode)
 			clickTab('CRDC/Login/Login.gov_OneTimeCode_Submit-Btn')
+			
+			//handle the "NIH is requesting new information" page that rarely comes up when rules are updated, and will block login unless Accepted by account
+			if (WebUIUtils.fastElementPresent('CRDC/AILocators/Login/NihRequestingInfoAgreeSubmit-Btn', 3)) {
+				println("NIH is requesting new information page is displayed - clicking on Agree and continue button")
+				clickTab('CRDC/AILocators/Login/NihRequestingInfoAgreeSubmit-Btn')
+			}
 
 			// Wait for Grant button
 			TestObject consentBtn = findTestObject('CRDC/Login/Login.gov_ConsentGrant-Btn')
