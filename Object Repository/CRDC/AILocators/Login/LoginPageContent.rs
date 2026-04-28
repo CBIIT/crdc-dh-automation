@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>LoginPageContent</name>
+   <tag></tag>
+   <elementGuidId>e0f221d4-bac1-4517-9760-55bf8a960652</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//main[@id='main-content']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//main[@id='main-content']</value>
+      <webElementGuid>31355adb-2c9c-40ab-aa7d-d689c1a55c3a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
