@@ -105,7 +105,7 @@ WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Dcp')
 CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(deleteSubId)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Release-Btn')
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseConfirmationYes-Btn')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseCrossValidationConfirmRelease-Btn')
 WebUI.delay(3)
 //Database verification prior deleting
 CustomKeywords.'utilities.DatabaseUtils.connectFromGlobalVariable'()
