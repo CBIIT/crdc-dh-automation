@@ -12,31 +12,10 @@
    <rerunImmediately>true</rerunImmediately>
    <testSuiteGuid>520a73fd-4575-400c-a3a4-caf41ed5ffde</testSuiteGuid>
    <testCaseLink>
-      <guid>63aeb5c7-ea82-415f-b40c-d446d73b9a37</guid>
+      <guid>5c43dd65-e665-4a85-9afa-8ee152802d3f</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1051/TC25_CRDC-VerifyDcpCrossValidation</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>f9e6f4bf-8368-4434-bdee-ded83df37cb1</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1390/TC40_CRDC-CrossValidationExport_WithIssues</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>4fd1eb09-89ea-411e-8285-8080553c29fb</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1051/TC25_CRDC-VerifyDcpCrossValidation</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>3a317b07-e122-45dc-8c55-ba9a6dad7bcd</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1390/TC40_CRDC-CrossValidationExport_WithIssues</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1042/TC23_CRDCDH-1042-VerifyDeleteSubmission</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>
