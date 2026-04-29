@@ -19,3 +19,11 @@ Downloads/
 # CRDC CLI (binary or source): ignore runtime configs and uploader output
 Tools/crdc-datahub-cli-uploader-src/configs/
 Tools/crdc-datahub-cli-uploader-src/tmp/
+# Ignore the project file
+Commons_Automation.prj
+
+# Ignore files ending in -final.tsv
+*-final.tsv
+
+# Ignore files with _mod_ followed by a timestamp/string and .tsv
+*_mod_*.tsv

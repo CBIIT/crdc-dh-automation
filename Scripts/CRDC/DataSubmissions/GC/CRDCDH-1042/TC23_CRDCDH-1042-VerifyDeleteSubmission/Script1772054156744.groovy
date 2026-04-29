@@ -62,6 +62,7 @@ WebUI.delay(3)
 WebUI.closeBrowser()
 
 //Login as DCP and release plus complete data submission
+//If release is not successful, make sure another Submitted DS in the same study does not exist -- Reject it if so
 CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Dcp')
