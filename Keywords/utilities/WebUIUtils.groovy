@@ -288,6 +288,7 @@ class WebUIUtils {
 	@Keyword
 	static void refreshPageAndWaitForLoad(int timeoutSeconds = DEFAULT_TIMEOUT) {
 		int timeout = timeoutSeconds > 0 ? timeoutSeconds : DEFAULT_TIMEOUT
+		WebUI.delay(2)
 		WebUI.refresh()
 		WebUI.waitForPageLoad(timeout)
 		WebDriver driver = DriverFactory.getWebDriver()
