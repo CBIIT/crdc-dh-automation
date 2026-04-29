@@ -218,6 +218,65 @@ class DataSubmissions extends TestRunner {
 	}
 
 	/**
+	 * Polls the Upload Activities table until no row Status cell equals "Uploading" (case-insensitive),
+	 * or until timeoutSeconds elapses (2 second poll intervals). Requires Upload Activities tab to be visible.
+	 * Use before verifyUploadActivitiesBatchRow when CLI-uploaded batches may show Uploading before final status.
+	 *
+	 * @param timeoutSeconds Maximum seconds to wait (e.g. 120)
+	 */
+	@Keyword
+	void waitForUploadActivitiesTableNoUploading(int timeoutSeconds) {
+		int effectiveTimeout = timeoutSeconds > 0 ? timeoutSeconds : 120
+		long deadlineMs = System.currentTimeMillis() + (long) effectiveTimeout * 1000L
+		final String uploadingLabel = "Uploading"
+
+		while (System.currentTimeMillis() < deadlineMs) {
+			try {
+				List<WebElement> headerList = Utils.getListWebElements('CRDC/DataSubmissions/Validation/Table-Headers')
+				if (headerList == null || headerList.isEmpty()) {
+					Thread.sleep(2000)
+					continue
+				}
+				List<String> headerLabels = headerList.collect { it.getText()?.trim() ?: '' }
+				int statusIdx = findHeaderIndex(headerLabels, UPLOAD_ACTIVITIES_STATUS_CANDIDATES)
+				if (statusIdx < 0) {
+					Thread.sleep(2000)
+					continue
+				}
+				List<WebElement> rows = Utils.getListWebElements('CRDC/AILocators/GenericTable/TableRow')
+				if (rows == null || rows.isEmpty()) {
+					Thread.sleep(2000)
+					continue
+				}
+				boolean anyUploading = false
+				for (WebElement row : rows) {
+					try {
+						List<WebElement> cells = row.findElements(By.xpath(".//td"))
+						if (statusIdx >= cells.size()) continue
+						String rowStatus = cells.get(statusIdx).getText()?.trim() ?: ""
+						if (uploadingLabel.equalsIgnoreCase(rowStatus)) {
+							anyUploading = true
+							break
+						}
+					} catch (StaleElementReferenceException e) {
+						KeywordUtil.logInfo("waitForUploadActivitiesTableNoUploading: Stale row, retrying...")
+					}
+				}
+				if (!anyUploading) {
+					KeywordUtil.logInfo("waitForUploadActivitiesTableNoUploading: No 'Uploading' status in Upload Activities rows.")
+					return
+				}
+				KeywordUtil.logInfo("waitForUploadActivitiesTableNoUploading: Still seeing Uploading, waiting...")
+				Thread.sleep(2000)
+			} catch (Exception e) {
+				KeywordUtil.logInfo("waitForUploadActivitiesTableNoUploading: " + e.getMessage())
+				Thread.sleep(2000)
+			}
+		}
+		KeywordUtil.markFailed("waitForUploadActivitiesTableNoUploading: Timeout after " + effectiveTimeout + "s; Uploading still present in Upload Activities.")
+	}
+
+	/**
 	 * Verifies that the Upload Activities table contains a batch row matching the given criteria.
 	 * Caller must ensure the Upload Activities tab is visible before invoking.
 	 *
