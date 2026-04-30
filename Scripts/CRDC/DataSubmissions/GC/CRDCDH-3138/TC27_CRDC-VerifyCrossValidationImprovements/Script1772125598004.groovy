@@ -45,6 +45,8 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/SubmitYes-B
 WebUI.delay(5)
 //Release
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Release-Btn')
+CustomKeywords.'utilities.WebUIUtils.waitForElementClickableWithStaleRetry'(
+	findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseCrossValidationConfirmRelease-Btn'), 30)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseCrossValidationConfirmRelease-Btn')
 String submissionIdDsA = CustomKeywords.'utilities.DataSubmissions.getSubmissionIdFromUploadActivityUrl'()
 
@@ -62,6 +64,8 @@ WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'),
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Submit-Btn')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/SubmitYes-Btn')
 //Cross Validate
+CustomKeywords.'utilities.WebUIUtils.waitForElementClickableWithStaleRetry'(
+	findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/CrossValidate-Btn'), 30)
 CustomKeywords.'utilities.DataSubmissions.clickCrossValidateButton'()
 String submissionIdDsB = CustomKeywords.'utilities.DataSubmissions.getSubmissionIdFromUploadActivityUrl'()
 
@@ -83,6 +87,8 @@ CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('Object R
 // CRDCDH-1390 (ex-TC02): export disabled when there are no cross-validation issues; tooltip copy
 CustomKeywords.'utilities.WebUIUtils.verifyElementCount'(
 		findTestObject('CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Filters/ExportCrossValidation-Btn'), 2)
+CustomKeywords.'utilities.WebUIUtils.waitUntilStableForButtonEnabledOrDisabled'(
+		findTestObject('CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Filters/ExportCrossValidation-Btn'), 'disabled', 30)
 CustomKeywords.'utilities.WebUIUtils.verifyButtonEnabled'(
 		findTestObject('CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Filters/ExportCrossValidation-Btn'), false)
 CustomKeywords.'utilities.WebUIUtils.verifyTooltipOnHover'(
