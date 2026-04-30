@@ -5,7 +5,7 @@
    <tag></tag>
    <isRerun>false</isRerun>
    <mailRecipient></mailRecipient>
-   <numberOfRerun>3</numberOfRerun>
+   <numberOfRerun>0</numberOfRerun>
    <pageLoadTimeout>30</pageLoadTimeout>
    <pageLoadTimeoutDefault>true</pageLoadTimeoutDefault>
    <rerunFailedTestCasesOnly>false</rerunFailedTestCasesOnly>
@@ -71,7 +71,7 @@
       <guid>e40a7422-55fa-4824-851e-2510226d5213</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/CTDC/CRDCDH-1382-CTDC/TC102_CRDC-699-DeletedRecordFromDataViewCTDC</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/CTDC/CRDCDH-1382-CTDC/TC102_CRDC-1382-DeletedRecordFromDataViewCTDC</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
