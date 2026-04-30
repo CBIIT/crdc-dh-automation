@@ -34,6 +34,8 @@ import java.util.Map
 import java.util.Set
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.support.ui.ExpectedConditions
+import org.openqa.selenium.support.ui.WebDriverWait
 import com.kms.katalon.core.testobject.TestObject
 
 /**
@@ -1712,28 +1714,54 @@ class DataSubmissions extends TestRunner {
 			KeywordUtil.markFailed("Study option "+dataModel+" not found in dropdown.")
 		}
 
-		//Select the study
+		//Select the study (scoped MUI menu xpath, normalized match, re-find before click — same pattern as Pbac.createDataSubmission)
 		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/Study-Ddn'))
-		WebUI.delay(1)
-		List<WebElement> studyDropdownOptions = WebUI.findWebElements(findTestObject('Object Repository/CRDC/DataSubmissions/Create/StudyDdn-Option'), 10)
-		for (WebElement option : studyDropdownOptions) {
-			String studyName = option.getAttribute("innerText")?.trim()
-			KeywordUtil.logInfo("Dropdown option is: " + studyName)
-		}
-		KeywordUtil.logInfo("Number of study options in dropdown: " + studyDropdownOptions.size())
 
-		WebElement matchStudy = studyDropdownOptions.find {it.getAttribute("innerText")?.trim() == study}
-		if (matchStudy != null) {
-			try {
-				new Actions(driver).moveToElement(matchStudy).click().perform()
-			} catch (Exception e) {
-				KeywordUtil.logInfo("Click blocked, retrying after overlay removal...")
-				WebUI.executeJavaScript("""document.querySelectorAll('.MuiBackdrop-root, .MuiDialog-container').forEach(e => e.remove())""", null)
-				WebUI.delay(1)
+		String normalizedTarget = study.replaceAll(/\s+/, ' ').trim()
+		String studyOptionXpath = "//div[contains(@class,'MuiMenu-paper')]//li[contains(@data-testid,'study-option')]"
+
+		WebDriverWait menuWait = new WebDriverWait(driver, 10)
+		menuWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(studyOptionXpath)))
+
+		List<WebElement> studyDropdownOptions = driver.findElements(By.xpath(studyOptionXpath))
+		WebElement matchStudy = studyDropdownOptions.find {
+			String t = it.getAttribute("innerText")
+			(t != null ? t.replaceAll(/\s+/, ' ').trim() : "") == normalizedTarget
+		}
+		if (matchStudy == null) {
+			KeywordUtil.markFailed("Study option '${study}' not found in dropdown.")
+			return
+		}
+		KeywordUtil.logInfo("Found the study to create DS: '${study}'")
+
+		studyDropdownOptions = driver.findElements(By.xpath(studyOptionXpath))
+		matchStudy = studyDropdownOptions.find {
+			String t = it.getAttribute("innerText")
+			(t != null ? t.replaceAll(/\s+/, ' ').trim() : "") == normalizedTarget
+		}
+		if (matchStudy == null) {
+			KeywordUtil.markFailed("Study option '${study}' disappeared before click.")
+			return
+		}
+
+		new Actions(driver).moveToElement(matchStudy).perform()
+		WebUI.delay(1)
+
+		try {
+			matchStudy.click()
+		} catch (Exception e) {
+			KeywordUtil.logInfo("Native study option click failed: ${e.message}. Retrying with Actions move + click...")
+			WebUI.delay(1)
+			studyDropdownOptions = driver.findElements(By.xpath(studyOptionXpath))
+			matchStudy = studyDropdownOptions.find {
+				String t = it.getAttribute("innerText")
+				(t != null ? t.replaceAll(/\s+/, ' ').trim() : "") == normalizedTarget
+			}
+			if (matchStudy != null) {
+				new Actions(driver).moveToElement(matchStudy).perform()
+				WebUI.delay(0.2)
 				new Actions(driver).moveToElement(matchStudy).click().perform()
 			}
-		} else {
-			KeywordUtil.markFailed("Study option '${study}' not found in dropdown.")
 		}
 
 		//Enter the submission name -- setText() is not working, need to use Actions class
