@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description>UI metadata upload with invalid file_id - Essential Validation batch error (GC)</description>
-   <name>TC102_CRDC-699-DeletedRecordFromDataViewCTDC</name>
+   <name>TC102_CRDC-1382-DeletedRecordFromDataViewCTDC</name>
    <tag>CRDCDH-1405,UI,file_id,essential_validation,GC</tag>
    <comment></comment>
    <recordOption>OTHER</recordOption>
