@@ -62,12 +62,13 @@ WebUI.delay(3)
 WebUI.closeBrowser()
 
 //Login as DCP and release plus complete data submission
+//If release is not successful, make sure another Submitted DS in the same study does not exist -- Reject it if so
 CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Dcp')
 CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(deleteTargetSubId)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Release-Btn')
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseConfirmationYes-Btn')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseCrossValidationConfirmRelease-Btn')
 WebUI.delay(3)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Complete-Btn')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/CompleteConfirmationYes-Btn')
@@ -104,7 +105,7 @@ WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Dcp')
 CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(deleteSubId)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Release-Btn')
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseConfirmationYes-Btn')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseCrossValidationConfirmRelease-Btn')
 WebUI.delay(3)
 //Database verification prior deleting
 CustomKeywords.'utilities.DatabaseUtils.connectFromGlobalVariable'()

@@ -68,34 +68,6 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>8ac64320-e8b6-4f4f-a4eb-f8c81db1ae1f</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/CTDC/CRDCDH-1405-CTDC/TC103_CRDC-1405-CLIInvalidFileIdFormatCTDC</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>a5cb0c77-7060-4f7f-9f5d-33b7bbd13f22</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-1405-ICDC/TC104_CRDC-1405-CLIInvalidFileIdFormatICDC</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>ed65daac-b6af-49bf-a9dd-e4f3eaafca79</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/CTDC/CRDCDH-1405-CTDC/TC105_CRDC-1405-UploadActivitiesBatchErrorsCTDC</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>b0777e7a-c3c9-40e9-8f26-c8734f03c228</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-1405-ICDC/TC106_CRDC-1405-UploadActivitiesBatchErrorsICDC</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
       <guid>b24978a0-577d-4749-bf9c-5ce4b8cd67d5</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
