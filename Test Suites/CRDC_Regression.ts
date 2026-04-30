@@ -96,13 +96,6 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>f9239575-4062-47a1-8e34-a3b56c0eed15</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC01_UseAiLocators</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
       <guid>db5317d3-242a-40cc-b4e6-a49f2c1c1ebf</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>

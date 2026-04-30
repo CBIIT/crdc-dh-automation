@@ -26,6 +26,7 @@ WebUI.delay(3)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Tabs/UploadActivities-Tab')
 WebUI.delay(2)
 
+CustomKeywords.'utilities.DataSubmissions.waitForUploadActivitiesTableNoUploading'(120)
 CustomKeywords.'utilities.DataSubmissions.verifyUploadActivitiesBatchRow'('Metadata', 1, 'Uploaded')
 
 CustomKeywords.'utilities.DatabaseUtils.verifyRecordsExistInMongoForSubmission'()

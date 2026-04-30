@@ -51,6 +51,7 @@ CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC28', 'datafile')
 CustomKeywords.'utilities.WebUIUtils.refreshPageAndWaitForLoad'()
 
 //Verify upload is successful
+CustomKeywords.'utilities.DataSubmissions.waitForUploadActivitiesTableNoUploading'(120)
 CustomKeywords.'utilities.DataSubmissions.verifyUploadActivitiesBatchRow'('Metadata', 4, 'Uploaded')
 CustomKeywords.'utilities.DataSubmissions.verifyUploadActivitiesBatchRow'('Data File', 11, 'Uploaded')
 
