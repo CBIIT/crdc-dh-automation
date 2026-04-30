@@ -19,20 +19,6 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>5d25a6a9-ffca-4d3e-af79-544e08bde817</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC07_ValidationErrorDetailsVerification</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>20825523-0f3d-467a-a86e-ccb88b9e9099</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC16_EditExistingProgram</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
       <guid>e6709d66-b995-4940-8331-ad5340fc42d1</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
@@ -93,13 +79,6 @@
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
       <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-675/TC11_CRDC-VerifyDataFileUploadViaCLI</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>6a663759-fb03-4c00-8c9c-4960cc47e02e</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/CTDC/CRDCDH-699-CTDC/TC101_CRDC-699-VerifyValidationResultsLongFormErrorsCTDC</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>

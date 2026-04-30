@@ -1,4 +1,5 @@
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
+import utilities.Utils
 
 /*
  * TC16_EditExistingProgram
@@ -22,10 +23,11 @@ CustomKeywords.'utilities.ManagePrograms.navigateToManagePrograms'()
 WebUI.delay(2)
 
 String programNameToEdit = 'AutoProgram-TC15-10'
+String descriptionTs = Utils.getCurrentDate('yyyyMMdd_HHmmss')
 Map updates = [
 	abbreviation: 'TC15-edited-10',
-	description: 'updated description',
-	status: 'Inactive'
+	description: "updated description ${descriptionTs}",
+	status: 'Active'
 ]
 CustomKeywords.'utilities.ManagePrograms.editExistingProgram'(programNameToEdit, updates)
 WebUI.delay(2)
