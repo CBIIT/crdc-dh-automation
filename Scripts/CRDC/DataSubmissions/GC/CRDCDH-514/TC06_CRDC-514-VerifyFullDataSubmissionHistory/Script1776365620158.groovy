@@ -54,7 +54,8 @@ CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/Dat
 CustomKeywords.'utilities.Pbac.prepareUniqueMetadataAndUpload'('InputFiles/CRDC/MetadataData/PBAC/program.tsv', "program_acronym")
 //Validate data
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
-WebUI.delay(2)
+//WebUI.delay(2)
+CustomKeywords.'utilities.WebUIUtils.waitUntilElementTextEquals'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'In Progress', 30)
 CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "In Progress")
 //Submit
 WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'), 30)
@@ -126,12 +127,14 @@ CustomKeywords.'utilities.DataSubmissions.clickCrossValidateButton'()
 //Click on Release button
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Release-Btn')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseConfirmationYes-Btn')
-WebUI.delay(10)
+//WebUI.delay(10)
+CustomKeywords.'utilities.WebUIUtils.waitUntilElementTextEquals'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Released', 30)
 CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Released")
 WebUI.delay(2)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Complete-Btn')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/CompleteConfirmationYes-Btn')
-WebUI.delay(10)
+//WebUI.delay(10)
+CustomKeywords.'utilities.WebUIUtils.waitUntilElementTextEquals'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Completed', 30)
 CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Completed")
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Summary/FullHistory-Btn')
 

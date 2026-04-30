@@ -124,13 +124,6 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>d8fa778b-0180-48a9-96a0-f59f4297a429</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC07_ValidationErrorDetailsVerification</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
       <guid>14ba17d5-a8b1-4e29-8245-c922919c0ab2</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
