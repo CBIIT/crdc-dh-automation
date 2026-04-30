@@ -60,9 +60,9 @@ CustomKeywords.'utilities.SubmissionRequest.logoutFromCrdc'()
 WebUI.closeBrowser()
 
 // DCP — navigate to submission 2, cross-validate, assert table vs expected TSV, then export UI
-CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
+CustomKeywords.'utilities.Login.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
-CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Dcp')
+CustomKeywords.'utilities.Login.loginToCrdcOtp'('Dcp')
 WebUI.delay(2)
 
 CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submissionId2)
@@ -96,7 +96,7 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx')
 WebUI.setText(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx'), 'testing Reject')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('Object Repository/CRDC/AILocators/DataSubmissions/Detail/Actions/ConfirmToReject-Btn')
-WebUI.delay(3)
+CustomKeywords.'utilities.WebUIUtils.waitUntilElementTextEquals'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Rejected', 30)
 CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Rejected")
 
 //Reject submission1 and verify
@@ -106,7 +106,7 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx')
 WebUI.setText(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx'), 'testing Reject')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('Object Repository/CRDC/AILocators/DataSubmissions/Detail/Actions/ConfirmToReject-Btn')
-WebUI.delay(3)
+CustomKeywords.'utilities.WebUIUtils.waitUntilElementTextEquals'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Rejected', 30)
 CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Rejected")
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
