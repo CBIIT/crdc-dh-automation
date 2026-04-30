@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TestCaseEntity>
-   <description></description>
-   <name>TC01_UseAiLocators</name>
-   <tag>Filter</tag>
-   <comment></comment>
-   <recordOption>OTHER</recordOption>
-   <testCaseGuid>e52d1fe1-683a-4b36-bada-323190255c5f</testCaseGuid>
-</TestCaseEntity>

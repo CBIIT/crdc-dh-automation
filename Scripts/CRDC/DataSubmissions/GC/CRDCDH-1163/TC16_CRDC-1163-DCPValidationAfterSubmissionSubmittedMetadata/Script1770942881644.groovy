@@ -44,18 +44,18 @@ CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
 WebUI.delay(2)
 
 //Create DS - Metadata only
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/Global/Header/Desktop/DataSubmissions-Tab')
 CustomKeywords.'utilities.Pbac.createDataSubmission'()
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/List/Table/SubmissionName-Link')
 //Upload metadata file
 CustomKeywords.'utilities.Pbac.prepareUniqueMetadataAndUpload'('InputFiles/CRDC/MetadataData/PBAC/program.tsv', "program_acronym")
 //Validate data
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 //Submit
-WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'), 30)
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Submit-Btn')
+WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/Submit-Btn'), 30)
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Submit-Btn')
 WebUI.delay(2) //race condition for Yes button
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/SubmitYes-Btn')
+CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/SubmitDialog/Confirm-Btn')
 //Get Submission ID
 String submissionIdMetadataOnly = CustomKeywords.'utilities.DataSubmissions.getSubmissionIdFromUploadActivityUrl'()
 
@@ -71,15 +71,15 @@ CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Dcp')
 //Go to submitter's submission - Metadata only
 CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submissionIdMetadataOnly)
 //After data submission is submitted, Status = Submitted
-CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), "Submitted")
+CustomKeywords.'utilities.WebUIUtils.verifyElementText'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Summary/Status-Lbl'), "Submitted")
 //The Validate button should still be enabled for the DCP
-CustomKeywords.'utilities.WebUIUtils.verifyButtonEnabled'(findTestObject('CRDC/DataSubmissions/Validate-Btn'), true)
-//A Metadata only submission will default to “Metadata”
-CustomKeywords.'utilities.WebUIUtils.verifyButtonSelected'(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/ValidationType-Metadata-RadioBtn'), true)
-//The Validation Target should be set to “All Uploaded Data”
-CustomKeywords.'utilities.WebUIUtils.verifyButtonSelected'(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/ValidationTarget-AllUploadedData-RadioBtn'), true)
-//“New Uploaded Data” will be disabled
-CustomKeywords.'utilities.WebUIUtils.verifyButtonSelected'(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/ValidationTarget-NewUploadedData-RadioBtn'), false)
+CustomKeywords.'utilities.WebUIUtils.verifyButtonEnabled'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/Validate-Btn'), true)
+//A Metadata only submission will default to "Metadata"
+CustomKeywords.'utilities.WebUIUtils.verifyButtonSelected'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Metadata-RadioBtn'), true)
+//The Validation Target should be set to "All Uploaded Data"
+CustomKeywords.'utilities.WebUIUtils.verifyButtonSelected'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationTarget-AllUploadedData-RadioBtn'), true)
+//"New Uploaded Data" will be disabled
+CustomKeywords.'utilities.WebUIUtils.verifyButtonSelected'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationTarget-NewUploadedData-RadioBtn'), false)
 
 //Generate HTML report
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
