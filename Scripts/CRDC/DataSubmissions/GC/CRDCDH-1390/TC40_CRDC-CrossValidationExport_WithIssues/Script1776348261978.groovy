@@ -74,6 +74,8 @@ CustomKeywords.'utilities.Utils.waitForElementToDisappear'('Object Repository/CR
 // Export: two toolbar instances, tooltip, filename, CSV rows match UI table row count
 CustomKeywords.'utilities.WebUIUtils.verifyElementCount'(
 		findTestObject('CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Filters/ExportCrossValidation-Btn'), 2)
+CustomKeywords.'utilities.WebUIUtils.waitUntilStableForButtonEnabledOrDisabled'(
+		findTestObject('CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Filters/ExportCrossValidation-Btn'), 'enabled', 30)
 CustomKeywords.'utilities.WebUIUtils.verifyButtonEnabled'(
 		findTestObject('CRDC/AILocators/DataSubmissions/Detail/CrossValidation/Filters/ExportCrossValidation-Btn'), true)
 CustomKeywords.'utilities.WebUIUtils.verifyTooltipOnHover'(
