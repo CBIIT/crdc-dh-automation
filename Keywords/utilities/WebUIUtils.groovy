@@ -191,6 +191,55 @@ class WebUIUtils {
 	}
 
 	/**
+	 * Polls until findWebElement + isEnabled succeeds without stale and matches the desired state,
+	 * or until timeout. Non-stale failures from find propagate immediately (e.g. missing element).
+	 * Use before verifyButtonEnabled when the DOM may still re-render, or standalone to wait for a button state.
+	 *
+	 * @param to TestObject for the button
+	 * @param enabledOrDisabled literal "enabled" or "disabled" (case-insensitive, trimmed)
+	 * @param timeoutSeconds overall deadline from first attempt
+	 */
+	@Keyword
+	static void waitUntilStableForButtonEnabledOrDisabled(TestObject to, String enabledOrDisabled, int timeoutSeconds) {
+		String norm = enabledOrDisabled?.trim()?.toLowerCase()
+		boolean expectedEnabled
+		if ("enabled".equals(norm)) {
+			expectedEnabled = true
+		} else if ("disabled".equals(norm)) {
+			expectedEnabled = false
+		} else {
+			KeywordUtil.markFailed("waitUntilStableForButtonEnabledOrDisabled: enabledOrDisabled must be \"enabled\" or \"disabled\", got: '${enabledOrDisabled}'")
+			return
+		}
+		long deadlineMs = System.currentTimeMillis() + (timeoutSeconds * 1000L)
+		int findProbeSec = Math.min(DEFAULT_TIMEOUT, 5)
+		String expectedStateLabel = expectedEnabled ? "enabled" : "disabled"
+		while (System.currentTimeMillis() < deadlineMs) {
+			try {
+				WebElement element = WebUI.findWebElement(to, findProbeSec)
+				boolean actualEnabled = element.isEnabled()
+				if (actualEnabled == expectedEnabled) {
+					return
+				}
+				KeywordUtil.logInfo("waitUntilStableForButtonEnabledOrDisabled: probe read ${actualEnabled ? 'enabled' : 'disabled'}, waiting for ${expectedStateLabel}...")
+			} catch (StaleElementReferenceException e) {
+				KeywordUtil.logInfo("waitUntilStableForButtonEnabledOrDisabled: stale element, retrying...")
+			} catch (StepFailedException e) {
+				if (e.getCause() instanceof StaleElementReferenceException) {
+					KeywordUtil.logInfo("waitUntilStableForButtonEnabledOrDisabled: stale element (wrapped), retrying...")
+				} else {
+					throw e
+				}
+			}
+			if (System.currentTimeMillis() >= deadlineMs) {
+				break
+			}
+			WebUI.delay(1)
+		}
+		KeywordUtil.markFailed("waitUntilStableForButtonEnabledOrDisabled: timed out after ${timeoutSeconds}s — element not stable in ${expectedStateLabel} state.")
+	}
+
+	/**
 	 * Verify that a button/element is enabled or disabled.
 	 * Results are logged to ValidationReport.
 	 * @param to TestObject for the button or element

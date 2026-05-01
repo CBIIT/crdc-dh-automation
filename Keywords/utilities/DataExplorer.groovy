@@ -369,10 +369,7 @@ class DataExplorer {
 		}
 
 		if (total > 20) {
-			boolean changed = WebUIUtils.changeRowsPerPage(100)
-			if (!changed && total > 50) {
-				WebUIUtils.changeRowsPerPage(50)
-			}
+			WebUIUtils.changeRowsPerPage(50)
 			WebUI.delay(2)
 		}
 
