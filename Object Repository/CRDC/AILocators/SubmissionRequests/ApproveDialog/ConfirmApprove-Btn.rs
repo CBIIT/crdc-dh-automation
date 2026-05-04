@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//*[@data-testid=&apos;confirm-to-approve-button&apos;]</value>
+         <value>//*[@data-testid='review-form-dialog-confirm-button']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//*[@data-testid=&apos;confirm-to-approve-button&apos;]</value>
-      <webElementGuid>310940b7-bdc6-489d-9869-12a2381649c4</webElementGuid>
+      <value>//*[@data-testid='review-form-dialog-confirm-button']</value>
+      <webElementGuid>00a664ec-75b3-4bce-baac-07115b244480</webElementGuid>
    </webElementProperties>
 </WebElementEntity>
