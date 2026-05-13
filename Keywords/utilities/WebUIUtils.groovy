@@ -152,6 +152,94 @@ class WebUIUtils {
 	}
 
 	/**
+	 * Polls until the element's text matches expectedText (same whitespace normalization as verifyElementText),
+	 * or until timeoutSeconds elapses (2 second intervals between attempts). Does not write to ValidationReport;
+	 * call verifyElementText afterward if you want the check recorded.
+	 *
+	 * @param to TestObject for the element
+	 * @param expectedText Target text once the UI settles
+	 * @param timeoutSeconds Max wait in seconds; defaults to 30 if &lt;= 0
+	 */
+	@Keyword
+	static void waitUntilElementTextEquals(TestObject to, String expectedText, int timeoutSeconds) {
+		int effectiveTimeout = timeoutSeconds > 0 ? timeoutSeconds : 30
+		long deadlineMs = System.currentTimeMillis() + (long) effectiveTimeout * 1000L
+		String expectedNormalized = expectedText?.replaceAll(/\s+/, ' ').trim() ?: ""
+		String lastActual = "<unreadable>"
+		final int findTimeoutSec = 10
+		while (System.currentTimeMillis() < deadlineMs) {
+			try {
+				WebElement element = WebUI.findWebElement(to, findTimeoutSec)
+				lastActual = element.getText()?.replaceAll(/\s+/, ' ').trim() ?: ""
+				if (expectedNormalized.equals(lastActual)) {
+					KeywordUtil.logInfo("waitUntilElementTextEquals: matched '${expectedText}' within deadline.")
+					return
+				}
+				KeywordUtil.logInfo("waitUntilElementTextEquals: actual '${lastActual}', waiting for '${expectedText}'...")
+			} catch (StaleElementReferenceException e) {
+				KeywordUtil.logInfo("waitUntilElementTextEquals: stale element, retrying...")
+			} catch (Exception e) {
+				lastActual = "<unreadable>"
+				KeywordUtil.logInfo("waitUntilElementTextEquals: could not read element (${e.getMessage()}), retrying...")
+			}
+			if (System.currentTimeMillis() >= deadlineMs) {
+				break
+			}
+			WebUI.delay(2)
+		}
+		KeywordUtil.markFailed("waitUntilElementTextEquals: Timeout after ${effectiveTimeout}s; expected '${expectedText}', last actual '${lastActual}'")
+	}
+
+	/**
+	 * Polls until findWebElement + isEnabled succeeds without stale and matches the desired state,
+	 * or until timeout. Non-stale failures from find propagate immediately (e.g. missing element).
+	 * Use before verifyButtonEnabled when the DOM may still re-render, or standalone to wait for a button state.
+	 *
+	 * @param to TestObject for the button
+	 * @param enabledOrDisabled literal "enabled" or "disabled" (case-insensitive, trimmed)
+	 * @param timeoutSeconds overall deadline from first attempt
+	 */
+	@Keyword
+	static void waitUntilStableForButtonEnabledOrDisabled(TestObject to, String enabledOrDisabled, int timeoutSeconds) {
+		String norm = enabledOrDisabled?.trim()?.toLowerCase()
+		boolean expectedEnabled
+		if ("enabled".equals(norm)) {
+			expectedEnabled = true
+		} else if ("disabled".equals(norm)) {
+			expectedEnabled = false
+		} else {
+			KeywordUtil.markFailed("waitUntilStableForButtonEnabledOrDisabled: enabledOrDisabled must be \"enabled\" or \"disabled\", got: '${enabledOrDisabled}'")
+			return
+		}
+		long deadlineMs = System.currentTimeMillis() + (timeoutSeconds * 1000L)
+		int findProbeSec = Math.min(DEFAULT_TIMEOUT, 5)
+		String expectedStateLabel = expectedEnabled ? "enabled" : "disabled"
+		while (System.currentTimeMillis() < deadlineMs) {
+			try {
+				WebElement element = WebUI.findWebElement(to, findProbeSec)
+				boolean actualEnabled = element.isEnabled()
+				if (actualEnabled == expectedEnabled) {
+					return
+				}
+				KeywordUtil.logInfo("waitUntilStableForButtonEnabledOrDisabled: probe read ${actualEnabled ? 'enabled' : 'disabled'}, waiting for ${expectedStateLabel}...")
+			} catch (StaleElementReferenceException e) {
+				KeywordUtil.logInfo("waitUntilStableForButtonEnabledOrDisabled: stale element, retrying...")
+			} catch (StepFailedException e) {
+				if (e.getCause() instanceof StaleElementReferenceException) {
+					KeywordUtil.logInfo("waitUntilStableForButtonEnabledOrDisabled: stale element (wrapped), retrying...")
+				} else {
+					throw e
+				}
+			}
+			if (System.currentTimeMillis() >= deadlineMs) {
+				break
+			}
+			WebUI.delay(1)
+		}
+		KeywordUtil.markFailed("waitUntilStableForButtonEnabledOrDisabled: timed out after ${timeoutSeconds}s — element not stable in ${expectedStateLabel} state.")
+	}
+
+	/**
 	 * Verify that a button/element is enabled or disabled.
 	 * Results are logged to ValidationReport.
 	 * @param to TestObject for the button or element
@@ -288,6 +376,7 @@ class WebUIUtils {
 	@Keyword
 	static void refreshPageAndWaitForLoad(int timeoutSeconds = DEFAULT_TIMEOUT) {
 		int timeout = timeoutSeconds > 0 ? timeoutSeconds : DEFAULT_TIMEOUT
+		WebUI.delay(2)
 		WebUI.refresh()
 		WebUI.waitForPageLoad(timeout)
 		WebDriver driver = DriverFactory.getWebDriver()
