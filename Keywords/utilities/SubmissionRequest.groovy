@@ -755,9 +755,9 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		TestObject targetedDeliveryDate = findTestObject('CRDC/SubmissionRequest/Section-D/TragetSubmDelivryDate-TxtBx')
 		TestObject expectedPublicationDate = findTestObject('CRDC/SubmissionRequest/Section-D/ExpctdPublicationDate-TxtBx')
 		WebUI.clearText(targetedDeliveryDate)
-		WebUI.setText(targetedDeliveryDate, "05/12/2026")
+		WebUI.setText(targetedDeliveryDate, "05/12/2036")
 		WebUI.clearText(expectedPublicationDate)
-		WebUI.setText(expectedPublicationDate, "05/12/2026")
+		WebUI.setText(expectedPublicationDate, "05/12/2036")
 		//TestObject targetSubDeDate = findTestObject('CRDC/SubmissionRequest/Section-D/TragetSubmDelivryDate-TxtBx');
 
 		//		WebUI.scrollToElement(targetSubDeDate, 10)
@@ -1357,12 +1357,12 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(new Date())
 
 		actual = WebUI.getText(findTestObject(ePath+'TragetSubmDelivryDate-Txt'))
-		expctd = "05/12/2026";
+		expctd = "05/12/2036";
 		KeywordUtil.logInfo("Actual target data submission delivery date is: " + actual +" Expected target data submission delivery date is: "+expctd);
 		WebUI.verifyMatch(actual, expctd, false)
 
 		actual = WebUI.getText(findTestObject(ePath+'ExpctdPubliDateSec-D-RevPage-Txt'))
-		expctd =  "05/12/2026"
+		expctd =  "05/12/2036"
 		KeywordUtil.logInfo("Actual Publication date is: " + actual +"\nExpected Publication date is: "+expctd);
 		WebUI.verifyMatch(actual, expctd, false)
 		KeywordUtil.logInfo("Successfully verified Data Types delivery dates");
