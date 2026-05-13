@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//input[@value='All']</value>
+         <value>//*[@data-testid='validate-controls-validation-type']//input[@value='All']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//input[@value='All']</value>
+      <value>//*[@data-testid='validate-controls-validation-type']//input[@value='All']</value>
       <webElementGuid>441e3b4b-d5aa-4496-bdd9-44364df3ff43</webElementGuid>
    </webElementProperties>
 </WebElementEntity>
