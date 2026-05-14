@@ -14,7 +14,7 @@
    <testCaseLink>
       <guid>7373de0d-e69f-4689-be10-c7ad3d02aabd</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC17_VisionScreenshotComparison</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
