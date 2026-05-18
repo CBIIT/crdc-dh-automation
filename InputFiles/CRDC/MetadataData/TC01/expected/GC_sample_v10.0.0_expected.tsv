@@ -1,6 +1,6 @@
-type	sample_id	sample_type	sample_description	sample_type_category	sample_tumor_status	sample_anatomic_site	sample_age_at_collection	derived_from_specimen	biosample_accession	tumor_classification	 participant.study_participant_id	 pdx.pdx_id	status
-sample	CDS2008_DNA	Cells	samdescription	Skin	Peritumoral	Vulva|Wrist|Venous	37	derived from speci		Progression	Key_3	pdxkey_1	Warning
-sample	CDS2009_DNA	Cells	samdescription	Skin	Peritumoral	Vulva|Wrist|Venous	39	derived from speci		Recurrent	Key_2	pdxkey_1	Warning
-sample	CDS2011_DNA	Cells	samdescription	Skin	Peritumoral	Vulva|Wrist|Venous	38	derived from speci		Recurrent	Key_2	pdxkey_1	Warning
-sample	CDS2014_DNA	Cells	samdescription	Skin	Peritumoral	Vulva|Wrist|Venous	36	derived from speci		Metastatic	Key_2	pdxkey_1	Warning
-sample	CDS2016_DNA	Cells	samdescription	Cell Line	Normal	Vulva|Wrist|Venous	35	derived from speci		Premalignant	Key_1	pdxkey_1	Passed
+type	biosample_accession	derived_from_specimen	participant.study_participant_id	pdx.pdx_id	sample_age_at_collection	sample_anatomic_site	sample_description	sample_id	sample_tumor_status	sample_type	sample_type_category	tumor_classification	status
+sample		derived from speci	Key_3	pdxkey_1	37	Vulva|Wrist|Venous	samdescription	CDS2008_DNA	Peritumoral	Cells	Skin	Progression	Warning
+sample		derived from speci	Key_2	pdxkey_1	39	Vulva|Wrist|Venous	samdescription	CDS2009_DNA	Peritumoral	Cells	Skin	Recurrent	Warning
+sample		derived from speci	Key_2	pdxkey_1	38	Vulva|Wrist|Venous	samdescription	CDS2011_DNA	Peritumoral	Cells	Skin	Recurrent	Warning
+sample		derived from speci	Key_2	pdxkey_1	36	Vulva|Wrist|Venous	samdescription	CDS2014_DNA	Peritumoral	Cells	Skin	Metastatic	Warning
+sample		derived from speci	Key_1	pdxkey_1	35	Vulva|Wrist|Venous	samdescription	CDS2016_DNA	Normal	Cells	Cell Line	Premalignant	Passed

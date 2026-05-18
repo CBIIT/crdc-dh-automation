@@ -8,6 +8,7 @@ import com.kms.katalon.core.util.KeywordUtil
 import com.kms.katalon.core.webui.driver.DriverFactory
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import org.openqa.selenium.By
+import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.Keys
 import org.openqa.selenium.StaleElementReferenceException
 import org.openqa.selenium.WebDriver
@@ -484,9 +485,11 @@ class DataSubmissions extends TestRunner {
 	}
 
 	/**
-	 * This function verifies the rows of the Data View tab match the metadata file for the given node.
-	 * Loads TSV from metadataFile, filters columns (skips 'type' and fields with '.'), selects node in dropdown,
-	 * then compares expected vs actual row-by-row. Uses aria-label for truncated cells when present.
+	 * Verifies Data View table rows match the upload metadata TSV for the given node.
+	 * Keeps all TSV columns except type and status (relationship columns with '.' are included).
+	 * Maps TSV headers to UI columns by name (not input file column index), checks alphabetical
+	 * header order after ID and Status, then compares cell values row-by-row.
+	 * Truncated cells use aria-label from truncated-text-wrapper when present.
 	 * @param metadataFile Relative path to metadata TSV (e.g. InputFiles/CRDC/MetadataData/TC01/file.tsv)
 	 * @param node Node name to select in Data View dropdown (e.g. consent_group, participant)
 	 */
@@ -503,31 +506,11 @@ class DataSubmissions extends TestRunner {
 				KeywordUtil.markFailed("TSV file does not contain data rows.")
 			}
 
-			// Step 2: Determine which columns to keep (skip 'type' and fields with '.')
-			String[] headers = lines.get(0).split("\t", -1)
-			List<Integer> includedIndexes = new ArrayList<>()
-			for (int j = 1; j < headers.length; j++) {
-				if (!headers[j].contains(".")) {
-					includedIndexes.add(j)
-				}
-			}
+			// Step 2: All columns except type/status (include relationship columns shown in the UI)
+			List<String> expectedHeaderNames = new ArrayList<>()
+			List<List<String>> expectedRows = parseDataViewMetadataTsv(lines, expectedHeaderNames)
 
-			// Step 3: Load expected values from filtered columns
-			List<List<String>> expectedRows = new ArrayList<>()
-			for (int i = 1; i < lines.size(); i++) {
-				String[] fields = lines.get(i).split("\t", -1)
-				List<String> row = new ArrayList<>()
-				for (int index : includedIndexes) {
-					String val = fields[index].trim()
-					if (val.startsWith("\"") && val.endsWith("\"") && val.length() > 1) {
-						val = val.substring(1, val.length() - 1)
-					}
-					row.add(val)
-				}
-				expectedRows.add(row)
-			}
-
-			// Step 4: Select node from dropdown and wait for table refresh
+			// Step 3: Select node from dropdown and wait for table refresh
 			WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validation/NodeType-Ddn'), 30)
 			WebUI.click(findTestObject('CRDC/DataSubmissions/Validation/NodeType-Ddn'))
 			WebUI.delay(1)
@@ -535,66 +518,242 @@ class DataSubmissions extends TestRunner {
 			option.click()
 			WebUI.delay(1)
 
-			// Step 5: Get fresh list of actual UI rows
-			List<WebElement> actualRowElements = Utils.getListWebElements("CRDC/DataSubmissions/Validation/Table-Row")
-			if (actualRowElements.size() == 20) {
-				KeywordUtil.logInfo("Full table")
-			} else if (actualRowElements.size() != expectedRows.size()) {
-				KeywordUtil.markFailed("Row count mismatch: UI has " + actualRowElements.size() + ", but file has " + expectedRows.size())
-			}
-
-			// Step 6: Compare row by row and collect for report
+			// Step 4: Read UI headers and rows (map by header name, not positional index)
+			List<String> uiHeaders = getDataViewTableHeaderNames(driver)
 			String sectionName = "Data View"
 			boolean anyFail = false
-			for (int i = 0; i < actualRowElements.size(); i++) {
-				WebElement row = actualRowElements.get(i)
-				List<WebElement> cells = row.findElements(By.tagName("td"))
-				List<String> actualValues = new ArrayList<>()
-				List<String> uiValues = new ArrayList<>()
-				int uiColIndex = 0
-				for (int j = 0; j < cells.size(); j++) {
-					if (j == 0 || j == 2) continue  // skip checkbox and status
-						if (uiColIndex >= includedIndexes.size()) break
-						WebElement cell = cells.get(j)
-					String actual
-					String uiText = ""
-					try {
-						WebElement span = cell.findElement(By.tagName("span"))
-						String ariaLabel = span.getAttribute("aria-label")
-						uiText = span.getText().trim()
-						actual = (ariaLabel != null && !ariaLabel.isEmpty()) ? ariaLabel.trim() : cell.getText().trim()
-					} catch (Exception e) {
-						actual = cell.getText().trim()
-						uiText = actual
-					}
-					actualValues.add(actual)
-					uiValues.add(uiText)
-					uiColIndex++
-				}
-				List<String> expectedValues = i < expectedRows.size() ? expectedRows.get(i) : new ArrayList<>()
-				if (actualValues.size() != expectedValues.size()) {
+			if (!verifyDataViewColumnHeaderOrder(uiHeaders, sectionName, node)) {
+				anyFail = true
+			}
+
+			List<List<String>> uiRows = readDataViewTableRows(driver)
+			if (uiRows.size() == 20) {
+				KeywordUtil.logInfo("Full table")
+			} else if (uiRows.size() != expectedRows.size()) {
+				KeywordUtil.markFailed("Row count mismatch: UI has " + uiRows.size() + ", but file has " + expectedRows.size())
+			}
+
+			int[] expectedToUiIndex = mapDataViewHeadersToUiIndices(expectedHeaderNames, uiHeaders)
+			for (int c = 0; c < expectedHeaderNames.size(); c++) {
+				String expHeader = expectedHeaderNames.get(c)?.trim() ?: ""
+				int uiIdx = c < expectedToUiIndex.length ? expectedToUiIndex[c] : -1
+				String actHeader = (uiIdx >= 0 && uiIdx < uiHeaders.size()) ? (uiHeaders.get(uiIdx)?.trim() ?: "") : ""
+				boolean found = uiIdx >= 0 && !actHeader.isEmpty()
+				if (!found) {
 					anyFail = true
-					ValidationReport.addValidationReportItem(sectionName, "Row " + (i + 1), "columns=" + expectedValues.size(), "columns=" + actualValues.size(), "Fail")
-					continue
+					ValidationReport.addValidationReportItem(sectionName, "Column '" + expHeader + "'", "present in table", "missing", "Fail")
 				}
+			}
+
+			int maxRows = Math.min(uiRows.size(), expectedRows.size())
+			for (int i = 0; i < maxRows; i++) {
+				List<String> expectedValues = expectedRows.get(i)
+				List<String> actRow = uiRows.get(i)
 				for (int j = 0; j < expectedValues.size(); j++) {
 					String expected = expectedValues.get(j)
-					String actual = actualValues.get(j)
-					String actualUi = uiValues.get(j)
-					String cleanedUi = actualUi.replace("...", "").trim()
+					int uiIdx = j < expectedToUiIndex.length ? expectedToUiIndex[j] : -1
+					String actual = (uiIdx >= 0 && uiIdx < actRow.size()) ? (actRow.get(uiIdx) ?: "") : ""
+					String cleanedUi = actual.replace("...", "").trim()
 					boolean match = actual.equals(expected) || expected.contains(cleanedUi)
 					if (!match) anyFail = true
-					ValidationReport.addValidationReportItem(sectionName, "Row " + (i + 1) + " Col " + (j + 1), expected, actual, match ? "Pass" : "Fail")
+					String colLabel = j < expectedHeaderNames.size() ? expectedHeaderNames.get(j) : String.valueOf(j + 1)
+					ValidationReport.addValidationReportItem(sectionName, "Row " + (i + 1) + " " + colLabel, expected, actual, match ? "Pass" : "Fail")
 				}
 			}
 			if (anyFail) {
 				KeywordUtil.markFailed("Data View: one or more row/column mismatches. See validation report.")
 			} else {
-				KeywordUtil.logInfo("Finished verifying-- Data View tab in UI matches the contents of the TSV (ignoring type and reference columns).")
+				KeywordUtil.logInfo("Finished verifying-- Data View tab in UI matches the contents of the TSV (ignoring type and status).")
 			}
 		} catch (Exception e) {
 			KeywordUtil.markFailed("Exception in verifyDataViewMatchesMetadata(): " + e.getMessage())
 		}
+	}
+
+	/**
+	 * Parse upload metadata TSV for Data View UI verification.
+	 * Keeps all columns except type and status (relationship columns with '.' are included).
+	 */
+	private static List<List<String>> parseDataViewMetadataTsv(List<String> lines, List<String> expectedHeaderNames) {
+		List<List<String>> rows = new ArrayList<>()
+		if (lines == null || lines.isEmpty()) return rows
+		String[] headerLine = lines.get(0).split("\t", -1)
+		List<Integer> includedIndexes = new ArrayList<>()
+		for (int j = 0; j < headerLine.length; j++) {
+			String h = headerLine[j].trim()
+			if (h.equalsIgnoreCase("type") || h.equalsIgnoreCase("status")) continue
+			includedIndexes.add(j)
+			expectedHeaderNames.add(h)
+		}
+		for (int i = 1; i < lines.size(); i++) {
+			String[] fields = lines.get(i).split("\t", -1)
+			List<String> row = new ArrayList<>()
+			for (Integer idx : includedIndexes) {
+				String val = idx < fields.length ? fields[idx].trim() : ""
+				if (val.startsWith("\"") && val.endsWith("\"") && val.length() > 1) {
+					val = val.substring(1, val.length() - 1)
+				}
+				row.add(val)
+			}
+			rows.add(row)
+		}
+		return rows
+	}
+
+	/** Header labels from the Data View generic table (single JS read for speed). */
+	private static List<String> getDataViewTableHeaderNames(WebDriver driver) {
+		JavascriptExecutor js = (JavascriptExecutor) driver
+		String script = "var headers = document.querySelectorAll(\"[data-testid^='generic-table-header-']\"); " +
+				"var names = []; " +
+				"for (var i = 0; i < headers.length; i++) { " +
+				"  var h = headers[i]; " +
+				"  var text = (h.innerText || '').replace(/\\s+/g, ' ').trim(); " +
+				"  if (text) { names.push(text); } " +
+				"  else { " +
+				"    var tid = h.getAttribute('data-testid') || ''; " +
+				"    if (tid.indexOf('generic-table-header-') === 0) names.push(tid.replace('generic-table-header-', '')); " +
+				"  } " +
+				"} " +
+				"return names;"
+		List<String> names = (List<String>) js.executeScript(script)
+		if (names != null && !names.isEmpty()) return names
+		// Fallback when generic-table-header is not used
+		List<WebElement> headers = Utils.getListWebElements("CRDC/DataSubmissions/Validation/Table-Headers")
+		List<String> fallback = new ArrayList<>()
+		for (WebElement h : headers) {
+			String text = h.getText()?.replaceAll(/\s+/, ' ')?.trim()
+			if (text != null && !text.isEmpty()) fallback.add(text)
+		}
+		return fallback
+	}
+
+	/**
+	 * Reads all Data View table rows in one JS call (same approach as DataExplorer.readTableRows).
+	 * Per-cell WebDriver findElement was very slow due to implicit waits on missing nested elements.
+	 */
+	private static List<List<String>> readDataViewTableRows(WebDriver driver) {
+		JavascriptExecutor js = (JavascriptExecutor) driver
+		String script = "var rows = document.querySelectorAll(\"[data-testid='generic-table-row']\"); " +
+				"var out = []; " +
+				"for (var i = 0; i < rows.length; i++) { " +
+				"  var cells = rows[i].querySelectorAll('td'); " +
+				"  var row = []; " +
+				"  for (var j = 0; j < cells.length; j++) { " +
+				"    var cell = cells[j]; " +
+				"    var trunc = cell.querySelector(\"[data-testid='truncated-text-wrapper']\"); " +
+				"    var val = ''; " +
+				"    if (trunc) { " +
+				"      var aria = trunc.getAttribute('aria-label'); " +
+				"      val = (aria && aria.trim()) ? aria.trim() : (cell.innerText || '').trim(); " +
+				"    } else { " +
+				"      val = (cell.innerText || '').trim(); " +
+				"    } " +
+				"    row.push(val); " +
+				"  } " +
+				"  out.push(row); " +
+				"} " +
+				"return out;"
+		List<List<String>> raw = (List<List<String>>) js.executeScript(script)
+		List<List<String>> result = new ArrayList<>()
+		if (raw == null) return result
+		for (List<String> row : raw) {
+			result.add(row != null ? new ArrayList<>(row) : new ArrayList<>())
+		}
+		return result
+	}
+
+	/**
+	 * Sort key for Data View column headers: case-insensitive, with '.' ordered after letters and '_'
+	 * (matches UI/export so sample_type_for_implantation sorts before sample.sample_id).
+	 */
+	private static String dataViewColumnSortKey(String header) {
+		if (header == null) return ""
+		return header.toLowerCase().replace(".", "\u00ff")
+	}
+
+	/**
+	 * Verifies Data View header order: optional checkbox column ("Select All" or "checkbox"), then primary key
+	 * and Status pinned, then remaining columns alphabetically (case-insensitive; '.' after '_'). Skips Orphaned.
+	 * When Status is not present in the header DOM read, skips only the checkbox (if any) and ID column.
+	 * @return true when order matches
+	 */
+	private static boolean verifyDataViewColumnHeaderOrder(List<String> uiHeaders, String sectionName, String node) {
+		String itemLabel = "Column order (after ID, Status)" + (node ? " [" + node + "]" : "")
+		if (uiHeaders == null || uiHeaders.isEmpty()) {
+			ValidationReport.addValidationReportItem(sectionName, itemLabel, "headers present", "none", "Fail")
+			return false
+		}
+		int startIndex = 0
+		String firstHeader = uiHeaders.get(0)?.trim() ?: ""
+		if (firstHeader.equalsIgnoreCase("Select All") || firstHeader.equalsIgnoreCase("checkbox")) {
+			startIndex = 1
+		}
+		if (uiHeaders.size() <= startIndex) {
+			ValidationReport.addValidationReportItem(sectionName, itemLabel, "ID column", "missing", "Fail")
+			return false
+		}
+		int statusIdx = -1
+		for (int i = startIndex; i < uiHeaders.size(); i++) {
+			String h = uiHeaders.get(i)?.trim() ?: ""
+			if (h.equalsIgnoreCase("Status")) {
+				statusIdx = i
+				break
+			}
+		}
+		int sortableStart = (statusIdx >= 0) ? statusIdx + 1 : startIndex + 1
+		if (uiHeaders.size() <= sortableStart) {
+			ValidationReport.addValidationReportItem(sectionName, itemLabel, "sortable columns", "none after pinned columns", "Fail")
+			return false
+		}
+		List<String> sortableHeaders = new ArrayList<>()
+		for (int i = sortableStart; i < uiHeaders.size(); i++) {
+			String h = uiHeaders.get(i)?.trim() ?: ""
+			if (h.isEmpty()) continue
+			if (h.equalsIgnoreCase("Orphaned")) continue
+			sortableHeaders.add(h)
+		}
+		List<String> expectedOrder = new ArrayList<>(sortableHeaders)
+		Collections.sort(expectedOrder, { String a, String b ->
+			dataViewColumnSortKey(a) <=> dataViewColumnSortKey(b)
+		})
+		boolean ok = true
+		if (sortableHeaders.size() != expectedOrder.size()) {
+			ok = false
+		} else {
+			for (int i = 0; i < sortableHeaders.size(); i++) {
+				if (dataViewColumnSortKey(sortableHeaders.get(i)) != dataViewColumnSortKey(expectedOrder.get(i))) {
+					ok = false
+					break
+				}
+			}
+		}
+		String actualJoined = sortableHeaders.join("; ")
+		String expectedJoined = expectedOrder.join("; ")
+		ValidationReport.addValidationReportItem(sectionName, itemLabel, expectedJoined, actualJoined, ok ? "Pass" : "Fail")
+		return ok
+	}
+
+	/**
+	 * Maps TSV header names to UI column indices (case-insensitive; underscores vs spaces normalized).
+	 */
+	private static int[] mapDataViewHeadersToUiIndices(List<String> expectedHeaderNames, List<String> uiHeaders) {
+		int[] map = new int[expectedHeaderNames.size()]
+		Arrays.fill(map, -1)
+		for (int c = 0; c < expectedHeaderNames.size(); c++) {
+			String exp = expectedHeaderNames.get(c)
+			if (exp == null) continue
+			String expNorm = exp.replace("_", " ").trim()
+			for (int u = 0; u < uiHeaders.size(); u++) {
+				String ui = uiHeaders.get(u)
+				if (ui == null) continue
+				String uiNorm = ui.replace("_", " ").trim()
+				if (ui.equalsIgnoreCase(exp) || uiNorm.equalsIgnoreCase(expNorm)) {
+					map[c] = u
+					break
+				}
+			}
+		}
+		return map
 	}
 
 	/**
