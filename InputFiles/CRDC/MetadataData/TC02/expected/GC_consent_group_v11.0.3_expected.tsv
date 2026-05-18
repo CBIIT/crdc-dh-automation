@@ -1,4 +1,4 @@
-type	consent_group_id	consent_group_name	consent_group_number	 study.study_id	status
+type	consent_group_id	consent_group_name	consent_group_number	study.study_id	status
 consent_group	auto_consent_1	auto_gp name1	10	phs769076	Passed
 consent_group	auto_consent_2	auto_gp name2	3	phs769076	Passed
 consent_group	auto_consent_3	auto_gp name3	2	phs769076	Passed
