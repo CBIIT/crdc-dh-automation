@@ -485,9 +485,11 @@ class DataSubmissions extends TestRunner {
 	}
 
 	/**
-	 * This function verifies the rows of the Data View tab match the metadata file for the given node.
-	 * Loads TSV from metadataFile, filters columns (skips 'type' and fields with '.'), selects node in dropdown,
-	 * then compares expected vs actual row-by-row. Uses aria-label for truncated cells when present.
+	 * Verifies Data View table rows match the upload metadata TSV for the given node.
+	 * Keeps all TSV columns except type and status (relationship columns with '.' are included).
+	 * Maps TSV headers to UI columns by name (not input file column index), checks alphabetical
+	 * header order after ID and Status, then compares cell values row-by-row.
+	 * Truncated cells use aria-label from truncated-text-wrapper when present.
 	 * @param metadataFile Relative path to metadata TSV (e.g. InputFiles/CRDC/MetadataData/TC01/file.tsv)
 	 * @param node Node name to select in Data View dropdown (e.g. consent_group, participant)
 	 */
