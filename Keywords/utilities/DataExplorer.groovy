@@ -68,8 +68,8 @@ class DataExplorer {
 			String node = nodeType?.trim()
 			if (node == null || node.isEmpty()) continue
 
-				// 1. Select node type in dropdown
-				selectNodeType(driver, node)
+			// 1. Select node type in dropdown
+			selectNodeType(driver, node)
 
 			// 1b. Open column visibility and select Show All so all columns are visible
 			WebUI.waitForElementClickable(findTestObject(COLUMN_VISIBILITY_BTN_OR), DEFAULT_TIMEOUT)
@@ -78,9 +78,10 @@ class DataExplorer {
 			WebUI.waitForElementClickable(findTestObject(SHOW_ALL_CHKBX_OR), DEFAULT_TIMEOUT)
 			WebUI.check(findTestObject(SHOW_ALL_CHKBX_OR))
 			WebUI.delay(1)
+			Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+			Utils.waitForElementToDisappear('CRDC/AILocators/GenericTable/LoadingRow', 15)
 
 			// 2. Wait for table and verify structure
-			WebUI.delay(2)
 			boolean containerVisible = WebUI.waitForElementVisible(findTestObject(STUDY_VIEW_CONTAINER_OR), DEFAULT_TIMEOUT)
 			ValidationReport.addValidationReportItem(REPORT_SECTION, "Node '${node}' – study view container", "visible", containerVisible ? "visible" : "not visible", containerVisible ? "Pass" : "Fail")
 			if (!containerVisible) {
