@@ -2,6 +2,8 @@ package utilities
 
 import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
 import com.kms.katalon.core.annotation.Keyword
+import com.kms.katalon.core.testobject.ConditionType
+import com.kms.katalon.core.testobject.TestObject
 import com.kms.katalon.core.util.KeywordUtil
 import com.kms.katalon.core.webui.driver.DriverFactory
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
@@ -175,18 +177,17 @@ class DataSubmissionsList extends TestRunner {
 				}
 			}
 			if (criteria.submitterName != null && !criteria.submitterName.trim().isEmpty()) {
-				String v = criteria.submitterName.trim().replace("'", "''")
+				String raw = criteria.submitterName.trim()
+				String escaped = raw.replace("'", "''")
 				if (WebUI.waitForElementPresent(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)) {
-					// Prior filters trigger listSubmissions refetch; wait for table load before submitter options populate
-					Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
-					Utils.waitForElementToDisappear('CRDC/AILocators/GenericTable/LoadingRow', 15)
 					WebUI.waitForElementClickable(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)
 					WebUI.click(findTestObject(listFilters + "/SubmitterName-Ddn"))
-					WebUI.delay(1)
-					WebElement opt = new WebDriverWait(driver, DEFAULT_TIMEOUT).until(
-						ExpectedConditions.presenceOfElementLocated(By.xpath("//li[normalize-space(text())='" + v + "']"))
-					)
-					opt.click()
+					// Same pattern as SubmissionRequest.fillSectionBDataTypesSubmitted: dynamic TestObject + waitForElementVisible on last open listbox
+					TestObject submitterOption = new TestObject('DataSubmissionsList_SubmitterNameOption')
+					submitterOption.addProperty('xpath', ConditionType.EQUALS,
+						"(//*[@role='listbox'])[last()]//li[normalize-space()='" + escaped + "']", true)
+					WebUI.waitForElementVisible(submitterOption, DEFAULT_TIMEOUT)
+					WebUI.click(submitterOption)
 					WebUI.delay(1)
 				}
 			}
