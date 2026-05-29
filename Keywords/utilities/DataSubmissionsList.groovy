@@ -178,8 +178,9 @@ class DataSubmissionsList extends TestRunner {
 				String v = criteria.submitterName.trim().replace("'", "''")
 				if (WebUI.waitForElementPresent(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)) {
 					WebUI.waitForElementClickable(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)
-					WebUI.delay(2)
-					WebUI.click(findTestObject(listFilters + "/SubmitterName-Ddn"))
+					//WebUI.delay(2)
+					clickTab(listFilters + "/SubmitterName-Ddn")
+					//WebUI.click(findTestObject(listFilters + "/SubmitterName-Ddn"))
 					WebUI.delay(1)
 					WebElement opt = driver.findElement(By.xpath("//li[normalize-space(text())='" + v + "']"))
 					opt.click()
