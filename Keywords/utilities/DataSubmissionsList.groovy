@@ -177,10 +177,15 @@ class DataSubmissionsList extends TestRunner {
 			if (criteria.submitterName != null && !criteria.submitterName.trim().isEmpty()) {
 				String v = criteria.submitterName.trim().replace("'", "''")
 				if (WebUI.waitForElementPresent(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)) {
+					// Prior filters trigger listSubmissions refetch; wait for table load before submitter options populate
+					Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+					Utils.waitForElementToDisappear('CRDC/AILocators/GenericTable/LoadingRow', 15)
 					WebUI.waitForElementClickable(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)
 					WebUI.click(findTestObject(listFilters + "/SubmitterName-Ddn"))
 					WebUI.delay(1)
-					WebElement opt = driver.findElement(By.xpath("//li[normalize-space(text())='" + v + "']"))
+					WebElement opt = new WebDriverWait(driver, DEFAULT_TIMEOUT).until(
+						ExpectedConditions.presenceOfElementLocated(By.xpath("//li[normalize-space(text())='" + v + "']"))
+					)
 					opt.click()
 					WebUI.delay(1)
 				}
