@@ -84,6 +84,7 @@ class DataSubmissionsList extends TestRunner {
 	 */
 	@Keyword
 	void applyDataSubmissionsListFilters(Map<String, String> criteria) {
+		WebUI.delay(2)
 		if (criteria == null || criteria.isEmpty()) {
 			KeywordUtil.logInfo("applyDataSubmissionsListFilters: no criteria; skipping")
 			return
@@ -93,6 +94,19 @@ class DataSubmissionsList extends TestRunner {
 			WebDriver driver = DriverFactory.getWebDriver()
 			String listFilters = "CRDC/AILocators/DataSubmissions/List/Filters"
 
+			if (criteria.submitterName != null && !criteria.submitterName.trim().isEmpty()) {
+				String v = criteria.submitterName.trim().replace("'", "''")
+				if (WebUI.waitForElementPresent(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)) {
+					WebUI.waitForElementClickable(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)
+					WebUI.delay(1)
+					WebElement submitterDdn = WebUI.findWebElement(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)
+					new Actions(driver).moveToElement(submitterDdn).click().perform()
+					WebUI.delay(1)
+					WebElement opt = driver.findElement(By.xpath("//li[normalize-space(text())='" + v + "']"))
+					opt.click()
+					WebUI.delay(1)
+				}
+			}
 			if (criteria.submissionName != null && !criteria.submissionName.trim().isEmpty()) {
 				String v = criteria.submissionName.trim()
 				if (WebUI.waitForElementPresent(findTestObject(listFilters + "/SubmissionName-TxtBx"), 5)) {
@@ -174,17 +188,6 @@ class DataSubmissionsList extends TestRunner {
 					WebUI.delay(1)
 				}
 			}
-			if (criteria.submitterName != null && !criteria.submitterName.trim().isEmpty()) {
-				String v = criteria.submitterName.trim().replace("'", "''")
-				if (WebUI.waitForElementPresent(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)) {
-					WebUI.waitForElementClickable(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)
-					WebUI.click(findTestObject(listFilters + "/SubmitterName-Ddn"))
-					WebUI.delay(1)
-					WebElement opt = driver.findElement(By.xpath("//li[normalize-space(text())='" + v + "']"))
-					opt.click()
-					WebUI.delay(1)
-				}
-			}
 			if (criteria.dataCommons != null && !criteria.dataCommons.trim().isEmpty()) {
 				String v = criteria.dataCommons.trim().replace("'", "''")
 				if (WebUI.waitForElementPresent(findTestObject(listFilters + "/DataCommons-Ddn"), 5)) {
@@ -204,7 +207,7 @@ class DataSubmissionsList extends TestRunner {
 					WebUI.delay(1)
 				}
 			}
-			WebUI.delay(2)
+			waitForGenericTableReady(DriverFactory.getWebDriver(), DEFAULT_TIMEOUT)
 			KeywordUtil.logInfo("applyDataSubmissionsListFilters: completed")
 		} catch (Exception e) {
 			KeywordUtil.markFailed("applyDataSubmissionsListFilters: " + e.getMessage())
@@ -212,7 +215,112 @@ class DataSubmissionsList extends TestRunner {
 	}
 
 	/**
+	 * Wait until GenericTable finishes refetch: suspense overlay and loading rows clear, then row text is stable.
+	 * During refetch with existing rows the UI keeps old generic-table-row nodes until swap; the suspense loader
+	 * (data-testid generic-table-suspense-loader) is the reliable in-flight signal.
+	 */
+	private static void waitForGenericTableReady(WebDriver driver, int timeoutSeconds) {
+		JavascriptExecutor js = (JavascriptExecutor) driver
+		long deadline = System.currentTimeMillis() + (long) timeoutSeconds * 1000L
+		String snapshotScript =
+			"var rows = document.querySelectorAll(\"[data-testid='generic-table-row']\");" +
+			"var parts = [];" +
+			"for (var i = 0; i < rows.length; i++) { parts.push((rows[i].innerText || '').trim()); }" +
+			"return parts.join('\\n');"
+
+		String baselineSnapshot = (String) js.executeScript(snapshotScript)
+		if (baselineSnapshot == null) baselineSnapshot = ""
+
+		// Debounced filter handlers (e.g. submission name) may start refetch shortly after the last interaction
+		Thread.sleep(600)
+
+		long activityDeadline = Math.min(deadline, System.currentTimeMillis() + 5000)
+		while (System.currentTimeMillis() < activityDeadline) {
+			Boolean loaderVisible = (Boolean) js.executeScript(
+				"var el = document.querySelector(\"[data-testid='generic-table-suspense-loader']\");" +
+				"return el != null && el.offsetParent !== null;"
+			)
+			Long loadingRows = (Long) js.executeScript(
+				"return document.querySelectorAll(\"[data-testid='loading-row']\").length;"
+			)
+			String snapshot = (String) js.executeScript(snapshotScript)
+			if (snapshot == null) snapshot = ""
+			if (Boolean.TRUE.equals(loaderVisible) || (loadingRows != null && loadingRows > 0) || !snapshot.equals(baselineSnapshot)) {
+				break
+			}
+			Thread.sleep(250)
+		}
+
+		while (System.currentTimeMillis() < deadline) {
+			Boolean loaderVisible = (Boolean) js.executeScript(
+				"var el = document.querySelector(\"[data-testid='generic-table-suspense-loader']\");" +
+				"return el != null && el.offsetParent !== null;"
+			)
+			if (!Boolean.TRUE.equals(loaderVisible)) break
+			Thread.sleep(250)
+		}
+
+		try {
+			Utils.waitForElementToDisappear('CRDC/AILocators/GenericTable/LoadingRow', timeoutSeconds)
+		} catch (Exception e) {
+			KeywordUtil.logInfo("waitForGenericTableReady: loading row wait: " + e.getMessage())
+		}
+
+		String lastSnapshot = null
+		int stableSamples = 0
+		while (System.currentTimeMillis() < deadline && stableSamples < 2) {
+			String snapshot = (String) js.executeScript(snapshotScript)
+			if (snapshot == null) snapshot = ""
+			if (snapshot.equals(lastSnapshot)) {
+				stableSamples++
+			} else {
+				stableSamples = 0
+				lastSnapshot = snapshot
+			}
+			if (stableSamples < 2) Thread.sleep(500)
+		}
+		KeywordUtil.logInfo("waitForGenericTableReady: content stable=" + (stableSamples >= 2))
+	}
+
+	/**
+	 * Reads all GenericTable rows in one JS call (same approach as readDataViewTableRows in DataSubmissions).
+	 * Avoids StaleElementReferenceException from holding WebElement references across React re-renders.
+	 */
+	private static List<List<String>> readGenericTableRowsViaJs(WebDriver driver) {
+		JavascriptExecutor js = (JavascriptExecutor) driver
+		String script =
+			"var rows = document.querySelectorAll(\"[data-testid='generic-table-row']\");" +
+			"var out = [];" +
+			"for (var i = 0; i < rows.length; i++) {" +
+			"  var cells = rows[i].querySelectorAll('td');" +
+			"  var row = [];" +
+			"  for (var j = 0; j < cells.length; j++) {" +
+			"    var cell = cells[j];" +
+			"    var trunc = cell.querySelector(\"[data-testid='truncated-text-wrapper']\");" +
+			"    var val = '';" +
+			"    if (trunc) {" +
+			"      var aria = trunc.getAttribute('aria-label');" +
+			"      val = (aria && aria.trim()) ? aria.trim() : (cell.innerText || '').trim();" +
+			"    } else {" +
+			"      val = (cell.innerText || '').trim();" +
+			"    }" +
+			"    row.push(val);" +
+			"  }" +
+			"  out.push(row);" +
+			"}" +
+			"return out;"
+		List<List<String>> raw = (List<List<String>>) js.executeScript(script)
+		List<List<String>> result = new ArrayList<>()
+		if (raw == null) return result
+		for (List<String> row : raw) {
+			result.add(row != null ? new ArrayList<>(row) : new ArrayList<>())
+		}
+		return result
+	}
+
+	/**
 	 * Read currently visible Data Submissions list table rows (GenericTable). Returns list of row data.
+	 * Waits for table refetch to finish, then reads all rows in one JS batch to avoid stale element flakes.
 	 *
 	 * @return List of rows, each row a List<String> of cell values in header order
 	 */
@@ -221,21 +329,18 @@ class DataSubmissionsList extends TestRunner {
 		List<List<String>> result = new ArrayList<>()
 		try {
 			WebDriver driver = DriverFactory.getWebDriver()
-			String tableXpath = TestRunner.givexpath("CRDC/AILocators/GenericTable/Table")
-			WebElement table = driver.findElement(By.xpath(tableXpath))
-			List<WebElement> headerEls = table.findElements(By.xpath(".//thead//th"))
-			List<String> headers = new ArrayList<>()
-			for (WebElement h : headerEls) headers.add(h.getText().trim())
-			List<WebElement> rows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
-			if (rows == null) {
-				KeywordUtil.logInfo("Data Submissions list table row count: 0")
-				return result
+			try {
+				Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+			} catch (Exception e) {
+				KeywordUtil.logInfo("readDataSubmissionsListTableRows: loading icon wait: " + e.getMessage())
 			}
-			for (WebElement row : rows) {
-				List<WebElement> cells = row.findElements(By.tagName("td"))
-				List<String> cellTexts = new ArrayList<>()
-				for (WebElement cell : cells) cellTexts.add(cell.getText().trim())
-				result.add(cellTexts)
+			waitForGenericTableReady(driver, DEFAULT_TIMEOUT)
+
+			for (int readAttempt = 1; readAttempt <= 3; readAttempt++) {
+				result = readGenericTableRowsViaJs(driver)
+				if (!result.isEmpty()) break
+				KeywordUtil.logInfo("readDataSubmissionsListTableRows: 0 rows on attempt " + readAttempt + ", re-waiting for table...")
+				waitForGenericTableReady(driver, 10)
 			}
 			KeywordUtil.logInfo("Data Submissions list table row count: " + result.size())
 		} catch (Exception e) {
