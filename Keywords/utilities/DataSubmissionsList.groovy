@@ -84,6 +84,7 @@ class DataSubmissionsList extends TestRunner {
 	 */
 	@Keyword
 	void applyDataSubmissionsListFilters(Map<String, String> criteria) {
+		WebUI.delay(2)
 		if (criteria == null || criteria.isEmpty()) {
 			KeywordUtil.logInfo("applyDataSubmissionsListFilters: no criteria; skipping")
 			return
