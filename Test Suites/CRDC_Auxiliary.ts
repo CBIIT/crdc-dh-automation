@@ -47,13 +47,6 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>4e64b294-292c-4e05-b20c-00b5a9e6b21a</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>false</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC17_VisionScreenshotComparison</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
       <guid>1172dea7-ad0f-4b5b-a0b6-7499d37ebbfb</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>

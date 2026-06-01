@@ -1,6 +1,6 @@
-type	study_participant_id	participant_id	race	sex	ethnicity	dbGaP_subject_id	study.study_id	consent_group.consent_group_id	status
-participant	study.study1_autopart1	autopart1	Asian|American Indian or Alaska Native	Male	Not Hispanic or Latino|Hispanic or Latino	dbgap_subID	study.study1	consent_1	New
-participant	study.study2_autopart2	autopart2	Asian|white	Male	Not Hispanic or Latino|Not reported		study.study2	consent_1	New
-participant	study.study3_autopart3	autopart3	Asian|Native Hawaiian or other Pacific Islander	Male	Not Hispanic or Latino		study.study3	consent_3	New
-participant	study.study4_autopart4	autopart4	Asian|Native Hawaiian or other Pacific Islander	Male	Not Hispanic or Latino		study.study4	consent_4	New
-participant	study.study5_autopart5	autopart5	Asian|Native Hawaiian or other Pacific Islander	Male	Not Hispanic or Latino		study.study5	consent_5	New
+type	consent_group.consent_group_id	dbGaP_subject_id	ethnicity	participant_id	race	sex	study_participant_id	study.study_id	status
+participant	consent_1	dbgap_subID	Not Hispanic or Latino|Hispanic or Latino	autopart1	Asian|American Indian or Alaska Native	Male	study.study1_autopart1	study.study1	New
+participant	consent_1		Not Hispanic or Latino|Not reported	autopart2	Asian|white	Male	study.study2_autopart2	study.study2	New
+participant	consent_3		Not Hispanic or Latino	autopart3	Asian|Native Hawaiian or other Pacific Islander	Male	study.study3_autopart3	study.study3	New
+participant	consent_4		Not Hispanic or Latino	autopart4	Asian|Native Hawaiian or other Pacific Islander	Male	study.study4_autopart4	study.study4	New
+participant	consent_5		Not Hispanic or Latino	autopart5	Asian|Native Hawaiian or other Pacific Islander	Male	study.study5_autopart5	study.study5	New

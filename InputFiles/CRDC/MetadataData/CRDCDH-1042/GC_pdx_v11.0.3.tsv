@@ -1,6 +1,6 @@
 type	 study.study_id	 sample.sample_id	pdx_id	model_id	implantation_type	implantation_site	mouse_strain	sample_type_for_implantation	tumor_not_mus_or_ebv_origin
 pdx	hello1	auto_sample1	auto_pdx_1	2	Orthotopic|Trocar|Injection	left cerebrum	mousestrn	implant	Not Reported
-pdx	hello1	auto_sample2	auto_pdx_2	2	Trocar	adnexa of uterus	mousestrn	implant	Yes
-pdx	hello1	auto_sample3	auto_pdx_3	4	Orthotopic	ankle joint	tre	imp1	No
-pdx	hello1	auto_sample4	auto_pdx_4	1	Intravenous	adrenal cortex	trt	imp2	Unknown
-pdx	hello1	auto_sample5	auto_pdx_5	3	Unknown	inferior surface of tongue	kio	imp3	Yes
+pdx	hello1	auto_sample2	auto_pdx_2	2	Trocar	muscle	mousestrn	implant	Yes
+pdx	hello1	auto_sample3	auto_pdx_3	4	Orthotopic	brain stem	tre	imp1	No
+pdx	hello1	auto_sample4	auto_pdx_4	1	Intravenous	subcutaneous	trt	imp2	Unknown
+pdx	hello1	auto_sample5	auto_pdx_5	3	Unknown	tail vein	kio	imp3	Yes
