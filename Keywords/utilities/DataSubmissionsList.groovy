@@ -93,6 +93,19 @@ class DataSubmissionsList extends TestRunner {
 			WebDriver driver = DriverFactory.getWebDriver()
 			String listFilters = "CRDC/AILocators/DataSubmissions/List/Filters"
 
+			if (criteria.submitterName != null && !criteria.submitterName.trim().isEmpty()) {
+				String v = criteria.submitterName.trim().replace("'", "''")
+				if (WebUI.waitForElementPresent(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)) {
+					WebUI.waitForElementClickable(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)
+					WebUI.delay(1)
+					WebElement submitterDdn = WebUI.findWebElement(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)
+					new Actions(driver).moveToElement(submitterDdn).click().perform()
+					WebUI.delay(1)
+					WebElement opt = driver.findElement(By.xpath("//li[normalize-space(text())='" + v + "']"))
+					opt.click()
+					WebUI.delay(1)
+				}
+			}
 			if (criteria.submissionName != null && !criteria.submissionName.trim().isEmpty()) {
 				String v = criteria.submissionName.trim()
 				if (WebUI.waitForElementPresent(findTestObject(listFilters + "/SubmissionName-TxtBx"), 5)) {
@@ -168,19 +181,6 @@ class DataSubmissionsList extends TestRunner {
 				if (WebUI.waitForElementPresent(findTestObject(listFilters + "/Program-Ddn"), 5)) {
 					WebUI.waitForElementClickable(findTestObject(listFilters + "/Program-Ddn"), 5)
 					WebUI.click(findTestObject(listFilters + "/Program-Ddn"))
-					WebUI.delay(1)
-					WebElement opt = driver.findElement(By.xpath("//li[normalize-space(text())='" + v + "']"))
-					opt.click()
-					WebUI.delay(1)
-				}
-			}
-			if (criteria.submitterName != null && !criteria.submitterName.trim().isEmpty()) {
-				String v = criteria.submitterName.trim().replace("'", "''")
-				if (WebUI.waitForElementPresent(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)) {
-					WebUI.waitForElementClickable(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)
-					WebUI.delay(1)
-					WebElement submitterDdn = WebUI.findWebElement(findTestObject(listFilters + "/SubmitterName-Ddn"), 5)
-					new Actions(driver).moveToElement(submitterDdn).click().perform()
 					WebUI.delay(1)
 					WebElement opt = driver.findElement(By.xpath("//li[normalize-space(text())='" + v + "']"))
 					opt.click()
