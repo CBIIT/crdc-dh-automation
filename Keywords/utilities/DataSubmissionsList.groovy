@@ -8,6 +8,7 @@ import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.Keys
+import org.openqa.selenium.StaleElementReferenceException
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.ui.WebDriverWait
@@ -216,29 +217,66 @@ class DataSubmissionsList extends TestRunner {
 
 	/**
 	 * Read currently visible Data Submissions list table rows (GenericTable). Returns list of row data.
+	 * Waits for loading to finish, stabilizes row count, then re-queries each row by index with stale retry
+	 * (same approach as readValidationResultsTableFromUI in DataSubmissions).
 	 *
 	 * @return List of rows, each row a List<String> of cell values in header order
 	 */
 	@Keyword
 	List<List<String>> readDataSubmissionsListTableRows() {
 		List<List<String>> result = new ArrayList<>()
+		String tableRowLocator = "CRDC/AILocators/GenericTable/TableRow"
 		try {
-			WebDriver driver = DriverFactory.getWebDriver()
-			String tableXpath = TestRunner.givexpath("CRDC/AILocators/GenericTable/Table")
-			WebElement table = driver.findElement(By.xpath(tableXpath))
-			List<WebElement> headerEls = table.findElements(By.xpath(".//thead//th"))
-			List<String> headers = new ArrayList<>()
-			for (WebElement h : headerEls) headers.add(h.getText().trim())
-			List<WebElement> rows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
-			if (rows == null) {
+			try {
+				Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+			} catch (Exception e) {
+				KeywordUtil.logInfo("readDataSubmissionsListTableRows: loading icon wait: " + e.getMessage())
+			}
+			try {
+				Utils.waitForElementToDisappear('CRDC/AILocators/GenericTable/LoadingRow', 15)
+			} catch (Exception e) {
+				KeywordUtil.logInfo("readDataSubmissionsListTableRows: loading row wait: " + e.getMessage())
+			}
+
+			int rowCount = 0
+			for (int w = 0; w < 5; w++) {
+				List<WebElement> waitRows = Utils.getListWebElements(tableRowLocator)
+				int n = waitRows != null ? waitRows.size() : 0
+				WebUI.delay(0.5)
+				waitRows = Utils.getListWebElements(tableRowLocator)
+				int n2 = waitRows != null ? waitRows.size() : 0
+				if (n == n2) {
+					rowCount = n
+					break
+				}
+			}
+			if (rowCount <= 0) {
+				List<WebElement> rows = Utils.getListWebElements(tableRowLocator)
+				rowCount = rows != null ? rows.size() : 0
+			}
+			if (rowCount <= 0) {
 				KeywordUtil.logInfo("Data Submissions list table row count: 0")
 				return result
 			}
-			for (WebElement row : rows) {
-				List<WebElement> cells = row.findElements(By.tagName("td"))
-				List<String> cellTexts = new ArrayList<>()
-				for (WebElement cell : cells) cellTexts.add(cell.getText().trim())
-				result.add(cellTexts)
+
+			for (int i = 0; i < rowCount; i++) {
+				boolean done = false
+				for (int attempt = 1; attempt <= 3 && !done; attempt++) {
+					try {
+						List<WebElement> currentRows = Utils.getListWebElements(tableRowLocator)
+						if (i >= (currentRows != null ? currentRows.size() : 0)) break
+						WebElement row = currentRows.get(i)
+						List<WebElement> cells = row.findElements(By.tagName("td"))
+						List<String> cellTexts = new ArrayList<>()
+						for (WebElement cell : cells) cellTexts.add(cell.getText().trim())
+						result.add(cellTexts)
+						done = true
+					} catch (StaleElementReferenceException e) {
+						if (attempt == 3) throw e
+						KeywordUtil.logInfo("readDataSubmissionsListTableRows: stale row " + i + ", retry " + attempt + "...")
+						WebUI.delay(0.5)
+					}
+				}
 			}
 			KeywordUtil.logInfo("Data Submissions list table row count: " + result.size())
 		} catch (Exception e) {
