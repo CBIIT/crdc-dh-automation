@@ -1,23 +1,29 @@
 # Baseline screenshots for visual comparison
 
-This folder stores **baseline (reference) screenshots** used by `WebUIUtils.verifyScreenshotMatchesBaseline()`.
+This folder stores **baseline (reference) screenshots** for visual regression tests.
 
-## How comparison works
+## Vision AI comparison (TC17 — recommended POC)
 
-Comparison uses **SSIM (structural similarity)** locally — no LLM is used for pass/fail. The script loads baseline and current images, aligns their dimensions if needed, and computes an SSIM score in [0, 1]. If score ≥ threshold (default **0.99**), the test passes.
+`WebUIUtils.compareScreenshotsWithVisionAi()` sends baseline and current PNGs to **Claude on AWS Bedrock** (default: `us.anthropic.claude-sonnet-4-6`) and returns a **structured JSON diff** — not a pixel/SSIM pass/fail.
 
-- **1.0** – identical
-- **0.99+** – nearly identical (recommended default; allows minor rendering/timestamp differences)
-- **0.95–0.99** – minor differences
-- **&lt; 0.95** – major change or different screen
+- **Output:** `Reports/vision_diff.json` plus ValidationReport entries with status **Info** (report-only; test does not fail on diff content in Phase 1)
+- **Note:** If report rows showed **Fail** despite a passing test, ensure `ValidationReport` accepts `Info` status (fixed in framework; re-run after refresh)
+- **Override model:** set optional Katalon global `BedrockVisionModelId` (e.g. `us.anthropic.claude-opus-4-8`)
+- **AWS:** `AwsAccessKeyId`, `AwsSecretAccessKey`, optional `AwsRegion` in profile, or `~/.aws/credentials`
+- **Python:** `boto3` (see `requirements.txt`)
 
-Optional: when the comparison **fails**, you can pass `explainWithLlm: true` so the keyword calls Bedrock once to get a one-sentence description of the difference (e.g. for the report). AWS credentials are only required in that case.
+## SSIM comparison (legacy)
+
+`WebUIUtils.verifyScreenshotMatchesBaseline()` uses **SSIM (structural similarity)** locally. Optional Bedrock one-sentence explanation on FAIL only.
+
+- Threshold default **1.0** in script (README historically suggested 0.99 for tolerance)
+- **Python:** `Pillow`, `numpy`, `scikit-image`
 
 ## Convention
 
 - **Path pattern:** `InputFiles/CRDC/Screenshots/<pageOrTestId>_baseline.png`
 - **Examples:**
-  - `DataSubmission_Summary_baseline.png` – data submission summary/charts view
+  - `DataSubmission_Summary_baseline-TC05.png` – statistics charts after TC05 validation (TC17)
   - `DataSubmission_ValidationResults_baseline.png` – validation results tab
 
 ## Creating a baseline
@@ -25,10 +31,8 @@ Optional: when the comparison **fails**, you can pass `explainWithLlm: true` so 
 1. Run the test or navigate manually to the page you want to baseline (use a known-good build).
 2. Set a fixed viewport (e.g. 1920×1080) so future runs match.
 3. Take a screenshot and save it here with the `_baseline.png` suffix.
-4. In your test script, pass this path as the baseline argument to `verifyScreenshotMatchesBaseline(currentPath, baselinePath, reportSection)`.
+4. Pass this path as the baseline argument in your test script.
 
 ## Requirements
 
-- **Python:** `Pillow`, `numpy`, `scikit-image` (see project `requirements.txt`). No AWS dependency for basic comparison.
-- **Optional (for LLM explanation on fail):** AWS credentials in Katalon profile (`AwsAccessKeyId`, `AwsSecretAccessKey`, optional `AwsRegion`) or environment / `~/.aws/credentials`, and `boto3`.
-- Profile/AppKey set to CRDC so `Utils.getPythonFilePath()` resolves to `PythonFiles/CRDC/`.
+- Profile/AppKey set to **CRDC** so `Utils.getPythonFilePath()` resolves to `PythonFiles/CRDC/`.
