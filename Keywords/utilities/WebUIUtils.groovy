@@ -23,6 +23,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import groovy.json.JsonSlurper
 
 /**
  * Generic, reusable web UI verification helpers (tooltips, element count, etc.).
@@ -1428,6 +1429,164 @@ class WebUIUtils {
 			ValidationReport.addValidationReportItem(reportSection, "Screenshot vs baseline", "Match baseline", e.getMessage(), "Fail")
 			KeywordUtil.markFailed("Screenshot comparison failed: " + e.getMessage())
 			return false
+		}
+	}
+
+	/**
+	 * Compare baseline and current screenshots using Claude vision on AWS Bedrock.
+	 * Returns structured JSON diff (report-only by default; does not fail on diff content).
+	 * Runs PythonFiles/CRDC/CompareScreenshotsWithVision.py. Writes Reports/vision_diff.json.
+	 * Requires AWS credentials in Katalon profile or environment (boto3).
+	 *
+	 * @param currentScreenshotPath Full path to the screenshot just captured
+	 * @param baselineScreenshotPath Full path to the expected baseline image
+	 * @param reportSection Section name for ValidationReport
+	 * @param context Optional context for the vision prompt (page state, what to ignore)
+	 * @param reportOnly if true, log diff to ValidationReport but do not markFailed on diff content
+	 */
+	@Keyword
+	static void compareScreenshotsWithVisionAi(
+			String currentScreenshotPath,
+			String baselineScreenshotPath,
+			String reportSection = "Vision AI diff",
+			String context = "",
+			boolean reportOnly = true) {
+		String pythonExe = Utils.getPythonExecutablePath()
+		Path scriptPath = Utils.getPythonFilePath("CompareScreenshotsWithVision.py")
+		if (scriptPath == null || !scriptPath.toFile().exists()) {
+			KeywordUtil.logInfo("compareScreenshotsWithVisionAi: script not found at " + scriptPath)
+			ValidationReport.addValidationReportItem(reportSection, "Vision AI diff", "Structured JSON diff", "Script not found", "Fail")
+			KeywordUtil.markFailed("CompareScreenshotsWithVision.py not found. Check AppKey=CRDC and PythonFiles/CRDC/.")
+			return
+		}
+		String outputJsonPath = Paths.get(currentScreenshotPath).getParent().resolve("vision_diff.json").toString()
+		KeywordUtil.logInfo("compareScreenshotsWithVisionAi: baseline=" + baselineScreenshotPath + ", current=" + currentScreenshotPath)
+		List<String> cmd = [
+			pythonExe,
+			scriptPath.toString(),
+			baselineScreenshotPath,
+			currentScreenshotPath,
+			"--output-json",
+			outputJsonPath,
+			"--verbose"
+		]
+		if (context?.trim()) {
+			cmd.add("--context")
+			cmd.add(context.trim())
+		}
+		String modelId = resolveBedrockVisionModelId()
+		if (modelId) {
+			cmd.add("--model")
+			cmd.add(modelId)
+		}
+		String region = resolveAwsRegionForBedrock()
+		if (region) {
+			cmd.add("--region")
+			cmd.add(region)
+		}
+		ProcessBuilder pb = new ProcessBuilder(cmd)
+		pb.redirectErrorStream(true)
+		injectAwsCredentialsIntoProcess(pb)
+		try {
+			Process proc = pb.start()
+			BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()))
+			StringBuilder output = new StringBuilder()
+			String line
+			while ((line = reader.readLine()) != null) {
+				output.append(line).append("\n")
+			}
+			boolean finished = proc.waitFor(120, TimeUnit.SECONDS)
+			if (!finished) {
+				proc.destroyForcibly()
+				ValidationReport.addValidationReportItem(reportSection, "Vision AI diff", "Structured JSON diff", "Timeout (120s)", "Fail")
+				KeywordUtil.markFailed("Vision AI comparison timed out after 120s")
+				return
+			}
+			String out = output.toString().trim()
+			KeywordUtil.logInfo("Vision AI comparison output:\n" + out)
+			String[] lines = out.split("\n")
+			String result = (lines.length >= 2) ? lines[lines.length - 2].trim().toUpperCase() : (lines.length == 1 ? lines[0].trim().toUpperCase() : "ERROR")
+			String detail = (lines.length >= 2) ? lines[lines.length - 1].trim() : (lines.length == 1 ? lines[0].trim() : "No output")
+			if (!result.startsWith("OK")) {
+				ValidationReport.addValidationReportItem(reportSection, "Vision AI diff", "Structured JSON diff", detail, "Fail")
+				KeywordUtil.markFailed("Vision AI comparison failed: " + detail)
+				return
+			}
+			Path jsonPath = Paths.get(detail)
+			if (!jsonPath.toFile().exists()) {
+				ValidationReport.addValidationReportItem(reportSection, "Vision AI diff", "Structured JSON diff", "JSON file not found: " + detail, "Fail")
+				KeywordUtil.markFailed("Vision AI JSON output not found: " + detail)
+				return
+			}
+			def diffData = new JsonSlurper().parse(jsonPath.toFile())
+			String summary = diffData?.summary?.toString() ?: "(no summary)"
+			ValidationReport.addValidationReportItem(reportSection, "Vision AI summary", "Diff report", summary, "Info")
+			if (diffData?.elements instanceof List) {
+				diffData.elements.each { element ->
+					String name = element?.name?.toString() ?: "element"
+					String changeType = element?.changeType?.toString() ?: ""
+					String baselineObs = formatVisionObservations(element?.baseline)
+					String currentObs = formatVisionObservations(element?.current)
+					String actual = "changeType=${changeType}; baseline=[${baselineObs}]; current=[${currentObs}]"
+					ValidationReport.addValidationReportItem(reportSection, name, "baseline vs current", actual, "Info")
+				}
+			}
+			KeywordUtil.logInfo("Vision AI diff written to: " + detail)
+			if (!reportOnly) {
+				KeywordUtil.logInfo("compareScreenshotsWithVisionAi: reportOnly=false has no assertions yet (Phase 2)")
+			}
+		} catch (Exception e) {
+			KeywordUtil.logInfo("compareScreenshotsWithVisionAi: " + e.getMessage())
+			ValidationReport.addValidationReportItem(reportSection, "Vision AI diff", "Structured JSON diff", e.getMessage(), "Fail")
+			KeywordUtil.markFailed("Vision AI comparison failed: " + e.getMessage())
+		}
+	}
+
+	private static String formatVisionObservations(def observations) {
+		if (observations instanceof List) {
+			return observations.collect { it?.toString() ?: "" }.findAll { it }.join("; ")
+		}
+		return observations?.toString() ?: ""
+	}
+
+	private static String resolveBedrockVisionModelId() {
+		try {
+			String model = GlobalVariable.BedrockVisionModelId?.toString()?.trim()
+			if (model) {
+				return model
+			}
+		} catch (MissingPropertyException ignored) {
+			// optional profile global
+		}
+		return "us.anthropic.claude-sonnet-4-6"
+	}
+
+	private static String resolveAwsRegionForBedrock() {
+		try {
+			String region = GlobalVariable.AwsRegion?.toString()?.trim()
+			if (region) {
+				return region
+			}
+		} catch (MissingPropertyException ignored) {
+			// optional profile global
+		}
+		return ""
+	}
+
+	private static void injectAwsCredentialsIntoProcess(ProcessBuilder pb) {
+		try {
+			String accessKey = GlobalVariable.AwsAccessKeyId?.toString()?.trim()
+			String secretKey = GlobalVariable.AwsSecretAccessKey?.toString()?.trim()
+			if (accessKey && secretKey) {
+				pb.environment().put("AWS_ACCESS_KEY_ID", accessKey)
+				pb.environment().put("AWS_SECRET_ACCESS_KEY", secretKey)
+				String region = GlobalVariable.AwsRegion?.toString()?.trim()
+				if (region) {
+					pb.environment().put("AWS_DEFAULT_REGION", region)
+				}
+			}
+		} catch (MissingPropertyException e) {
+			// Profile variables not defined; boto3 will use env or ~/.aws/credentials
 		}
 	}
 }

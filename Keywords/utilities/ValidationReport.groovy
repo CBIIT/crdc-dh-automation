@@ -20,7 +20,7 @@ class ValidationReport {
 
 	static void addValidationReportItem(String section, String label, String expected, String actual, String status) {
 		if (!validationReportCollector.containsKey(section)) validationReportCollector.put(section, new ArrayList<>())
-		String s = (status == "Pass" || status == "Fail") ? status : "Fail"
+		String s = (status == "Pass" || status == "Fail" || status == "Info") ? status : "Fail"
 		validationReportCollector.get(section).add([
 			label: label ?: "",
 			expected: expected ?: "",
@@ -47,7 +47,7 @@ class ValidationReport {
 	private static String buildValidationReportHtml() {
 		StringBuilder sb = new StringBuilder()
 		sb.append("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Validation Report</title>")
-		sb.append("<style>table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ccc;padding:6px;text-align:left;} th{background:#f5f5f5;} .pass{background:#e8f5e9;} .fail{background:#ffebee;} details{margin:12px 0;} summary{cursor:pointer;font-weight:bold;padding:8px;background:#e3f2fd;}</style>")
+		sb.append("<style>table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ccc;padding:6px;text-align:left;} th{background:#f5f5f5;} .pass{background:#e8f5e9;} .fail{background:#ffebee;} .info{background:#e3f2fd;} details{margin:12px 0;} summary{cursor:pointer;font-weight:bold;padding:8px;background:#e3f2fd;}</style>")
 		sb.append("</head><body>")
 		sb.append("<h1>Validation Report</h1>")
 		sb.append("<p>Generated: ").append(escapeHtml(new Date().format("yyyy-MM-dd HH:mm:ss"))).append("</p>")
@@ -58,7 +58,7 @@ class ValidationReport {
 			sb.append("<table><thead><tr><th>Item / Line</th><th>Expected</th><th>Actual</th><th>Status</th></tr></thead><tbody>")
 			for (Map<String, String> item : items) {
 				String status = item.get("status") ?: "Fail"
-				String rowClass = status == "Pass" ? "pass" : "fail"
+				String rowClass = status == "Pass" ? "pass" : (status == "Info" ? "info" : "fail")
 				sb.append("<tr class=\"").append(rowClass).append("\">")
 				sb.append("<td>").append(escapeHtml(item.get("label"))).append("</td>")
 				sb.append("<td>").append(escapeHtml(item.get("expected"))).append("</td>")

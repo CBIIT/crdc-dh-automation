@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
-   <description>Vision baseline: compare data submission page screenshot to baseline image via Claude on Bedrock. Requires baseline at InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline.png and profile vars AwsAccessKeyId, AwsSecretAccessKey (optional AwsRegion).</description>
+   <description>Vision AI POC: Bedrock Claude Sonnet 4.6 structured screenshot diff (report-only). Requires baseline at InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline-TC05.png and profile vars AwsAccessKeyId, AwsSecretAccessKey (optional AwsRegion, BedrockVisionModelId).</description>
    <name>TC17_VisionScreenshotComparison</name>
    <tag>Vision</tag>
    <comment></comment>

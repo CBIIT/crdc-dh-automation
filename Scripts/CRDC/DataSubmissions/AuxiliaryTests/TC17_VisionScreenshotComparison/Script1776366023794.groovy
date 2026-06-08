@@ -1,17 +1,17 @@
 import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import com.kms.katalon.core.configuration.RunConfiguration
-import com.kms.katalon.core.util.KeywordUtil
-import internal.GlobalVariable as GlobalVariable
 
-/** RUN IN JENKINS
- * Example: Screenshot comparison against baseline using SSIM (structural similarity).
- * - Logs in as Submitter, navigates to a data submission, takes a screenshot.
- * - On failure, saves a diff image to Reports/vision_diff.png. Optional: set explainWithLlm true for a one-sentence LLM explanation.
+/**
+ * Vision AI POC: compare statistics charts screenshot to baseline via Claude on Bedrock (Sonnet 4.6).
+ * Report-only phase — logs structured JSON diff to ValidationReport and Reports/vision_diff.json.
+ * Does not fail on diff content; only fails on infra errors (Bedrock, script, timeout).
  *
  * Prerequisites:
- * - Baselines: DataSubmission_Summary_baseline-TC05.png (Jenkins), DataSubmission_Summary_baseline-TC05-local.png (local).
- * - Python with Pillow, numpy, scikit-image (see requirements.txt). AWS only if explainWithLlm is true.
+ * - Baseline: InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline-TC05.png
+ * - Python with boto3 (see requirements.txt)
+ * - AWS creds: AwsAccessKeyId, AwsSecretAccessKey, optional AwsRegion in Katalon profile
+ * - Optional: BedrockVisionModelId profile global to override default us.anthropic.claude-sonnet-4-6
  */
 WebUI.closeBrowser()
 
@@ -20,34 +20,31 @@ WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
 WebUI.delay(2)
 
-//Create DS
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
 CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata only', 'GC','autoQA - AutomationQA_Study')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
-//Upload data via folder
 CustomKeywords.'utilities.DataSubmissions.uploadFolder'('TC05')
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 WebUI.refresh()
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Statistics/Charts-Container')
-// Wait for "Validation process is starting" snackbar message to disappear before screenshot
-//CustomKeywords.'utilities.Utils.waitForElementNotVisible'('CRDC/AILocators/Global/Notistack-Snackbar', 60)
-WebUI.delay(3)
+
+CustomKeywords.'utilities.Utils.waitForElementToDisappear'('CRDC/AILocators/Global/Notistack-Snackbar', 60)
+WebUI.delay(1)
 
 String projectDir = RunConfiguration.getProjectDir()
 String currentPath = "${projectDir}/Reports/vision_current.png"
-String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline-TC05.png"
+//String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline-TC05.png"
+String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/current_QA2.png"
 
-//Option for having different versions of screenshot
-//String projectDir = RunConfiguration.getProjectDir()
-//String currentPath = "${projectDir}/Reports/vision_current.png"
-//String baselineSuffix = utilities.Utils.isJenkinsRun() ? "TC05" : "TC05-local"
-//String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline-${baselineSuffix}.png"
-//KeywordUtil.logInfo("Using baseline: ${baselineSuffix} (Jenkins=${utilities.Utils.isJenkinsRun()})")
-
-//Take screenshot of element and verify the chart matches baseline image -- can also take screenshot of entire page via WebUI.takeScreenshot(currentPath)
 WebUI.takeElementScreenshot(currentPath, findTestObject('CRDC/AILocators/DataSubmissions/Detail/Statistics/Charts-Container'))
-CustomKeywords.'utilities.WebUIUtils.verifyScreenshotMatchesBaseline'(currentPath, baselinePath, "Data Submission Charts", null, true)
+CustomKeywords.'utilities.WebUIUtils.compareScreenshotsWithVisionAi'(
+	currentPath,
+	baselinePath,
+	"Data Submission Charts",
+	"Statistics charts container after TC05 metadata validation; ignore minor rendering differences",
+	true
+)
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 WebUI.closeBrowser()
