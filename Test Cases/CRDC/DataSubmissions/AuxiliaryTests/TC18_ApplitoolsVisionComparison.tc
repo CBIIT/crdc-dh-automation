@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Applitools vision demo: compare statistics charts via Katalon Applitools plugin (checkTestObject). Requires Applitools Integration plugin and API key in Project Settings. First run creates baseline in Applitools dashboard.</description>
+   <name>TC18_ApplitoolsVisionComparison</name>
+   <tag>Vision</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>b8c9d0e1-f2a3-4567-8901-c2d3e4f5a6b7</testCaseGuid>
+</TestCaseEntity>

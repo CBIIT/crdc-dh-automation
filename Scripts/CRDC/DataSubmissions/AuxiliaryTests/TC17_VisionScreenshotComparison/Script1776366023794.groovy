@@ -34,8 +34,8 @@ WebUI.delay(1)
 
 String projectDir = RunConfiguration.getProjectDir()
 String currentPath = "${projectDir}/Reports/vision_current.png"
-//String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline-TC05.png"
-String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/current_QA2.png"
+String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/DataSubmission_Summary_baseline-TC05.png"
+//String baselinePath = "${projectDir}/InputFiles/CRDC/Screenshots/current_QA2.png"
 
 WebUI.takeElementScreenshot(currentPath, findTestObject('CRDC/AILocators/DataSubmissions/Detail/Statistics/Charts-Container'))
 CustomKeywords.'utilities.WebUIUtils.compareScreenshotsWithVisionAi'(

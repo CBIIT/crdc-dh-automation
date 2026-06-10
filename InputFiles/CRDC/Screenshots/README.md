@@ -12,6 +12,18 @@ This folder stores **baseline (reference) screenshots** for visual regression te
 - **AWS:** `AwsAccessKeyId`, `AwsSecretAccessKey`, optional `AwsRegion` in profile, or `~/.aws/credentials`
 - **Python:** `boto3` (see `requirements.txt`)
 
+## Applitools comparison (TC18 — demo)
+
+`TC18_ApplitoolsVisionComparison` uses the Katalon **Applitools Integration** plugin:
+
+- Keyword: `com.kms.katalon.keyword.applitools.BasicKeywords.checkTestObject` on `statistics-charts-container`
+- Test name (baseline key): `CRDC Data Submission Statistics Charts - TC05`
+- Baselines live in the **Applitools dashboard**, not under `InputFiles/CRDC/Screenshots/`
+- Configure API key in Katalon **Project > Settings > Plugins > Applitools Integration**
+- Docs: [Applitools integration in Katalon Studio](https://docs.katalon.com/katalon-studio/keywords/using-keywords-in-katalon-studio/web-testing/applitools-integration-in-katalon-studio)
+
+**Calibration:** Run TC18 once to create baseline, then re-run and review in Applitools UI.
+
 ## SSIM comparison (legacy)
 
 `WebUIUtils.verifyScreenshotMatchesBaseline()` uses **SSIM (structural similarity)** locally. Optional Bedrock one-sentence explanation on FAIL only.
