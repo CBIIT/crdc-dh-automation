@@ -924,7 +924,7 @@ class DataSubmissions extends TestRunner {
 
 	/**
 	 * Clicks the Validation Results export button (export-validation-button) and verifies that the
-	 * downloaded file name follows the expected pattern: {submissionName}-{YYYY-MM-DDThhmmss}.csv
+	 * downloaded file name follows the expected pattern: {submissionName}-{YYYY-MM-DDThhmmss}.csv or .xlsx
 	 * (e.g. "auto-test20260309142645-2026-03-09T151725.csv"). File is expected in project Downloads folder.
 	 * Assumes caller is on the Data Submission detail page with Validation Results tab in aggregated view.
 	 *
@@ -947,10 +947,10 @@ class DataSubmissions extends TestRunner {
 			return
 		}
 		String fileName = latest.name
-		// Pattern: {submissionName}-{YYYY-MM-DDThhmmss}.csv or without extension
-		def matcher = (fileName =~ /^(.+)-(\d{4}-\d{2}-\d{2}T\d{6})(\.csv)?$/)
+		// Pattern: {submissionName}-{YYYY-MM-DDThhmmss}.csv, .xlsx, or without extension
+		def matcher = (fileName =~ /^(.+)-(\d{4}-\d{2}-\d{2}T\d{6})(\.(csv|xlsx))?$/)
 		if (!matcher.find()) {
-			ValidationReport.addValidationReportItem("Validation Results Export", "Downloaded file name", "pattern: {submissionName}-YYYY-MM-DDThhmmss.csv", fileName, "Fail")
+			ValidationReport.addValidationReportItem("Validation Results Export", "Downloaded file name", "pattern: {submissionName}-YYYY-MM-DDThhmmss.csv|.xlsx", fileName, "Fail")
 			KeywordUtil.markFailed("clickValidationResultsExportAndVerifyDownloadedFileName: downloaded file name does not match pattern. Got: " + fileName)
 			return
 		}
