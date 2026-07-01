@@ -1844,6 +1844,7 @@ class DataSubmissions extends TestRunner {
 			WebUI.click(findTestObject('CRDC/DataSubmissions/Create/SubTypeDelete-Btn'))
 			expectedSubmissionType = "Delete"
 		}else {
+			WebUI.click(findTestObject('CRDC/DataSubmissions/Create/SubTypeNewUpdate-Btn'))
 			expectedSubmissionType ="New/Update";
 		}
 
