@@ -610,8 +610,8 @@ class Pbac extends TestRunner {
 	@Keyword
 	public static void createDataSubmission() {
 		TestRunner.clickTab('CRDC/DataSubmissions/Create/CreateADataSubmission-Btn')
-		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/MetadataOnly-Btn'))
 		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/SubTypeNewUpdate-Btn'))
+		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/MetadataOnly-Btn'))
 
 		String automationStudy = 'ATS - AutoTest-Study'
 		String normalizedTarget = automationStudy.replaceAll(/\s+/, ' ').trim()
