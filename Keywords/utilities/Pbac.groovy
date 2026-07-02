@@ -610,14 +610,36 @@ class Pbac extends TestRunner {
 	@Keyword
 	public static void createDataSubmission() {
 		TestRunner.clickTab('CRDC/DataSubmissions/Create/CreateADataSubmission-Btn')
+		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/SubTypeNewUpdate-Btn'))
 		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/MetadataOnly-Btn'))
-		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/Study-Ddn'))
 
 		String automationStudy = 'ATS - AutoTest-Study'
 		String normalizedTarget = automationStudy.replaceAll(/\s+/, ' ').trim()
 		String studyOptionXpath = "//div[contains(@class,'MuiMenu-paper')]//li[contains(@data-testid,'study-option')]"
-
+		String dataModel = 'GC'
+		
 		WebDriver driver = DriverFactory.getWebDriver()
+		
+		//Select the Data Commons
+		WebUI.click(findTestObject('Object Repository/CRDC/DataSubmissions/Create/DataCommons-Ddn'))
+		WebUI.delay(2)
+		List<WebElement> commonsDropdownOptions = WebUI.findWebElements(findTestObject('Object Repository/CRDC/DataSubmissions/Create/DataCommonsDdn-Option'), 10)
+		WebElement matchDataCommons = commonsDropdownOptions.find {it.getAttribute("innerText")?.trim() == dataModel}
+		if (matchDataCommons != null) {
+			try {
+				new Actions(driver).moveToElement(matchDataCommons).click().perform()
+			} catch (Exception e) {
+				KeywordUtil.logInfo("Click blocked, retrying after overlay removal...")
+				WebUI.executeJavaScript("""document.querySelectorAll('.MuiBackdrop-root, .MuiDialog-container').forEach(e => e.remove())""", null)
+				WebUI.delay(1)
+				new Actions(driver).moveToElement(matchDataCommons).click().perform()
+			}
+		} else {
+			KeywordUtil.markFailed("Study option "+dataModel+" not found in dropdown.")
+		}
+		
+		//Select the Study
+		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/Study-Ddn'))
 		WebDriverWait menuWait = new WebDriverWait(driver, 10)
 		menuWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(studyOptionXpath)))
 
