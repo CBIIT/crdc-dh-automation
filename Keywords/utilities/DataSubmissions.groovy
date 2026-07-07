@@ -1852,6 +1852,9 @@ class DataSubmissions extends TestRunner {
 		if(dataType?.toLowerCase()?.contains("only")) {
 			WebUI.click(findTestObject('CRDC/DataSubmissions/Create/MetadataOnly-Btn'))
 		}
+		else {
+			WebUI.click(findTestObject('CRDC/DataSubmissions/Create/MetadataDataFiles-Btn'))
+		}
 
 		WebUI.delay(5)
 
