@@ -410,8 +410,7 @@ class Pbac extends TestRunner {
 			return
 		}
 
-		// Click role dropdown
-		WebUI.click(findTestObject('CRDC/ManageUsers/Role-Ddn'))
+		clickTab('CRDC/ManageUsers/Role-Ddn')
 		KeywordUtil.logInfo("Clicked role dropdown")
 
 		// Find an alternate role to toggle to
@@ -427,7 +426,7 @@ class Pbac extends TestRunner {
 		WebUI.delay(2)
 
 		// Open dropdown again
-		WebUI.click(findTestObject('CRDC/ManageUsers/Role-Ddn'))
+		clickTab('CRDC/ManageUsers/Role-Ddn')
 		KeywordUtil.logInfo("Clicked role dropdown again")
 		WebUI.delay(2)
 
@@ -437,7 +436,7 @@ class Pbac extends TestRunner {
 		WebUI.delay(2)
 
 		// Click Save
-		WebUI.click(findTestObject('CRDC/ManageUsers/Save-Btn'))
+		clickTab('CRDC/ManageUsers/Save-Btn')
 		KeywordUtil.logInfo("Clicked Save")
 		waitForPbacNotistackDismissed()
 
