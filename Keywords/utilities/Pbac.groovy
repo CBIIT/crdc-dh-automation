@@ -806,16 +806,24 @@ class Pbac extends TestRunner {
 			KeywordUtil.logInfo("Verifying SR Submit...")
 			try {
 				SubmissionRequest.clickHome()
-				TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
+				WebUIUtils.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
 				//only run the create SR flow if the Create button is available -- verify the Resume button is displayed in SR list and the Submit button during SR creation
 				if (WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn"), 5, FailureHandling.OPTIONAL)) {
 					boolean srSubmitExists = false, srListResume = false;
 					//SR resume flow
-					TestRunner.clickTab('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
+					WebUIUtils.clickTab('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
 					WebUI.delay(1)
-					TestRunner.clickTab('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn')
-					WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
-					TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
+					WebUIUtils.clickTab('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn')
+					// Save is disabled until the form is dirty; fill PI so Save can be clicked.
+					SubmissionRequest.enterPrincipalInvestigatorInfo(2)
+					WebUIUtils.clickTab('CRDC/SubmissionRequest/Save-Btn')
+					WebUIUtils.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
+					// Leaving with incomplete Section A opens the unsaved-changes dialog; Save there to keep the draft.
+					if (WebUI.verifyElementPresent(findTestObject('CRDC/AILocators/SubmissionRequests/UnsavedChangesDialog/Save-Btn'), 5, FailureHandling.OPTIONAL)) {
+						KeywordUtil.logInfo("Unsaved changes dialog present; clicking Save")
+						WebUIUtils.clickTab('CRDC/AILocators/SubmissionRequests/UnsavedChangesDialog/Save-Btn')
+						WebUI.waitForElementNotPresent(findTestObject('CRDC/AILocators/SubmissionRequests/UnsavedChangesDialog/Save-Btn'), 10)
+					}
 					String loggedInUserName = WebUIUtils.getProfileName()
 					SubmissionRequestList.applySubmissionRequestsListFilters([
 						submitterName: loggedInUserName,
@@ -826,9 +834,9 @@ class Pbac extends TestRunner {
 					srListResume = WebUI.verifyElementPresent(findTestObject("CRDC/AILocators/SubmissionRequests/List/Resume-Btn"), 5, FailureHandling.OPTIONAL)
 
 					//SR create/submit flow
-					TestRunner.clickTab('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
+					WebUIUtils.clickTab('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
 					WebUI.delay(1)
-					TestRunner.clickTab('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn')
+					WebUIUtils.clickTab('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn')
 
 					SubmissionRequest.enterPrincipalInvestigatorInfo(2)
 					SubmissionRequest.enterPrimaryContactInfo(2)
@@ -1048,7 +1056,8 @@ class Pbac extends TestRunner {
 					TestRunner.clickTab('CRDC/DataSubmissions/Validate-Btn')
 
 					//Verify
-					return WebUI.verifyElementPresent(findTestObject("CRDC/DataSubmissions/AdminSubmit-Btn"), 5, FailureHandling.OPTIONAL)
+					return WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/AdminSubmit-Btn'), 30, FailureHandling.OPTIONAL)
+					
 				}
 				return false
 			} catch (Exception e) {

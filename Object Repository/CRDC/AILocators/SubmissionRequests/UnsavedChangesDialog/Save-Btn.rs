@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//button[.=&apos;Save&apos;]</value>
+         <value>//div[@role=&apos;dialog&apos;][.//*[contains(text(),&apos;Unsaved Changes&apos;) or contains(text(),&apos;Validation errors have been detected&apos;)]]//button[.=&apos;Save&apos;]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//button[.=&apos;Save&apos;]</value>
+      <value>//div[@role=&apos;dialog&apos;][.//*[contains(text(),&apos;Unsaved Changes&apos;) or contains(text(),&apos;Validation errors have been detected&apos;)]]//button[.=&apos;Save&apos;]</value>
       <webElementGuid>e2388f01-d86e-4d1c-9dce-a0e198d7c808</webElementGuid>
    </webElementProperties>
 </WebElementEntity>
