@@ -134,7 +134,7 @@
       <guid>2789072d-19f4-40e8-a6a6-edffa91a5bb7</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/EnableAllPermissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/SuiteSetup/EnableAllPermissions</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>

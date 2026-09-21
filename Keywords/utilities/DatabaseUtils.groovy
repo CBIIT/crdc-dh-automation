@@ -5,11 +5,22 @@ import com.kms.katalon.core.configuration.RunConfiguration
 import com.kms.katalon.core.testdata.TestDataFactory
 import com.kms.katalon.core.util.KeywordUtil
 import java.io.File
+import java.io.InputStream
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
+import java.security.KeyStore
+import java.security.cert.Certificate
+import java.security.cert.CertificateFactory
 import java.util.ArrayList
+import java.util.Collection
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManagerFactory
 import groovy.json.JsonSlurper
 import internal.GlobalVariable
 import org.bson.Document
 import org.bson.conversions.Bson
+import com.mongodb.ConnectionString
+import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoCollection
@@ -20,6 +31,8 @@ import com.mongodb.client.MongoCursor
  * MongoDB connection and query utilities for CRDC Data Hub automation.
  * Use connectFromGlobalVariable() (requires G_MongoUri, G_MongoDatabase in profile),
  * then find/findOne/count/findRecordFromDataFile, and close() when done.
+ * If G_MongoUri includes tlsCAFile, that PEM is loaded into the Mongo SSL context
+ * because the Java driver ignores tlsCAFile in the URI.
  */
 public class DatabaseUtils {
 
@@ -27,10 +40,12 @@ public class DatabaseUtils {
 	private static MongoDatabase database
 	/** Collection name for data records in MongoDB. */
 	private static final String DATA_RECORDS_COLLECTION = "dataRecords"
+	private static final String TLS_CA_FILE_PARAM = "tlsCAFile"
 
 	/**
 	 * Connect using connection URI and database name from GlobalVariable.
 	 * Set GlobalVariable.G_MongoUri and GlobalVariable.G_MongoDatabase (e.g. in Katalon profile or execution settings).
+	 * When the URI has tlsCAFile, the PEM is applied via SSLContext (Java does not honor that URI option).
 	 */
 	@Keyword
 	public static void connectFromGlobalVariable() {
@@ -45,13 +60,124 @@ public class DatabaseUtils {
 				KeywordUtil.logInfo("MongoDB client already connected; closing existing connection.")
 				close()
 			}
-			mongoClient = MongoClients.create(uri)
+			mongoClient = createMongoClient(uri)
 			database = mongoClient.getDatabase(dbName)
 			KeywordUtil.logInfo("Connected to MongoDB database: ${dbName}")
 		} catch (Exception e) {
 			KeywordUtil.markFailed("MongoDB connect failed: ${e.message}")
 			throw e
 		}
+	}
+
+	/**
+	 * Create a MongoClient from the profile URI.
+	 * Loads tlsCAFile into an SSLContext when present; otherwise uses MongoClients.create(uri).
+	 */
+	private static MongoClient createMongoClient(String uri) {
+		String caFile = extractQueryParam(uri, TLS_CA_FILE_PARAM)
+		if (caFile == null || caFile.isEmpty()) {
+			return MongoClients.create(uri)
+		}
+		File pemFile = resolveCaFile(caFile)
+		SSLContext sslContext = sslContextFromPem(pemFile)
+		String uriWithoutCaFile = stripQueryParam(uri, TLS_CA_FILE_PARAM)
+		ConnectionString connectionString = new ConnectionString(uriWithoutCaFile)
+		MongoClientSettings settings = MongoClientSettings.builder()
+				.applyConnectionString(connectionString)
+				.applyToSslSettings { ssl ->
+					ssl.enabled(true)
+					ssl.context(sslContext)
+				}
+				.build()
+		KeywordUtil.logInfo("MongoDB TLS: using CA file ${pemFile.absolutePath}")
+		return MongoClients.create(settings)
+	}
+
+	/**
+	 * Resolve tlsCAFile to an existing file. Absolute paths are used as-is;
+	 * relative paths are resolved from the Katalon project directory.
+	 */
+	private static File resolveCaFile(String caFile) {
+		File pemFile = new File(caFile)
+		if (!pemFile.isAbsolute()) {
+			pemFile = new File(RunConfiguration.getProjectDir(), caFile)
+		}
+		if (!pemFile.isFile()) {
+			throw new FileNotFoundException("tlsCAFile not found: ${pemFile.absolutePath}")
+		}
+		return pemFile
+	}
+
+	/**
+	 * Build an SSLContext that trusts every X.509 cert in a PEM bundle (e.g. AWS global-bundle.pem).
+	 */
+	private static SSLContext sslContextFromPem(File pemFile) {
+		CertificateFactory factory = CertificateFactory.getInstance("X.509")
+		Collection<? extends Certificate> certs = pemFile.withInputStream { InputStream stream ->
+			factory.generateCertificates(stream)
+		}
+		if (certs == null || certs.isEmpty()) {
+			throw new IllegalStateException("No certificates found in tlsCAFile: ${pemFile.absolutePath}")
+		}
+		KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType())
+		keyStore.load(null, null)
+		int index = 0
+		certs.each { Certificate cert ->
+			keyStore.setCertificateEntry("ca-" + (index++), cert)
+		}
+		TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+		trustManagerFactory.init(keyStore)
+		SSLContext sslContext = SSLContext.getInstance("TLS")
+		sslContext.init(null, trustManagerFactory.getTrustManagers(), null)
+		KeywordUtil.logInfo("MongoDB TLS: loaded ${certs.size()} CA cert(s) from ${pemFile.name}")
+		return sslContext
+	}
+
+	/**
+	 * Return a decoded query parameter from a Mongo URI, or null if absent.
+	 */
+	private static String extractQueryParam(String uri, String name) {
+		int queryIndex = uri.indexOf('?')
+		if (queryIndex < 0 || queryIndex >= uri.length() - 1) {
+			return null
+		}
+		String query = uri.substring(queryIndex + 1)
+		for (String pair : query.split("&")) {
+			int eq = pair.indexOf('=')
+			if (eq < 0) {
+				continue
+			}
+			String key = URLDecoder.decode(pair.substring(0, eq), StandardCharsets.UTF_8.name())
+			if (name.equalsIgnoreCase(key)) {
+				return URLDecoder.decode(pair.substring(eq + 1), StandardCharsets.UTF_8.name())
+			}
+		}
+		return null
+	}
+
+	/**
+	 * Remove a query parameter from a Mongo URI so the Java driver does not see unsupported options.
+	 */
+	private static String stripQueryParam(String uri, String name) {
+		int queryIndex = uri.indexOf('?')
+		if (queryIndex < 0) {
+			return uri
+		}
+		String base = uri.substring(0, queryIndex)
+		String query = uri.substring(queryIndex + 1)
+		List<String> kept = new ArrayList<>()
+		for (String pair : query.split("&")) {
+			if (pair.isEmpty()) {
+				continue
+			}
+			int eq = pair.indexOf('=')
+			String key = (eq < 0) ? pair : URLDecoder.decode(pair.substring(0, eq), StandardCharsets.UTF_8.name())
+			if (name.equalsIgnoreCase(key)) {
+				continue
+			}
+			kept.add(pair)
+		}
+		return kept.isEmpty() ? base : base + "?" + kept.join("&")
 	}
 
 	/**

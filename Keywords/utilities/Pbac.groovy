@@ -58,6 +58,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.openqa.selenium.TimeoutException
 import org.openqa.selenium.ElementClickInterceptedException
+import org.openqa.selenium.StaleElementReferenceException
+import com.kms.katalon.core.exception.StepFailedException
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import java.util.HashMap;
 import java.util.Map;
@@ -111,6 +113,34 @@ class Pbac extends TestRunner {
 		WebUIUtils.clickTab('CRDC/NavBar/ManageUsers-Btn')
 		WebUI.delay(2)
 		WebUI.waitForPageLoad(15)
+	}
+
+	/**
+	 * Native-click the Edit User Role dropdown. clickTab JS-click reports success but does not
+	 * open the MUI list. Retries StaleElementReferenceException after the form remounts on Edit.
+	 */
+	private static void clickPbacRoleDropdown() {
+		TestObject to = findTestObject('CRDC/ManageUsers/Role-Ddn')
+		if (!WebUIUtils.waitForElementClickableWithStaleRetry(to, 10)) {
+			return
+		}
+		for (int i = 0; i < 3; i++) {
+			try {
+				WebUI.click(to)
+				return
+			} catch (StepFailedException e) {
+				if (e.getCause() instanceof StaleElementReferenceException) {
+					KeywordUtil.logInfo("clickPbacRoleDropdown: stale element, retrying (attempt ${i + 1}/3)...")
+					WebUI.delay(1)
+					if (!WebUIUtils.waitForElementClickableWithStaleRetry(to, 10)) {
+						return
+					}
+				} else {
+					throw e
+				}
+			}
+		}
+		KeywordUtil.markFailed("Unable to click Role-Ddn after stale retries")
 	}
 
 	private static void clickPbacPermissionCheckbox(WebElement cb) {
@@ -410,8 +440,7 @@ class Pbac extends TestRunner {
 			return
 		}
 
-		// Click role dropdown
-		WebUI.click(findTestObject('CRDC/ManageUsers/Role-Ddn'))
+		clickPbacRoleDropdown()
 		KeywordUtil.logInfo("Clicked role dropdown")
 
 		// Find an alternate role to toggle to
@@ -422,22 +451,26 @@ class Pbac extends TestRunner {
 		}
 
 		// Select alternate role
-		WebUI.click(findTestObject('CRDC/ManageUsers/RoleDdn-Option', [('role') : alternateRole]))
+		TestObject alternateOption = findTestObject('CRDC/ManageUsers/RoleDdn-Option', [('role') : alternateRole])
+		WebUI.waitForElementClickable(alternateOption, 10)
+		WebUI.click(alternateOption)
 		KeywordUtil.logInfo("Selected alternate role: ${alternateRole}")
 		WebUI.delay(2)
 
 		// Open dropdown again
-		WebUI.click(findTestObject('CRDC/ManageUsers/Role-Ddn'))
+		clickPbacRoleDropdown()
 		KeywordUtil.logInfo("Clicked role dropdown again")
 		WebUI.delay(2)
 
 		// Re-select target role
-		WebUI.click(findTestObject('CRDC/ManageUsers/RoleDdn-Option', [('role') : roleDisplay]))
+		TestObject targetOption = findTestObject('CRDC/ManageUsers/RoleDdn-Option', [('role') : roleDisplay])
+		WebUI.waitForElementClickable(targetOption, 10)
+		WebUI.click(targetOption)
 		KeywordUtil.logInfo("Selected target role: ${roleDisplay}")
 		WebUI.delay(2)
 
 		// Click Save
-		WebUI.click(findTestObject('CRDC/ManageUsers/Save-Btn'))
+		clickTab('CRDC/ManageUsers/Save-Btn')
 		KeywordUtil.logInfo("Clicked Save")
 		waitForPbacNotistackDismissed()
 
@@ -806,16 +839,24 @@ class Pbac extends TestRunner {
 			KeywordUtil.logInfo("Verifying SR Submit...")
 			try {
 				SubmissionRequest.clickHome()
-				TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
+				WebUIUtils.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
 				//only run the create SR flow if the Create button is available -- verify the Resume button is displayed in SR list and the Submit button during SR creation
 				if (WebUI.verifyElementPresent(findTestObject("CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn"), 5, FailureHandling.OPTIONAL)) {
 					boolean srSubmitExists = false, srListResume = false;
 					//SR resume flow
-					TestRunner.clickTab('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
+					WebUIUtils.clickTab('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
 					WebUI.delay(1)
-					TestRunner.clickTab('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn')
-					WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
-					TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
+					WebUIUtils.clickTab('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn')
+					// Save is disabled until the form is dirty; fill PI so Save can be clicked.
+					SubmissionRequest.enterPrincipalInvestigatorInfo(2)
+					WebUIUtils.clickTab('CRDC/SubmissionRequest/Save-Btn')
+					WebUIUtils.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
+					// Leaving with incomplete Section A opens the unsaved-changes dialog; Save there to keep the draft.
+					if (WebUI.verifyElementPresent(findTestObject('CRDC/AILocators/SubmissionRequests/UnsavedChangesDialog/Save-Btn'), 5, FailureHandling.OPTIONAL)) {
+						KeywordUtil.logInfo("Unsaved changes dialog present; clicking Save")
+						WebUIUtils.clickTab('CRDC/AILocators/SubmissionRequests/UnsavedChangesDialog/Save-Btn')
+						WebUI.waitForElementNotPresent(findTestObject('CRDC/AILocators/SubmissionRequests/UnsavedChangesDialog/Save-Btn'), 10)
+					}
 					String loggedInUserName = WebUIUtils.getProfileName()
 					SubmissionRequestList.applySubmissionRequestsListFilters([
 						submitterName: loggedInUserName,
@@ -826,9 +867,9 @@ class Pbac extends TestRunner {
 					srListResume = WebUI.verifyElementPresent(findTestObject("CRDC/AILocators/SubmissionRequests/List/Resume-Btn"), 5, FailureHandling.OPTIONAL)
 
 					//SR create/submit flow
-					TestRunner.clickTab('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
+					WebUIUtils.clickTab('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn')
 					WebUI.delay(1)
-					TestRunner.clickTab('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn')
+					WebUIUtils.clickTab('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn')
 
 					SubmissionRequest.enterPrincipalInvestigatorInfo(2)
 					SubmissionRequest.enterPrimaryContactInfo(2)
@@ -1048,7 +1089,8 @@ class Pbac extends TestRunner {
 					TestRunner.clickTab('CRDC/DataSubmissions/Validate-Btn')
 
 					//Verify
-					return WebUI.verifyElementPresent(findTestObject("CRDC/DataSubmissions/AdminSubmit-Btn"), 5, FailureHandling.OPTIONAL)
+					return WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/AdminSubmit-Btn'), 30, FailureHandling.OPTIONAL)
+					
 				}
 				return false
 			} catch (Exception e) {
