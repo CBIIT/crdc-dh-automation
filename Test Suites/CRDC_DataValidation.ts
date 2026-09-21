@@ -15,7 +15,7 @@
       <guid>536c80e3-9c29-492c-a326-607b094eb427</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/SuiteSetup/EnableAllPermissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/SuiteSetup/EnableAllPermissions</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>

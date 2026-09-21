@@ -7,8 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//li[text()='${role}']
-</value>
+         <value>//li[text()='${role}']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -19,8 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//li[text()='${role}']
-</value>
+      <value>//li[text()='${role}']</value>
       <webElementGuid>b6acb7d0-ffe2-4f37-9e1a-0249a11c6770</webElementGuid>
    </webElementProperties>
 </WebElementEntity>

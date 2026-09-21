@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubTypeNewUpdate-Btn</name>
+   <tag></tag>
+   <elementGuidId>05f46478-74b1-4076-acf0-4edfdae5f9a0</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&quot;create-data-submission-dialog-submission-type-New/Update-radio-button&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&quot;create-data-submission-dialog-submission-type-New/Update-radio-button&quot;]</value>
+      <webElementGuid>26141cd6-2f6a-46e6-95d2-c39ef73ef58b</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
