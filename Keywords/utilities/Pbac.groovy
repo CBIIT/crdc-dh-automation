@@ -58,6 +58,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.openqa.selenium.TimeoutException
 import org.openqa.selenium.ElementClickInterceptedException
+import org.openqa.selenium.StaleElementReferenceException
+import com.kms.katalon.core.exception.StepFailedException
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import java.util.HashMap;
 import java.util.Map;
@@ -111,6 +113,34 @@ class Pbac extends TestRunner {
 		WebUIUtils.clickTab('CRDC/NavBar/ManageUsers-Btn')
 		WebUI.delay(2)
 		WebUI.waitForPageLoad(15)
+	}
+
+	/**
+	 * Native-click the Edit User Role dropdown. clickTab JS-click reports success but does not
+	 * open the MUI list. Retries StaleElementReferenceException after the form remounts on Edit.
+	 */
+	private static void clickPbacRoleDropdown() {
+		TestObject to = findTestObject('CRDC/ManageUsers/Role-Ddn')
+		if (!WebUIUtils.waitForElementClickableWithStaleRetry(to, 10)) {
+			return
+		}
+		for (int i = 0; i < 3; i++) {
+			try {
+				WebUI.click(to)
+				return
+			} catch (StepFailedException e) {
+				if (e.getCause() instanceof StaleElementReferenceException) {
+					KeywordUtil.logInfo("clickPbacRoleDropdown: stale element, retrying (attempt ${i + 1}/3)...")
+					WebUI.delay(1)
+					if (!WebUIUtils.waitForElementClickableWithStaleRetry(to, 10)) {
+						return
+					}
+				} else {
+					throw e
+				}
+			}
+		}
+		KeywordUtil.markFailed("Unable to click Role-Ddn after stale retries")
 	}
 
 	private static void clickPbacPermissionCheckbox(WebElement cb) {
@@ -410,7 +440,7 @@ class Pbac extends TestRunner {
 			return
 		}
 
-		clickTab('CRDC/ManageUsers/Role-Ddn')
+		clickPbacRoleDropdown()
 		KeywordUtil.logInfo("Clicked role dropdown")
 
 		// Find an alternate role to toggle to
@@ -421,17 +451,21 @@ class Pbac extends TestRunner {
 		}
 
 		// Select alternate role
-		WebUI.click(findTestObject('CRDC/ManageUsers/RoleDdn-Option', [('role') : alternateRole]))
+		TestObject alternateOption = findTestObject('CRDC/ManageUsers/RoleDdn-Option', [('role') : alternateRole])
+		WebUI.waitForElementClickable(alternateOption, 10)
+		WebUI.click(alternateOption)
 		KeywordUtil.logInfo("Selected alternate role: ${alternateRole}")
 		WebUI.delay(2)
 
 		// Open dropdown again
-		clickTab('CRDC/ManageUsers/Role-Ddn')
+		clickPbacRoleDropdown()
 		KeywordUtil.logInfo("Clicked role dropdown again")
 		WebUI.delay(2)
 
 		// Re-select target role
-		WebUI.click(findTestObject('CRDC/ManageUsers/RoleDdn-Option', [('role') : roleDisplay]))
+		TestObject targetOption = findTestObject('CRDC/ManageUsers/RoleDdn-Option', [('role') : roleDisplay])
+		WebUI.waitForElementClickable(targetOption, 10)
+		WebUI.click(targetOption)
 		KeywordUtil.logInfo("Selected target role: ${roleDisplay}")
 		WebUI.delay(2)
 
