@@ -8,7 +8,7 @@ drive the browser.
 How a row is judged
 1. Keep rows whose Timestamp starts with --date (default: today).
 2. Search Gmail by Environment-prefixed subject and recency. Do not put the Name
-   in the Gmail q string. Name-in-body is required when EmailNotifications
+   in the Gmail q string. Name-in-body is required when Permissions
    (InputFiles/CRDC/PBACPermissions.xlsx) says TRUE for that expected subject.
 3. For each candidate, require the Subject to start with [QA], [QA2], or [STAGE]
    from the Environment column, to contain the expected subject phrase, and to
@@ -48,7 +48,7 @@ COL_SUBJECT = 7
 COL_RECIPIENT = 8
 COL_RESULT = 10
 COL_ENV = 11
-CATALOG_SHEET = "EmailNotifications"
+CATALOG_SHEET = "Permissions"
 
 # This file is PythonFiles/CRDC/VerifyNotificationEmails.py
 # parents[0] = PythonFiles/CRDC, parents[1] = repo root
@@ -163,10 +163,10 @@ def catalog_truthy(value):
 
 
 def load_name_in_body_map(catalog_path):
-	"""Map expected-subject (casefold) to Name in body from the EmailNotifications sheet."""
+	"""Map expected-subject (casefold) to Name in body from Permissions email rows."""
 	path = Path(catalog_path)
 	if not path.is_file():
-		print("EmailNotifications catalog not found:", path)
+		print("Permissions catalog not found:", path)
 		return {}
 	workbook = load_workbook(path, read_only=True, data_only=True)
 	try:
@@ -184,7 +184,7 @@ def load_name_in_body_map(catalog_path):
 		subject_idx = headers.index("Expected subject")
 		name_idx = headers.index("Name in body")
 	except ValueError:
-		print("EmailNotifications sheet is missing Expected subject or Name in body")
+		print("Permissions sheet is missing Expected subject or Name in body")
 		return {}
 	mapping = {}
 	for row in rows[1:]:
@@ -233,7 +233,7 @@ def find_message(service, expected_subject, name, env, recipient, name_in_body_m
 
 	Lists up to 20 recent messages for the env-prefixed subject, loads each full
 	MIME payload, then requires subject_matches, To: contains Expected recipient,
-	and Name in the body when the EmailNotifications catalog says so.
+	and Name in the body when the Permissions catalog says so.
 	"""
 	result = service.users().messages().list(
 		userId="me", q=gmail_query(expected_subject, env), maxResults=20

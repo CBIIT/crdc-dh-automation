@@ -44,7 +44,7 @@ class NotificationEmailLog {
 		"Environment"
 	] as String[]
 	private static final String ENV_PREFIX_NOTE = "Subject is prefixed with [Environment] (QA, QA2, or STAGE)."
-	private static final String CATALOG_DATA_FILE = "CRDC/Pbac/EmailNotifications"
+	private static final String CATALOG_DATA_FILE = "CRDC/Pbac/Permissions"
 
 	/**
 	 * Append one checklist row. Result is always left blank.
@@ -98,7 +98,7 @@ class NotificationEmailLog {
 	}
 
 	/**
-	 * After a UI action, write To: rows whose Trigger matches the EmailNotifications catalog.
+	 * After a UI action, write To: rows whose Trigger matches Permissions email rows.
 	 * Action on the checklist is the Trigger. Actor is who clicked, not who receives.
 	 */
 	@Keyword
@@ -108,7 +108,9 @@ class NotificationEmailLog {
 	}
 
 	/**
-	 * Look up Trigger in EmailNotifications and append one checklist row per matching catalog row.
+	 * Look up Trigger on Permissions email rows and append one checklist row per match.
+	 * Rows with a blank Trigger are ignored. Entity type comes from Group
+	 * (Submission Request Emails -> SR, Data Submission Emails -> DS).
 	 */
 	private static void appendFromCatalog(String trigger, String timestamp, String actor, String id, String name) {
 		def testData = TestDataFactory.findTestData(CATALOG_DATA_FILE)
@@ -116,25 +118,38 @@ class NotificationEmailLog {
 		boolean found = false
 		for (int i = 1; i <= rowCount; i++) {
 			String catalogTrigger = testData.getValue("Trigger", i)?.toString()?.trim() ?: ""
-			if (catalogTrigger != trigger) {
+			if (!catalogTrigger || catalogTrigger != trigger) {
 				continue
 			}
 			found = true
-			String entityType = testData.getValue("Entity type", i)?.toString()?.trim() ?: ""
-			String extraNotes = testData.getValue("Extra notes", i)?.toString()?.trim() ?: ""
+			String entityType = entityTypeFromGroup(testData.getValue("Group", i)?.toString()?.trim() ?: "")
 			String subject = testData.getValue("Expected subject", i)?.toString()?.trim() ?: ""
 			String toRole = testData.getValue("To role", i)?.toString()?.trim() ?: ""
-			String notes = ENV_PREFIX_NOTE
-			if (extraNotes) {
-				notes = ENV_PREFIX_NOTE + " " + extraNotes
-			}
-			appendRow(timestamp, actor, trigger, entityType, id, name, subject, emailForRole(toRole), notes)
+			appendRow(timestamp, actor, trigger, entityType, id, name, subject, emailForRole(toRole), ENV_PREFIX_NOTE)
 		}
 		if (!found) {
-			KeywordUtil.markFailed("EmailNotifications catalog has no row for Trigger " + trigger)
+			KeywordUtil.markFailed("Permissions catalog has no email row for Trigger " + trigger)
 		}
 	}
 
+	/**
+	 * SR vs DS for the checklist Entity type column, from the Permissions Group cell.
+	 */
+	private static String entityTypeFromGroup(String group) {
+		String g = group?.toLowerCase() ?: ""
+		if (g.contains("submission request")) {
+			return "SR"
+		}
+		if (g.contains("data submission")) {
+			return "DS"
+		}
+		return ""
+	}
+
+	/**
+	 * Map Permissions To role to the matching profile inbox
+	 * (SubmitterEmail, FedleadEmail, DcpEmail, or AdminEmail).
+	 */
 	private static String emailForRole(String toRole) {
 		String role = toRole?.toLowerCase() ?: ""
 		if (role == "submitter") {
@@ -149,10 +164,13 @@ class NotificationEmailLog {
 		if (role == "admin") {
 			return inbox(GlobalVariable.AdminEmail)
 		}
-		KeywordUtil.markFailed("Unknown To role in EmailNotifications catalog: " + toRole)
+		KeywordUtil.markFailed("Unknown To role in Permissions catalog: " + toRole)
 		return ""
 	}
 
+	/**
+	 * Trim a GlobalVariable email to a string. Blank if the profile value is missing.
+	 */
 	private static String inbox(Object value) {
 		return value?.toString()?.trim() ?: ""
 	}
@@ -190,6 +208,9 @@ class NotificationEmailLog {
 		return ""
 	}
 
+	/**
+	 * Write the Checklist header row with bold grey styling. Used only when the sheet is created.
+	 */
 	private static void writeHeader(Workbook workbook, Sheet sheet) {
 		Row header = sheet.createRow(0)
 		CellStyle headerStyle = workbook.createCellStyle()
