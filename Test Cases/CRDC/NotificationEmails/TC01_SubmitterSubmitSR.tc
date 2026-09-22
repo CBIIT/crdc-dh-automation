@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Submitter submits one new Submission Request and appends expected email rows to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
+   <name>TC01_SubmitterSubmitSR</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>b8e4c1d0-7a3f-4e91-9c2b-5d6f8a0e1b23</testCaseGuid>
+</TestCaseEntity>

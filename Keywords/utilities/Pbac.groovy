@@ -797,6 +797,63 @@ class Pbac extends TestRunner {
 		}
 	}
 
+	/**
+	 * Create and submit one submission request. Returns id (application UUID) and name (study title)
+	 * for NotificationEmailLog.logEmails. Caller must already be logged in.
+	 */
+	@Keyword
+	static Map createAndSubmitSubmissionRequest() {
+		WebUI.delay(2)
+		WebUI.waitForElementPresent(findTestObject('CRDC/NavBar/SubmissionRequest-Tab'), 10)
+		WebUI.waitForElementVisible(findTestObject('CRDC/NavBar/SubmissionRequest-Tab'), 10)
+		WebUI.click(findTestObject('CRDC/NavBar/SubmissionRequest-Tab'))
+
+		WebUI.waitForElementPresent(findTestObject('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn'), 5)
+		WebUI.click(findTestObject('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn'))
+
+		WebUI.delay(1)
+		WebUI.waitForElementPresent(findTestObject('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn'), 5)
+		WebUI.click(findTestObject('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn'))
+
+		SubmissionRequest.fillSubmissionRequestAllSections(2, 'Other', 6, 1, 1, 'Open',
+				'Yes', 'Cholangiocarcinoma', 'Homo', 1, 'genomics', 'proteomics', 5, 6, 1, 1)
+
+		String srId = SubmissionRequest.getApplicationIdFromUrl()
+		String studyName = SubmissionRequest.lastEnteredStudyTitle
+
+		WebUI.waitForElementClickable(findTestObject('CRDC/SubmissionRequest/Submit-Btn'), 30, FailureHandling.STOP_ON_FAILURE)
+		SubmissionRequest.clickSubmitButton()
+		return [id: srId, name: studyName]
+	}
+
+	/**
+	 * Create a metadata-only DS, upload unique program.tsv, Validate, and Submit.
+	 * Returns id (submission UUID) and name (DS display name) for NotificationEmailLog.logEmails.
+	 * Native-clicks Validate and Submit only after they are clickable so a disabled JS click cannot continue.
+	 * Caller must already be logged in.
+	 */
+	@Keyword
+	static Map createUploadValidateAndSubmitDataSubmission() {
+		WebUI.delay(2)
+		WebUIUtils.clickTab('CRDC/NavBar/DataSubmissions-Tab')
+		DataSubmissions.createDataSubmission('New', 'Metadata Only', 'GC', 'ATS - AutoTest-Study')
+		WebUIUtils.clickTab('CRDC/DataSubmissions/DataSubmissionName-Link')
+		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 60)
+
+		String dsId = DataSubmissions.getSubmissionIdFromUploadActivityUrl()
+		String dsName = DataSubmissions.expectedSubmissionName
+
+		prepareUniqueMetadataAndUpload('InputFiles/CRDC/MetadataData/PBAC/program.tsv', 'program_acronym')
+		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 60)
+		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 120, FailureHandling.STOP_ON_FAILURE)
+		WebUI.click(findTestObject('CRDC/DataSubmissions/Validate-Btn'))
+
+		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'), 120, FailureHandling.STOP_ON_FAILURE)
+		WebUI.click(findTestObject('CRDC/DataSubmissions/Submit-Btn'))
+		WebUI.delay(2)
+		WebUIUtils.clickTab('CRDC/DataSubmissions/SubmitYes-Btn')
+		return [id: dsId, name: dsName]
+	}
 
 	/**
 	 * Create mappings between permissions and verification actions

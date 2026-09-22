@@ -1487,6 +1487,23 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 
 	/**
+	 * Extract the Submission Request application id from the current form URL.
+	 * Call this after fillSubmissionRequestAllSections and before clickSubmitButton,
+	 * while the browser is still on /submission-request/{appId}/...
+	 * @return application UUID string, or null if not found
+	 */
+	@Keyword
+	static String getApplicationIdFromUrl() {
+		String url = WebUI.getUrl()
+		if (url == null || url.trim().isEmpty()) return null
+		java.util.regex.Pattern p = ~/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
+		java.util.regex.Matcher m = p.matcher(url)
+		String applicationId = m.find() ? m.group(0) : null
+		KeywordUtil.logInfo("Submission Request ID: ${applicationId}")
+		return applicationId
+	}
+
+	/**
 	 * This function clicks on submit and confirm submit buttons
 	 */
 	@Keyword
