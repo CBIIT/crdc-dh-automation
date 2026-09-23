@@ -856,6 +856,100 @@ class Pbac extends TestRunner {
 	}
 
 	/**
+	 * Create a metadata-only New DS and Cancel it (no upload or submit).
+	 * Returns id (submission UUID) and name (DS display name) for NotificationEmailLog.logEmails.
+	 * Capture id/name before Cancel; the detail page may leave after confirm.
+	 * Caller must already be logged in.
+	 */
+	@Keyword
+	static Map createAndCancelDataSubmission() {
+		WebUI.delay(2)
+		WebUIUtils.clickTab('CRDC/NavBar/DataSubmissions-Tab')
+		DataSubmissions.createDataSubmission('New', 'Metadata Only', 'GC', 'ATS - AutoTest-Study')
+		WebUIUtils.clickTab('CRDC/DataSubmissions/DataSubmissionName-Link')
+		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 60)
+
+		String dsId = DataSubmissions.getSubmissionIdFromUploadActivityUrl()
+		String dsName = DataSubmissions.expectedSubmissionName
+
+		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Cancel-Btn'), 30, FailureHandling.STOP_ON_FAILURE)
+		WebUI.click(findTestObject('CRDC/DataSubmissions/Cancel-Btn'))
+		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/SubmitYes-Btn'), 10, FailureHandling.STOP_ON_FAILURE)
+		WebUI.click(findTestObject('CRDC/DataSubmissions/SubmitYes-Btn'))
+		return [id: dsId, name: dsName]
+	}
+
+	/**
+	 * Submit a metadata-only DS via createUploadValidateAndSubmitDataSubmission, then Withdraw it.
+	 * Returns the same id/name map for NotificationEmailLog.logEmails.
+	 * Caller must already be logged in.
+	 */
+	@Keyword
+	static Map createSubmitAndWithdrawDataSubmission() {
+		Map created = createUploadValidateAndSubmitDataSubmission()
+		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 60)
+		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Withdraw-Btn'), 30, FailureHandling.STOP_ON_FAILURE)
+		WebUI.click(findTestObject('CRDC/DataSubmissions/Withdraw-Btn'))
+		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/SubmitYes-Btn'), 10, FailureHandling.STOP_ON_FAILURE)
+		WebUI.click(findTestObject('CRDC/DataSubmissions/SubmitYes-Btn'))
+		return created
+	}
+
+	/**
+	 * Submit a metadata-only DS as the current user (Submitter), then log in as DCP,
+	 * Cross Validate, and Release. Returns the same id/name map for NotificationEmailLog.logEmails.
+	 * Caller must already be logged in as Submitter.
+	 */
+	@Keyword
+	static Map createSubmitAndReleaseDataSubmission() {
+		Map created = createUploadValidateAndSubmitDataSubmission()
+		String dsId = created.id
+
+		SubmissionRequest.logoutFromCrdc()
+		WebUI.closeBrowser()
+		SubmissionRequest.navigateToCrdc()
+		SubmissionRequest.loginToCrdcOtp('Dcp')
+		WebUI.setViewPortSize(1920, 1080)
+
+		WebUIUtils.navigateToSubmissionUploadActivity(dsId)
+		Utils.waitForElementToAppear('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl', 30)
+		WebUIUtils.verifyElementText(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Submitted')
+		new DataSubmissions().clickCrossValidateButton()
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Actions/Release-Btn')
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseConfirmationYes-Btn')
+		WebUIUtils.waitUntilElementTextEquals(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Released', 30)
+		WebUI.verifyElementText(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Released', FailureHandling.STOP_ON_FAILURE)
+		return created
+	}
+
+	/**
+	 * Submit a metadata-only DS as the current user (Submitter), then log in as DCP
+	 * and Reject it with a comment. Returns the same id/name map for NotificationEmailLog.logEmails.
+	 * Caller must already be logged in as Submitter.
+	 */
+	@Keyword
+	static Map createSubmitAndRejectDataSubmission() {
+		Map created = createUploadValidateAndSubmitDataSubmission()
+		String dsId = created.id
+
+		SubmissionRequest.logoutFromCrdc()
+		WebUI.closeBrowser()
+		SubmissionRequest.navigateToCrdc()
+		SubmissionRequest.loginToCrdcOtp('Dcp')
+		WebUI.setViewPortSize(1920, 1080)
+
+		WebUIUtils.navigateToSubmissionUploadActivity(dsId)
+		Utils.waitForElementToAppear('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl', 30)
+		WebUIUtils.verifyElementText(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Submitted')
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn')
+		WebUI.sendKeys(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx'), 'Rejecting')
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Actions/ConfirmToReject-Btn')
+		WebUIUtils.waitUntilElementTextEquals(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Rejected', 30)
+		WebUI.verifyElementText(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Rejected', FailureHandling.STOP_ON_FAILURE)
+		return created
+	}
+
+	/**
 	 * Create mappings between permissions and verification actions
 	 */
 	private static final Map<String, Closure> permissionToCheck = [:]

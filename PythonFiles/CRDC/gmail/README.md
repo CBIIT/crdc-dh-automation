@@ -13,6 +13,10 @@ Four extra columns on those rows drive the judge. Other permission rows leave th
 | SR Submit | Submitter, and Fedlead | FALSE on Received; TRUE on Available for Review |
 | DS Create | Dcp | TRUE |
 | DS Submit | Submitter | TRUE |
+| DS Cancel | Submitter | TRUE |
+| DS Withdraw | Dcp | TRUE |
+| DS Release | Dcp | TRUE |
+| DS Reject | Submitter | TRUE |
 
 Subject, To role, and name-in-body live here. Tests do not hardcode those strings. Fill Trigger on a Permissions email row to include it in `logEmails`.
 
@@ -36,28 +40,68 @@ Only then:
 
 Same rule: fail before log. `created.id` is the submission UUID; `created.name` is the DS display name.
 
-## 4. logEmails
+## 4. TC03 — Submitter cancels a DS
+
+Login → `Pbac.createAndCancelDataSubmission()` (create a New metadata-only DS, wait until Cancel is clickable, native click, Yes). No upload or submit.
+
+Only then:
+
+`logEmails('DS Cancel', 'Submitter', created.id, created.name)`
+
+To is the Submitter. Fedlead/DCP/Admin with the cancelled notification on are BCC and are **not** judged. Creating still sends the DCP create mail; this case does not log `DS Create`.
+
+## 5. TC04 — Submitter withdraws a DS
+
+Login → `Pbac.createSubmitAndWithdrawDataSubmission()` (reuses `createUploadValidateAndSubmitDataSubmission`, wait until Withdraw is clickable, native click, Yes).
+
+Only then:
+
+`logEmails('DS Withdraw', 'Submitter', created.id, created.name)`
+
+To is DCP. Fedlead/Submitter/Admin with the withdrawn notification on are BCC and are **not** judged. Submit still sends create/submit mail; this case does not log `DS Create` or `DS Submit`.
+
+## 6. TC05 — DCP releases a DS
+
+Login Submitter → `Pbac.createSubmitAndReleaseDataSubmission()` (reuses `createUploadValidateAndSubmitDataSubmission`, logout, login DCP, wait until status is Submitted, `clickCrossValidateButton`, `clickTab` Release, `clickTab` Yes — same waits as TC06 history).
+
+Only then:
+
+`logEmails('DS Release', 'Dcp', created.id, created.name)`
+
+To is DCP. Fedlead/Submitter/Admin with the released notification on are BCC and are **not** judged. Submit still sends create/submit mail; this case does not log `DS Create` or `DS Submit`.
+
+## 7. TC06 — DCP rejects a DS
+
+Login Submitter → `Pbac.createSubmitAndRejectDataSubmission()` (reuses `createUploadValidateAndSubmitDataSubmission`, logout, login DCP, wait until status is Submitted, `clickTab` Reject, comment `Rejecting`, Confirm to Reject — same waits as TC06 history).
+
+Only then:
+
+`logEmails('DS Reject', 'Dcp', created.id, created.name)`
+
+To is the Submitter. Fedlead/DCP/Admin with the rejected notification on are BCC and are **not** judged. Submit still sends create/submit mail; this case does not log `DS Create` or `DS Submit`.
+
+## 8. logEmails
 
 One timestamp. Find every catalog row whose **Trigger** matches. For each:
 
 - Action on the checklist = Trigger
-- Actor = who clicked (script argument, always Submitter today)
+- Actor = who clicked (script argument; Submitter except TC05/TC06 Dcp)
 - Expected recipient = profile email for To role (`SubmitterEmail` / `FedleadEmail` / `DcpEmail` / `AdminEmail`)
 - Environment from `G_Urlname` (`QA` / `QA2` / `STAGE`; `hub-qa2` is checked before `hub-qa`)
 - Name = study title or DS display name
 - Result left blank
 
-SR Submit writes **two** rows (Submitter + Fedlead). DS Create and DS Submit write one each.
+SR Submit writes **two** rows (Submitter + Fedlead). DS Create, DS Submit, DS Cancel, DS Withdraw, DS Release, and DS Reject write one each.
 
 Unknown Trigger → test fails. New mail after the same click = another catalog row with the same Trigger. New UI action = a new Trigger value plus one `logEmails` call.
 
 `appendFromCatalog` does the lookup. `appendRow` writes one Excel row. Tests only call `logEmails`.
 
-## 5. Checklist
+## 9. Checklist
 
 Append-only `OutputFiles/NotificationEmail_Checklist.xlsx`. UI tests never open Gmail.
 
-## 6. Verifier (run after mail should be in the inbox)
+## 10. Verifier (run after mail should be in the inbox)
 
 `PythonFiles/CRDC/VerifyNotificationEmails.py` against `qa@essential-soft.com` (plus-aliases like `qa+crdc-automation-submitter@…` land in the same mailbox).
 
@@ -71,10 +115,10 @@ For each of **today’s** checklist rows that are still blank or Fail it:
 
 Writes **Pass** or **Fail**. Re-run retries Fail/blank only; Pass/Skip stay. Console on Pass includes the To: address. A blank Environment cell Fails without searching Gmail.
 
-## 7. How you run it
+## 11. How you run it
 
 1. Refresh Katalon Data File `CRDC/Pbac/Permissions` if you changed Trigger/subject/To role/Name in body.
-2. Run TC01 and/or TC02 (profile `CRDC_QA` / `CRDC_QA2` / `CRDC_STAGE`).
+2. Run TC01 through TC06 as needed (profile `CRDC_QA` / `CRDC_QA2` / `CRDC_STAGE`).
 3. When mail should already be there, from the project venv:
 
 ```bash
@@ -83,7 +127,7 @@ python PythonFiles/CRDC/VerifyNotificationEmails.py
 
 Override with `--excel`, `--date`, `--credentials`, `--token`, or env `GMAIL_CREDENTIALS_PATH` / `GMAIL_TOKEN_PATH`.
 
-That is the whole loop: catalog defines mail, UI tests only log after a real submit, Gmail judge scores the sheet.
+That is the whole loop: catalog defines mail, UI tests only log after a real submit, cancel, withdraw, release, or reject, Gmail judge scores the sheet.
 
 ## Auth files (not committed)
 
