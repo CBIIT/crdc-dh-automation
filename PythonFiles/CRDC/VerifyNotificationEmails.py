@@ -181,10 +181,10 @@ def load_name_in_body_map(catalog_path):
 		return {}
 	headers = [(h or "").strip() for h in rows[0]]
 	try:
-		subject_idx = headers.index("Expected subject")
+		subject_idx = headers.index("Expected email subject")
 		name_idx = headers.index("Name in body")
 	except ValueError:
-		print("Permissions sheet is missing Expected subject or Name in body")
+		print("Permissions sheet is missing Expected email subject or Name in body")
 		return {}
 	mapping = {}
 	for row in rows[1:]:

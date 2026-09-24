@@ -736,16 +736,30 @@ class Pbac extends TestRunner {
 	}
 
 	/**
-	 * Upload a metadata file in the data submission via the UI
+	 * Poll until the button is enabled, then stop the test if it still is not.
+	 * Katalon waitForElementClickable with STOP_ON_FAILURE only warns and continues,
+	 * which lets a later native click hit a still-disabled control.
+	 */
+	private static void waitUntilEnabledOrStop(TestObject to, int timeoutSeconds, String label) {
+		WebUIUtils.waitUntilStableForButtonEnabledOrDisabled(to, 'enabled', timeoutSeconds)
+		WebElement el = WebUI.findWebElement(to, 10)
+		if (el == null || !el.isEnabled()) {
+			KeywordUtil.markFailedAndStop(label + " did not become enabled within " + timeoutSeconds + "s")
+		}
+	}
+
+	/**
+	 * Upload a metadata file in the data submission via the UI.
+	 * Native-clicks Upload only after it is enabled (file must be attached).
 	 */
 	@Keyword
 	public static void uploadMetadataUI(String relativePath) {
 		String absolutePath = Paths.get(relativePath).toAbsolutePath().toString()
 		WebUI.delay(2)
 		WebUI.uploadFile(findTestObject('CRDC/DataSubmissions/ChooseFiles-Btn'), absolutePath)
-		WebUI.delay(5)
-		TestRunner.clickTab('CRDC/DataSubmissions/Upload-Btn')
-		WebUI.delay(10)
+		waitUntilEnabledOrStop(findTestObject('CRDC/DataSubmissions/Upload-Btn'), 30, 'Upload')
+		WebUI.click(findTestObject('CRDC/DataSubmissions/Upload-Btn'))
+		WebUI.delay(2)
 	}
 
 	/**
@@ -786,11 +800,12 @@ class Pbac extends TestRunner {
 			}
 		}
 
-		// Upload the modified file
+		// Upload the modified file. Keep the temp TSV until Validate enables so a still-in-flight
+		// ingest is not deleted out from under Chrome.
 		WebUI.delay(2)
 		uploadMetadataUI(tempFile.absolutePath)
+		waitUntilEnabledOrStop(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 120, 'Validate after metadata upload')
 
-		// Clean up
 		if (tempFile.exists()) {
 			tempFile.delete()
 			KeywordUtil.logInfo("Temporary metadata file deleted: ${tempFile.getAbsolutePath()}")
@@ -829,7 +844,8 @@ class Pbac extends TestRunner {
 	/**
 	 * Create a metadata-only DS, upload unique program.tsv, Validate, and Submit.
 	 * Returns id (submission UUID) and name (DS display name) for NotificationEmailLog.logEmails.
-	 * Native-clicks Validate and Submit only after they are clickable so a disabled JS click cannot continue.
+	 * Validate uses DataSubmissions.clickValidateButton after metadata ingest enables it.
+	 * Native-clicks Submit only after it is clickable so a disabled JS click cannot continue.
 	 * Caller must already be logged in.
 	 */
 	@Keyword
@@ -844,9 +860,7 @@ class Pbac extends TestRunner {
 		String dsName = DataSubmissions.expectedSubmissionName
 
 		prepareUniqueMetadataAndUpload('InputFiles/CRDC/MetadataData/PBAC/program.tsv', 'program_acronym')
-		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 60)
-		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 120, FailureHandling.STOP_ON_FAILURE)
-		WebUI.click(findTestObject('CRDC/DataSubmissions/Validate-Btn'))
+		DataSubmissions.clickValidateButton()
 
 		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'), 120, FailureHandling.STOP_ON_FAILURE)
 		WebUI.click(findTestObject('CRDC/DataSubmissions/Submit-Btn'))
@@ -908,8 +922,8 @@ class Pbac extends TestRunner {
 		SubmissionRequest.logoutFromCrdc()
 		WebUI.closeBrowser()
 		SubmissionRequest.navigateToCrdc()
-		SubmissionRequest.loginToCrdcOtp('Dcp')
 		WebUI.setViewPortSize(1920, 1080)
+		SubmissionRequest.loginToCrdcOtp('Dcp')
 
 		WebUIUtils.navigateToSubmissionUploadActivity(dsId)
 		Utils.waitForElementToAppear('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl', 30)
@@ -935,8 +949,8 @@ class Pbac extends TestRunner {
 		SubmissionRequest.logoutFromCrdc()
 		WebUI.closeBrowser()
 		SubmissionRequest.navigateToCrdc()
-		SubmissionRequest.loginToCrdcOtp('Dcp')
 		WebUI.setViewPortSize(1920, 1080)
+		SubmissionRequest.loginToCrdcOtp('Dcp')
 
 		WebUIUtils.navigateToSubmissionUploadActivity(dsId)
 		Utils.waitForElementToAppear('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl', 30)
@@ -947,6 +961,94 @@ class Pbac extends TestRunner {
 		WebUIUtils.waitUntilElementTextEquals(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Rejected', 30)
 		WebUI.verifyElementText(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Rejected', FailureHandling.STOP_ON_FAILURE)
 		return created
+	}
+
+	/**
+	 * Submit and Release a metadata-only DS via createSubmitAndReleaseDataSubmission, then Complete it as DCP.
+	 * Returns the same id/name map for NotificationEmailLog.logEmails.
+	 * Caller must already be logged in as Submitter.
+	 */
+	@Keyword
+	static Map createSubmitReleaseAndCompleteDataSubmission() {
+		Map created = createSubmitAndReleaseDataSubmission()
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Actions/Complete-Btn')
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Actions/CompleteConfirmationYes-Btn')
+		WebUIUtils.waitUntilElementTextEquals(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Completed', 30)
+		WebUI.verifyElementText(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Completed', FailureHandling.STOP_ON_FAILURE)
+		return created
+	}
+
+	/**
+	 * Open Profile Request Access and submit Institution AutoTest-Institution plus study AutoTest-Study.
+	 * Returns id and name (unique Additional Info token) for NotificationEmailLog.logEmails.
+	 * Caller must already be logged in as User. Stops if the dialog does not close after Submit.
+	 */
+	@Keyword
+	static Map submitAccessRequest() {
+		String institutionName = 'AutoTest-Institution'
+		String studyName = 'AutoTest-Study'
+		String additionalInfo = 'TC08 Request Access ' + new SimpleDateFormat('yyyy-MM-dd HH:mm:ss').format(new Date())
+
+		// Open Profile Request Access
+		WebUI.delay(2)
+		SubmissionRequest.clickHome()
+		SubmissionRequest.clickAccountDropdown()
+		WebUIUtils.clickTab('CRDC/AILocators/Global/Header/Desktop/UserProfile-Link')
+		WebUIUtils.clickTab('CRDC/AILocators/AccessRequest/RequestAccess-Btn')
+		Utils.waitForElementToAppear('CRDC/AILocators/AccessRequest/Dialog', 10)
+
+		// Enter institution
+		WebUIUtils.clickTab('CRDC/AILocators/AccessRequest/Institution-TxtBx')
+		WebUIUtils.clearTextfieldByOs('CRDC/AILocators/AccessRequest/Institution-TxtBx')
+		WebUI.sendKeys(findTestObject('CRDC/AILocators/AccessRequest/Institution-TxtBx'), institutionName)
+		WebUI.delay(1)
+		WebElement institutionMatch = Utils.getListWebElements('CRDC/AILocators/AccessRequest/Institution-Ddn-Option').find {
+			String t = it.getAttribute("innerText")
+			(t != null ? t.replaceAll(/\s+/, ' ').trim() : "") == institutionName
+		}
+		if (institutionMatch != null) {
+			institutionMatch.click()
+		} else {
+			WebUI.sendKeys(findTestObject('CRDC/AILocators/AccessRequest/Institution-TxtBx'), Keys.chord(Keys.TAB))
+		}
+		Utils.waitForElementToDisappear('CRDC/AILocators/AccessRequest/Institution-Ddn-Option', 10)
+
+		// Enter study. clickTab JS click reports success but does not open MUI Select; native click is the same pattern as Study-Ddn in createDataSubmission.
+		WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/AccessRequest/Studies-Ddn'), 10, FailureHandling.STOP_ON_FAILURE)
+		WebUI.click(findTestObject('CRDC/AILocators/AccessRequest/Studies-Ddn'))
+		Utils.waitForElementToAppear('CRDC/AILocators/AccessRequest/Studies-Ddn-Option', 10)
+		String normalizedStudy = studyName.replaceAll(/\s+/, ' ').trim()
+		WebElement studyMatch = Utils.getListWebElements('CRDC/AILocators/AccessRequest/Studies-Ddn-Option').find {
+			String t = it.getAttribute("innerText")
+			String testId = it.getAttribute("data-testid") ?: ""
+			String text = (t != null ? t.replaceAll(/\s+/, ' ').trim() : "")
+			text == normalizedStudy || text.contains(normalizedStudy) || testId.contains(normalizedStudy)
+		}
+		if (studyMatch == null) {
+			KeywordUtil.markFailedAndStop("Study option '${studyName}' not found in Request Access dialog.")
+			return
+		}
+		studyMatch.click()
+		// Close the multi-select by JS-clicking its invisible MUI backdrop. Escape closes the Request Access dialog. Native clicks on the header, Studies field, and Additional Info are intercepted: the backdrop covers the dialog, and a native click on the backdrop hits the menu at the viewport center.
+		WebUIUtils.clickTab('CRDC/AILocators/AccessRequest/Studies-Menu-Backdrop')
+		Utils.waitForElementToDisappear('CRDC/AILocators/AccessRequest/Studies-Ddn-Option', 10)
+
+		// Enter additional info. data-testid is on the MUI wrapper; sendKeys needs the inner textarea, same pattern as Institution-TxtBx.
+		WebUIUtils.clickTab('CRDC/AILocators/AccessRequest/AdditionalInfo-TxtBx')
+		WebUIUtils.clearTextfieldByOs('CRDC/AILocators/AccessRequest/AdditionalInfo-TxtBx')
+		WebUI.sendKeys(findTestObject('CRDC/AILocators/AccessRequest/AdditionalInfo-TxtBx'), additionalInfo)
+
+		// Submit
+		WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/AccessRequest/Submit-Btn'), 10, FailureHandling.STOP_ON_FAILURE)
+		WebUI.click(findTestObject('CRDC/AILocators/AccessRequest/Submit-Btn'))
+
+		// Wait for the dialog to close
+		try {
+			Utils.waitForElementToDisappear('CRDC/AILocators/AccessRequest/Dialog', 30)
+		} catch (AssertionError e) {
+			KeywordUtil.markFailedAndStop("Request Access dialog did not close after Submit")
+		}
+		return [id: additionalInfo, name: additionalInfo]
 	}
 
 	/**

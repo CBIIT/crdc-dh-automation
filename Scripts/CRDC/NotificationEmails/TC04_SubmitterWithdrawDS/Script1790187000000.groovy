@@ -8,8 +8,8 @@ import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 WebUI.closeBrowser()
 
 CustomKeywords.'utilities.SubmissionRequest.navigateToCrdc'()
-CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Submitter')
 WebUI.setViewPortSize(1920, 1080)
+CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Submitter')
 
 def created = CustomKeywords.'utilities.Pbac.createSubmitAndWithdrawDataSubmission'()
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('DS Withdraw', 'Submitter', created.id, created.name)

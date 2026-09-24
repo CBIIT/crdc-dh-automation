@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Submitter submits one Data Submission, DCP releases and completes it, then the case appends the expected complete-email row to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
+   <name>TC07_DcpCompleteDS</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a1b7e9c4-3d82-4f15-9e6a-2c8d04f17b90</testCaseGuid>
+</TestCaseEntity>

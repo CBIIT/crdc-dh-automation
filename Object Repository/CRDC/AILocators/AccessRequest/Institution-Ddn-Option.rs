@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Institution-Ddn-Option</name>
+   <tag></tag>
+   <elementGuidId>2e8b5c17-4f91-4a3d-8c6e-0d2a7b5f9e14</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@role=&apos;listbox&apos;]//li[@role=&apos;option&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@role=&apos;listbox&apos;]//li[@role=&apos;option&apos;]</value>
+      <webElementGuid>5a3c9d82-1e46-4b70-9f2d-8c7e1a4b6d05</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

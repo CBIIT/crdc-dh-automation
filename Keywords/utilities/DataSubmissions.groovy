@@ -1773,7 +1773,7 @@ class DataSubmissions extends TestRunner {
 	 * Click on Validate button to validate data uploaded
 	 */
 	@Keyword
-	private static clickValidateButton() {
+	static clickValidateButton() {
 		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
 		TestRunner.clickTab('CRDC/DataSubmissions/Validate-Btn')
 		//WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)

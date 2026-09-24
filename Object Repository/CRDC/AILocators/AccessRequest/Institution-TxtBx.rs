@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Institution-TxtBx</name>
+   <tag></tag>
+   <elementGuidId>7c4e2a91-3b58-4d0f-9e6a-1f8c2d5b7a03</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;access-request-institution-field&apos;]//input</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;access-request-institution-field&apos;]//input</value>
+      <webElementGuid>9d1f6b40-8c27-4a5e-b3d2-6e0f9a8c1b47</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

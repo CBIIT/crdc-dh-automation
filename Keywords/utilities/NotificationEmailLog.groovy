@@ -123,7 +123,7 @@ class NotificationEmailLog {
 			}
 			found = true
 			String entityType = entityTypeFromGroup(testData.getValue("Group", i)?.toString()?.trim() ?: "")
-			String subject = testData.getValue("Expected subject", i)?.toString()?.trim() ?: ""
+			String subject = testData.getValue("Expected email subject", i)?.toString()?.trim() ?: ""
 			String toRole = testData.getValue("To role", i)?.toString()?.trim() ?: ""
 			appendRow(timestamp, actor, trigger, entityType, id, name, subject, emailForRole(toRole), ENV_PREFIX_NOTE)
 		}
