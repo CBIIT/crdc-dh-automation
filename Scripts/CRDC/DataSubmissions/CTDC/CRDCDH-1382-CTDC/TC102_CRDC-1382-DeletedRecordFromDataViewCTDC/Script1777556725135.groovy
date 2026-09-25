@@ -27,7 +27,7 @@ CustomKeywords.'utilities.DataSubmissions.uploadFolder'('CRDCDH-699_TC102')
 CustomKeywords.'utilities.DataSubmissions.deleteRowsFromDataView'('data file', 1)
 
 //Validate data
-WebUI.click(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/ValidationType-Both-RadioBtn'))
+CustomKeywords.'utilities.DataSubmissions.selectValidationTypeBoth'()
 WebUI.click(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/ValidationTarget-AllUploadedData-RadioBtn'))
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 

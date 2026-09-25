@@ -12,38 +12,31 @@
    <rerunImmediately>true</rerunImmediately>
    <testSuiteGuid>da511912-1a63-433b-97f8-db467341cdb4</testSuiteGuid>
    <testCaseLink>
-      <guid>22944be0-8bcb-4f50-bb00-3650ada1c8f1</guid>
+      <guid>7a3f667e-50f4-4944-b298-a1445ec31111</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/NotificationEmails/DS/TC07_DcpCompleteDS</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1804/TC14_CRDC-VerifyDataViewDeleteRecordsTooltips</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>9cbad3a4-eae0-4982-bb77-bf9fc5bb5fec</guid>
+      <guid>f142cc35-42ae-4e1e-a97a-0c4d6e89ffb6</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/NotificationEmails/DS/TC07_DcpCompleteDS</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1163/TC17_CRDC-1163-DCPValidationAfterSubmissionSubmittedDataFiles</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>79002d50-88fb-40eb-83f0-7338b970d2bb</guid>
+      <guid>d768b9a9-fd68-4b16-b494-62b1665125f2</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/NotificationEmails/DS/TC07_DcpCompleteDS</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/CTDC/CRDCDH-1051-CTDC/TC38_CRDC-VerifyCrossValidationCTDC</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>783c0c0d-81d4-4c11-86ed-77708b29c712</guid>
+      <guid>6f47f04c-bb37-4d44-9a67-56b8a6643524</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/NotificationEmails/DS/TC07_DcpCompleteDS</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>fb828f6b-3787-43a8-a3e4-b81209ab7142</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/NotificationEmails/DS/TC07_DcpCompleteDS</testCaseId>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-1051-ICDC/TC39_CRDC-VerifyCrossValidationICDC</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>

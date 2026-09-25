@@ -737,7 +737,8 @@ class Pbac extends TestRunner {
 
 	/**
 	 * Upload a metadata file in the data submission via the UI.
-	 * Native-clicks Upload only after it is enabled (file must be attached).
+	 * Native-clicks Upload only after it is enabled (file must be attached), then waits until
+	 * Validate enables (metadata ingest finished) or stops the test.
 	 */
 	@Keyword
 	public static void uploadMetadataUI(String relativePath) {
@@ -746,7 +747,7 @@ class Pbac extends TestRunner {
 		WebUI.uploadFile(findTestObject('CRDC/DataSubmissions/ChooseFiles-Btn'), absolutePath)
 		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/DataSubmissions/Upload-Btn'), 30, 'Upload')
 		WebUI.click(findTestObject('CRDC/DataSubmissions/Upload-Btn'))
-		WebUI.delay(2)
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 120, 'Validate after metadata upload')
 	}
 
 	/**
@@ -787,11 +788,10 @@ class Pbac extends TestRunner {
 			}
 		}
 
-		// Upload the modified file. Keep the temp TSV until Validate enables so a still-in-flight
-		// ingest is not deleted out from under Chrome.
+		// Upload the modified file. uploadMetadataUI waits until Validate enables, so the temp TSV
+		// is not deleted while ingest is still in flight.
 		WebUI.delay(2)
 		uploadMetadataUI(tempFile.absolutePath)
-		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 120, 'Validate after metadata upload')
 
 		if (tempFile.exists()) {
 			tempFile.delete()

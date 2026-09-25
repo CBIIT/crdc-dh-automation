@@ -1770,6 +1770,46 @@ class DataSubmissions extends TestRunner {
 	}
 
 	/**
+	 * Select the "Both" validation type.
+	 *
+	 * Both stays disabled while a batch in the Upload Activities table still shows Uploading.
+	 * A data file upload creates two batches (the files, then the manifest metadata), and the second
+	 * can appear only after the first has finished, so a single "Uploading disappeared" check returns
+	 * in the gap between them. Waits until Uploading has been gone for a stretch, then clicks Both.
+	 * Stops the test if a batch is still Uploading at the timeout, or if Both never enables.
+	 * Native-clicks because WebUIUtils.clickTab uses a JavaScript click that succeeds on a disabled radio.
+	 */
+	@Keyword
+	static void selectValidationTypeBoth() {
+		waitUntilNoBatchUploading(180, 10)
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Both-RadioBtn'), 30, 'Both validation type')
+		WebUI.click(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Both-RadioBtn'))
+		WebUIUtils.verifyButtonSelected(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Both-RadioBtn'), true)
+	}
+
+	/**
+	 * Wait until the Upload Activities table shows no batch with status Uploading, and that stays
+	 * true for stableSeconds. Uses the Uploading-Txt locator, same as Utils.waitForElementToDisappear.
+	 */
+	private static void waitUntilNoBatchUploading(int timeoutSeconds, int stableSeconds) {
+		long deadline = System.currentTimeMillis() + timeoutSeconds * 1000L
+		Long clearSince = null
+		while (System.currentTimeMillis() < deadline) {
+			boolean uploading = Utils.getListWebElements('CRDC/DataSubmissions/Uploading-Txt').size() > 0
+			if (uploading) {
+				clearSince = null
+			} else if (clearSince == null) {
+				clearSince = System.currentTimeMillis()
+			} else if ((System.currentTimeMillis() - clearSince) / 1000 >= stableSeconds) {
+				KeywordUtil.logInfo("No batch Uploading for " + stableSeconds + "s")
+				return
+			}
+			WebUI.delay(2)
+		}
+		KeywordUtil.markFailedAndStop("A batch was still Uploading in Upload Activities after " + timeoutSeconds + "s")
+	}
+
+	/**
 	 * Click on Validate button to validate data uploaded
 	 */
 	@Keyword

@@ -50,15 +50,8 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmiss
 
 CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC21', 'datafile')
 
-// Refresh so validation radio controls sync with CLI-uploaded files; wait for loader instead of fixed sleep.
-WebUI.delay(2)
-WebUI.refresh()
-CustomKeywords.'utilities.Utils.waitForElementToDisappear'('CRDC/DataSubmissions/Loading-Icon', 60)
-// Spinner only means the shell loaded; wait until radios are actionable (Both stays disabled until metadata+file validation are both available from the server after CLI upload).
-WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationTarget-AllUploadedData-RadioBtn'), 90)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationTarget-AllUploadedData-RadioBtn')
-WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Both-RadioBtn'), 90)
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Both-RadioBtn')
+CustomKeywords.'utilities.DataSubmissions.selectValidationTypeBoth'()
 
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
