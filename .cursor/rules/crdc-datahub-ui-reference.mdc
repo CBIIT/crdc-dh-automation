@@ -7,7 +7,7 @@ alwaysApply: true
 
 ## Project Location
 
-The crdc-datahub-ui frontend is a separate repo. Product source lives together under `~/ai/crdc/` (this UI repo is `~/ai/crdc/crdc-datahub-ui`). Use it as a reference for UI structure, components, and DOM attributes when writing locators.
+The crdc-datahub-ui frontend is a separate repo. Clone it to your preferred location (e.g. `../crdc-datahub-ui` as a sibling to crdc-dh-automation, or `~/crdc-frontend/crdc-datahub-ui`). Use it as a reference for UI structure, components, and DOM attributes when writing locators.
 
 ## Tech Stack
 - **React 18** + **TypeScript 5.8**, **Vite 6** (port 3010)

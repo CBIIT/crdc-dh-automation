@@ -1684,7 +1684,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	@Keyword
 	public static void rejectSubmissionRequest(String studyName, String rejectionComment = DEFAULT_REJECTION_COMMENT) {
 		if (openSubmissionRequestReview(studyName, "rejectSubmissionRequest") == null) return
-			String comment = (rejectionComment != null && !rejectionComment.trim().isEmpty()) ? rejectionComment.trim() : DEFAULT_REJECTION_COMMENT
+		String comment = (rejectionComment != null && !rejectionComment.trim().isEmpty()) ? rejectionComment.trim() : DEFAULT_REJECTION_COMMENT
 		confirmReviewDecision(SR_FORM_BASE + "/Navigation/Reject-Btn",
 				"CRDC/AILocators/SubmissionRequests/RejectDialog/ReviewComment-TxtBx",
 				"CRDC/AILocators/SubmissionRequests/RejectDialog/ConfirmReject-Btn", comment)
@@ -1705,7 +1705,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	@Keyword
 	public static void approveSubmissionRequest(String studyName, String approvalComment = DEFAULT_APPROVAL_COMMENT) {
 		if (openSubmissionRequestReview(studyName, "approveSubmissionRequest") == null) return
-			String comment = (approvalComment != null && !approvalComment.trim().isEmpty()) ? approvalComment.trim() : DEFAULT_APPROVAL_COMMENT
+		String comment = (approvalComment != null && !approvalComment.trim().isEmpty()) ? approvalComment.trim() : DEFAULT_APPROVAL_COMMENT
 		confirmReviewDecision(SR_FORM_BASE + "/Navigation/Approve-Btn",
 				"CRDC/AILocators/SubmissionRequests/ApproveDialog/ReviewComment-TxtBx",
 				"CRDC/AILocators/SubmissionRequests/ApproveDialog/ConfirmApprove-Btn", comment)
