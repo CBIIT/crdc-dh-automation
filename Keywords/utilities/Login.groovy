@@ -490,4 +490,17 @@ class Login extends TestRunner implements Comparator<List<XSSFCell>>{
 			}
 		}
 	}
+
+	/**
+	 * Log out the current user, close the browser, and log in as another role in a fresh session.
+	 * @param role One of: Admin, Fedlead, Dcp, Submitter, User
+	 */
+	@Keyword
+	void switchUser(String role) {
+		SubmissionRequest.logoutFromCrdc()
+		WebUI.closeBrowser()
+		navigateToCrdc()
+		WebUI.setViewPortSize(1920, 1080)
+		loginToCrdcOtp(role)
+	}
 }//class ends

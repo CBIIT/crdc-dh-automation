@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Studies-Ddn-Option</name>
+   <tag></tag>
+   <elementGuidId>8f0d4e26-7a13-4c59-b1e8-3d6f2a9c5b70</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//li[starts-with(@data-testid,&apos;studies-&apos;)]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//li[starts-with(@data-testid,&apos;studies-&apos;)]</value>
+      <webElementGuid>4b7e1c93-6d28-4f05-a8c1-2e9d5f7b0a36</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

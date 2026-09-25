@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Submitter creates and submits one Data Submission and appends expected email rows to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
+   <name>TC02_SubmitterCreateAndSubmitDS</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>c9f5d2e1-8b4a-5f02-ad3c-6e7f9b1c2d34</testCaseGuid>
+</TestCaseEntity>

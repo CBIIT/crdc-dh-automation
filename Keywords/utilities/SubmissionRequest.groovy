@@ -497,7 +497,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			KeywordUtil.logInfo("Successfully entered: " + value + " into " + testObjectId)
 		}
 	}
-	
+
 	/**
 	 * This function enters funding agency information into the submission request form.
 	 * @param dataRowNum Row number from the test data file
@@ -1487,6 +1487,36 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 
 	/**
+	 * Extract the Submission Request application id from the current form URL.
+	 * Call this after fillSubmissionRequestAllSections and before clickSubmitButton,
+	 * while the browser is still on /submission-request/{appId}/...
+	 * @return application UUID string, or null if not found
+	 */
+	@Keyword
+	static String getApplicationIdFromUrl() {
+		String url = WebUI.getUrl()
+		if (url == null || url.trim().isEmpty()) return null
+		java.util.regex.Pattern p = ~/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
+		java.util.regex.Matcher m = p.matcher(url)
+		String applicationId = m.find() ? m.group(0) : null
+		KeywordUtil.logInfo("Submission Request ID: ${applicationId}")
+		return applicationId
+	}
+
+	/**
+	 * Open the Submission Requests list, click Start a Submission Request, and accept the read/accept dialog
+	 * so Section A of a new request is showing.
+	 */
+	@Keyword
+	public static void startSubmissionRequest() {
+		new SubmissionRequestList().navigateToSubmissionRequestsList()
+		WebUI.waitForElementClickable(findTestObject('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn'), 10)
+		WebUI.click(findTestObject('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn'))
+		WebUI.waitForElementClickable(findTestObject('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn'), 10)
+		WebUI.click(findTestObject('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn'))
+	}
+
+	/**
 	 * This function clicks on submit and confirm submit buttons
 	 */
 	@Keyword
@@ -1500,15 +1530,17 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	}
 
 	/**
-	 * This function clicks on submit and confirm submit buttons
+	 * This function clicks Cancel Request, enters a cancel reason, and confirms the cancel
 	 */
 	@Keyword
 	public static void cancelSubmissionRequestButton() {
-		findTestObject('Object Repository/CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequest-TxtBx')
+		WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelRequest-Btn'), 10)
 		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelRequest-Btn'))
-		Thread.sleep(1000)
-		WebUI.setText(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequest-TxtBx'), "Auto Test Cancel")
-		Thread.sleep(1000)
+		WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequest-TxtBx'), 10)
+		// setText on the MUI reason field does not update react-hook-form, so Confirm stays disabled. Native click then sendKeys fires onChange.
+		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequest-TxtBx'))
+		WebUI.sendKeys(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequest-TxtBx'), "Auto Test Cancel")
+		WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequestConfirm-Btn'), 10)
 		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequestConfirm-Btn'))
 	}
 
@@ -1651,39 +1683,11 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	 */
 	@Keyword
 	public static void rejectSubmissionRequest(String studyName, String rejectionComment = DEFAULT_REJECTION_COMMENT) {
-		if (studyName == null || studyName.trim().isEmpty()) {
-			KeywordUtil.markFailed("rejectSubmissionRequest: studyName is required.")
-			return
-		}
-		String token = studyName.trim()
-		if (token.length() < 3) {
-			KeywordUtil.markFailed("rejectSubmissionRequest: studyName must be at least 3 characters (Submission Requests Study filter).")
-			return
-		}
+		if (openSubmissionRequestReview(studyName, "rejectSubmissionRequest") == null) return
 		String comment = (rejectionComment != null && !rejectionComment.trim().isEmpty()) ? rejectionComment.trim() : DEFAULT_REJECTION_COMMENT
-
-		KeywordUtil.logInfo("rejectSubmissionRequest: navigating to Submission Requests list; study token length=" + token.length())
-		new SubmissionRequestList().navigateToSubmissionRequestsList()
-		SubmissionRequestList.applySubmissionRequestsListFilters([study: token] as Map<String, String>)
-		WebUI.delay(2)
-		clickSubmissionRequestsListReviewForStudyRow(token)
-
-		// List "Review" opens the request on the first section (e.g. PI); Approve/Reject exist only on the final Review step.
-		WebUI.waitForElementPresent(findTestObject(SR_FORM_BASE + "/Review/ProgressBar-Review"), 45)
-		WebUI.waitForElementClickable(findTestObject(SR_FORM_BASE + "/Review/ProgressBar-Review"), 15)
-		WebUI.click(findTestObject(SR_FORM_BASE + "/Review/ProgressBar-Review"))
-		WebUI.delay(2)
-		WebUI.scrollToElement(findTestObject(SR_FORM_BASE + "/Navigation/Reject-Btn"), 15)
-		WebUI.waitForElementVisible(findTestObject(SR_FORM_BASE + "/Navigation/Reject-Btn"), 20)
-		WebUI.waitForElementClickable(findTestObject(SR_FORM_BASE + "/Navigation/Reject-Btn"), 15)
-		WebUI.click(findTestObject(SR_FORM_BASE + "/Navigation/Reject-Btn"))
-		TestObject rejectCommentTo = findTestObject("CRDC/AILocators/SubmissionRequests/RejectDialog/ReviewComment-TxtBx")
-		WebUI.waitForElementPresent(rejectCommentTo, 10)
-		WebUI.waitForElementVisible(rejectCommentTo, 10)
-		WebUI.setText(rejectCommentTo, comment)
-		WebUI.waitForElementClickable(findTestObject("CRDC/AILocators/SubmissionRequests/RejectDialog/ConfirmReject-Btn"), 10)
-		WebUI.click(findTestObject("CRDC/AILocators/SubmissionRequests/RejectDialog/ConfirmReject-Btn"))
-		WebUI.delay(2)
+		confirmReviewDecision(SR_FORM_BASE + "/Navigation/Reject-Btn",
+				"CRDC/AILocators/SubmissionRequests/RejectDialog/ReviewComment-TxtBx",
+				"CRDC/AILocators/SubmissionRequests/RejectDialog/ConfirmReject-Btn", comment)
 		KeywordUtil.logInfo("rejectSubmissionRequest: completed for study token.")
 	}
 
@@ -1700,41 +1704,60 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	 */
 	@Keyword
 	public static void approveSubmissionRequest(String studyName, String approvalComment = DEFAULT_APPROVAL_COMMENT) {
+		if (openSubmissionRequestReview(studyName, "approveSubmissionRequest") == null) return
+		String comment = (approvalComment != null && !approvalComment.trim().isEmpty()) ? approvalComment.trim() : DEFAULT_APPROVAL_COMMENT
+		confirmReviewDecision(SR_FORM_BASE + "/Navigation/Approve-Btn",
+				"CRDC/AILocators/SubmissionRequests/ApproveDialog/ReviewComment-TxtBx",
+				"CRDC/AILocators/SubmissionRequests/ApproveDialog/ConfirmApprove-Btn", comment)
+		KeywordUtil.logInfo("approveSubmissionRequest: completed for study token.")
+	}
+
+	/**
+	 * Filter the Submission Requests list by study, open Review on the matching row, and select the Review
+	 * section in the form sidebar so the decision buttons are showing.
+	 * Returns the trimmed study token, or null after markFailed when studyName is blank or shorter than 3 characters.
+	 */
+	private static String openSubmissionRequestReview(String studyName, String caller) {
 		if (studyName == null || studyName.trim().isEmpty()) {
-			KeywordUtil.markFailed("approveSubmissionRequest: studyName is required.")
-			return
+			KeywordUtil.markFailed(caller + ": studyName is required.")
+			return null
 		}
 		String token = studyName.trim()
 		if (token.length() < 3) {
-			KeywordUtil.markFailed("approveSubmissionRequest: studyName must be at least 3 characters (Submission Requests Study filter).")
-			return
+			KeywordUtil.markFailed(caller + ": studyName must be at least 3 characters (Submission Requests Study filter).")
+			return null
 		}
-		String comment = (approvalComment != null && !approvalComment.trim().isEmpty()) ? approvalComment.trim() : DEFAULT_APPROVAL_COMMENT
 
-		KeywordUtil.logInfo("approveSubmissionRequest: navigating to Submission Requests list; study token length=" + token.length())
+		KeywordUtil.logInfo(caller + ": navigating to Submission Requests list; study token length=" + token.length())
 		new SubmissionRequestList().navigateToSubmissionRequestsList()
 		SubmissionRequestList.applySubmissionRequestsListFilters([study: token] as Map<String, String>)
 		WebUI.delay(2)
 		clickSubmissionRequestsListReviewForStudyRow(token)
 
+		// List "Review" opens the request on the first section (e.g. PI); decision buttons exist only on the final Review step.
 		WebUI.waitForElementPresent(findTestObject(SR_FORM_BASE + "/Review/ProgressBar-Review"), 45)
 		WebUI.waitForElementClickable(findTestObject(SR_FORM_BASE + "/Review/ProgressBar-Review"), 15)
 		WebUI.click(findTestObject(SR_FORM_BASE + "/Review/ProgressBar-Review"))
 		WebUI.delay(2)
-		WebUI.scrollToElement(findTestObject(SR_FORM_BASE + "/Navigation/Approve-Btn"), 15)
-		WebUI.waitForElementVisible(findTestObject(SR_FORM_BASE + "/Navigation/Approve-Btn"), 20)
-		WebUI.waitForElementClickable(findTestObject(SR_FORM_BASE + "/Navigation/Approve-Btn"), 15)
-		WebUI.click(findTestObject(SR_FORM_BASE + "/Navigation/Approve-Btn"))
+		return token
+	}
+
+	/**
+	 * Click a review decision button (Reject, Approve, and so on), type the comment in its dialog, and confirm.
+	 */
+	private static void confirmReviewDecision(String actionBtnPath, String commentPath, String confirmPath, String comment) {
+		WebUI.scrollToElement(findTestObject(actionBtnPath), 15)
+		WebUI.waitForElementVisible(findTestObject(actionBtnPath), 20)
+		WebUI.waitForElementClickable(findTestObject(actionBtnPath), 15)
+		WebUI.click(findTestObject(actionBtnPath))
+		WebUI.waitForElementPresent(findTestObject(commentPath), 10)
+		WebUI.waitForElementVisible(findTestObject(commentPath), 10)
+		// setText on the MUI review-comment field does not update react-hook-form, so Confirm stays disabled. Native click then sendKeys fires onChange.
+		WebUI.click(findTestObject(commentPath))
+		WebUI.sendKeys(findTestObject(commentPath), comment)
+		WebUI.waitForElementClickable(findTestObject(confirmPath), 10)
+		WebUI.click(findTestObject(confirmPath))
 		WebUI.delay(2)
-		TestObject approveCommentTo = findTestObject("CRDC/AILocators/SubmissionRequests/ApproveDialog/ReviewComment-TxtBx")
-		WebUI.waitForElementPresent(approveCommentTo, 10)
-		WebUI.waitForElementVisible(approveCommentTo, 10)
-		WebUI.setText(approveCommentTo, comment)
-		WebUI.delay(1)
-		WebUI.waitForElementClickable(findTestObject("CRDC/AILocators/SubmissionRequests/ApproveDialog/ConfirmApprove-Btn"), 10)
-		WebUI.click(findTestObject("CRDC/AILocators/SubmissionRequests/ApproveDialog/ConfirmApprove-Btn"))
-		WebUI.delay(2)
-		KeywordUtil.logInfo("approveSubmissionRequest: completed for study token.")
 	}
 
 	/**

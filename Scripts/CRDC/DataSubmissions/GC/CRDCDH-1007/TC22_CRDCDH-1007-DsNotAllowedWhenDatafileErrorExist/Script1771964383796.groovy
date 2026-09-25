@@ -53,7 +53,7 @@ WebUI.delay(3)
 CustomKeywords.'utilities.DataSubmissions.deleteRowsFromDataView'('data file', 2)
 
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationTarget-AllUploadedData-RadioBtn')
-CustomKeywords.'utilities.WebUIUtils.clickTab'('/CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Both-RadioBtn')
+CustomKeywords.'utilities.DataSubmissions.selectValidationTypeBoth'()
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 CustomKeywords.'utilities.DataSubmissions.verifyValidationResultsVsExpectedForTC'("CRDCDH-1007")
 CustomKeywords.'utilities.WebUIUtils.verifyButtonEnabled'(findTestObject('Object Repository/CRDC/AILocators/DataSubmissions/Detail/Actions/Submit-Btn'), false)

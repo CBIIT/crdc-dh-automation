@@ -11,3 +11,6 @@ rich
 numpy>=1.21,<1.24
 pandas==1.5.3
 pytest
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib

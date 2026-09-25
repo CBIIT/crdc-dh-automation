@@ -4,6 +4,7 @@ import static com.kms.katalon.core.testdata.TestDataFactory.findTestData
 import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
 import com.kms.katalon.core.annotation.Keyword
 import com.kms.katalon.core.configuration.RunConfiguration
+import com.kms.katalon.core.model.FailureHandling
 import com.kms.katalon.core.util.KeywordUtil
 import com.kms.katalon.core.webui.driver.DriverFactory
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
@@ -256,7 +257,7 @@ class DataSubmissions extends TestRunner {
 					try {
 						List<WebElement> cells = row.findElements(By.xpath(".//td"))
 						if (statusIdx >= cells.size()) continue
-						String rowStatus = cells.get(statusIdx).getText()?.trim() ?: ""
+							String rowStatus = cells.get(statusIdx).getText()?.trim() ?: ""
 						if (uploadingLabel.equalsIgnoreCase(rowStatus)) {
 							anyUploading = true
 							break
@@ -582,7 +583,7 @@ class DataSubmissions extends TestRunner {
 		for (int j = 0; j < headerLine.length; j++) {
 			String h = headerLine[j].trim()
 			if (h.equalsIgnoreCase("type") || h.equalsIgnoreCase("status")) continue
-			includedIndexes.add(j)
+				includedIndexes.add(j)
 			expectedHeaderNames.add(h)
 		}
 		for (int i = 1; i < lines.size(); i++) {
@@ -709,8 +710,8 @@ class DataSubmissions extends TestRunner {
 		for (int i = sortableStart; i < uiHeaders.size(); i++) {
 			String h = uiHeaders.get(i)?.trim() ?: ""
 			if (h.isEmpty()) continue
-			if (h.equalsIgnoreCase("Orphaned")) continue
-			sortableHeaders.add(h)
+				if (h.equalsIgnoreCase("Orphaned")) continue
+				sortableHeaders.add(h)
 		}
 		List<String> expectedOrder = new ArrayList<>(sortableHeaders)
 		Collections.sort(expectedOrder, { String a, String b ->
@@ -742,11 +743,11 @@ class DataSubmissions extends TestRunner {
 		for (int c = 0; c < expectedHeaderNames.size(); c++) {
 			String exp = expectedHeaderNames.get(c)
 			if (exp == null) continue
-			String expNorm = exp.replace("_", " ").trim()
+				String expNorm = exp.replace("_", " ").trim()
 			for (int u = 0; u < uiHeaders.size(); u++) {
 				String ui = uiHeaders.get(u)
 				if (ui == null) continue
-				String uiNorm = ui.replace("_", " ").trim()
+					String uiNorm = ui.replace("_", " ").trim()
 				if (ui.equalsIgnoreCase(exp) || uiNorm.equalsIgnoreCase(expNorm)) {
 					map[c] = u
 					break
@@ -990,7 +991,7 @@ class DataSubmissions extends TestRunner {
 	/** Load node -> submitted-identifier column name from Data File (Data Files/CRDC/DataSubmissions/ValidationResults-Mappings). Falls back to Excel if Data File not available. Used by DatabaseUtils.verifyRecordsInMongo. */
 	public static Map<String, String> loadValidationResultsMappings() {
 		Map<String, String> nodeToColumn = new HashMap<>()
-		try {			
+		try {
 			String testCaseId = RunConfiguration.getExecutionSourceId()
 			String sheetName = "GC" // default
 
@@ -1028,7 +1029,6 @@ class DataSubmissions extends TestRunner {
 					KeywordUtil.markWarning("Sheet not found: " + sheetName)
 				}
 				wb.close()
-			
 			}
 		} catch (Exception e) {
 			KeywordUtil.markWarning("Not able to get mapping from DSV_ValidationResults-mappings.xlsx - " + e.message)
@@ -1770,10 +1770,50 @@ class DataSubmissions extends TestRunner {
 	}
 
 	/**
+	 * Select the "Both" validation type.
+	 *
+	 * Both stays disabled while a batch in the Upload Activities table still shows Uploading.
+	 * A data file upload creates two batches (the files, then the manifest metadata), and the second
+	 * can appear only after the first has finished, so a single "Uploading disappeared" check returns
+	 * in the gap between them. Waits until Uploading has been gone for a stretch, then clicks Both.
+	 * Stops the test if a batch is still Uploading at the timeout, or if Both never enables.
+	 * Native-clicks because WebUIUtils.clickTab uses a JavaScript click that succeeds on a disabled radio.
+	 */
+	@Keyword
+	static void selectValidationTypeBoth() {
+		waitUntilNoBatchUploading(180, 10)
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Both-RadioBtn'), 30, 'Both validation type')
+		WebUI.click(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Both-RadioBtn'))
+		WebUIUtils.verifyButtonSelected(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Both-RadioBtn'), true)
+	}
+
+	/**
+	 * Wait until the Upload Activities table shows no batch with status Uploading, and that stays
+	 * true for stableSeconds. Uses the Uploading-Txt locator, same as Utils.waitForElementToDisappear.
+	 */
+	private static void waitUntilNoBatchUploading(int timeoutSeconds, int stableSeconds) {
+		long deadline = System.currentTimeMillis() + timeoutSeconds * 1000L
+		Long clearSince = null
+		while (System.currentTimeMillis() < deadline) {
+			boolean uploading = Utils.getListWebElements('CRDC/DataSubmissions/Uploading-Txt').size() > 0
+			if (uploading) {
+				clearSince = null
+			} else if (clearSince == null) {
+				clearSince = System.currentTimeMillis()
+			} else if ((System.currentTimeMillis() - clearSince) / 1000 >= stableSeconds) {
+				KeywordUtil.logInfo("No batch Uploading for " + stableSeconds + "s")
+				return
+			}
+			WebUI.delay(2)
+		}
+		KeywordUtil.markFailedAndStop("A batch was still Uploading in Upload Activities after " + timeoutSeconds + "s")
+	}
+
+	/**
 	 * Click on Validate button to validate data uploaded
 	 */
 	@Keyword
-	private static clickValidateButton() {
+	static clickValidateButton() {
 		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
 		TestRunner.clickTab('CRDC/DataSubmissions/Validate-Btn')
 		//WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 30)
@@ -1795,6 +1835,94 @@ class DataSubmissions extends TestRunner {
 		WebUI.waitForElementNotHasAttribute(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/CrossValidate-Btn'), 'disabled', 300)
 	}
 
+	/**
+	 * Submit the open data submission and confirm. Stops the test if Submit never enables
+	 * or the status does not become Submitted.
+	 */
+	@Keyword
+	static void submitDataSubmission() {
+		clickDSActionAndConfirm('CRDC/DataSubmissions/Submit-Btn', 120, 'DS Submit')
+		waitForSubmissionStatus('Submitted')
+	}
+
+	/**
+	 * Cancel the open data submission and confirm. Stops the test if Cancel never enables
+	 * or the status does not become Canceled.
+	 */
+	@Keyword
+	static void cancelDataSubmission() {
+		clickDSActionAndConfirm('CRDC/DataSubmissions/Cancel-Btn', 30, 'DS Cancel')
+		waitForSubmissionStatus('Canceled')
+	}
+
+	/**
+	 * Withdraw the open Submitted data submission and confirm. Stops the test if Withdraw never enables
+	 * or the status does not become Withdrawn.
+	 */
+	@Keyword
+	static void withdrawDataSubmission() {
+		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 60)
+		clickDSActionAndConfirm('CRDC/DataSubmissions/Withdraw-Btn', 30, 'DS Withdraw')
+		waitForSubmissionStatus('Withdrawn')
+	}
+
+	/**
+	 * Open a Submitted data submission by id, Cross Validate, and Release it.
+	 * Caller must already be logged in as a role that can release (e.g. Dcp).
+	 */
+	@Keyword
+	static void releaseDataSubmission(String dsId) {
+		WebUIUtils.navigateToSubmissionUploadActivity(dsId)
+		waitForSubmissionStatus('Submitted')
+		new DataSubmissions().clickCrossValidateButton()
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Actions/Release-Btn')
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Actions/ReleaseConfirmationYes-Btn')
+		waitForSubmissionStatus('Released')
+	}
+
+	/**
+	 * Open a Submitted data submission by id and Reject it with a comment.
+	 * Caller must already be logged in as a role that can reject (e.g. Dcp).
+	 */
+	@Keyword
+	static void rejectDataSubmission(String dsId) {
+		WebUIUtils.navigateToSubmissionUploadActivity(dsId)
+		waitForSubmissionStatus('Submitted')
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Actions/Reject-Btn')
+		WebUI.sendKeys(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Actions/RejectDsComment-Txtbx'), 'Rejecting')
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Actions/ConfirmToReject-Btn')
+		waitForSubmissionStatus('Rejected')
+	}
+
+	/**
+	 * Complete the Released data submission on the current detail page (run after releaseDataSubmission).
+	 * Caller must already be logged in as a role that can complete (e.g. Dcp).
+	 */
+	@Keyword
+	static void completeDataSubmission() {
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Actions/Complete-Btn')
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Actions/CompleteConfirmationYes-Btn')
+		waitForSubmissionStatus('Completed')
+	}
+
+	/**
+	 * Native-click an action button once it is enabled, then confirm its Yes dialog.
+	 */
+	private static void clickDSActionAndConfirm(String buttonPath, int timeoutSeconds, String label) {
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject(buttonPath), timeoutSeconds, label)
+		WebUI.click(findTestObject(buttonPath))
+		WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/SubmitYes-Btn'), 10)
+		WebUIUtils.clickTab('CRDC/DataSubmissions/SubmitYes-Btn')
+	}
+
+	/**
+	 * Wait until the dashboard status label shows the given status, then stop the test if it does not.
+	 */
+	private static void waitForSubmissionStatus(String status) {
+		WebUIUtils.waitUntilElementTextEquals(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), status, 30)
+		WebUI.verifyElementText(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), status, FailureHandling.STOP_ON_FAILURE)
+	}
+
 	private static final String VALIDATION_RESULTS_UI_SECTION = "UI / Validation Results"
 
 	/**
@@ -1812,7 +1940,7 @@ class DataSubmissions extends TestRunner {
 		List emptyMsgEls = Utils.getListWebElements('CRDC/DataSubmissions/Validation/ValidationResults-DefaultMesssage')
 		boolean hasEmptyStateCopy = emptyMsgEls != null && !emptyMsgEls.isEmpty()
 		ValidationReport.addValidationReportItem(VALIDATION_RESULTS_UI_SECTION, 'Validation Results data rows (generic-table-row)',
-			"0", String.valueOf(qcDataRows), qcDataRows == 0 ? "Pass" : "Fail")
+				"0", String.valueOf(qcDataRows), qcDataRows == 0 ? "Pass" : "Fail")
 		if (qcDataRows > 0) {
 			KeywordUtil.markFailed("verifyNoValidationErrors: expected 0 Validation Results data rows (generic-table-row), found ${qcDataRows}")
 		} else {
@@ -2278,7 +2406,7 @@ class DataSubmissions extends TestRunner {
 
 	/** Scope to the GenericTable that exposes Cross Validation column "Submitted Identifier" (avoids document-wide generic-table-row). */
 	private static final String CV_GENERIC_TABLE_XPATH =
-			"//*[@data-testid='generic-table'][.//*[starts-with(@data-testid,'generic-table-header-')][normalize-space()='Submitted Identifier']]"
+	"//*[@data-testid='generic-table'][.//*[starts-with(@data-testid,'generic-table-header-')][normalize-space()='Submitted Identifier']]"
 	private static final String CV_TABLE_HEADER_CELLS_XPATH = CV_GENERIC_TABLE_XPATH + "//*[starts-with(@data-testid,'generic-table-header-')]"
 	private static final String CV_TABLE_DATA_ROWS_XPATH = CV_GENERIC_TABLE_XPATH + "//*[@data-testid='generic-table-row']"
 
@@ -2407,9 +2535,9 @@ class DataSubmissions extends TestRunner {
 		Map<String, Integer> counts = new LinkedHashMap<>()
 		for (List<String> exp : allExpected) {
 			if (exp == null || exp.isEmpty()) continue
-			String id = exp.get(0) != null ? exp.get(0).trim() : ""
+				String id = exp.get(0) != null ? exp.get(0).trim() : ""
 			if (id.isEmpty()) continue
-			counts.put(id, counts.getOrDefault(id, 0) + 1)
+				counts.put(id, counts.getOrDefault(id, 0) + 1)
 		}
 		return counts
 	}
@@ -2842,7 +2970,7 @@ class DataSubmissions extends TestRunner {
 				"pattern match, submission: ${namePart}", fileName, "Pass")
 		KeywordUtil.logInfo("clickCrossValidationExportAndVerifyDownloadedFileName: verified downloaded file: ${fileName}")
 	}
-	
+
 	/**
 	 * Counts data rows in a UTF-8 CSV file (first row treated as header). Uses quote-aware record boundaries
 	 * so commas inside quoted fields do not inflate the count. Suitable for any hub CSV with that shape;

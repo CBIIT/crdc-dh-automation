@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Runs PythonFiles/CRDC/VerifyNotificationEmails.py against today's NotificationEmail_Checklist.xlsx rows. Fails if the script reports any Fail (or the checklist is missing). Does not drive the UI.</description>
+   <name>VerifyNotificationEmails</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>c9f3a618-2e74-4b15-8d06-1a7b4e5c902d</testCaseGuid>
+</TestCaseEntity>

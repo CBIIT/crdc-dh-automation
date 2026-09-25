@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//*[@data-testid=&apos;access-request-studies-field&apos;]</value>
+         <value>//*[@data-testid=&apos;access-request-studies-field&apos;]//*[@role=&apos;button&apos;]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//*[@data-testid=&apos;access-request-studies-field&apos;]</value>
+      <value>//*[@data-testid=&apos;access-request-studies-field&apos;]//*[@role=&apos;button&apos;]</value>
       <webElementGuid>5ab9f9be-70ea-4768-b3d2-4f9f0def00be</webElementGuid>
    </webElementProperties>
 </WebElementEntity>

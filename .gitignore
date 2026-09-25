@@ -27,3 +27,6 @@ Commons_Automation.prj
 
 # Ignore files with _mod_ followed by a timestamp/string and .tsv
 *_mod_*.tsv
+
+# Gmail OAuth files (drop in locally; do not commit)
+PythonFiles/CRDC/gmail/*.json
