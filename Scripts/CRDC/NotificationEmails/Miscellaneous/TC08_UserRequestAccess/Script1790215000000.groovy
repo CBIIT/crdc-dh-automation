@@ -12,6 +12,6 @@ WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('User')
 
 def created = CustomKeywords.'utilities.Pbac.submitAccessRequest'()
-CustomKeywords.'utilities.NotificationEmailLog.logEmails'('Request Access', 'User', created.id, created.name)
+CustomKeywords.'utilities.NotificationEmailLog.logEmails'('Request Access', 'User', created.id, created.name, 'Admin')
 
 WebUI.closeBrowser()

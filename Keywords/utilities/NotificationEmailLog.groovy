@@ -1,9 +1,12 @@
 package utilities
 
+import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.InputStreamReader
 import java.text.SimpleDateFormat
+import java.util.List
 
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.CellStyle
@@ -24,7 +27,7 @@ import internal.GlobalVariable
 
 /**
  * Append-only Excel checklist for email-notification helper tests.
- * Does not open or verify inboxes. Result is left blank for the Gmail verifier.
+ * logEmails does not open inboxes. verifyNotificationEmails runs the Gmail judge.
  */
 class NotificationEmailLog {
 
@@ -98,38 +101,99 @@ class NotificationEmailLog {
 	}
 
 	/**
-	 * After a UI action, write To: rows whose Trigger matches Permissions email rows.
-	 * Action on the checklist is the Trigger. Actor is who clicked, not who receives.
+	 * After a UI action, write one To: checklist row for the matching Permissions Trigger.
+	 * Actor is who clicked. toRole is who Gmail To: must contain (profile inbox).
 	 */
 	@Keyword
-	static void logEmails(String trigger, String actor, String id, String name) {
+	static void logEmails(String trigger, String actor, String id, String name, String toRole) {
+		if (!toRole?.toString()?.trim()) {
+			KeywordUtil.markFailedAndStop("logEmails requires toRole")
+			return
+		}
 		String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
-		appendFromCatalog(trigger, timestamp, actor, id, name)
+		appendFromCatalog(trigger, timestamp, actor, id, name, toRole.trim())
 	}
 
 	/**
-	 * Look up Trigger on Permissions email rows and append one checklist row per match.
-	 * Rows with a blank Trigger are ignored. Entity type comes from Group
+	 * Run VerifyNotificationEmails.py against today's checklist rows.
+	 * Logs the script output. Stops the test if the process exits non-zero
+	 * (any Fail, missing checklist, or script error).
+	 */
+	@Keyword
+	static void verifyNotificationEmails() {
+		String pythonExe = Utils.getPythonExecutablePath()
+		String scriptPath = RunConfiguration.getProjectDir() + "/PythonFiles/CRDC/VerifyNotificationEmails.py"
+		File script = new File(scriptPath)
+		if (!script.exists()) {
+			KeywordUtil.markFailedAndStop("VerifyNotificationEmails.py not found at " + scriptPath)
+			return
+		}
+		KeywordUtil.logInfo("Running " + scriptPath + " with " + pythonExe)
+		ProcessBuilder pb = new ProcessBuilder(pythonExe, scriptPath)
+		pb.redirectErrorStream(true)
+		pb.directory(new File(RunConfiguration.getProjectDir()))
+		try {
+			Process proc = pb.start()
+			BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()))
+			StringBuilder output = new StringBuilder()
+			String line
+			while ((line = reader.readLine()) != null) {
+				output.append(line).append("\n")
+				KeywordUtil.logInfo(line)
+			}
+			int exitCode = proc.waitFor()
+			if (exitCode != 0) {
+				KeywordUtil.markFailedAndStop("VerifyNotificationEmails.py reported failures (exit " + exitCode + "):\n" + output.toString())
+			} else {
+				KeywordUtil.logInfo("VerifyNotificationEmails.py completed with no Fail rows")
+			}
+		} catch (Exception e) {
+			KeywordUtil.markFailedAndStop("VerifyNotificationEmails.py failed to run: " + e.getMessage())
+		}
+	}
+
+	/**
+	 * Look up Trigger on Permissions email rows (pipe-separated tokens allowed) and
+	 * append one checklist row. Blank Trigger cells are ignored. Entity type comes from Group
 	 * (Submission Request Emails -> SR, Data Submission Emails -> DS).
 	 */
-	private static void appendFromCatalog(String trigger, String timestamp, String actor, String id, String name) {
+	private static void appendFromCatalog(String trigger, String timestamp, String actor, String id, String name,
+			String toRole) {
 		def testData = TestDataFactory.findTestData(CATALOG_DATA_FILE)
 		int rowCount = testData.getRowNumbers()
 		boolean found = false
 		for (int i = 1; i <= rowCount; i++) {
 			String catalogTrigger = testData.getValue("Trigger", i)?.toString()?.trim() ?: ""
-			if (!catalogTrigger || catalogTrigger != trigger) {
+			if (!catalogTrigger) {
+				continue
+			}
+			List<String> triggers = splitPacked(catalogTrigger)
+			List<String> subjects = splitPacked(testData.getValue("Expected email subject", i)?.toString()?.trim() ?: "")
+			if (triggers.size() != subjects.size()) {
+				KeywordUtil.markFailedAndStop("Permissions catalog Trigger and Expected email subject token counts differ on row " + i)
+				return
+			}
+			int tokenIndex = triggers.indexOf(trigger)
+			if (tokenIndex < 0) {
 				continue
 			}
 			found = true
 			String entityType = entityTypeFromGroup(testData.getValue("Group", i)?.toString()?.trim() ?: "")
-			String subject = testData.getValue("Expected email subject", i)?.toString()?.trim() ?: ""
-			String toRole = testData.getValue("To role", i)?.toString()?.trim() ?: ""
-			appendRow(timestamp, actor, trigger, entityType, id, name, subject, emailForRole(toRole), ENV_PREFIX_NOTE)
+			appendRow(timestamp, actor, trigger, entityType, id, name, subjects[tokenIndex], emailForRole(toRole), ENV_PREFIX_NOTE)
 		}
 		if (!found) {
 			KeywordUtil.markFailed("Permissions catalog has no email row for Trigger " + trigger)
 		}
+	}
+
+	/**
+	 * Split a catalog cell on |. No pipe means one token. Keeps empty tokens so a length mismatch fails.
+	 */
+	private static List<String> splitPacked(String value) {
+		if (value == null || value.isEmpty()) {
+			return []
+		}
+		return value.split("\\|", -1).collect { it.trim() }
 	}
 
 	/**
@@ -147,8 +211,8 @@ class NotificationEmailLog {
 	}
 
 	/**
-	 * Map Permissions To role to the matching profile inbox
-	 * (SubmitterEmail, FedleadEmail, DcpEmail, or AdminEmail).
+	 * Map logEmails toRole to the matching profile inbox
+	 * (SubmitterEmail, FedleadEmail, DcpEmail, AdminEmail, or UserEmail).
 	 */
 	private static String emailForRole(String toRole) {
 		String role = toRole?.toLowerCase() ?: ""
@@ -164,7 +228,10 @@ class NotificationEmailLog {
 		if (role == "admin") {
 			return inbox(GlobalVariable.AdminEmail)
 		}
-		KeywordUtil.markFailed("Unknown To role in Permissions catalog: " + toRole)
+		if (role == "user") {
+			return inbox(GlobalVariable.UserEmail)
+		}
+		KeywordUtil.markFailedAndStop("Unknown toRole: " + toRole)
 		return ""
 	}
 

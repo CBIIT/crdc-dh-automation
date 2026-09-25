@@ -48,18 +48,7 @@ CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Submitter')
 
 WebUI.setViewPortSize(1920, 1080)
 
-WebUI.delay(2)
-
-WebUI.waitForElementPresent(findTestObject('CRDC/NavBar/SubmissionRequest-Tab'), 10)
-WebUI.waitForElementVisible(findTestObject('CRDC/NavBar/SubmissionRequest-Tab'), 10)
-WebUI.click(findTestObject('CRDC/NavBar/SubmissionRequest-Tab'))
-
-WebUI.waitForElementPresent(findTestObject('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn'), 5)
-WebUI.click(findTestObject('CRDC/SubmissionRequest/Start_a_SubmissionRequest-Btn'))
-
-WebUI.delay(1)
-WebUI.waitForElementPresent(findTestObject('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn'), 5)
-WebUI.click(findTestObject('CRDC/SubmissionRequest/ReadAndAcceptPopUp-Btn'))
+CustomKeywords.'utilities.SubmissionRequest.startSubmissionRequest'()
 
 
 // Sections A–D required fields + submit (see SubmissionRequest.fillCompleteSubmissionRequestAllSectionsAndSubmit)

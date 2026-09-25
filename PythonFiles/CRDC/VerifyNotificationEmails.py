@@ -194,7 +194,11 @@ def load_name_in_body_map(catalog_path):
 		if not subject:
 			continue
 		name_val = row[name_idx] if name_idx < len(row) else None
-		mapping[subject.casefold()] = catalog_truthy(name_val)
+		require_name = catalog_truthy(name_val)
+		for token in subject.split("|"):
+			token = token.strip()
+			if token:
+				mapping[token.casefold()] = require_name
 	return mapping
 
 
