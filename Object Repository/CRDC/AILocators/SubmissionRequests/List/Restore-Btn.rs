@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Restore-Btn</name>
+   <tag></tag>
+   <elementGuidId>e7c1a4b2-8d35-4f60-9e18-3a6b7c8d9e0f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&quot;cancel-restore-application-button&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&quot;cancel-restore-application-button&quot;]</value>
+      <webElementGuid>f8d2b5c3-9e46-4071-af29-4b7c8d9e0f1a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

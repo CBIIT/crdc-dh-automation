@@ -1,16 +1,16 @@
 # CRDC email notification verification
 
-Katalon UI tests live under `Test Cases/CRDC/NotificationEmails/`: **SR/** (submit, cancel, reject, approve), **DS/** (create/submit through complete), **Miscellaneous/** (Request Access and similar), and **VerifyNotificationEmails** in the parent folder.
+Katalon UI tests live under `Test Cases/CRDC/NotificationEmails/`: **SR/** (submit, cancel, reject, approve, inquire, reopen, conditional approve, pending cleared), **DS/** (create/submit through complete), **Miscellaneous/** (Request Access and similar), and **VerifyNotificationEmails** in the parent folder.
 
 This is a **two-step pipeline**. Katalon only drives the UI and writes expected rows. Python only judges Gmail later. Neither talks to the other at runtime.
 
 ## 1. Catalog (source of truth)
 
-`InputFiles/CRDC/PBACPermissions.xlsx` → sheet **Permissions**, the email-notification rows (`Submission Request Emails`, `Data Submission Emails`, and Miscellaneous Request Access). Katalon sees it as Data File `CRDC/Pbac/Permissions`.
+`InputFiles/CRDC/PBACPermissions.xlsx` → sheet **Permissions**, the email-notification rows (`Submission Request Emails`, `Data Submission Emails`, and Miscellaneous Request Access / Account Disabled). Katalon sees it as Data File `CRDC/Pbac/Permissions`.
 
-Catalog columns on those rows: **Trigger**, **Expected email subject**, **Name in body**. Other permission rows leave them blank. Recipient is not on this sheet; each `logEmails` call passes `toRole`.
+Catalog columns on those rows: **Trigger**, **Expected email subject**, **Name in body**, **Expected body contains**. Other permission rows leave them blank. Recipient is not on this sheet; each `logEmails` call passes `toRole`.
 
-One PBAC checkbox that sends more than one template packs Triggers and subjects with ` | ` (same token count). `logEmails` matches one token and uses the subject at the same index.
+One PBAC checkbox that sends more than one template packs Triggers, subjects, and body snippets with ` | ` (same token count). `logEmails` matches one token and uses the subject and body snippet at the same index. Every logged Trigger has a unique **Expected body contains** snippet. Other permission rows leave the email columns blank; a blank snippet means Verify does not require extra body text (Name-in-body still applies).
 
 | Trigger | Name in body | Typical `toRole` on the test |
 |---|---|---|
@@ -18,6 +18,11 @@ One PBAC checkbox that sends more than one template packs Triggers and subjects 
 | SR Available for Review | TRUE | Fedlead |
 | SR Reject / SR Approve / SR Inquire (packed on **When review decision made**) | TRUE | Submitter (or User) |
 | SR Cancel / SR Restore (packed on **When canceled/restored**) | TRUE | Submitter (or User) |
+| SR Reopen | TRUE | Submitter (or User) |
+| SR Conditional Model (**Pending on model update**) | TRUE | Submitter (or User) |
+| SR Conditional dbGaP (**Pending on dbGaPID**) | TRUE | Submitter (or User) |
+| SR Conditional Image (**Pending on image de-identification**) | TRUE | Submitter (or User) |
+| SR Pending Cleared (**When conditionally approved**) | TRUE | Submitter (or User) |
 | DS Create | TRUE | Dcp |
 | DS Submit | TRUE | Submitter |
 | DS Cancel | TRUE | Submitter |
@@ -26,8 +31,9 @@ One PBAC checkbox that sends more than one template packs Triggers and subjects 
 | DS Reject | TRUE | Submitter |
 | DS Complete | TRUE | Submitter |
 | Request Access | TRUE | Admin |
+| Account Disabled | TRUE | Admin, Fedlead, Dcp, Submitter, User (one case, five rows) |
 
-Tests do not hardcode expected subjects. Fill Trigger on a Permissions email row to include it in `logEmails`. Leave Trigger blank on the `access:request` permission row (the Request Access button). Do not add extra Permissions rows for extra templates; pack tokens on the existing checkbox row.
+Tests do not hardcode expected subjects or body snippets. Fill Trigger on a Permissions email row to include it in `logEmails`. Leave Trigger blank on the `access:request` permission row (the Request Access button). Do not add extra Permissions rows for extra templates; pack tokens on the existing checkbox row, or fill Trigger / subject / **Expected body contains** on the matching existing row. Packed examples: **When review decision made** (`SR Reject | SR Approve | SR Inquire`) and **When canceled/restored** (`SR Cancel | SR Restore`). Conditional-approve bodies live on the three `pending_*` rows; the cleared template lives on **When conditionally approved**. One mail goes To: the Submitter (optional BCC). Unique study titles keep Gmail rows apart when the subject is the same as `SR Approve`. Clean approve uses `look forward to supporting your study` so a pending-condition Decision mail cannot Pass an `SR Approve` row.
 
 ## 2. TC01 — Submitter submits an SR
 
@@ -119,15 +125,17 @@ Only then:
 
 To is Admin. Entity type is blank (Miscellaneous). `created.id` and `created.name` are the Additional Info token. Admin’s Request Access email checkbox is already on by default; this case does not turn permissions on.
 
-## 10. TC09 — Submitter cancels an In Progress SR
+## 10. TC09 — Submitter cancels and restores an In Progress SR
 
-TC01 steps 1–2, then `SubmissionRequest.cancelSubmissionRequestButton()`. Does **not** Submit.
+TC01 steps 1–2, then `SubmissionRequest.cancelSubmissionRequestButton()`, then `SubmissionRequest.restoreSubmissionRequest(studyName)` (list, Status Canceled plus study, Restore icon, reason, Confirm). Does **not** Submit.
 
 Only then:
 
 `logEmails('SR Cancel', 'Submitter', srId, studyName, 'Submitter')`
 
-To is the Submitter (`toRole`). Fedlead/DCP/Admin with the canceled notification on are BCC and are **not** judged. Restore uses the same PBAC checkbox (packed `SR Restore` on that row); this case does not log a restore row.
+`logEmails('SR Restore', 'Submitter', srId, studyName, 'Submitter')`
+
+To is the Submitter (`toRole`). Fedlead/DCP/Admin with the canceled/restored notification on are BCC and are **not** judged. Cancel and Restore share one PBAC checkbox; this case logs both packed tokens.
 
 ## 11. TC10 — Fedlead rejects an SR
 
@@ -139,40 +147,131 @@ Only then:
 
 To is the Submitter. Fedlead/DCP/Admin with the reviewed notification on are BCC and are **not** judged. Submit still sends TC01 mail; this case does not log `SR Submit`.
 
-## 12. TC11 — Fedlead approves an SR
+## 12. TC11 — Fedlead approves and reopens an SR
 
-TC01 steps 1–3 as Submitter → `Login.switchUser('Fedlead')` → `SubmissionRequest.approveSubmissionRequest(studyName)` (no pending-condition checkboxes).
+TC01 steps 1–3 as Submitter → `Login.switchUser('Fedlead')` → `SubmissionRequest.approveSubmissionRequest(studyName)` (no pending-condition checkboxes) → `logEmails('SR Approve', ...)` → `SubmissionRequest.reopenApprovedSubmissionRequest(studyName)` (list, Status Approved plus study, Reopen, Confirm without changing Owner).
 
-Only then:
+Then:
 
 `logEmails('SR Approve', 'Fedlead', srId, studyName, 'Submitter')`
 
+`logEmails('SR Reopen', 'Fedlead', srId, studyName, 'Submitter')`
+
+Approve is logged before Reopen so a missing Reopen button still leaves the approve checklist row. To is the Submitter for both. Fedlead/DCP/Admin with those notifications on are BCC and are **not** judged. Approve and Reopen are separate PBAC checkboxes; this case logs both. Inquire Resume does not send the reopen mail. Submit mail is not logged here.
+
+## 13. TC12 — Fedlead inquires on an SR
+
+TC01 steps 1–3 as Submitter → `Login.switchUser('Fedlead')` → `SubmissionRequest.inquireSubmissionRequest(studyName)` (Request Additional Information, comment, Confirm to move to Inquired).
+
+Only then:
+
+`logEmails('SR Inquire', 'Fedlead', srId, studyName, 'Submitter')`
+
 To is the Submitter. Same BCC rule as TC10. Submit mail is not logged here.
 
-## 13. VerifyNotificationEmails
+## 14. TC13 — Conditional approve (data model) and clear pending
+
+TC01 steps 1–3 as Submitter (Open access so dbGaP/GPA do not fire) → `Login.switchUser('Fedlead')` → `SubmissionRequest.approveSubmissionRequestWithModelChangePending(studyName)` (Approve dialog, check Require Data Model changes, comment, Confirm) → `logEmails('SR Conditional Model', ...)` → `Login.switchUser('Admin')` → `ManageStudies.navigateToManageStudies()` → `editExistingStudy(studyName, [pendingConditions: [false]])`.
+
+Then:
+
+`logEmails('SR Conditional Model', 'Fedlead', srId, studyName, 'Submitter')`
+
+`logEmails('SR Pending Cleared', 'Admin', srId, studyName, 'Submitter')`
+
+Model pending is logged before the Admin clear so a missing study-edit still leaves the model checklist row. To is the Submitter for both. Catalog rows **Pending on model update** and **When conditionally approved**. Same Decision subject as `SR Approve`; unique study title keeps Gmail rows apart. Do not log `SR Approve` for this study. TC11 stays a clean approve. Submit mail is not logged here.
+
+## 15. TC14 — Fedlead conditionally approves an SR (missing dbGaP)
+
+TC01 steps 1–3 as Submitter with `fillSubmissionRequestAllSections(..., 'Controlled', 'No', ...)` → `Login.switchUser('Fedlead')` → `SubmissionRequest.approveSubmissionRequest(studyName)` (no pending-condition checkboxes).
+
+Only then:
+
+`logEmails('SR Conditional dbGaP', 'Fedlead', srId, studyName, 'Submitter')`
+
+To is the Submitter. Catalog row **Pending on dbGaPID**. Controlled with an empty GPA name may send the multi-condition template; the dbGaP sentence is still in that body. Submit mail is not logged here.
+
+## 16. TC15 — Fedlead conditionally approves an SR (image de-identification pending)
+
+TC01 steps 1–3 as Submitter (Open access) → `Login.switchUser('Fedlead')` → `SubmissionRequest.approveSubmissionRequestWithImageDeidPending(studyName)` (Approve dialog, check image de-identification, comment, Confirm).
+
+Only then:
+
+`logEmails('SR Conditional Image', 'Fedlead', srId, studyName, 'Submitter')`
+
+To is the Submitter. Catalog row **Pending on image de-identification**. Submit mail is not logged here.
+
+## 17. TC16 — User submits an SR
+
+Same as TC01 with `loginToCrdcOtp('User')`.
+
+`logEmails('SR Submit', 'User', srId, studyName, 'User')`
+
+`logEmails('SR Available for Review', 'User', srId, studyName, 'Fedlead')`
+
+To is User for Received and Fedlead for Available for Review. Unique study title keeps this Fedlead row apart from TC01.
+
+## 18. TC17 — User cancels and restores an In Progress SR
+
+Same as TC09 with User login. Actor and `toRole` are `User` on both `SR Cancel` and `SR Restore`.
+
+## 19. TC18 — Fedlead rejects a User-owned SR
+
+Same as TC10: User creates and submits, Fedlead rejects. `logEmails('SR Reject', 'Fedlead', srId, studyName, 'User')`.
+
+## 20. TC19 — Fedlead approves and reopens a User-owned SR
+
+Same as TC11 with User as applicant. Both `SR Approve` and `SR Reopen` use `toRole 'User'`. Actor stays Fedlead.
+
+## 21. TC20 — Fedlead inquires on a User-owned SR
+
+Same as TC12 with User as applicant. `logEmails('SR Inquire', 'Fedlead', srId, studyName, 'User')`.
+
+## 22. TC21 — Conditional approve (data model) and clear pending, User-owned
+
+Same as TC13 with User as applicant. `SR Conditional Model` and `SR Pending Cleared` use `toRole 'User'`. Actor is Fedlead then Admin.
+
+## 23. TC22 — Fedlead conditionally approves a User-owned SR (missing dbGaP)
+
+Same as TC14 with User as applicant. `logEmails('SR Conditional dbGaP', 'Fedlead', srId, studyName, 'User')`.
+
+## 24. TC23 — Fedlead conditionally approves a User-owned SR (image de-identification pending)
+
+Same as TC15 with User as applicant. `logEmails('SR Conditional Image', 'Fedlead', srId, studyName, 'User')`.
+
+## 25. TC24 — Master disables each of the five automation accounts
+
+Login Master → Profile → Manage Users → `Pbac.disableThenRestoreUserAccounts(['Admin', 'Fedlead', 'Dcp', 'Submitter', 'User'])`. For each role: Inactive + Save, `logEmails`, Active + Save. Do not pass Master. Restore runs in `try/finally` so Active still happens if logging fails; restore failure `markFailedAndStop`. Inactive is the only send; Active is restore only. `account:inactivated` is default-on and disabled, so EnableAllPermissions is enough.
+
+`logEmails('Account Disabled', 'Master', email, 'pbac.{role}-automation', role)`
+
+`email` is the profile inbox (`AdminEmail` … `UserEmail`) for To:. Name is the lowercase `pbac.{role}-automation` token so Verify can require it in the Dear line. Entity type blank (Miscellaneous), same as TC08.
+
+## 26. VerifyNotificationEmails
 
 No browser. `NotificationEmailLog.verifyNotificationEmails()` runs `PythonFiles/CRDC/VerifyNotificationEmails.py` with `Utils.getPythonExecutablePath()`. The case **fails** if the process exits non-zero (any Fail for today, or the checklist is missing). Pass/Skip rows are left unchanged. Last case in `CRDC_EmailNotifications`.
 
-## 14. logEmails
+## 27. logEmails
 
 One timestamp. Find the catalog row whose **Trigger** cell contains that token (plain value or ` | `-separated). Write one checklist row:
 
 - Action on the checklist = Trigger argument
-- Actor = who clicked (script argument; Submitter except TC05/TC06/TC07 Dcp, TC08 User, and TC10/TC11 Fedlead)
+- Actor = who clicked (script argument; Submitter except TC05/TC06/TC07 Dcp, TC08/TC16/TC17 User, TC10/TC11/TC12/TC14/TC15/TC18/TC19/TC20/TC22/TC23 Fedlead, TC13/TC21 Fedlead then Admin, and TC24 Master)
 - Expected recipient = profile email for the `toRole` argument (`SubmitterEmail` / `FedleadEmail` / `DcpEmail` / `AdminEmail` / `UserEmail`)
 - Environment from `G_Urlname` (`QA` / `QA2` / `STAGE`; `hub-qa2` is checked before `hub-qa`)
-- Name = study title, DS display name, or the Request Access Additional Info token
+- Name = study title, DS display name, the Request Access Additional Info token, or the `pbac.{role}-automation` token for Account Disabled
+- Expected body contains = catalog snippet at the same Trigger token index
 - Result left blank
 
-Blank `toRole` or unknown Trigger → test fails. Packed Trigger and Expected email subject must have the same token count. One UI action that sends two different mails (TC01) uses two `logEmails` calls with two Triggers. One checkbox with several templates (reject / approve / inquire) stays one Permissions row with packed tokens; the test passes the Trigger for that click.
+Blank `toRole` or unknown Trigger → test fails. Packed Trigger, Expected email subject, and Expected body contains (when that cell is non-empty) must have the same token count. One UI action that sends two different mails (TC01) uses two `logEmails` calls with two Triggers. One checkbox with several templates (reject / approve / inquire) stays one Permissions row with packed tokens; the test passes the Trigger for that click.
 
 `appendFromCatalog` does the lookup. `appendRow` writes one Excel row. Tests only call `logEmails`.
 
-## 15. Checklist
+## 28. Checklist
 
 Append-only `OutputFiles/NotificationEmail_Checklist.xlsx`. UI tests never open Gmail.
 
-## 16. Verifier (run after mail should be in the inbox)
+## 29. Verifier (run after mail should be in the inbox)
 
 `PythonFiles/CRDC/VerifyNotificationEmails.py` against `qa@essential-soft.com` (plus-aliases like `qa+crdc-automation-submitter@…` land in the same mailbox).
 
@@ -183,13 +282,14 @@ For each of **today’s** checklist rows that are still blank or Fail it:
    - Subject starts with that env tag and contains the expected title
    - **To** contains the expected address (not Cc/Bcc)
    - Body contains **Name** only if the catalog says Name in body = TRUE (packed Expected email subject cells are split on `|`)
+   - Body contains the checklist **Expected body contains** snippet when that cell is non-blank
 
-Writes **Pass** or **Fail**. Re-run retries Fail/blank only; Pass/Skip stay. Console on Pass includes the To: address. A blank Environment cell Fails without searching Gmail.
+Writes **Pass** or **Fail**. Re-run retries Fail/blank only; Pass/Skip stay. Console on Pass includes the To: address, and the body snippet when that checklist cell is non-blank. A blank Environment cell Fails without searching Gmail. Logged Triggers always have a snippet; a blank **Expected body contains** cell on other rows means Verify does not require extra body text.
 
-## 17. How you run it
+## 30. How you run it
 
-1. Refresh Katalon Data File `CRDC/Pbac/Permissions` if you changed Trigger/Expected email subject/Name in body (or after removing a column).
-2. Run TC01 through TC11 as needed (profile `CRDC_QA` / `CRDC_QA2` / `CRDC_STAGE`).
+1. Refresh Katalon Data File `CRDC/Pbac/Permissions` if you changed Trigger/Expected email subject/Name in body/Expected body contains (or after removing a column).
+2. Run TC01 through TC24 as needed (profile `CRDC_QA` / `CRDC_QA2` / `CRDC_STAGE`).
 3. When mail should already be there, run **VerifyNotificationEmails** (same profile). It runs `PythonFiles/CRDC/VerifyNotificationEmails.py`. The case **fails** if the script exits non-zero (any Fail row, or the checklist file is missing). You can also run the script from the project venv:
 
 ```bash
@@ -198,7 +298,7 @@ python PythonFiles/CRDC/VerifyNotificationEmails.py
 
 Override with `--excel`, `--date`, `--credentials`, `--token`, or env `GMAIL_CREDENTIALS_PATH` / `GMAIL_TOKEN_PATH`.
 
-That is the whole loop: catalog defines mail, UI tests only log after a real submit, cancel, withdraw, release, reject, complete, request access, or SR approve, Gmail judge scores the sheet.
+That is the whole loop: catalog defines mail, UI tests only log after a real submit, cancel, restore, withdraw, release, reject, complete, request access, SR approve, SR inquire, SR reopen, SR conditional approve (model / dbGaP / image), SR pending cleared, or Account Disabled, Gmail judge scores the sheet.
 
 ## Auth files (not committed)
 

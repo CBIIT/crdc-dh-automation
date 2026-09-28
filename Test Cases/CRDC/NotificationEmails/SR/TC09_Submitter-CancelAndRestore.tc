@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Submitter fills one In Progress Submission Request, cancels it, restores it from the list, then appends the expected cancel and restore email rows to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
+   <name>TC09_Submitter-CancelAndRestore</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a1b7c3d9-2e40-4f81-9a16-8c5d7e0b4f29</testCaseGuid>
+</TestCaseEntity>

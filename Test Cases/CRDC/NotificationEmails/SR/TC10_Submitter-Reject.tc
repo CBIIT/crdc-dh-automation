@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Submitter submits one SR, Fedlead Rejects it, then the case appends the expected reject-email row to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
+   <name>TC10_Submitter-Reject</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>b2c8d4e0-3f51-4092-ab27-9d6e8f1c503a</testCaseGuid>
+</TestCaseEntity>

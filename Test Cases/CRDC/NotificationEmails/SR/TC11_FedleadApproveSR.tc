@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TestCaseEntity>
-   <description>Submitter submits one SR, Fedlead Approves it with no pending conditions, then the case appends the expected approve-email row to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
-   <name>TC11_FedleadApproveSR</name>
-   <tag>Filter</tag>
-   <comment></comment>
-   <recordOption>OTHER</recordOption>
-   <testCaseGuid>c3d9e5f1-4062-41a3-bc38-ae7f902d614b</testCaseGuid>
-</TestCaseEntity>

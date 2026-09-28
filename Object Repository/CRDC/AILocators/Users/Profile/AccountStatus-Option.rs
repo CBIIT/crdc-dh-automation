@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>AccountStatus-Option</name>
+   <tag></tag>
+   <elementGuidId>a8c3e1f4-2b7d-4e91-9c06-5d4a8b7e12f0</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//li[text()='${status}']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//li[text()='${status}']</value>
+      <webElementGuid>b9d4f205-3c8e-4f02-ad17-6e5b9c8f2301</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

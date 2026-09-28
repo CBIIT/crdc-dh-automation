@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//*[@aria-labelledby=&apos;userStatusLabel&apos;]</value>
+         <value>//*[@id=&apos;mui-component-select-userStatus&apos;]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//*[@aria-labelledby=&apos;userStatusLabel&apos;]</value>
+      <value>//*[@id=&apos;mui-component-select-userStatus&apos;]</value>
       <webElementGuid>924bbb36-cdb1-4ef8-ac1d-202fde2efd9e</webElementGuid>
    </webElementProperties>
 </WebElementEntity>

@@ -1545,6 +1545,69 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	}
 
 	/**
+	 * Restore a Canceled submission request from the Submission Requests list.
+	 * After cancel, the form leaves the request; Restore is the list-row icon
+	 * (data-testid cancel-restore-application-button). Default list statuses omit Canceled,
+	 * so this filters study plus Canceled, then enters a restore reason and confirms.
+	 *
+	 * @param studyName Study title or search string for the Study filter (minimum 3 characters)
+	 */
+	@Keyword
+	public static void restoreSubmissionRequest(String studyName) {
+		if (studyName == null || studyName.trim().isEmpty()) {
+			KeywordUtil.markFailed("restoreSubmissionRequest: studyName is required.")
+			return
+		}
+		String token = studyName.trim()
+		if (token.length() < 3) {
+			KeywordUtil.markFailed("restoreSubmissionRequest: studyName must be at least 3 characters (Submission Requests Study filter).")
+			return
+		}
+		KeywordUtil.logInfo("restoreSubmissionRequest: navigating to Submission Requests list; study token length=" + token.length())
+		new SubmissionRequestList().navigateToSubmissionRequestsList()
+		SubmissionRequestList.applySubmissionRequestsListFilters([study: token, status: 'Canceled'] as Map<String, String>)
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/SubmissionRequests/List/Restore-Btn'), 30, 'SR Restore')
+		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/List/Restore-Btn'))
+		WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequest-TxtBx'), 10)
+		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequest-TxtBx'))
+		WebUI.sendKeys(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequest-TxtBx'), "Auto Test Restore")
+		WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequestConfirm-Btn'), 10)
+		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Review/CancelSubmissionRequestConfirm-Btn'))
+		KeywordUtil.logInfo("restoreSubmissionRequest: completed for study token.")
+	}
+
+	/**
+	 * Reopen an Approved submission request from the Submission Requests list.
+	 * Reopen is the list-row button (data-testid reopen-application-button). Fedlead default
+	 * list statuses omit Approved, so this filters study plus Approved, then confirms the
+	 * shared DeleteDialog without changing Owner.
+	 *
+	 * @param studyName Study title or search string for the Study filter (minimum 3 characters)
+	 */
+	@Keyword
+	public static void reopenApprovedSubmissionRequest(String studyName) {
+		if (studyName == null || studyName.trim().isEmpty()) {
+			KeywordUtil.markFailed("reopenApprovedSubmissionRequest: studyName is required.")
+			return
+		}
+		String token = studyName.trim()
+		if (token.length() < 3) {
+			KeywordUtil.markFailed("reopenApprovedSubmissionRequest: studyName must be at least 3 characters (Submission Requests Study filter).")
+			return
+		}
+		KeywordUtil.logInfo("reopenApprovedSubmissionRequest: navigating to Submission Requests list; study token length=" + token.length())
+		new SubmissionRequestList().navigateToSubmissionRequestsList()
+		SubmissionRequestList.applySubmissionRequestsListFilters([study: token, status: 'Approved'] as Map<String, String>)
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/SubmissionRequests/List/Reopen-Btn'), 30, 'SR Reopen')
+		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/List/Reopen-Btn'))
+		WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/DeleteDialog/Dialog'), 10)
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'), 30, 'SR Reopen Confirm')
+		WebUI.click(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'))
+		Utils.waitForElementToDisappear('CRDC/AILocators/DeleteDialog/Dialog', 30)
+		KeywordUtil.logInfo("reopenApprovedSubmissionRequest: completed for study token.")
+	}
+
+	/**
 	 * This function logs in to CRDC via Login.gov 2FA / OTP using a dynamic TOTP secret.
 	 * Delegates to utilities.Login; kept for backward compatibility.
 	 * @param pbacUser Admin, Fedlead, Dcp, Submitter, or User
@@ -1662,6 +1725,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 	private static final String DEFAULT_REJECTION_COMMENT = "Automated test rejection - CRDC submission request."
 	private static final String DEFAULT_APPROVAL_COMMENT = "Automated test approval - CRDC submission request."
+	private static final String DEFAULT_INQUIRE_COMMENT = "Automated test inquire - CRDC submission request."
 	private static final String SR_FORM_BASE = "CRDC/AILocators/SubmissionRequests/Form"
 	/** ValidationReport section for submission-request UI checks (snackbar, etc.); aligns with list section naming. */
 	private static final String SECTION_SUBMISSION_REQUEST_UI = "Submission Request"
@@ -1710,6 +1774,86 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 				"CRDC/AILocators/SubmissionRequests/ApproveDialog/ReviewComment-TxtBx",
 				"CRDC/AILocators/SubmissionRequests/ApproveDialog/ConfirmApprove-Btn", comment)
 		KeywordUtil.logInfo("approveSubmissionRequest: completed for study token.")
+	}
+
+	/**
+	 * Same navigation as approveSubmissionRequest, then Approve with Require Data Model changes
+	 * checked so the backend sends the conditionally-approved mail instead of a clean approve.
+	 *
+	 * @param studyName Study title or search string for the Study filter (minimum 3 characters)
+	 * @param approvalComment Optional reviewer comment; if omitted or blank, the default automated-test message is used
+	 */
+	@Keyword
+	public static void approveSubmissionRequestWithModelChangePending(String studyName, String approvalComment = DEFAULT_APPROVAL_COMMENT) {
+		if (openSubmissionRequestReview(studyName, "approveSubmissionRequestWithModelChangePending") == null) return
+		String comment = (approvalComment != null && !approvalComment.trim().isEmpty()) ? approvalComment.trim() : DEFAULT_APPROVAL_COMMENT
+		String actionBtnPath = SR_FORM_BASE + "/Navigation/Approve-Btn"
+		String commentPath = "CRDC/AILocators/SubmissionRequests/ApproveDialog/ReviewComment-TxtBx"
+		String confirmPath = "CRDC/AILocators/SubmissionRequests/ApproveDialog/ConfirmApprove-Btn"
+		WebUI.scrollToElement(findTestObject(actionBtnPath), 15)
+		WebUI.waitForElementVisible(findTestObject(actionBtnPath), 20)
+		WebUI.waitForElementClickable(findTestObject(actionBtnPath), 15)
+		WebUI.click(findTestObject(actionBtnPath))
+		// ApproveDialog/Dialog (approve-form-dialog) is not in the live ReviewFormDialog. Wait on the pending checkbox instead; confirmReviewDecision waits on the comment field.
+		WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/SubmissionRequests/ApproveDialog/PendingModelChange-Chkbx'), 10)
+		WebUI.check(findTestObject('CRDC/AILocators/SubmissionRequests/ApproveDialog/PendingModelChange-Chkbx'))
+		WebUI.waitForElementPresent(findTestObject(commentPath), 10)
+		WebUI.waitForElementVisible(findTestObject(commentPath), 10)
+		// setText on the MUI review-comment field does not update react-hook-form, so Confirm stays disabled. Native click then sendKeys fires onChange.
+		WebUI.click(findTestObject(commentPath))
+		WebUI.sendKeys(findTestObject(commentPath), comment)
+		WebUI.waitForElementClickable(findTestObject(confirmPath), 10)
+		WebUI.click(findTestObject(confirmPath))
+		WebUI.delay(2)
+		KeywordUtil.logInfo("approveSubmissionRequestWithModelChangePending: completed for study token.")
+	}
+
+	/**
+	 * Same navigation as approveSubmissionRequest, then Approve with image de-identification
+	 * pending checked so the backend sends the image pending-condition mail.
+	 *
+	 * @param studyName Study title or search string for the Study filter (minimum 3 characters)
+	 * @param approvalComment Optional reviewer comment; if omitted or blank, the default automated-test message is used
+	 */
+	@Keyword
+	public static void approveSubmissionRequestWithImageDeidPending(String studyName, String approvalComment = DEFAULT_APPROVAL_COMMENT) {
+		if (openSubmissionRequestReview(studyName, "approveSubmissionRequestWithImageDeidPending") == null) return
+		String comment = (approvalComment != null && !approvalComment.trim().isEmpty()) ? approvalComment.trim() : DEFAULT_APPROVAL_COMMENT
+		String actionBtnPath = SR_FORM_BASE + "/Navigation/Approve-Btn"
+		String commentPath = "CRDC/AILocators/SubmissionRequests/ApproveDialog/ReviewComment-TxtBx"
+		String confirmPath = "CRDC/AILocators/SubmissionRequests/ApproveDialog/ConfirmApprove-Btn"
+		WebUI.scrollToElement(findTestObject(actionBtnPath), 15)
+		WebUI.waitForElementVisible(findTestObject(actionBtnPath), 20)
+		WebUI.waitForElementClickable(findTestObject(actionBtnPath), 15)
+		WebUI.click(findTestObject(actionBtnPath))
+		WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/SubmissionRequests/ApproveDialog/PendingImageDeid-Chkbx'), 10)
+		WebUI.check(findTestObject('CRDC/AILocators/SubmissionRequests/ApproveDialog/PendingImageDeid-Chkbx'))
+		WebUI.waitForElementPresent(findTestObject(commentPath), 10)
+		WebUI.waitForElementVisible(findTestObject(commentPath), 10)
+		WebUI.click(findTestObject(commentPath))
+		WebUI.sendKeys(findTestObject(commentPath), comment)
+		WebUI.waitForElementClickable(findTestObject(confirmPath), 10)
+		WebUI.click(findTestObject(confirmPath))
+		WebUI.delay(2)
+		KeywordUtil.logInfo("approveSubmissionRequestWithImageDeidPending: completed for study token.")
+	}
+
+	/**
+	 * Federal-lead (or reviewer) flow: same navigation as rejectSubmissionRequest — list filter by study,
+	 * open the row Review action, select the Review section in the form sidebar, then Request Additional
+	 * Information (Inquire) with a comment and confirm.
+	 *
+	 * @param studyName Study title or search string for the Study filter (minimum 3 characters)
+	 * @param inquireComment Optional reviewer comment for the inquire dialog; if omitted or blank, a default automated-test message is used
+	 */
+	@Keyword
+	public static void inquireSubmissionRequest(String studyName, String inquireComment = DEFAULT_INQUIRE_COMMENT) {
+		if (openSubmissionRequestReview(studyName, "inquireSubmissionRequest") == null) return
+		String comment = (inquireComment != null && !inquireComment.trim().isEmpty()) ? inquireComment.trim() : DEFAULT_INQUIRE_COMMENT
+		confirmReviewDecision(SR_FORM_BASE + "/Navigation/Inquire-Btn",
+				"CRDC/AILocators/SubmissionRequests/InquireDialog/ReviewComment-TxtBx",
+				"CRDC/AILocators/SubmissionRequests/InquireDialog/ConfirmInquire-Btn", comment)
+		KeywordUtil.logInfo("inquireSubmissionRequest: completed for study token.")
 	}
 
 	/**
