@@ -25,5 +25,6 @@ CustomKeywords.'utilities.SubmissionRequest.clickSubmitButton'()
 CustomKeywords.'utilities.Login.switchUser'('Fedlead')
 CustomKeywords.'utilities.SubmissionRequest.approveSubmissionRequest'(studyName)
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('SR Conditional dbGaP', 'Fedlead', srId, studyName, 'User')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Conditional dbGaP', 'Fedlead', srId, studyName, 'FedleadBcc')
 
 WebUI.closeBrowser()

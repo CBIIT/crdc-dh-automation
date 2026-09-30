@@ -4,7 +4,8 @@ import utilities.SubmissionRequest
 
 /*
  * Helper (not an inbox assertion): Submitter submits one SR, switches to Fedlead,
- * Fedlead Rejects it, then logEmails('SR Reject') appends the expected-email row
+ * Fedlead Rejects it, then logEmails('SR Reject') and logBccEmails('SR Reject')
+ * append the To: Submitter and Bcc Fedlead checklist rows
  * to OutputFiles/NotificationEmail_Checklist.xlsx.
  */
 WebUI.closeBrowser()
@@ -26,5 +27,6 @@ CustomKeywords.'utilities.Login.switchUser'('Fedlead')
 CustomKeywords.'utilities.SubmissionRequest.rejectSubmissionRequest'(studyName)
 
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('SR Reject', 'Fedlead', srId, studyName, 'Submitter')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Reject', 'Fedlead', srId, studyName, 'FedleadBcc')
 
 WebUI.closeBrowser()

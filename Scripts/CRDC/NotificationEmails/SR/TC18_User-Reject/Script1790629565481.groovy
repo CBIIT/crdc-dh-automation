@@ -26,5 +26,6 @@ CustomKeywords.'utilities.Login.switchUser'('Fedlead')
 CustomKeywords.'utilities.SubmissionRequest.rejectSubmissionRequest'(studyName)
 
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('SR Reject', 'Fedlead', srId, studyName, 'User')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Reject', 'Fedlead', srId, studyName, 'FedleadBcc')
 
 WebUI.closeBrowser()

@@ -27,7 +27,7 @@ import internal.GlobalVariable
 
 /**
  * Append-only Excel checklist for email-notification helper tests.
- * logEmails does not open inboxes. verifyNotificationEmails runs the Gmail judge.
+ * logEmails and logBccEmails do not open inboxes. verifyNotificationEmails runs the Gmail judge.
  */
 class NotificationEmailLog {
 
@@ -45,17 +45,21 @@ class NotificationEmailLog {
 		"Notes",
 		"Result",
 		"Environment",
-		"Expected body contains"
+		"Expected body contains",
+		"Recipient kind"
 	] as String[]
 	private static final String ENV_PREFIX_NOTE = "Subject is prefixed with [Environment] (QA, QA2, or STAGE)."
 	private static final String CATALOG_DATA_FILE = "CRDC/Pbac/Permissions"
+	private static final String RECIPIENT_KIND_TO = "To"
+	private static final String RECIPIENT_KIND_BCC = "Bcc"
 
 	/**
 	 * Append one checklist row. Result is always left blank.
 	 */
 	@Keyword
 	static void appendRow(String timestamp, String actor, String action, String entityType, String id, String name,
-			String expectedSubject, String expectedRecipient, String notes, String expectedBodyContains = "") {
+			String expectedSubject, String expectedRecipient, String notes, String expectedBodyContains = "",
+			String recipientKind = "To") {
 		Utils.createDirctory("OutputFiles")
 		String outputPath = RunConfiguration.getProjectDir() + RELATIVE_OUTPUT_PATH
 		File file = new File(outputPath)
@@ -87,7 +91,8 @@ class NotificationEmailLog {
 				notes ?: "",
 				"",
 				resolveEnvironment(),
-				expectedBodyContains ?: ""
+				expectedBodyContains ?: "",
+				(recipientKind ?: RECIPIENT_KIND_TO)
 			] as String[]
 			for (int i = 0; i < values.length; i++) {
 				Cell cell = row.createCell(i)
@@ -113,7 +118,22 @@ class NotificationEmailLog {
 			return
 		}
 		String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
-		appendFromCatalog(trigger, timestamp, actor, id, name, toRole.trim())
+		appendFromCatalog(trigger, timestamp, actor, id, name, toRole.trim(), RECIPIENT_KIND_TO)
+	}
+
+	/**
+	 * After a UI action, write one Bcc checklist row for the matching Permissions Trigger.
+	 * Same catalog lookup as logEmails. bccRole FedleadBcc uses FedleadBccEmail (CRDC_QA).
+	 * Verify searches that mailbox; the address must not be in To or Cc.
+	 */
+	@Keyword
+	static void logBccEmails(String trigger, String actor, String id, String name, String bccRole) {
+		if (!bccRole?.toString()?.trim()) {
+			KeywordUtil.markFailedAndStop("logBccEmails requires bccRole")
+			return
+		}
+		String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
+		appendFromCatalog(trigger, timestamp, actor, id, name, bccRole.trim(), RECIPIENT_KIND_BCC)
 	}
 
 	/**
@@ -160,7 +180,7 @@ class NotificationEmailLog {
 	 * (Submission Request Emails -> SR, Data Submission Emails -> DS).
 	 */
 	private static void appendFromCatalog(String trigger, String timestamp, String actor, String id, String name,
-			String toRole) {
+			String role, String recipientKind) {
 		def testData = TestDataFactory.findTestData(CATALOG_DATA_FILE)
 		int rowCount = testData.getRowNumbers()
 		boolean found = false
@@ -188,8 +208,11 @@ class NotificationEmailLog {
 			found = true
 			String entityType = entityTypeFromGroup(testData.getValue("Group", i)?.toString()?.trim() ?: "")
 			String bodySnippet = bodies ? bodies[tokenIndex] : ""
-			KeywordUtil.logInfo("logEmails " + trigger + " expected body contains: " + (bodySnippet ? bodySnippet : "(blank)"))
-			appendRow(timestamp, actor, trigger, entityType, id, name, subjects[tokenIndex], emailForRole(toRole), ENV_PREFIX_NOTE, bodySnippet)
+			String expectedRecipient = (recipientKind == RECIPIENT_KIND_BCC) ? emailForBccRole(role) : emailForRole(role)
+			KeywordUtil.logInfo((recipientKind == RECIPIENT_KIND_BCC ? "logBccEmails " : "logEmails ") + trigger
+				+ " expected body contains: " + (bodySnippet ? bodySnippet : "(blank)"))
+			appendRow(timestamp, actor, trigger, entityType, id, name, subjects[tokenIndex], expectedRecipient,
+				ENV_PREFIX_NOTE, bodySnippet, recipientKind)
 		}
 		if (!found) {
 			KeywordUtil.markFailed("Permissions catalog has no email row for Trigger " + trigger)
@@ -242,6 +265,22 @@ class NotificationEmailLog {
 			return inbox(GlobalVariable.UserEmail)
 		}
 		KeywordUtil.markFailedAndStop("Unknown toRole: " + toRole)
+		return ""
+	}
+
+	/**
+	 * Map logBccEmails bccRole to the BCC inbox. FedleadBcc is FedleadBccEmail on CRDC_QA.
+	 */
+	private static String emailForBccRole(String bccRole) {
+		String role = bccRole?.toLowerCase() ?: ""
+		if (role == "fedleadbcc") {
+			String email = inbox(GlobalVariable.FedleadBccEmail)
+			if (!email) {
+				KeywordUtil.markFailedAndStop("FedleadBccEmail is blank. Set it on profile CRDC_QA.")
+			}
+			return email
+		}
+		KeywordUtil.markFailedAndStop("Unknown bccRole: " + bccRole)
 		return ""
 	}
 

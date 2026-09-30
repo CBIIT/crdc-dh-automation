@@ -26,10 +26,12 @@ CustomKeywords.'utilities.SubmissionRequest.clickSubmitButton'()
 CustomKeywords.'utilities.Login.switchUser'('Fedlead')
 CustomKeywords.'utilities.SubmissionRequest.approveSubmissionRequestWithModelChangePending'(studyName)
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('SR Conditional Model', 'Fedlead', srId, studyName, 'Submitter')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Conditional Model', 'Fedlead', srId, studyName, 'FedleadBcc')
 
 CustomKeywords.'utilities.Login.switchUser'('Admin')
 CustomKeywords.'utilities.ManageStudies.navigateToManageStudies'()
 CustomKeywords.'utilities.ManageStudies.editExistingStudy'(studyName, [pendingConditions: [false]])
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('SR Pending Cleared', 'Admin', srId, studyName, 'Submitter')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Pending Cleared', 'Admin', srId, studyName, 'FedleadBcc')
 
 WebUI.closeBrowser()
