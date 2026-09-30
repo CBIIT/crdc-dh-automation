@@ -22,6 +22,7 @@ CustomKeywords.'utilities.WebUIUtils.waitUntilEnabledOrStop'(findTestObject('CRD
 CustomKeywords.'utilities.SubmissionRequest.clickSubmitButton'()
 
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('SR Submit', 'Submitter', srId, studyName, 'Submitter')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Submit', 'Submitter', srId, studyName, 'FedleadBcc')
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('SR Available for Review', 'Submitter', srId, studyName, 'Fedlead')
 
 WebUI.closeBrowser()

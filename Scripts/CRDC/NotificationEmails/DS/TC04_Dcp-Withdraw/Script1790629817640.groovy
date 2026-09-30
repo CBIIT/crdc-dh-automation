@@ -26,5 +26,6 @@ CustomKeywords.'utilities.DataSubmissions.submitDataSubmission'()
 CustomKeywords.'utilities.DataSubmissions.withdrawDataSubmission'()
 
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('DS Withdraw', 'Submitter', dsId, dsName, 'Dcp')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('DS Withdraw', 'Submitter', dsId, dsName, 'FedleadBcc')
 
 WebUI.closeBrowser()

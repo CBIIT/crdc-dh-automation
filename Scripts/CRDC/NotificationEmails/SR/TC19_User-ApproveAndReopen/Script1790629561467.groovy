@@ -25,8 +25,10 @@ CustomKeywords.'utilities.SubmissionRequest.clickSubmitButton'()
 CustomKeywords.'utilities.Login.switchUser'('Fedlead')
 CustomKeywords.'utilities.SubmissionRequest.approveSubmissionRequest'(studyName)
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('SR Approve', 'Fedlead', srId, studyName, 'User')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Approve', 'Fedlead', srId, studyName, 'FedleadBcc')
 
 CustomKeywords.'utilities.SubmissionRequest.reopenApprovedSubmissionRequest'(studyName)
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('SR Reopen', 'Fedlead', srId, studyName, 'User')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Reopen', 'Fedlead', srId, studyName, 'FedleadBcc')
 
 WebUI.closeBrowser()

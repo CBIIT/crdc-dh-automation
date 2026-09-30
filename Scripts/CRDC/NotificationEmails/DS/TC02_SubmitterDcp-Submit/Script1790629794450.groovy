@@ -24,6 +24,8 @@ CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 CustomKeywords.'utilities.DataSubmissions.submitDataSubmission'()
 
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('DS Create', 'Submitter', dsId, dsName, 'Dcp')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('DS Create', 'Submitter', dsId, dsName, 'FedleadBcc')
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('DS Submit', 'Submitter', dsId, dsName, 'Submitter')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('DS Submit', 'Submitter', dsId, dsName, 'FedleadBcc')
 
 WebUI.closeBrowser()

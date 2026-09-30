@@ -25,5 +25,6 @@ CustomKeywords.'utilities.SubmissionRequest.clickSubmitButton'()
 CustomKeywords.'utilities.Login.switchUser'('Fedlead')
 CustomKeywords.'utilities.SubmissionRequest.approveSubmissionRequestWithImageDeidPending'(studyName)
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('SR Conditional Image', 'Fedlead', srId, studyName, 'User')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Conditional Image', 'Fedlead', srId, studyName, 'FedleadBcc')
 
 WebUI.closeBrowser()
