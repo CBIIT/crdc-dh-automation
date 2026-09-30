@@ -225,6 +225,59 @@ class Pbac extends TestRunner {
 		}
 	}
 
+	/**
+	 * Set a PBAC automation user's account status to Active or Inactive and Save.
+	 * Opens the user with findAndEditUserByName. Save returns to the Manage Users list.
+	 * @param userRole Fedlead, Dcp, Admin, Submitter, User
+	 * @param status Active or Inactive
+	 */
+	@Keyword
+	public static void setUserAccountStatus(String userRole, String status) {
+		if (status != 'Active' && status != 'Inactive') {
+			KeywordUtil.markFailedAndStop("setUserAccountStatus: status must be Active or Inactive, got '${status}'")
+		}
+		findAndEditUserByName(userRole)
+		WebUI.click(findTestObject('CRDC/AILocators/Users/Profile/AccountStatus-Ddn'))
+		TestObject statusOption = findTestObject('CRDC/AILocators/Users/Profile/AccountStatus-Option', [('status') : status])
+		WebUI.waitForElementClickable(statusOption, 10)
+		WebUI.click(statusOption)
+		WebUIUtils.clickTab('CRDC/AILocators/Users/Profile/Save-Btn')
+		waitForPbacNotistackDismissed()
+		KeywordUtil.logInfo("setUserAccountStatus: ${userRole} -> ${status}")
+	}
+
+	/**
+	 * For each role, set Inactive, log Account Disabled, then restore Active.
+	 * Caller must already be on Manage Users. Inactive is the only send; Active is restore only.
+	 * Do not pass Master.
+	 * @param userRoles Admin, Fedlead, Dcp, Submitter, User
+	 */
+	@Keyword
+	public static void disableThenRestoreUserAccounts(List<String> userRoles) {
+		if (userRoles == null || userRoles.isEmpty()) {
+			KeywordUtil.markFailedAndStop("disableThenRestoreUserAccounts requires at least one role")
+		}
+		for (String role : userRoles) {
+			if (role == null || role.trim().isEmpty()) {
+				KeywordUtil.markFailedAndStop("disableThenRestoreUserAccounts: blank role")
+			}
+			if (role.equalsIgnoreCase('Master')) {
+				KeywordUtil.markFailedAndStop("disableThenRestoreUserAccounts: do not inactivate Master")
+			}
+			String email = GlobalVariable."${role}Email"
+			String nameToken = "pbac." + role.toLowerCase() + "-automation"
+			try {
+				setUserAccountStatus(role, 'Inactive')
+				NotificationEmailLog.logEmails('Account Disabled', 'Master', email, nameToken, role)
+			} finally {
+				try {
+					setUserAccountStatus(role, 'Active')
+				} catch (Throwable t) {
+					KeywordUtil.markFailedAndStop("Failed to restore ${role} to Active: ${t.message}")
+				}
+			}
+		}
+	}
 
 	/**
 	 * Write the expected PBAC permissions for the role to Output Excel sheet

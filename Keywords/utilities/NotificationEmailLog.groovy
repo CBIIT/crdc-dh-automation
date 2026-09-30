@@ -44,7 +44,8 @@ class NotificationEmailLog {
 		"Expected recipient",
 		"Notes",
 		"Result",
-		"Environment"
+		"Environment",
+		"Expected body contains"
 	] as String[]
 	private static final String ENV_PREFIX_NOTE = "Subject is prefixed with [Environment] (QA, QA2, or STAGE)."
 	private static final String CATALOG_DATA_FILE = "CRDC/Pbac/Permissions"
@@ -54,7 +55,7 @@ class NotificationEmailLog {
 	 */
 	@Keyword
 	static void appendRow(String timestamp, String actor, String action, String entityType, String id, String name,
-			String expectedSubject, String expectedRecipient, String notes) {
+			String expectedSubject, String expectedRecipient, String notes, String expectedBodyContains = "") {
 		Utils.createDirctory("OutputFiles")
 		String outputPath = RunConfiguration.getProjectDir() + RELATIVE_OUTPUT_PATH
 		File file = new File(outputPath)
@@ -85,7 +86,8 @@ class NotificationEmailLog {
 				expectedRecipient ?: "",
 				notes ?: "",
 				"",
-				resolveEnvironment()
+				resolveEnvironment(),
+				expectedBodyContains ?: ""
 			] as String[]
 			for (int i = 0; i < values.length; i++) {
 				Cell cell = row.createCell(i)
@@ -173,13 +175,21 @@ class NotificationEmailLog {
 				KeywordUtil.markFailedAndStop("Permissions catalog Trigger and Expected email subject token counts differ on row " + i)
 				return
 			}
+			String bodyCell = testData.getValue("Expected body contains", i)?.toString()?.trim() ?: ""
+			List<String> bodies = bodyCell ? splitPacked(bodyCell) : []
+			if (bodies && bodies.size() != triggers.size()) {
+				KeywordUtil.markFailedAndStop("Permissions catalog Trigger and Expected body contains token counts differ on row " + i)
+				return
+			}
 			int tokenIndex = triggers.indexOf(trigger)
 			if (tokenIndex < 0) {
 				continue
 			}
 			found = true
 			String entityType = entityTypeFromGroup(testData.getValue("Group", i)?.toString()?.trim() ?: "")
-			appendRow(timestamp, actor, trigger, entityType, id, name, subjects[tokenIndex], emailForRole(toRole), ENV_PREFIX_NOTE)
+			String bodySnippet = bodies ? bodies[tokenIndex] : ""
+			KeywordUtil.logInfo("logEmails " + trigger + " expected body contains: " + (bodySnippet ? bodySnippet : "(blank)"))
+			appendRow(timestamp, actor, trigger, entityType, id, name, subjects[tokenIndex], emailForRole(toRole), ENV_PREFIX_NOTE, bodySnippet)
 		}
 		if (!found) {
 			KeywordUtil.markFailed("Permissions catalog has no email row for Trigger " + trigger)

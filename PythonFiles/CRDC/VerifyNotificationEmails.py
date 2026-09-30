@@ -11,8 +11,10 @@ How a row is judged
    in the Gmail q string. Name-in-body is required when Permissions
    (InputFiles/CRDC/PBACPermissions.xlsx) says TRUE for that expected subject.
 3. For each candidate, require the Subject to start with [QA], [QA2], or [STAGE]
-   from the Environment column, to contain the expected subject phrase, and to
-   have Expected recipient in the To header only (not Cc or Bcc).
+   from the Environment column, to contain the expected subject phrase, to
+   have Expected recipient in the To header only (not Cc or Bcc), Name in the
+   body when the catalog says TRUE, and Expected body contains when that
+   checklist cell is non-blank.
 4. Write Pass or Fail into the Result column once. Run this after the
    UI tests when mail should already be in the inbox. A later re-run retries only
    blank and Fail rows; Pass and Skip are left unchanged. Rows with a blank
@@ -48,6 +50,7 @@ COL_SUBJECT = 7
 COL_RECIPIENT = 8
 COL_RESULT = 10
 COL_ENV = 11
+COL_BODY_CONTAINS = 12
 CATALOG_SHEET = "Permissions"
 
 # This file is PythonFiles/CRDC/VerifyNotificationEmails.py
@@ -232,12 +235,13 @@ def header_value(headers, name):
 	return ""
 
 
-def find_message(service, expected_subject, name, env, recipient, name_in_body_map):
+def find_message(service, expected_subject, name, env, recipient, name_in_body_map, body_contains=""):
 	"""Return the actual Subject if a matching message exists, else None.
 
 	Lists up to 20 recent messages for the env-prefixed subject, loads each full
 	MIME payload, then requires subject_matches, To: contains Expected recipient,
-	and Name in the body when the Permissions catalog says so.
+	Name in the body when the Permissions catalog says so, and body_contains
+	when that checklist cell is non-blank.
 	"""
 	result = service.users().messages().list(
 		userId="me", q=gmail_query(expected_subject, env), maxResults=20
@@ -248,7 +252,10 @@ def find_message(service, expected_subject, name, env, recipient, name_in_body_m
 		actual_subject = header_value(headers, "Subject")
 		if not subject_matches(expected_subject, actual_subject, env):
 			continue
-		if requires_name_in_body(expected_subject, name_in_body_map) and name and name not in body_text(full.get("payload") or {}):
+		text = body_text(full.get("payload") or {})
+		if requires_name_in_body(expected_subject, name_in_body_map) and name and name not in text:
+			continue
+		if body_contains and body_contains not in text:
 			continue
 		if not to_matches(recipient, header_value(headers, "To")):
 			continue
@@ -308,6 +315,7 @@ def main():
 			"recipient": cell_str(row, COL_RECIPIENT),
 			"manual": cell_str(row, COL_RESULT),
 			"env": cell_str(row, COL_ENV),
+			"body_contains": cell_str(row, COL_BODY_CONTAINS),
 		})
 
 	if not rows:
@@ -345,18 +353,25 @@ def main():
 			try:
 				actual = find_message(
 					service, item["subject"], item["name"], item["env"], item["recipient"],
-					name_in_body_map)
+					name_in_body_map, item["body_contains"])
 			except HttpError as error:
 				print("Gmail API error for row %s: %s" % (item["idx"], error))
 				actual = None
 			if actual:
 				sheet.cell(item["idx"], COL_RESULT).value = "Pass"
-				print("Pass row %s | %s | To: %s | %s" % (
-					item["idx"], item["name"], item["recipient"], actual))
+				if item["body_contains"]:
+					print("Pass row %s | %s | To: %s | %s | body: %r" % (
+						item["idx"], item["name"], item["recipient"], actual, item["body_contains"]))
+				else:
+					print("Pass row %s | %s | To: %s | %s" % (
+						item["idx"], item["name"], item["recipient"], actual))
 			else:
 				sheet.cell(item["idx"], COL_RESULT).value = "Fail"
 				prefixed = "%s %s" % (env_tag(item["env"]), item["subject"])
-				if requires_name_in_body(item["subject"], name_in_body_map):
+				if item["body_contains"]:
+					print("Fail row %s | missing %r in body or To %r for subject containing %r" % (
+						item["idx"], item["body_contains"], item["recipient"], prefixed))
+				elif requires_name_in_body(item["subject"], name_in_body_map):
 					print("Fail row %s | missing %r in body or To %r for subject containing %r" % (
 						item["idx"], item["name"], item["recipient"], prefixed))
 				else:

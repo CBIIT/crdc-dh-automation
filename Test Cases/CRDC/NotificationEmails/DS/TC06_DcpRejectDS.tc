@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TestCaseEntity>
-   <description>Submitter submits one Data Submission, DCP rejects it, then the case appends the expected reject-email row to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
-   <name>TC06_DcpRejectDS</name>
-   <tag>Filter</tag>
-   <comment></comment>
-   <recordOption>OTHER</recordOption>
-   <testCaseGuid>6c6cee00-2857-4aa8-80c3-f56e3b6a3ac3</testCaseGuid>
-</TestCaseEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>PendingImageDeid-Chkbx</name>
+   <tag></tag>
+   <elementGuidId>a8c4d715-2e60-4b1b-9e03-7d4f6a1c8b20</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;pendingImageDeIdentification-checkbox&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;pendingImageDeIdentification-checkbox&apos;]</value>
+      <webElementGuid>b9d5e826-3f71-4c2c-af14-8e507b2d9c31</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
