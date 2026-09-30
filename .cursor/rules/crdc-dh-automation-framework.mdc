@@ -156,12 +156,23 @@ When implementing or modifying functions in this project:
 - Before writing new logic, search the codebase for existing keywords that already do it.
 - Prefer calling `CustomKeywords.'utilities.X.y'()` or internal methods over inlining equivalent logic.
 
+### Search Existing Methods First
+
+Before writing Selenium, WebDriver, Actions, or xpath in a keyword or script, search `WebUIUtils`, `Utils`, `DataSubmissions`, `Pbac`, `Login`, and `SubmissionRequest` for a method that already does it. Call that method. Do not inline a copy.
+
+**WebUIUtils (prefer these):** `clickTab` (clicks by Object Repository path), `clearTextfieldByOs` (pass the path string, not a local TestObject), `scrollToElement`, `waitUntilElementTextEquals`, `verifyElementText`, `verifyButtonEnabled`, `verifyElementDisplayed`.
+
+**Utils:** `getListWebElements` (lists from an Object Repository path), `waitForElementToAppear`, `waitForElementToDisappear`.
+
+Pass locator paths as strings (`WebUIUtils.clickTab('CRDC/AILocators/...')`, `WebUI.sendKeys(findTestObject('CRDC/AILocators/...'), text)`). Do not store `findTestObject` in a local TestObject unless the object is parameterized or reused in a loop. Do not hardcode xpath; add an AILocators object and pass its path. Do not copy Actions / WebDriverWait / `By.xpath` boilerplate from `createDataSubmission` unless this widget has the same overlay or stale-element problem.
+
 ### Maximize Use of Existing Keywords
 
 - **Login, navigation, clicks:** Use `Login.*`, `WebUIUtils.clickTab`, `SubmissionRequest.logoutFromCrdc`, etc.
 - **Table/UI reads:** Use `Utils.getListWebElements`, `Utils.waitForElementToDisappear`, existing `DataSubmissions` helpers.
 - **Verification:** Use `WebUIUtils.verifyElementText`, `verifyButtonEnabled`, `ValidationReport.addValidationReportItem`.
 - **Data loading:** Use `Utils.getListFromDataFile`, `findTestData`, existing `load*` and `read*` methods in DataSubmissions.
+- **Text fields:** `WebUIUtils.clickTab` or `WebUI.click(findTestObject(path))`, then `WebUIUtils.clearTextfieldByOs(path)`, then `WebUI.sendKeys(findTestObject(path), value)`.
 
 ### Never Duplicate Code
 

@@ -51,9 +51,8 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmiss
 CustomKeywords.'utilities.Pbac.prepareUniqueMetadataAndUpload'('InputFiles/CRDC/MetadataData/PBAC/program.tsv', "program_acronym")
 //Upload data files
 CustomKeywords.'utilities.CliUploader.uploadFilesViaCli'('TC17', 'datafile')
-CustomKeywords.'utilities.Utils.waitForElementToDisappear'('Object Repository/CRDC/DataSubmissions/Uploading-Txt', 60)
-//Validate data
-WebUI.click(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/ValidationType-Both-RadioBtn'))
+//Validate data. selectValidationTypeBoth waits until no batch in Upload Activities is still Uploading.
+CustomKeywords.'utilities.DataSubmissions.selectValidationTypeBoth'()
 WebUI.click(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/ValidationTarget-AllUploadedData-RadioBtn'))
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 //Submit

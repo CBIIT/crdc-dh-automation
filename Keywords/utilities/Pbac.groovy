@@ -225,6 +225,59 @@ class Pbac extends TestRunner {
 		}
 	}
 
+	/**
+	 * Set a PBAC automation user's account status to Active or Inactive and Save.
+	 * Opens the user with findAndEditUserByName. Save returns to the Manage Users list.
+	 * @param userRole Fedlead, Dcp, Admin, Submitter, User
+	 * @param status Active or Inactive
+	 */
+	@Keyword
+	public static void setUserAccountStatus(String userRole, String status) {
+		if (status != 'Active' && status != 'Inactive') {
+			KeywordUtil.markFailedAndStop("setUserAccountStatus: status must be Active or Inactive, got '${status}'")
+		}
+		findAndEditUserByName(userRole)
+		WebUI.click(findTestObject('CRDC/AILocators/Users/Profile/AccountStatus-Ddn'))
+		TestObject statusOption = findTestObject('CRDC/AILocators/Users/Profile/AccountStatus-Option', [('status') : status])
+		WebUI.waitForElementClickable(statusOption, 10)
+		WebUI.click(statusOption)
+		WebUIUtils.clickTab('CRDC/AILocators/Users/Profile/Save-Btn')
+		waitForPbacNotistackDismissed()
+		KeywordUtil.logInfo("setUserAccountStatus: ${userRole} -> ${status}")
+	}
+
+	/**
+	 * For each role, set Inactive, log Account Disabled, then restore Active.
+	 * Caller must already be on Manage Users. Inactive is the only send; Active is restore only.
+	 * Do not pass Master.
+	 * @param userRoles Admin, Fedlead, Dcp, Submitter, User
+	 */
+	@Keyword
+	public static void disableThenRestoreUserAccounts(List<String> userRoles) {
+		if (userRoles == null || userRoles.isEmpty()) {
+			KeywordUtil.markFailedAndStop("disableThenRestoreUserAccounts requires at least one role")
+		}
+		for (String role : userRoles) {
+			if (role == null || role.trim().isEmpty()) {
+				KeywordUtil.markFailedAndStop("disableThenRestoreUserAccounts: blank role")
+			}
+			if (role.equalsIgnoreCase('Master')) {
+				KeywordUtil.markFailedAndStop("disableThenRestoreUserAccounts: do not inactivate Master")
+			}
+			String email = GlobalVariable."${role}Email"
+			String nameToken = "pbac." + role.toLowerCase() + "-automation"
+			try {
+				setUserAccountStatus(role, 'Inactive')
+				NotificationEmailLog.logEmails('Account Disabled', 'Master', email, nameToken, role)
+			} finally {
+				try {
+					setUserAccountStatus(role, 'Active')
+				} catch (Throwable t) {
+					KeywordUtil.markFailedAndStop("Failed to restore ${role} to Active: ${t.message}")
+				}
+			}
+		}
+	}
 
 	/**
 	 * Write the expected PBAC permissions for the role to Output Excel sheet
@@ -650,9 +703,9 @@ class Pbac extends TestRunner {
 		String normalizedTarget = automationStudy.replaceAll(/\s+/, ' ').trim()
 		String studyOptionXpath = "//div[contains(@class,'MuiMenu-paper')]//li[contains(@data-testid,'study-option')]"
 		String dataModel = 'GC'
-		
+
 		WebDriver driver = DriverFactory.getWebDriver()
-		
+
 		//Select the Data Commons
 		WebUI.click(findTestObject('Object Repository/CRDC/DataSubmissions/Create/DataCommons-Ddn'))
 		WebUI.delay(2)
@@ -670,7 +723,7 @@ class Pbac extends TestRunner {
 		} else {
 			KeywordUtil.markFailed("Study option "+dataModel+" not found in dropdown.")
 		}
-		
+
 		//Select the Study
 		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/Study-Ddn'))
 		WebDriverWait menuWait = new WebDriverWait(driver, 10)
@@ -736,16 +789,18 @@ class Pbac extends TestRunner {
 	}
 
 	/**
-	 * Upload a metadata file in the data submission via the UI
+	 * Upload a metadata file in the data submission via the UI.
+	 * Native-clicks Upload only after it is enabled (file must be attached), then waits until
+	 * Validate enables (metadata ingest finished) or stops the test.
 	 */
 	@Keyword
 	public static void uploadMetadataUI(String relativePath) {
 		String absolutePath = Paths.get(relativePath).toAbsolutePath().toString()
 		WebUI.delay(2)
 		WebUI.uploadFile(findTestObject('CRDC/DataSubmissions/ChooseFiles-Btn'), absolutePath)
-		WebUI.delay(5)
-		TestRunner.clickTab('CRDC/DataSubmissions/Upload-Btn')
-		WebUI.delay(10)
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/DataSubmissions/Upload-Btn'), 30, 'Upload')
+		WebUI.click(findTestObject('CRDC/DataSubmissions/Upload-Btn'))
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/DataSubmissions/Validate-Btn'), 120, 'Validate after metadata upload')
 	}
 
 	/**
@@ -786,17 +841,89 @@ class Pbac extends TestRunner {
 			}
 		}
 
-		// Upload the modified file
+		// Upload the modified file. uploadMetadataUI waits until Validate enables, so the temp TSV
+		// is not deleted while ingest is still in flight.
 		WebUI.delay(2)
 		uploadMetadataUI(tempFile.absolutePath)
 
-		// Clean up
 		if (tempFile.exists()) {
 			tempFile.delete()
 			KeywordUtil.logInfo("Temporary metadata file deleted: ${tempFile.getAbsolutePath()}")
 		}
 	}
 
+	/**
+	 * Open Profile Request Access and submit Institution AutoTest-Institution plus study AutoTest-Study.
+	 * Returns id and name (unique Additional Info token) for NotificationEmailLog.logEmails.
+	 * Caller must already be logged in as User. Stops if the dialog does not close after Submit.
+	 */
+	@Keyword
+	static Map submitAccessRequest() {
+		String institutionName = 'AutoTest-Institution'
+		String studyName = 'AutoTest-Study'
+		String additionalInfo = 'TC08 Request Access ' + new SimpleDateFormat('yyyy-MM-dd HH:mm:ss').format(new Date())
+
+		// Open Profile Request Access
+		WebUI.delay(2)
+		SubmissionRequest.clickHome()
+		SubmissionRequest.clickAccountDropdown()
+		WebUIUtils.clickTab('CRDC/AILocators/Global/Header/Desktop/UserProfile-Link')
+		WebUIUtils.clickTab('CRDC/AILocators/AccessRequest/RequestAccess-Btn')
+		Utils.waitForElementToAppear('CRDC/AILocators/AccessRequest/Dialog', 10)
+
+		// Enter institution
+		WebUIUtils.clickTab('CRDC/AILocators/AccessRequest/Institution-TxtBx')
+		WebUIUtils.clearTextfieldByOs('CRDC/AILocators/AccessRequest/Institution-TxtBx')
+		WebUI.sendKeys(findTestObject('CRDC/AILocators/AccessRequest/Institution-TxtBx'), institutionName)
+		WebUI.delay(1)
+		WebElement institutionMatch = Utils.getListWebElements('CRDC/AILocators/AccessRequest/Institution-Ddn-Option').find {
+			String t = it.getAttribute("innerText")
+			(t != null ? t.replaceAll(/\s+/, ' ').trim() : "") == institutionName
+		}
+		if (institutionMatch != null) {
+			institutionMatch.click()
+		} else {
+			WebUI.sendKeys(findTestObject('CRDC/AILocators/AccessRequest/Institution-TxtBx'), Keys.chord(Keys.TAB))
+		}
+		Utils.waitForElementToDisappear('CRDC/AILocators/AccessRequest/Institution-Ddn-Option', 10)
+
+		// Enter study. clickTab JS click reports success but does not open MUI Select; native click is the same pattern as Study-Ddn in createDataSubmission.
+		WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/AccessRequest/Studies-Ddn'), 10, FailureHandling.STOP_ON_FAILURE)
+		WebUI.click(findTestObject('CRDC/AILocators/AccessRequest/Studies-Ddn'))
+		Utils.waitForElementToAppear('CRDC/AILocators/AccessRequest/Studies-Ddn-Option', 10)
+		String normalizedStudy = studyName.replaceAll(/\s+/, ' ').trim()
+		WebElement studyMatch = Utils.getListWebElements('CRDC/AILocators/AccessRequest/Studies-Ddn-Option').find {
+			String t = it.getAttribute("innerText")
+			String testId = it.getAttribute("data-testid") ?: ""
+			String text = (t != null ? t.replaceAll(/\s+/, ' ').trim() : "")
+			text == normalizedStudy || text.contains(normalizedStudy) || testId.contains(normalizedStudy)
+		}
+		if (studyMatch == null) {
+			KeywordUtil.markFailedAndStop("Study option '${studyName}' not found in Request Access dialog.")
+			return
+		}
+		studyMatch.click()
+		// Close the multi-select by JS-clicking its invisible MUI backdrop. Escape closes the Request Access dialog. Native clicks on the header, Studies field, and Additional Info are intercepted: the backdrop covers the dialog, and a native click on the backdrop hits the menu at the viewport center.
+		WebUIUtils.clickTab('CRDC/AILocators/AccessRequest/Studies-Menu-Backdrop')
+		Utils.waitForElementToDisappear('CRDC/AILocators/AccessRequest/Studies-Ddn-Option', 10)
+
+		// Enter additional info. data-testid is on the MUI wrapper; sendKeys needs the inner textarea, same pattern as Institution-TxtBx.
+		WebUIUtils.clickTab('CRDC/AILocators/AccessRequest/AdditionalInfo-TxtBx')
+		WebUIUtils.clearTextfieldByOs('CRDC/AILocators/AccessRequest/AdditionalInfo-TxtBx')
+		WebUI.sendKeys(findTestObject('CRDC/AILocators/AccessRequest/AdditionalInfo-TxtBx'), additionalInfo)
+
+		// Submit
+		WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/AccessRequest/Submit-Btn'), 10, FailureHandling.STOP_ON_FAILURE)
+		WebUI.click(findTestObject('CRDC/AILocators/AccessRequest/Submit-Btn'))
+
+		// Wait for the dialog to close
+		try {
+			Utils.waitForElementToDisappear('CRDC/AILocators/AccessRequest/Dialog', 30)
+		} catch (AssertionError e) {
+			KeywordUtil.markFailedAndStop("Request Access dialog did not close after Submit")
+		}
+		return [id: additionalInfo, name: additionalInfo]
+	}
 
 	/**
 	 * Create mappings between permissions and verification actions
@@ -1090,7 +1217,6 @@ class Pbac extends TestRunner {
 
 					//Verify
 					return WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/AdminSubmit-Btn'), 30, FailureHandling.OPTIONAL)
-					
 				}
 				return false
 			} catch (Exception e) {

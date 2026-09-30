@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//*[@data-testid=&apos;access-request-additionalInfo-field&apos;]</value>
+         <value>//*[@data-testid=&apos;access-request-additionalInfo-field&apos;]//textarea[not(@aria-hidden=&apos;true&apos;)]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//*[@data-testid=&apos;access-request-additionalInfo-field&apos;]</value>
+      <value>//*[@data-testid=&apos;access-request-additionalInfo-field&apos;]//textarea[not(@aria-hidden=&apos;true&apos;)]</value>
       <webElementGuid>d0f20bae-9f38-4301-84a4-7e332f13d1af</webElementGuid>
    </webElementProperties>
 </WebElementEntity>

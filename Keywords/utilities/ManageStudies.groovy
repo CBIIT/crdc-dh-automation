@@ -319,11 +319,21 @@ class ManageStudies extends TestRunner {
 		if (!onlyProvided || (fields.pendingConditions != null && (fields.pendingConditions instanceof List ? (fields.pendingConditions as List).size() > 0 : true))) {
 			if (fields.pendingConditions != null && fields.pendingConditions instanceof List) {
 				List<?> pcs = fields.pendingConditions as List
-				List<WebElement> chks = driver.findElements(By.xpath("//*[@data-testid='pendingConditions-checkbox']"))
+				List<WebElement> chks = Utils.getListWebElements("CRDC/AILocators/Studies/Detail/PendingConditions-Chkbx")
+				if (chks == null) chks = []
 				for (int i = 0; i < chks.size() && i < pcs.size(); i++) {
-					boolean check = (pcs.get(i) instanceof Boolean && pcs.get(i)) || (pcs.get(i) != null && pcs.get(i).toString().trim().toLowerCase() in ["true", "1", "yes"])
-					if (check) chks.get(i).click()
-					WebUI.delay(1)
+					boolean wantChecked = (pcs.get(i) instanceof Boolean && pcs.get(i)) || (pcs.get(i) != null && pcs.get(i).toString().trim().toLowerCase() in ["true", "1", "yes"])
+					boolean isChecked = chks.get(i).isSelected()
+					if (!isChecked) {
+						String ariaChecked = chks.get(i).getAttribute("aria-checked")
+						if (ariaChecked != null && ariaChecked.equalsIgnoreCase("true")) isChecked = true
+						String cls = chks.get(i).getAttribute("class")
+						if (cls != null && cls.contains("Mui-checked")) isChecked = true
+					}
+					if (wantChecked != isChecked) {
+						chks.get(i).click()
+						WebUI.delay(1)
+					}
 				}
 			}
 		}

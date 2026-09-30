@@ -191,6 +191,24 @@ class WebUIUtils {
 	}
 
 	/**
+	 * Poll until the button is enabled, then stop the test if it still is not.
+	 * Katalon waitForElementClickable with STOP_ON_FAILURE only warns and continues,
+	 * which lets a later native click hit a still-disabled control.
+	 *
+	 * @param to TestObject for the button
+	 * @param timeoutSeconds Max wait in seconds
+	 * @param label Name used in the failure message (e.g. 'DS Submit')
+	 */
+	@Keyword
+	static void waitUntilEnabledOrStop(TestObject to, int timeoutSeconds, String label) {
+		waitUntilStableForButtonEnabledOrDisabled(to, 'enabled', timeoutSeconds)
+		WebElement el = WebUI.findWebElement(to, 10)
+		if (el == null || !el.isEnabled()) {
+			KeywordUtil.markFailedAndStop(label + " did not become enabled within " + timeoutSeconds + "s")
+		}
+	}
+
+	/**
 	 * Polls until findWebElement + isEnabled succeeds without stale and matches the desired state,
 	 * or until timeout. Non-stale failures from find propagate immediately (e.g. missing element).
 	 * Use before verifyButtonEnabled when the DOM may still re-render, or standalone to wait for a button state.

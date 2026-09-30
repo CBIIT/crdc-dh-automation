@@ -55,7 +55,7 @@ CustomKeywords.'utilities.DataSubmissions.deleteRowsFromDataView'('data file', 2
 
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationTarget-AllUploadedData-RadioBtn')
 
-CustomKeywords.'utilities.WebUIUtils.clickTab'('/CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Both-RadioBtn')
+CustomKeywords.'utilities.DataSubmissions.selectValidationTypeBoth'()
 
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 

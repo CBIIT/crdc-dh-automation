@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Submitter creates, submits, and withdraws one Data Submission, then appends the expected withdraw-email row to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
+   <name>TC04_Dcp-Withdraw</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>31ec5f4c-6ffb-4e27-8659-dcf5096cb08c</testCaseGuid>
+</TestCaseEntity>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Reopen-Btn</name>
+   <tag></tag>
+   <elementGuidId>7b2e4c91-6a18-4d3f-b5e0-1c9a8f4d2e70</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&quot;reopen-application-button&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&quot;reopen-application-button&quot;]</value>
+      <webElementGuid>8c3f5d02-7b29-4e40-c6f1-2d0b9e5e3f81</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

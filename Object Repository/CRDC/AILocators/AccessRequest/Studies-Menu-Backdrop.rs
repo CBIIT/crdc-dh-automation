@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Studies-Menu-Backdrop</name>
+   <tag></tag>
+   <elementGuidId>b4c91e70-6d2a-4f8e-9a15-3c7e8d1f0462</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//div[contains(@class,&apos;MuiBackdrop-invisible&apos;)]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//div[contains(@class,&apos;MuiBackdrop-invisible&apos;)]</value>
+      <webElementGuid>c8f3a2d1-4b67-4e90-9c15-7a6d2e0f1834</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
