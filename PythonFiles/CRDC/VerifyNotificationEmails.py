@@ -462,9 +462,17 @@ def main():
 		else:
 			creds_bcc = load_creds(str(token_bcc))
 			service_bcc = build("gmail", "v1", credentials=creds_bcc)
-			print("Authorized Fedlead BCC Gmail as",
-				gmail_execute(service_bcc.users().getProfile(userId="me")).get("emailAddress"))
-			failures += judge_search_rows(service_bcc, bcc_search, sheet, name_in_body_map)
+			bcc_email = gmail_execute(service_bcc.users().getProfile(userId="me")).get("emailAddress", "")
+			print("Authorized Fedlead BCC Gmail as", bcc_email)
+			expected_bcc = {item["recipient"].casefold() for item in bcc_search}
+			if bcc_email.casefold() not in expected_bcc:
+				for item in bcc_search:
+					sheet.cell(item["idx"], COL_RESULT).value = "Fail"
+					print("Fail row %s | BCC token authorizes %r, expected %r" % (
+						item["idx"], bcc_email, item["recipient"]))
+					failures += 1
+			else:
+				failures += judge_search_rows(service_bcc, bcc_search, sheet, name_in_body_map)
 
 	workbook.save(excel_path)
 	print("Updated", excel_path)
