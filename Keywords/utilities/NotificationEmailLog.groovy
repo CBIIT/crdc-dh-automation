@@ -27,7 +27,7 @@ import internal.GlobalVariable
 
 /**
  * Append-only Excel checklist for email-notification helper tests.
- * logEmails and logBccEmails do not open inboxes. verifyNotificationEmails runs the Gmail judge.
+ * logEmails, logBccEmails, and logCcEmails do not open inboxes. verifyNotificationEmails runs the Gmail judge.
  */
 class NotificationEmailLog {
 
@@ -52,6 +52,7 @@ class NotificationEmailLog {
 	private static final String CATALOG_DATA_FILE = "CRDC/Pbac/Permissions"
 	private static final String RECIPIENT_KIND_TO = "To"
 	private static final String RECIPIENT_KIND_BCC = "Bcc"
+	private static final String RECIPIENT_KIND_CC = "Cc"
 
 	/**
 	 * Append one checklist row. Result is always left blank.
@@ -124,6 +125,8 @@ class NotificationEmailLog {
 	/**
 	 * After a UI action, write one Bcc checklist row for the matching Permissions Trigger.
 	 * Same catalog lookup as logEmails. bccRole FedleadBcc uses FedleadBccEmail (CRDC_QA).
+	 * bccRole DcpBcc uses DcpBccEmail (CRDC_QA).
+	 * bccRole AdminBcc uses AdminBccEmail (CRDC_QA).
 	 * Verify searches that mailbox; the address must not be in To or Cc.
 	 */
 	@Keyword
@@ -134,6 +137,22 @@ class NotificationEmailLog {
 		}
 		String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
 		appendFromCatalog(trigger, timestamp, actor, id, name, bccRole.trim(), RECIPIENT_KIND_BCC)
+	}
+
+	/**
+	 * After a UI action, write one Cc checklist row for the matching Permissions Trigger.
+	 * Same catalog lookup as logEmails. ccRole FedleadCc uses FedleadBccEmail (CRDC_QA).
+	 * ccRole AdminCc uses AdminBccEmail (CRDC_QA). DS Create only (CRDCDH-2614).
+	 * Verify searches that mailbox; the address must be in Cc and not in To.
+	 */
+	@Keyword
+	static void logCcEmails(String trigger, String actor, String id, String name, String ccRole) {
+		if (!ccRole?.toString()?.trim()) {
+			KeywordUtil.markFailedAndStop("logCcEmails requires ccRole")
+			return
+		}
+		String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
+		appendFromCatalog(trigger, timestamp, actor, id, name, ccRole.trim(), RECIPIENT_KIND_CC)
 	}
 
 	/**
@@ -208,8 +227,15 @@ class NotificationEmailLog {
 			found = true
 			String entityType = entityTypeFromGroup(testData.getValue("Group", i)?.toString()?.trim() ?: "")
 			String bodySnippet = bodies ? bodies[tokenIndex] : ""
-			String expectedRecipient = (recipientKind == RECIPIENT_KIND_BCC) ? emailForBccRole(role) : emailForRole(role)
-			KeywordUtil.logInfo((recipientKind == RECIPIENT_KIND_BCC ? "logBccEmails " : "logEmails ") + trigger
+			boolean hiddenInbox = (recipientKind == RECIPIENT_KIND_BCC || recipientKind == RECIPIENT_KIND_CC)
+			String expectedRecipient = hiddenInbox ? emailForBccRole(role) : emailForRole(role)
+			String logPrefix = "logEmails "
+			if (recipientKind == RECIPIENT_KIND_BCC) {
+				logPrefix = "logBccEmails "
+			} else if (recipientKind == RECIPIENT_KIND_CC) {
+				logPrefix = "logCcEmails "
+			}
+			KeywordUtil.logInfo(logPrefix + trigger
 				+ " expected body contains: " + (bodySnippet ? bodySnippet : "(blank)"))
 			appendRow(timestamp, actor, trigger, entityType, id, name, subjects[tokenIndex], expectedRecipient,
 				ENV_PREFIX_NOTE, bodySnippet, recipientKind)
@@ -269,18 +295,34 @@ class NotificationEmailLog {
 	}
 
 	/**
-	 * Map logBccEmails bccRole to the BCC inbox. FedleadBcc is FedleadBccEmail on CRDC_QA.
+	 * Map logBccEmails / logCcEmails role to the Fedlead, DCP, or Admin Gmail inbox.
+	 * FedleadBcc and FedleadCc use FedleadBccEmail on CRDC_QA.
+	 * DcpBcc uses DcpBccEmail. AdminBcc and AdminCc use AdminBccEmail.
 	 */
 	private static String emailForBccRole(String bccRole) {
 		String role = bccRole?.toLowerCase() ?: ""
-		if (role == "fedleadbcc") {
+		if (role == "fedleadbcc" || role == "fedleadcc") {
 			String email = inbox(GlobalVariable.FedleadBccEmail)
 			if (!email) {
 				KeywordUtil.markFailedAndStop("FedleadBccEmail is blank. Set it on profile CRDC_QA.")
 			}
 			return email
 		}
-		KeywordUtil.markFailedAndStop("Unknown bccRole: " + bccRole)
+		if (role == "dcpbcc") {
+			String email = inbox(GlobalVariable.DcpBccEmail)
+			if (!email) {
+				KeywordUtil.markFailedAndStop("DcpBccEmail is blank. Set it on profile CRDC_QA.")
+			}
+			return email
+		}
+		if (role == "adminbcc" || role == "admincc") {
+			String email = inbox(GlobalVariable.AdminBccEmail)
+			if (!email) {
+				KeywordUtil.markFailedAndStop("AdminBccEmail is blank. Set it on profile CRDC_QA.")
+			}
+			return email
+		}
+		KeywordUtil.markFailedAndStop("Unknown bccRole or ccRole: " + bccRole)
 		return ""
 	}
 
