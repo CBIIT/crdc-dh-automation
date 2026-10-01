@@ -11,19 +11,22 @@ How a row is judged
    in the Gmail q string. Name-in-body is required when Permissions
    (InputFiles/CRDC/PBACPermissions.xlsx) says TRUE for that expected subject.
 3. For each candidate, require the Subject to start with [QA], [QA2], or [STAGE]
-   from the Environment column, to contain the expected subject phrase, to
-   have Expected recipient in the To header only (not Cc or Bcc), Name in the
-   body when the catalog says TRUE, and Expected body contains when that
-   checklist cell is non-blank.
+   from the Environment column, to contain the expected subject phrase, Name in
+   the body when the catalog says TRUE, and Expected body contains when that
+   checklist cell is non-blank. To rows also require Expected recipient in the
+   To header only (not Cc or Bcc). Bcc rows search the Fedlead BCC mailbox and
+   require the recipient not in To or Cc.
 4. Write Pass or Fail into the Result column once. Run this after the
    UI tests when mail should already be in the inbox. A later re-run retries only
    blank and Fail rows; Pass and Skip are left unchanged. Rows with a blank
    Environment cell Fail without searching Gmail.
 
 Auth files (gitignored) live in PythonFiles/CRDC/gmail/:
-  credentials.json  OAuth client from Google Cloud
-  token.json        refresh token for qa@essential-soft.com
-Plus-aliases (qa+crdc-automation-submitter@...) land in that same mailbox.
+  token.json               refresh token for qa@essential-soft.com
+  token-fedlead-bcc.json   refresh token for the Fedlead BCC Gmail inbox
+credentials.json is only for the one-time browser login that creates those tokens.
+Plus-aliases (qa+crdc-automation-submitter@...) land in the To mailbox.
+Bcc rows search the Fedlead BCC inbox; the address must not appear in To or Cc.
 """
 from __future__ import annotations
 
@@ -31,6 +34,7 @@ import argparse
 import base64
 import os
 import sys
+import time
 from datetime import date
 from pathlib import Path
 
@@ -51,6 +55,7 @@ COL_RECIPIENT = 8
 COL_RESULT = 10
 COL_ENV = 11
 COL_BODY_CONTAINS = 12
+COL_RECIPIENT_KIND = 13
 CATALOG_SHEET = "Permissions"
 
 # This file is PythonFiles/CRDC/VerifyNotificationEmails.py
@@ -58,9 +63,11 @@ CATALOG_SHEET = "Permissions"
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[1]
 DEFAULT_EXCEL = REPO_ROOT / "OutputFiles" / "NotificationEmail_Checklist.xlsx"
-DEFAULT_CREDENTIALS = SCRIPT_DIR / "gmail" / "credentials.json"
 DEFAULT_TOKEN = SCRIPT_DIR / "gmail" / "token.json"
+DEFAULT_TOKEN_BCC = SCRIPT_DIR / "gmail" / "token-fedlead-bcc.json"
 DEFAULT_CATALOG = REPO_ROOT / "InputFiles" / "CRDC" / "PBACPermissions.xlsx"
+RATE_LIMIT_SLEEP_SEC = 60
+RATE_LIMIT_MAX_ATTEMPTS = 5
 
 
 def body_text(payload):
@@ -93,19 +100,14 @@ def cell_str(row, col):
 	return str(value).strip()
 
 
-def load_creds(credentials_path, token_path):
-	"""Load Gmail OAuth credentials from the two JSON files.
+def load_creds(token_path):
+	"""Load Gmail OAuth credentials from the user token JSON.
 
-	credentials.json identifies the Cloud OAuth client. token.json is the user
-	refresh token after a one-time browser login as qa@essential-soft.com.
-	If the access token is expired, refresh it and rewrite token.json.
-	Does not open a browser; teammates must drop a valid token.json in place.
+	token.json (or token-fedlead-bcc.json) already has client_id, client_secret,
+	and refresh_token from the one-time browser login. If the access token is
+	expired, refresh it and rewrite the token file. Does not open a browser and
+	does not read credentials.json.
 	"""
-	if not Path(credentials_path).is_file():
-		raise FileNotFoundError(
-			"Missing credentials.json at %s. Drop the OAuth client file in PythonFiles/CRDC/gmail/."
-			% credentials_path
-		)
 	creds = None
 	if Path(token_path).is_file():
 		creds = Credentials.from_authorized_user_file(token_path, SCOPES)
@@ -115,7 +117,7 @@ def load_creds(credentials_path, token_path):
 			Path(token_path).write_text(creds.to_json())
 		else:
 			raise FileNotFoundError(
-				"Missing or invalid token.json at %s. Authorize once and drop token.json in PythonFiles/CRDC/gmail/."
+				"Missing or invalid Gmail token at %s. Authorize once and drop the token JSON in PythonFiles/CRDC/gmail/."
 				% token_path
 			)
 	return creds
@@ -226,6 +228,36 @@ def gmail_query(expected_subject, env):
 	return 'newer_than:2d subject:"%s"' % prefixed
 
 
+def is_rate_limit(error):
+	"""True for 403/429 Gmail quota errors (rateLimitExceeded or userRateLimitExceeded)."""
+	status = int(getattr(getattr(error, "resp", None), "status", 0) or 0)
+	if status not in (403, 429):
+		return False
+	text = str(error).casefold().replace("_", "").replace("-", "")
+	return "ratelimitexceeded" in text or "userratelimitexceeded" in text
+
+
+def gmail_execute(request):
+	"""Run one Gmail API request. Sleep 60s and retry on per-user quota.
+
+	list and get cost quota units. This project's per-user minute cap can be
+	250 units; a full To+Bcc Verify can hit it. Do not treat the first 403 as
+	missing mail.
+	"""
+	last_error = None
+	for attempt in range(1, RATE_LIMIT_MAX_ATTEMPTS + 1):
+		try:
+			return request.execute()
+		except HttpError as error:
+			last_error = error
+			if not is_rate_limit(error) or attempt == RATE_LIMIT_MAX_ATTEMPTS:
+				raise
+			print("Gmail rate limit (attempt %s/%s); waiting %ss" % (
+				attempt, RATE_LIMIT_MAX_ATTEMPTS, RATE_LIMIT_SLEEP_SEC))
+			time.sleep(RATE_LIMIT_SLEEP_SEC)
+	raise last_error
+
+
 def header_value(headers, name):
 	"""Return a header value with a case-insensitive name lookup."""
 	needle = (name or "").casefold()
@@ -235,19 +267,22 @@ def header_value(headers, name):
 	return ""
 
 
-def find_message(service, expected_subject, name, env, recipient, name_in_body_map, body_contains=""):
+def find_message(service, expected_subject, name, env, recipient, name_in_body_map, body_contains="",
+		recipient_kind="To"):
 	"""Return the actual Subject if a matching message exists, else None.
 
 	Lists up to 20 recent messages for the env-prefixed subject, loads each full
-	MIME payload, then requires subject_matches, To: contains Expected recipient,
-	Name in the body when the Permissions catalog says so, and body_contains
-	when that checklist cell is non-blank.
+	MIME payload, then requires subject_matches, Name in the body when the
+	Permissions catalog says so, and body_contains when that checklist cell is
+	non-blank. To rows require Expected recipient in the To header. Bcc rows
+	require the message in this mailbox and the recipient not in To or Cc.
 	"""
-	result = service.users().messages().list(
+	result = gmail_execute(service.users().messages().list(
 		userId="me", q=gmail_query(expected_subject, env), maxResults=20
-	).execute()
+	))
+	kind = (recipient_kind or "To").casefold()
 	for m in result.get("messages") or []:
-		full = service.users().messages().get(userId="me", id=m["id"], format="full").execute()
+		full = gmail_execute(service.users().messages().get(userId="me", id=m["id"], format="full"))
 		headers = {h["name"]: h["value"] for h in full.get("payload", {}).get("headers", [])}
 		actual_subject = header_value(headers, "Subject")
 		if not subject_matches(expected_subject, actual_subject, env):
@@ -257,28 +292,89 @@ def find_message(service, expected_subject, name, env, recipient, name_in_body_m
 			continue
 		if body_contains and body_contains not in text:
 			continue
-		if not to_matches(recipient, header_value(headers, "To")):
+		actual_to = header_value(headers, "To")
+		actual_cc = header_value(headers, "Cc")
+		if kind == "bcc":
+			if to_matches(recipient, actual_to) or to_matches(recipient, actual_cc):
+				continue
+			return actual_subject
+		if not to_matches(recipient, actual_to):
 			continue
 		return actual_subject
 	return None
 
 
 def parse_args():
-	"""CLI flags. Paths may also come from GMAIL_CREDENTIALS_PATH / GMAIL_TOKEN_PATH."""
+	"""CLI flags. Paths may also come from GMAIL_TOKEN_PATH / GMAIL_TOKEN_BCC_PATH."""
 	parser = argparse.ArgumentParser(description="Verify today's notification checklist rows in Gmail.")
 	parser.add_argument("--excel", default=str(DEFAULT_EXCEL), help="Checklist workbook path")
 	parser.add_argument("--date", default=date.today().isoformat(), help="Row date prefix YYYY-MM-DD")
 	parser.add_argument(
-		"--credentials",
-		default=os.environ.get("GMAIL_CREDENTIALS_PATH", str(DEFAULT_CREDENTIALS)),
-		help="OAuth client JSON (credentials.json)",
-	)
-	parser.add_argument(
 		"--token",
 		default=os.environ.get("GMAIL_TOKEN_PATH", str(DEFAULT_TOKEN)),
-		help="OAuth user token JSON (token.json)",
+		help="OAuth user token JSON for the To: mailbox (token.json)",
+	)
+	parser.add_argument(
+		"--token-bcc",
+		default=os.environ.get("GMAIL_TOKEN_BCC_PATH", str(DEFAULT_TOKEN_BCC)),
+		help="OAuth user token JSON for the Fedlead BCC inbox (token-fedlead-bcc.json)",
 	)
 	return parser.parse_args()
+
+
+def judge_search_rows(service, items, sheet, name_in_body_map):
+	"""Search one Gmail service for checklist rows. Write Pass or Fail. Return Fail count.
+
+	service is already authorized for the mailbox that should contain these rows
+	(To: inbox for To rows, Fedlead BCC inbox for Bcc rows).
+	"""
+	failures = 0
+	for item in items:
+		kind = item["kind"]
+		rate_limited = False
+		try:
+			actual = find_message(
+				service, item["subject"], item["name"], item["env"], item["recipient"],
+				name_in_body_map, item["body_contains"], kind)
+		except HttpError as error:
+			print("Gmail API error for row %s: %s" % (item["idx"], error))
+			actual = None
+			rate_limited = is_rate_limit(error)
+		if actual:
+			sheet.cell(item["idx"], COL_RESULT).value = "Pass"
+			label = "Bcc inbox" if kind.casefold() == "bcc" else "To"
+			if item["body_contains"]:
+				print("Pass row %s | %s | %s: %s | %s | body: %r" % (
+					item["idx"], item["name"], label, item["recipient"], actual, item["body_contains"]))
+			else:
+				print("Pass row %s | %s | %s: %s | %s" % (
+					item["idx"], item["name"], label, item["recipient"], actual))
+		else:
+			sheet.cell(item["idx"], COL_RESULT).value = "Fail"
+			prefixed = "%s %s" % (env_tag(item["env"]), item["subject"])
+			if rate_limited:
+				print("Fail row %s | Gmail rate limit after retries" % item["idx"])
+			elif kind.casefold() == "bcc":
+				if item["body_contains"]:
+					print("Fail row %s | missing %r in body of Bcc inbox %r for subject containing %r" % (
+						item["idx"], item["body_contains"], item["recipient"], prefixed))
+				elif requires_name_in_body(item["subject"], name_in_body_map):
+					print("Fail row %s | missing %r in body of Bcc inbox %r for subject containing %r" % (
+						item["idx"], item["name"], item["recipient"], prefixed))
+				else:
+					print("Fail row %s | no mail in Bcc inbox %r with subject containing %r" % (
+						item["idx"], item["recipient"], prefixed))
+			elif item["body_contains"]:
+				print("Fail row %s | missing %r in body or To %r for subject containing %r" % (
+					item["idx"], item["body_contains"], item["recipient"], prefixed))
+			elif requires_name_in_body(item["subject"], name_in_body_map):
+				print("Fail row %s | missing %r in body or To %r for subject containing %r" % (
+					item["idx"], item["name"], item["recipient"], prefixed))
+			else:
+				print("Fail row %s | no mail with To %r and subject containing %r" % (
+					item["idx"], item["recipient"], prefixed))
+			failures += 1
+	return failures
 
 
 def main():
@@ -316,6 +412,7 @@ def main():
 			"manual": cell_str(row, COL_RESULT),
 			"env": cell_str(row, COL_ENV),
 			"body_contains": cell_str(row, COL_BODY_CONTAINS),
+			"kind": cell_str(row, COL_RECIPIENT_KIND) or "To",
 		})
 
 	if not rows:
@@ -333,6 +430,7 @@ def main():
 
 	failures = 0
 	to_search = []
+	bcc_search = []
 	for item in pending:
 		if not item["env"]:
 			sheet.cell(item["idx"], COL_RESULT).value = "Fail"
@@ -340,44 +438,41 @@ def main():
 			failures += 1
 		elif not item["recipient"]:
 			sheet.cell(item["idx"], COL_RESULT).value = "Fail"
-			print("Fail row %s | missing Expected recipient (To: address)" % item["idx"])
+			kind_label = "Bcc inbox" if item["kind"].casefold() == "bcc" else "To: address"
+			print("Fail row %s | missing Expected recipient (%s)" % (item["idx"], kind_label))
 			failures += 1
+		elif item["kind"].casefold() == "bcc":
+			bcc_search.append(item)
 		else:
 			to_search.append(item)
 
 	if to_search:
-		creds = load_creds(args.credentials, args.token)
+		creds = load_creds(args.token)
 		service = build("gmail", "v1", credentials=creds)
-		print("Authorized Gmail as", service.users().getProfile(userId="me").execute().get("emailAddress"))
-		for item in to_search:
-			try:
-				actual = find_message(
-					service, item["subject"], item["name"], item["env"], item["recipient"],
-					name_in_body_map, item["body_contains"])
-			except HttpError as error:
-				print("Gmail API error for row %s: %s" % (item["idx"], error))
-				actual = None
-			if actual:
-				sheet.cell(item["idx"], COL_RESULT).value = "Pass"
-				if item["body_contains"]:
-					print("Pass row %s | %s | To: %s | %s | body: %r" % (
-						item["idx"], item["name"], item["recipient"], actual, item["body_contains"]))
-				else:
-					print("Pass row %s | %s | To: %s | %s" % (
-						item["idx"], item["name"], item["recipient"], actual))
-			else:
+		print("Authorized Gmail as", gmail_execute(service.users().getProfile(userId="me")).get("emailAddress"))
+		failures += judge_search_rows(service, to_search, sheet, name_in_body_map)
+
+	if bcc_search:
+		token_bcc = Path(args.token_bcc)
+		if not token_bcc.is_file():
+			for item in bcc_search:
 				sheet.cell(item["idx"], COL_RESULT).value = "Fail"
-				prefixed = "%s %s" % (env_tag(item["env"]), item["subject"])
-				if item["body_contains"]:
-					print("Fail row %s | missing %r in body or To %r for subject containing %r" % (
-						item["idx"], item["body_contains"], item["recipient"], prefixed))
-				elif requires_name_in_body(item["subject"], name_in_body_map):
-					print("Fail row %s | missing %r in body or To %r for subject containing %r" % (
-						item["idx"], item["name"], item["recipient"], prefixed))
-				else:
-					print("Fail row %s | no mail with To %r and subject containing %r" % (
-						item["idx"], item["recipient"], prefixed))
+				print("Fail row %s | missing Fedlead BCC token at %s" % (item["idx"], token_bcc))
 				failures += 1
+		else:
+			creds_bcc = load_creds(str(token_bcc))
+			service_bcc = build("gmail", "v1", credentials=creds_bcc)
+			bcc_email = gmail_execute(service_bcc.users().getProfile(userId="me")).get("emailAddress", "")
+			print("Authorized Fedlead BCC Gmail as", bcc_email)
+			expected_bcc = {item["recipient"].casefold() for item in bcc_search}
+			if bcc_email.casefold() not in expected_bcc:
+				for item in bcc_search:
+					sheet.cell(item["idx"], COL_RESULT).value = "Fail"
+					print("Fail row %s | BCC token authorizes %r, expected %r" % (
+						item["idx"], bcc_email, item["recipient"]))
+					failures += 1
+			else:
+				failures += judge_search_rows(service_bcc, bcc_search, sheet, name_in_body_map)
 
 	workbook.save(excel_path)
 	print("Updated", excel_path)

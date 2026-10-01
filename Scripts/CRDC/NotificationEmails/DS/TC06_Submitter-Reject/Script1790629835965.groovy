@@ -28,5 +28,6 @@ CustomKeywords.'utilities.Login.switchUser'('Dcp')
 CustomKeywords.'utilities.DataSubmissions.rejectDataSubmission'(dsId)
 
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('DS Reject', 'Dcp', dsId, dsName, 'Submitter')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('DS Reject', 'Dcp', dsId, dsName, 'FedleadBcc')
 
 WebUI.closeBrowser()

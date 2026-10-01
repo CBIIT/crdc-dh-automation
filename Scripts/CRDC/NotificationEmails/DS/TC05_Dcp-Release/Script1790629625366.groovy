@@ -28,5 +28,6 @@ CustomKeywords.'utilities.Login.switchUser'('Dcp')
 CustomKeywords.'utilities.DataSubmissions.releaseDataSubmission'(dsId)
 
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('DS Release', 'Dcp', dsId, dsName, 'Dcp')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('DS Release', 'Dcp', dsId, dsName, 'FedleadBcc')
 
 WebUI.closeBrowser()

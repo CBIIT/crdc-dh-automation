@@ -23,5 +23,6 @@ String dsName = DataSubmissions.expectedSubmissionName
 CustomKeywords.'utilities.DataSubmissions.cancelDataSubmission'()
 
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('DS Cancel', 'Submitter', dsId, dsName, 'Submitter')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('DS Cancel', 'Submitter', dsId, dsName, 'FedleadBcc')
 
 WebUI.closeBrowser()

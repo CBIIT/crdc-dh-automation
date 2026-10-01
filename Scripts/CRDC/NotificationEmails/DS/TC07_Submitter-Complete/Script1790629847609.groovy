@@ -29,5 +29,6 @@ CustomKeywords.'utilities.DataSubmissions.releaseDataSubmission'(dsId)
 CustomKeywords.'utilities.DataSubmissions.completeDataSubmission'()
 
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('DS Complete', 'Dcp', dsId, dsName, 'Submitter')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('DS Complete', 'Dcp', dsId, dsName, 'FedleadBcc')
 
 WebUI.closeBrowser()
