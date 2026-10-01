@@ -21,9 +21,13 @@ String studyName = SubmissionRequest.lastEnteredStudyTitle
 CustomKeywords.'utilities.SubmissionRequest.cancelSubmissionRequestButton'()
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('SR Cancel', 'Submitter', srId, studyName, 'Submitter')
 CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Cancel', 'Submitter', srId, studyName, 'FedleadBcc')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Cancel', 'Submitter', srId, studyName, 'DcpBcc')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Cancel', 'Submitter', srId, studyName, 'AdminBcc')
 
 CustomKeywords.'utilities.SubmissionRequest.restoreSubmissionRequest'(studyName)
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('SR Restore', 'Submitter', srId, studyName, 'Submitter')
 CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Restore', 'Submitter', srId, studyName, 'FedleadBcc')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Restore', 'Submitter', srId, studyName, 'DcpBcc')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Restore', 'Submitter', srId, studyName, 'AdminBcc')
 
 WebUI.closeBrowser()

@@ -7,15 +7,17 @@ drive the browser.
 
 How a row is judged
 1. Keep rows whose Timestamp starts with --date (default: today).
-2. Search Gmail by Environment-prefixed subject and recency. Do not put the Name
-   in the Gmail q string. Name-in-body is required when Permissions
-   (InputFiles/CRDC/PBACPermissions.xlsx) says TRUE for that expected subject.
+2. Search Gmail by Environment-prefixed subject, recency, and the unique Name
+   when Permissions (InputFiles/CRDC/PBACPermissions.xlsx) says Name in body is
+   TRUE. A subject-only fallback still classifies a missing-Name Fail.
 3. For each candidate, require the Subject to start with [QA], [QA2], or [STAGE]
    from the Environment column, to contain the expected subject phrase, Name in
    the body when the catalog says TRUE, and Expected body contains when that
    checklist cell is non-blank. To rows also require Expected recipient in the
-   To header only (not Cc or Bcc). Bcc rows search the Fedlead BCC mailbox and
-   require the recipient not in To or Cc.
+   To header only (not Cc or Bcc). Bcc rows search the mailbox whose token
+   profile email matches Expected recipient, and require the recipient not in
+   To or Cc. Cc rows search that same mailbox and require the recipient in Cc
+   and not in To.
 4. Write Pass or Fail into the Result column once. Run this after the
    UI tests when mail should already be in the inbox. A later re-run retries only
    blank and Fail rows; Pass and Skip are left unchanged. Rows with a blank
@@ -24,9 +26,13 @@ How a row is judged
 Auth files (gitignored) live in PythonFiles/CRDC/gmail/:
   token.json               refresh token for qa@essential-soft.com
   token-fedlead-bcc.json   refresh token for the Fedlead BCC Gmail inbox
+  token-dcp-bcc.json       refresh token for the DCP BCC Gmail inbox
+  token-admin-bcc.json     refresh token for the Admin BCC Gmail inbox
 credentials.json is only for the one-time browser login that creates those tokens.
 Plus-aliases (qa+crdc-automation-submitter@...) land in the To mailbox.
-Bcc rows search the Fedlead BCC inbox; the address must not appear in To or Cc.
+Bcc rows search the matching BCC inbox; the address must not appear in To or Cc.
+Cc rows search the matching Fedlead or Admin inbox; the address must be in Cc
+and not in To.
 """
 from __future__ import annotations
 
@@ -64,7 +70,9 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[1]
 DEFAULT_EXCEL = REPO_ROOT / "OutputFiles" / "NotificationEmail_Checklist.xlsx"
 DEFAULT_TOKEN = SCRIPT_DIR / "gmail" / "token.json"
-DEFAULT_TOKEN_BCC = SCRIPT_DIR / "gmail" / "token-fedlead-bcc.json"
+DEFAULT_TOKEN_FEDLEAD_BCC = SCRIPT_DIR / "gmail" / "token-fedlead-bcc.json"
+DEFAULT_TOKEN_DCP_BCC = SCRIPT_DIR / "gmail" / "token-dcp-bcc.json"
+DEFAULT_TOKEN_ADMIN_BCC = SCRIPT_DIR / "gmail" / "token-admin-bcc.json"
 DEFAULT_CATALOG = REPO_ROOT / "InputFiles" / "CRDC" / "PBACPermissions.xlsx"
 RATE_LIMIT_SLEEP_SEC = 60
 RATE_LIMIT_MAX_ATTEMPTS = 5
@@ -103,10 +111,10 @@ def cell_str(row, col):
 def load_creds(token_path):
 	"""Load Gmail OAuth credentials from the user token JSON.
 
-	token.json (or token-fedlead-bcc.json) already has client_id, client_secret,
-	and refresh_token from the one-time browser login. If the access token is
-	expired, refresh it and rewrite the token file. Does not open a browser and
-	does not read credentials.json.
+	token.json, token-fedlead-bcc.json, token-dcp-bcc.json, or token-admin-bcc.json already has
+	client_id, client_secret, and refresh_token from the one-time browser login.
+	If the access token is expired, refresh it and rewrite the token file. Does
+	not open a browser and does not read credentials.json.
 	"""
 	creds = None
 	if Path(token_path).is_file():
@@ -217,15 +225,20 @@ def requires_name_in_body(expected_subject, name_in_body_map):
 	return name_in_body_map.get(expected_subject.casefold(), True)
 
 
-def gmail_query(expected_subject, env):
+def gmail_query(expected_subject, env, name=""):
 	"""Build a Gmail search q for recent mail with this env-prefixed subject.
 
 	Quotes [QA] phrase (or [QA2] / [STAGE]) as one subject string so a QA row
-	does not match STAGE or QA2 mail. Does not include submission names.
+	does not match STAGE or QA2 mail. When name is non-blank, quote it too so
+	Gmail matches that study or submission name in the body. Otherwise the
+	newest 20 same-subject hits can be a later run and miss this row.
 	"""
 	escaped = expected_subject.replace('"', '\\"')
 	prefixed = "%s %s" % (env_tag(env), escaped)
-	return 'newer_than:2d subject:"%s"' % prefixed
+	q = 'newer_than:2d subject:"%s"' % prefixed
+	if name:
+		q += ' "%s"' % name.replace('"', '\\"')
+	return q
 
 
 def is_rate_limit(error):
@@ -269,19 +282,37 @@ def header_value(headers, name):
 
 def find_message(service, expected_subject, name, env, recipient, name_in_body_map, body_contains="",
 		recipient_kind="To"):
-	"""Return the actual Subject if a matching message exists, else None.
+	"""Return (actual Subject, None) if a matching message exists, else (None, reason).
 
-	Lists up to 20 recent messages for the env-prefixed subject, loads each full
-	MIME payload, then requires subject_matches, Name in the body when the
-	Permissions catalog says so, and body_contains when that checklist cell is
-	non-blank. To rows require Expected recipient in the To header. Bcc rows
-	require the message in this mailbox and the recipient not in To or Cc.
+	Lists up to 20 recent messages for the env-prefixed subject. When the catalog
+	requires Name in the body, the Gmail q also quotes Name so a later same-subject
+	mail does not hide this row. If that returns nothing, list subject-only so a
+	real missing Name still fails as name rather than no_mail. Then load each full
+	MIME payload and require subject_matches, Name in the body when the catalog
+	says so, and body_contains when that checklist cell is non-blank. To rows
+	require Expected recipient in the To header. Bcc rows require the message in
+	this mailbox and the recipient not in To or Cc. Cc rows require the recipient
+	in Cc and not in To.
+
+	reason is no_mail, subject, name, body, to, bcc_in_headers, cc, or cc_in_to.
+	After a subject match, later misses replace earlier ones so Fail text names
+	the check that actually missed.
 	"""
+	need_name = requires_name_in_body(expected_subject, name_in_body_map) and bool(name)
 	result = gmail_execute(service.users().messages().list(
-		userId="me", q=gmail_query(expected_subject, env), maxResults=20
+		userId="me", q=gmail_query(expected_subject, env, name if need_name else ""), maxResults=20
 	))
 	kind = (recipient_kind or "To").casefold()
-	for m in result.get("messages") or []:
+	messages = result.get("messages") or []
+	if not messages and need_name:
+		result = gmail_execute(service.users().messages().list(
+			userId="me", q=gmail_query(expected_subject, env), maxResults=20
+		))
+		messages = result.get("messages") or []
+	if not messages:
+		return None, "no_mail"
+	best_reason = "subject"
+	for m in messages:
 		full = gmail_execute(service.users().messages().get(userId="me", id=m["id"], format="full"))
 		headers = {h["name"]: h["value"] for h in full.get("payload", {}).get("headers", [])}
 		actual_subject = header_value(headers, "Subject")
@@ -289,23 +320,35 @@ def find_message(service, expected_subject, name, env, recipient, name_in_body_m
 			continue
 		text = body_text(full.get("payload") or {})
 		if requires_name_in_body(expected_subject, name_in_body_map) and name and name not in text:
+			best_reason = "name"
 			continue
 		if body_contains and body_contains not in text:
+			best_reason = "body"
 			continue
 		actual_to = header_value(headers, "To")
 		actual_cc = header_value(headers, "Cc")
 		if kind == "bcc":
 			if to_matches(recipient, actual_to) or to_matches(recipient, actual_cc):
+				best_reason = "bcc_in_headers"
 				continue
-			return actual_subject
+			return actual_subject, None
+		if kind == "cc":
+			if to_matches(recipient, actual_to):
+				best_reason = "cc_in_to"
+				continue
+			if not to_matches(recipient, actual_cc):
+				best_reason = "cc"
+				continue
+			return actual_subject, None
 		if not to_matches(recipient, actual_to):
+			best_reason = "to"
 			continue
-		return actual_subject
-	return None
+		return actual_subject, None
+	return None, best_reason
 
 
 def parse_args():
-	"""CLI flags. Paths may also come from GMAIL_TOKEN_PATH / GMAIL_TOKEN_BCC_PATH."""
+	"""CLI flags. Paths may also come from GMAIL_TOKEN_PATH / GMAIL_TOKEN_FEDLEAD_BCC_PATH / GMAIL_TOKEN_DCP_BCC_PATH / GMAIL_TOKEN_ADMIN_BCC_PATH."""
 	parser = argparse.ArgumentParser(description="Verify today's notification checklist rows in Gmail.")
 	parser.add_argument("--excel", default=str(DEFAULT_EXCEL), help="Checklist workbook path")
 	parser.add_argument("--date", default=date.today().isoformat(), help="Row date prefix YYYY-MM-DD")
@@ -315,34 +358,104 @@ def parse_args():
 		help="OAuth user token JSON for the To: mailbox (token.json)",
 	)
 	parser.add_argument(
-		"--token-bcc",
-		default=os.environ.get("GMAIL_TOKEN_BCC_PATH", str(DEFAULT_TOKEN_BCC)),
+		"--token-fedlead-bcc",
+		default=os.environ.get("GMAIL_TOKEN_FEDLEAD_BCC_PATH", str(DEFAULT_TOKEN_FEDLEAD_BCC)),
 		help="OAuth user token JSON for the Fedlead BCC inbox (token-fedlead-bcc.json)",
 	)
+	parser.add_argument(
+		"--token-dcp-bcc",
+		default=os.environ.get("GMAIL_TOKEN_DCP_BCC_PATH", str(DEFAULT_TOKEN_DCP_BCC)),
+		help="OAuth user token JSON for the DCP BCC inbox (token-dcp-bcc.json)",
+	)
+	parser.add_argument(
+		"--token-admin-bcc",
+		default=os.environ.get("GMAIL_TOKEN_ADMIN_BCC_PATH", str(DEFAULT_TOKEN_ADMIN_BCC)),
+		help="OAuth user token JSON for the Admin BCC inbox (token-admin-bcc.json)",
+	)
 	return parser.parse_args()
+
+
+def load_bcc_services(token_paths):
+	"""Authorize each BCC token once. Map profile email (casefold) to Gmail service.
+
+	Skip missing files. Do not search one mailbox for another recipient; rows
+	are grouped by Expected recipient and matched to the token whose profile
+	email equals that address.
+	"""
+	services = {}
+	for token_path in token_paths:
+		path = Path(token_path)
+		if not path.is_file():
+			print("BCC token not found:", path)
+			continue
+		creds = load_creds(str(path))
+		service = build("gmail", "v1", credentials=creds)
+		email = (gmail_execute(service.users().getProfile(userId="me")).get("emailAddress") or "").strip()
+		if not email:
+			print("BCC token at %s has no profile email" % path)
+			continue
+		print("Authorized BCC Gmail as", email)
+		services[email.casefold()] = service
+	return services
+
+
+def fail_detail(item, reason):
+	"""One Fail clause for the check that missed. reason comes from find_message."""
+	prefixed = "%s %s" % (env_tag(item["env"]), item["subject"])
+	kind = (item.get("kind") or "To").casefold()
+	if reason == "to":
+		return "To does not contain %r" % item["recipient"]
+	if reason == "cc":
+		return "Cc does not contain %r" % item["recipient"]
+	if reason == "cc_in_to":
+		return "Cc address %r is in To" % item["recipient"]
+	if reason == "name":
+		if kind in ("bcc", "cc"):
+			label = "Bcc" if kind == "bcc" else "Cc"
+			return "missing Name %r in body of %s inbox %r" % (item["name"], label, item["recipient"])
+		return "missing Name %r in body" % item["name"]
+	if reason == "body":
+		if kind in ("bcc", "cc"):
+			label = "Bcc" if kind == "bcc" else "Cc"
+			return "missing %r in body of %s inbox %r" % (item["body_contains"], label, item["recipient"])
+		return "missing %r in body" % item["body_contains"]
+	if reason == "bcc_in_headers":
+		return "Bcc address %r is in To or Cc" % item["recipient"]
+	if kind in ("bcc", "cc"):
+		label = "Bcc" if kind == "bcc" else "Cc"
+		return "no mail in %s inbox %r with subject containing %r" % (label, item["recipient"], prefixed)
+	return "no mail with subject containing %r" % prefixed
 
 
 def judge_search_rows(service, items, sheet, name_in_body_map):
 	"""Search one Gmail service for checklist rows. Write Pass or Fail. Return Fail count.
 
 	service is already authorized for the mailbox that should contain these rows
-	(To: inbox for To rows, Fedlead BCC inbox for Bcc rows).
+	(To: inbox for To rows, matching Fedlead/DCP/Admin inbox for Bcc and Cc rows).
 	"""
 	failures = 0
 	for item in items:
 		kind = item["kind"]
 		rate_limited = False
+		miss = None
 		try:
-			actual = find_message(
+			actual, miss = find_message(
 				service, item["subject"], item["name"], item["env"], item["recipient"],
 				name_in_body_map, item["body_contains"], kind)
 		except HttpError as error:
 			print("Gmail API error for row %s: %s" % (item["idx"], error))
 			actual = None
+			miss = None
 			rate_limited = is_rate_limit(error)
 		if actual:
 			sheet.cell(item["idx"], COL_RESULT).value = "Pass"
-			label = "Bcc inbox" if kind.casefold() == "bcc" else "To"
+			kind_cf = kind.casefold()
+			if kind_cf == "bcc":
+				label = "Bcc inbox"
+			elif kind_cf == "cc":
+				label = "Cc inbox"
+			else:
+				label = "To"
 			if item["body_contains"]:
 				print("Pass row %s | %s | %s: %s | %s | body: %r" % (
 					item["idx"], item["name"], label, item["recipient"], actual, item["body_contains"]))
@@ -351,28 +464,10 @@ def judge_search_rows(service, items, sheet, name_in_body_map):
 					item["idx"], item["name"], label, item["recipient"], actual))
 		else:
 			sheet.cell(item["idx"], COL_RESULT).value = "Fail"
-			prefixed = "%s %s" % (env_tag(item["env"]), item["subject"])
 			if rate_limited:
 				print("Fail row %s | Gmail rate limit after retries" % item["idx"])
-			elif kind.casefold() == "bcc":
-				if item["body_contains"]:
-					print("Fail row %s | missing %r in body of Bcc inbox %r for subject containing %r" % (
-						item["idx"], item["body_contains"], item["recipient"], prefixed))
-				elif requires_name_in_body(item["subject"], name_in_body_map):
-					print("Fail row %s | missing %r in body of Bcc inbox %r for subject containing %r" % (
-						item["idx"], item["name"], item["recipient"], prefixed))
-				else:
-					print("Fail row %s | no mail in Bcc inbox %r with subject containing %r" % (
-						item["idx"], item["recipient"], prefixed))
-			elif item["body_contains"]:
-				print("Fail row %s | missing %r in body or To %r for subject containing %r" % (
-					item["idx"], item["body_contains"], item["recipient"], prefixed))
-			elif requires_name_in_body(item["subject"], name_in_body_map):
-				print("Fail row %s | missing %r in body or To %r for subject containing %r" % (
-					item["idx"], item["name"], item["recipient"], prefixed))
 			else:
-				print("Fail row %s | no mail with To %r and subject containing %r" % (
-					item["idx"], item["recipient"], prefixed))
+				print("Fail row %s | %s" % (item["idx"], fail_detail(item, miss)))
 			failures += 1
 	return failures
 
@@ -438,10 +533,16 @@ def main():
 			failures += 1
 		elif not item["recipient"]:
 			sheet.cell(item["idx"], COL_RESULT).value = "Fail"
-			kind_label = "Bcc inbox" if item["kind"].casefold() == "bcc" else "To: address"
+			kind_cf = item["kind"].casefold()
+			if kind_cf == "bcc":
+				kind_label = "Bcc inbox"
+			elif kind_cf == "cc":
+				kind_label = "Cc inbox"
+			else:
+				kind_label = "To: address"
 			print("Fail row %s | missing Expected recipient (%s)" % (item["idx"], kind_label))
 			failures += 1
-		elif item["kind"].casefold() == "bcc":
+		elif item["kind"].casefold() in ("bcc", "cc"):
 			bcc_search.append(item)
 		else:
 			to_search.append(item)
@@ -453,26 +554,19 @@ def main():
 		failures += judge_search_rows(service, to_search, sheet, name_in_body_map)
 
 	if bcc_search:
-		token_bcc = Path(args.token_bcc)
-		if not token_bcc.is_file():
-			for item in bcc_search:
-				sheet.cell(item["idx"], COL_RESULT).value = "Fail"
-				print("Fail row %s | missing Fedlead BCC token at %s" % (item["idx"], token_bcc))
-				failures += 1
-		else:
-			creds_bcc = load_creds(str(token_bcc))
-			service_bcc = build("gmail", "v1", credentials=creds_bcc)
-			bcc_email = gmail_execute(service_bcc.users().getProfile(userId="me")).get("emailAddress", "")
-			print("Authorized Fedlead BCC Gmail as", bcc_email)
-			expected_bcc = {item["recipient"].casefold() for item in bcc_search}
-			if bcc_email.casefold() not in expected_bcc:
-				for item in bcc_search:
+		services_by_email = load_bcc_services([args.token_fedlead_bcc, args.token_dcp_bcc, args.token_admin_bcc])
+		by_recipient = {}
+		for item in bcc_search:
+			by_recipient.setdefault(item["recipient"].casefold(), []).append(item)
+		for recipient_key, items in by_recipient.items():
+			service_bcc = services_by_email.get(recipient_key)
+			if not service_bcc:
+				for item in items:
 					sheet.cell(item["idx"], COL_RESULT).value = "Fail"
-					print("Fail row %s | BCC token authorizes %r, expected %r" % (
-						item["idx"], bcc_email, item["recipient"]))
+					print("Fail row %s | no BCC token for inbox %r" % (item["idx"], item["recipient"]))
 					failures += 1
-			else:
-				failures += judge_search_rows(service_bcc, bcc_search, sheet, name_in_body_map)
+				continue
+			failures += judge_search_rows(service_bcc, items, sheet, name_in_body_map)
 
 	workbook.save(excel_path)
 	print("Updated", excel_path)

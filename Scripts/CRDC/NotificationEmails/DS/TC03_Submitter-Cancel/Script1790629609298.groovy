@@ -24,5 +24,7 @@ CustomKeywords.'utilities.DataSubmissions.cancelDataSubmission'()
 
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('DS Cancel', 'Submitter', dsId, dsName, 'Submitter')
 CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('DS Cancel', 'Submitter', dsId, dsName, 'FedleadBcc')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('DS Cancel', 'Submitter', dsId, dsName, 'DcpBcc')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('DS Cancel', 'Submitter', dsId, dsName, 'AdminBcc')
 
 WebUI.closeBrowser()
