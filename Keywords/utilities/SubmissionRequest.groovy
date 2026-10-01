@@ -73,8 +73,6 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.HashSet
-import java.util.List
-import java.util.Set
 import com.kms.katalon.core.configuration.RunConfiguration;
 import java.nio.file.Files;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -1748,7 +1746,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	@Keyword
 	public static void rejectSubmissionRequest(String studyName, String rejectionComment = DEFAULT_REJECTION_COMMENT) {
 		if (openSubmissionRequestReview(studyName, "rejectSubmissionRequest") == null) return
-		String comment = (rejectionComment != null && !rejectionComment.trim().isEmpty()) ? rejectionComment.trim() : DEFAULT_REJECTION_COMMENT
+			String comment = (rejectionComment != null && !rejectionComment.trim().isEmpty()) ? rejectionComment.trim() : DEFAULT_REJECTION_COMMENT
 		confirmReviewDecision(SR_FORM_BASE + "/Navigation/Reject-Btn",
 				"CRDC/AILocators/SubmissionRequests/RejectDialog/ReviewComment-TxtBx",
 				"CRDC/AILocators/SubmissionRequests/RejectDialog/ConfirmReject-Btn", comment)
@@ -1769,7 +1767,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	@Keyword
 	public static void approveSubmissionRequest(String studyName, String approvalComment = DEFAULT_APPROVAL_COMMENT) {
 		if (openSubmissionRequestReview(studyName, "approveSubmissionRequest") == null) return
-		String comment = (approvalComment != null && !approvalComment.trim().isEmpty()) ? approvalComment.trim() : DEFAULT_APPROVAL_COMMENT
+			String comment = (approvalComment != null && !approvalComment.trim().isEmpty()) ? approvalComment.trim() : DEFAULT_APPROVAL_COMMENT
 		confirmReviewDecision(SR_FORM_BASE + "/Navigation/Approve-Btn",
 				"CRDC/AILocators/SubmissionRequests/ApproveDialog/ReviewComment-TxtBx",
 				"CRDC/AILocators/SubmissionRequests/ApproveDialog/ConfirmApprove-Btn", comment)
@@ -1786,7 +1784,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	@Keyword
 	public static void approveSubmissionRequestWithModelChangePending(String studyName, String approvalComment = DEFAULT_APPROVAL_COMMENT) {
 		if (openSubmissionRequestReview(studyName, "approveSubmissionRequestWithModelChangePending") == null) return
-		String comment = (approvalComment != null && !approvalComment.trim().isEmpty()) ? approvalComment.trim() : DEFAULT_APPROVAL_COMMENT
+			String comment = (approvalComment != null && !approvalComment.trim().isEmpty()) ? approvalComment.trim() : DEFAULT_APPROVAL_COMMENT
 		String actionBtnPath = SR_FORM_BASE + "/Navigation/Approve-Btn"
 		String commentPath = "CRDC/AILocators/SubmissionRequests/ApproveDialog/ReviewComment-TxtBx"
 		String confirmPath = "CRDC/AILocators/SubmissionRequests/ApproveDialog/ConfirmApprove-Btn"
@@ -1818,7 +1816,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	@Keyword
 	public static void approveSubmissionRequestWithImageDeidPending(String studyName, String approvalComment = DEFAULT_APPROVAL_COMMENT) {
 		if (openSubmissionRequestReview(studyName, "approveSubmissionRequestWithImageDeidPending") == null) return
-		String comment = (approvalComment != null && !approvalComment.trim().isEmpty()) ? approvalComment.trim() : DEFAULT_APPROVAL_COMMENT
+			String comment = (approvalComment != null && !approvalComment.trim().isEmpty()) ? approvalComment.trim() : DEFAULT_APPROVAL_COMMENT
 		String actionBtnPath = SR_FORM_BASE + "/Navigation/Approve-Btn"
 		String commentPath = "CRDC/AILocators/SubmissionRequests/ApproveDialog/ReviewComment-TxtBx"
 		String confirmPath = "CRDC/AILocators/SubmissionRequests/ApproveDialog/ConfirmApprove-Btn"
@@ -1849,7 +1847,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	@Keyword
 	public static void inquireSubmissionRequest(String studyName, String inquireComment = DEFAULT_INQUIRE_COMMENT) {
 		if (openSubmissionRequestReview(studyName, "inquireSubmissionRequest") == null) return
-		String comment = (inquireComment != null && !inquireComment.trim().isEmpty()) ? inquireComment.trim() : DEFAULT_INQUIRE_COMMENT
+			String comment = (inquireComment != null && !inquireComment.trim().isEmpty()) ? inquireComment.trim() : DEFAULT_INQUIRE_COMMENT
 		confirmReviewDecision(SR_FORM_BASE + "/Navigation/Inquire-Btn",
 				"CRDC/AILocators/SubmissionRequests/InquireDialog/ReviewComment-TxtBx",
 				"CRDC/AILocators/SubmissionRequests/InquireDialog/ConfirmInquire-Btn", comment)

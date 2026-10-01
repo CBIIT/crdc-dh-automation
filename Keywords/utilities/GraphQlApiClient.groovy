@@ -58,8 +58,7 @@ class GraphQlApiClient {
 			conn.setRequestProperty("Content-Type", PRESIGNED_TSV_CONTENT_TYPE)
 			conn.setDoOutput(true)
 			byte[] bytes = file.getBytes()
-			conn.outputStream.withCloseable {
-				output ->
+			conn.outputStream.withCloseable { output ->
 				output.write(bytes)
 				output.flush()
 			}
@@ -67,8 +66,7 @@ class GraphQlApiClient {
 			InputStream stream = code >= 400 ? conn.errorStream : conn.inputStream
 			String text = ""
 			if (stream != null) {
-				stream.withCloseable {
-					input ->
+				stream.withCloseable { input ->
 					text = input.getText("UTF-8")
 				}
 			}
@@ -174,12 +172,12 @@ class GraphQlApiClient {
 			// Each basename must exist as a file; report Fail then abort on first missing.
 			if (!f.isFile()) {
 				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Local metadata file: ${basename}", "file exists",
-				"missing: ${f.absolutePath}", "Fail")
+						"missing: ${f.absolutePath}", "Fail")
 				KeywordUtil.markFailed("Missing input file for metadata upload: ${f.absolutePath}")
 				return
 			}
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Local metadata file: ${basename}", "file exists",
-			f.absolutePath, "Pass")
+					f.absolutePath, "Pass")
 		}
 	}
 
@@ -192,12 +190,12 @@ class GraphQlApiClient {
 		List rows = newBatch?.get('files') as List
 		if (!rows || rows.isEmpty()) {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "createBatch presigned file rows", "non-empty",
-			"(empty)", "Fail")
+					"(empty)", "Fail")
 			KeywordUtil.markFailed("createBatch returned no files with signedURL; cannot upload metadata.")
 			return null
 		}
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "createBatch presigned file rows", "non-empty",
-		String.valueOf(rows.size()) + " row(s)", "Pass")
+				String.valueOf(rows.size()) + " row(s)", "Pass")
 		return rows
 	}
 
@@ -211,7 +209,7 @@ class GraphQlApiClient {
 		// Verify GraphQL envelope contains data.createSubmission; fail keyword if missing.
 		if (!payload) {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.createSubmission", "present in response",
-			"missing", "Fail")
+					"missing", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateSubmission: missing data.createSubmission in ${result}")
 			return null
 		}
@@ -219,14 +217,14 @@ class GraphQlApiClient {
 		String st = payload?.get('status')?.toString() ?: ""
 		// Verify submission _id returned and non-empty; hard-fail below if empty.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Submission _id present", "non-empty",
-		id?.trim() ?: "(empty)", id?.trim() ? "Pass" : "Fail")
+				id?.trim() ?: "(empty)", id?.trim() ? "Pass" : "Fail")
 		// Verify status field present and non-empty.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Submission status", "non-empty",
-		st?.trim() ?: "(empty)", st?.trim() ? "Pass" : "Fail")
+				st?.trim() ?: "(empty)", st?.trim() ? "Pass" : "Fail")
 		boolean statusIsNew = st != null && "New".equalsIgnoreCase(st.trim())
 		// Verify new submission workflow: status must be New.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Submission status is New", "New",
-		st?.trim() ?: "(empty)", statusIsNew ? "Pass" : "Fail")
+				st?.trim() ?: "(empty)", statusIsNew ? "Pass" : "Fail")
 		if (!id?.trim()) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateSubmission: submission _id is empty.")
 			return null
@@ -248,14 +246,14 @@ class GraphQlApiClient {
 		// Verify GraphQL envelope contains data.createBatch; fail keyword if missing.
 		if (!payload) {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.createBatch", "present in response",
-			"missing", "Fail")
+					"missing", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateBatch: missing data.createBatch in ${result}")
 			return null
 		}
 		String batchId = payload?.get('_id')?.toString() ?: ""
 		// Verify batch _id returned and non-empty.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Batch _id present", "non-empty",
-		batchId?.trim() ?: "(empty)", batchId?.trim() ? "Pass" : "Fail")
+				batchId?.trim() ?: "(empty)", batchId?.trim() ? "Pass" : "Fail")
 		if (!batchId?.trim()) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateBatch: batch _id is empty.")
 			return null
@@ -267,7 +265,7 @@ class GraphQlApiClient {
 		boolean countOk = fcActual == fcExpectedFromRows
 		// Verify fileCount matches length of files array from API (internal consistency).
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Batch fileCount vs files list", "fileCount equals files.size()",
-		"fileCount=${fcActual}, files.size()=${fcExpectedFromRows}", countOk ? "Pass" : "Fail")
+				"fileCount=${fcActual}, files.size()=${fcExpectedFromRows}", countOk ? "Pass" : "Fail")
 		if (!countOk) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateBatch: fileCount ${fcActual} does not match files list size ${fcExpectedFromRows}")
 			return null
@@ -281,7 +279,7 @@ class GraphQlApiClient {
 				boolean urlOk = su.length() > 0 && (su.startsWith("https://") || su.startsWith("http://"))
 				String urlSummary = urlOk ? "(non-empty URL)" : su.length() > 0 ? "(invalid scheme)" : "(empty)"
 				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "createBatch signedURL: ${fn}", "non-empty http(s) URL",
-				urlSummary, urlOk ? "Pass" : "Fail")
+						urlSummary, urlOk ? "Pass" : "Fail")
 				if (!urlOk) {
 					KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackCreateBatch: file '${fn}' has invalid or missing signedURL (${urlSummary})")
 					return null
@@ -302,7 +300,7 @@ class GraphQlApiClient {
 		// Verify GraphQL envelope contains data.updateBatch; fail keyword if missing.
 		if (!payload) {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.updateBatch", "present in response",
-			"missing", "Fail")
+					"missing", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackUpdateBatch: missing data.updateBatch in ${result}")
 			return null
 		}
@@ -311,7 +309,7 @@ class GraphQlApiClient {
 			String pBid = payload?.get('_id')?.toString()?.trim() ?: ""
 			// When expectedBatchId passed, verify response batch _id matches request.
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "updateBatch batch _id matches request", expBid,
-			pBid ?: "(empty)", expBid == pBid ? "Pass" : "Fail")
+					pBid ?: "(empty)", expBid == pBid ? "Pass" : "Fail")
 			if (expBid != pBid) {
 				KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackUpdateBatch: expected batch _id '${expBid}' but got '${pBid}'")
 				return null
@@ -320,19 +318,19 @@ class GraphQlApiClient {
 		String pSub = payload?.get('submissionID')?.toString()?.trim() ?: ""
 		// Verify parent submission id present on batch node.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "updateBatch response submissionID", "non-empty",
-		pSub ?: "(empty)", pSub ? "Pass" : "Fail")
+				pSub ?: "(empty)", pSub ? "Pass" : "Fail")
 		String pType = payload?.get('type')?.toString()?.trim() ?: ""
 		// Verify batch type (metadata vs file) present.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "updateBatch response type", "non-empty",
-		pType ?: "(empty)", pType ? "Pass" : "Fail")
+				pType ?: "(empty)", pType ? "Pass" : "Fail")
 		String pFc = payload?.get('fileCount') != null ? String.valueOf(payload.get('fileCount')) : "(missing)"
 		// Verify fileCount field present on batch.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "updateBatch response fileCount", "present", pFc,
-		pFc != "(missing)" ? "Pass" : "Fail")
+				pFc != "(missing)" ? "Pass" : "Fail")
 		String finalBatchStatus = payload?.get('status')?.toString() ?: ""
 		// Verify batch-level status string present (e.g. Uploading / Uploaded).
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Final batch status", "non-empty",
-		finalBatchStatus?.trim() ?: "(empty)", finalBatchStatus?.trim() ? "Pass" : "Fail")
+				finalBatchStatus?.trim() ?: "(empty)", finalBatchStatus?.trim() ? "Pass" : "Fail")
 		List updFiles = payload?.get('files') as List
 		if (updFiles && !updFiles.isEmpty()) {
 			for (Object rowObj : updFiles) {
@@ -351,7 +349,7 @@ class GraphQlApiClient {
 				boolean fileOk = st?.trim() && noErrors
 				// Per file: non-empty status and empty errors; size only logged (null allowed).
 				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "File after updateBatch: ${fn}",
-				"status set, no errors; size may be null", actualFile, fileOk ? "Pass" : "Fail")
+						"status set, no errors; size may be null", actualFile, fileOk ? "Pass" : "Fail")
 				if (!fileOk) {
 					KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackUpdateBatch: file '${fn}' failed validation (${actualFile})")
 					return null
@@ -360,7 +358,7 @@ class GraphQlApiClient {
 		} else {
 			// Batch must return at least one file row after update.
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Batch files after updateBatch", "non-empty list",
-			"(missing or empty)", "Fail")
+					"(missing or empty)", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackUpdateBatch: files list is missing or empty in updateBatch response")
 			return null
 		}
@@ -374,12 +372,12 @@ class GraphQlApiClient {
 	 */
 	@Keyword
 	Map verifyAndUnpackListBatches(Map result, String expectedSubmissionId, String expectedBatchId, List expectedFileNames,
-	String expectedBatchType = null) {
+			String expectedBatchType = null) {
 		Map payload = (result?.data as Map)?.get('listBatches') as Map
 		// Verify GraphQL envelope contains data.listBatches; fail keyword if missing.
 		if (!payload) {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.listBatches", "present in response",
-			"missing", "Fail")
+					"missing", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: missing data.listBatches in ${result}")
 			return payload
 		}
@@ -412,13 +410,13 @@ class GraphQlApiClient {
 		boolean totalOk = totalObj != null && totalVal >= 1
 		// Verify paginated total count is present and at least one batch exists for the submission.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches total", ">= 1",
-		totalStr, totalOk ? "Pass" : "Fail")
+				totalStr, totalOk ? "Pass" : "Fail")
 		List batches = payload.get('batches') as List
 		boolean batchesNonEmpty = batches && !batches.isEmpty()
 		// Verify batches array is non-empty (page includes rows).
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches batches array", "non-empty",
-		batchesNonEmpty ? String.valueOf(batches.size()) + " batch(es)" : "(missing or empty)",
-		batchesNonEmpty ? "Pass" : "Fail")
+				batchesNonEmpty ? String.valueOf(batches.size()) + " batch(es)" : "(missing or empty)",
+				batchesNonEmpty ? "Pass" : "Fail")
 		if (!totalOk || !batchesNonEmpty) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: total or batches invalid.")
 			return null
@@ -434,7 +432,7 @@ class GraphQlApiClient {
 			}
 		}
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches contains expected batch _id", expBid,
-		matched ? "found" : "not found", matched ? "Pass" : "Fail")
+				matched ? "found" : "not found", matched ? "Pass" : "Fail")
 		if (!matched) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: no batch with _id ${expBid} in listBatches.")
 			return null
@@ -443,7 +441,7 @@ class GraphQlApiClient {
 		boolean subOk = expSub == pSub
 		// Verify batch row is tied to the expected submission.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches batch submissionID", expSub,
-		pSub ?: "(empty)", subOk ? "Pass" : "Fail")
+				pSub ?: "(empty)", subOk ? "Pass" : "Fail")
 		if (!subOk) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: submissionID mismatch.")
 			return null
@@ -453,7 +451,7 @@ class GraphQlApiClient {
 			String pType = matched?.get('type')?.toString()?.trim() ?: ""
 			// Optional: when expectedBatchType set, verify batch type (e.g. metadata).
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches batch type", expType,
-			pType ?: "(empty)", expType == pType ? "Pass" : "Fail")
+					pType ?: "(empty)", expType == pType ? "Pass" : "Fail")
 			if (expType != pType) {
 				KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: expected type ${expType}, got ${pType}")
 				return null
@@ -465,7 +463,7 @@ class GraphQlApiClient {
 		boolean fcOk = fcObj != null && fcObj.toString().trim().isNumber() && fcObj.toInteger() == expFc
 		// Verify fileCount matches number of expected upload files for this test.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches batch fileCount", String.valueOf(expFc),
-		fcActual, fcOk ? "Pass" : "Fail")
+				fcActual, fcOk ? "Pass" : "Fail")
 		if (!fcOk) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: fileCount expected ${expFc}, got ${fcActual}")
 			return null
@@ -473,7 +471,7 @@ class GraphQlApiClient {
 		String bStat = matched?.get('status')?.toString()?.trim() ?: ""
 		// Verify batch-level status string present.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches batch status", "non-empty",
-		bStat ?: "(empty)", bStat ? "Pass" : "Fail")
+				bStat ?: "(empty)", bStat ? "Pass" : "Fail")
 		if (!bStat) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: batch status is empty.")
 			return null
@@ -482,7 +480,7 @@ class GraphQlApiClient {
 		boolean batchNoErrs = bErrs == null || (bErrs instanceof List && ((List) bErrs).isEmpty())
 		// Verify no batch-level error strings returned.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches batch errors", "empty or absent",
-		bErrs != null ? bErrs.toString() : "(absent)", batchNoErrs ? "Pass" : "Fail")
+				bErrs != null ? bErrs.toString() : "(absent)", batchNoErrs ? "Pass" : "Fail")
 		if (!batchNoErrs) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: batch has errors: ${bErrs}")
 			return null
@@ -491,7 +489,7 @@ class GraphQlApiClient {
 		boolean dispOk = disp != null && disp.toString().trim()
 		// Verify human-visible batch display id present.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches batch displayID", "present",
-		disp != null ? disp.toString() : "(missing)", dispOk ? "Pass" : "Fail")
+				disp != null ? disp.toString() : "(missing)", dispOk ? "Pass" : "Fail")
 		if (!dispOk) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: batch displayID missing.")
 			return null
@@ -500,9 +498,9 @@ class GraphQlApiClient {
 		String up = matched?.get('updatedAt')?.toString()?.trim() ?: ""
 		// Verify audit timestamps returned for the batch row.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches batch createdAt", "non-empty",
-		cr ?: "(empty)", cr ? "Pass" : "Fail")
+				cr ?: "(empty)", cr ? "Pass" : "Fail")
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches batch updatedAt", "non-empty",
-		up ?: "(empty)", up ? "Pass" : "Fail")
+				up ?: "(empty)", up ? "Pass" : "Fail")
 		if (!cr || !up) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: batch createdAt or updatedAt empty.")
 			return null
@@ -510,7 +508,7 @@ class GraphQlApiClient {
 		String submName = matched?.get('submitterName')?.toString()?.trim() ?: ""
 		// Verify submitter display name populated (Upload Activity parity with UI).
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches batch submitterName", "non-empty",
-		submName ?: "(empty)", submName ? "Pass" : "Fail")
+				submName ?: "(empty)", submName ? "Pass" : "Fail")
 		if (!submName) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: submitterName empty.")
 			return null
@@ -519,7 +517,7 @@ class GraphQlApiClient {
 		boolean filesOk = batchFiles && !batchFiles.isEmpty()
 		// Verify nested files list exists for the batch.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches batch files array", "non-empty",
-		filesOk ? String.valueOf(batchFiles.size()) + " file(s)" : "(missing or empty)", filesOk ? "Pass" : "Fail")
+				filesOk ? String.valueOf(batchFiles.size()) + " file(s)" : "(missing or empty)", filesOk ? "Pass" : "Fail")
 		if (!filesOk) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: batch files list missing or empty.")
 			return null
@@ -536,7 +534,7 @@ class GraphQlApiClient {
 				}
 			}
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches file present: ${expFn}", "found",
-			found ? "found" : "missing", found ? "Pass" : "Fail")
+					found ? "found" : "missing", found ? "Pass" : "Fail")
 			if (!found) {
 				KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: file ${expFn} not in batch.files.")
 				return null
@@ -566,13 +564,13 @@ class GraphQlApiClient {
 				sizeActual = szObj.toString()
 			}
 			String nodeT = found.containsKey('nodeType') && found.get('nodeType') != null
-			? found.get('nodeType').toString()
-			: found.containsKey('nodeType') ? "null" : "(omitted)"
+					? found.get('nodeType').toString()
+					: found.containsKey('nodeType') ? "null" : "(omitted)"
 			String fpfx = found?.get('filePrefix')?.toString() ?: ""
 			String detail = "status=${st}, nodeType=${nodeT}, filePrefix=${fpfx}, size=${sizeActual}, errors=${ferrPart}"
 			boolean fileRowOk = st && fNoErrs && sizePass
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "listBatches file: ${expFn}",
-			"status set, no errors; size may be null (if returned, must be > 0)", detail, fileRowOk ? "Pass" : "Fail")
+					"status set, no errors; size may be null (if returned, must be > 0)", detail, fileRowOk ? "Pass" : "Fail")
 			if (!st || !fNoErrs) {
 				KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackListBatches: file ${expFn} status/errors invalid.")
 				return null
@@ -596,14 +594,14 @@ class GraphQlApiClient {
 		Map payload = (result?.data as Map)?.get('validateSubmission') as Map
 		if (!payload) {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.validateSubmission", "present in response",
-			"missing", "Fail")
+					"missing", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackValidateSubmission: missing data.validateSubmission in ${result}")
 			return null
 		}
 		Object succObj = payload.get('success')
 		boolean succIsBool = succObj instanceof Boolean
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "validateSubmission success (Boolean)", "Boolean",
-		succIsBool ? succObj.toString() : "not Boolean: ${succObj}", succIsBool ? "Pass" : "Fail")
+				succIsBool ? succObj.toString() : "not Boolean: ${succObj}", succIsBool ? "Pass" : "Fail")
 		if (!succIsBool) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackValidateSubmission: success is not Boolean: ${succObj}")
 			return null
@@ -611,16 +609,16 @@ class GraphQlApiClient {
 		boolean ok = (Boolean) succObj
 		if (expectSuccess) {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "validateSubmission success (initialized)", "true",
-			ok ? "true" : "false", ok ? "Pass" : "Fail")
+					ok ? "true" : "false", ok ? "Pass" : "Fail")
 			if (!ok) {
 				String msg = payload.get('message')?.toString()
 				KeywordUtil.markFailed(
-				"GraphQlApiClient.verifyAndUnpackValidateSubmission: expected success true; got false. message: ${msg}")
+						"GraphQlApiClient.verifyAndUnpackValidateSubmission: expected success true; got false. message: ${msg}")
 				return null
 			}
 		} else {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "validateSubmission success (initialized)", "(any)",
-			ok ? "true" : "false", "Pass")
+					ok ? "true" : "false", "Pass")
 		}
 		Object msgObj = payload.get('message')
 		if (msgObj != null && msgObj.toString().trim()) {
@@ -660,8 +658,8 @@ class GraphQlApiClient {
 			payload.variables = variables != null ? variables : [:]
 			String body = JsonOutput.toJson(payload)
 
-			conn.outputStream.withWriter("UTF-8") {
-				Writer w -> w << body
+			conn.outputStream.withWriter("UTF-8") { Writer w ->
+				w << body
 			}
 
 			int code = conn.responseCode
@@ -671,7 +669,7 @@ class GraphQlApiClient {
 			String httpActual = String.valueOf(code)
 			// Transport: expect HTTP 200 before interpreting JSON.
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "GraphQL HTTP status (Jira: 200)", "200", httpActual,
-			code == 200 ? "Pass" : "Fail")
+					code == 200 ? "Pass" : "Fail")
 			if (code < 200 || code >= 300) {
 				KeywordUtil.markFailed("GraphQlApiClient: HTTP ${code}. Body: ${text}")
 				return null
@@ -683,11 +681,11 @@ class GraphQlApiClient {
 			boolean dataKeyPresent = parsed != null && parsed.containsKey("data")
 			// GraphQL success envelope should include top-level data (may be null per field errors).
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "JSON body data key", "key present",
-			dataKeyPresent ? "present" : "absent", dataKeyPresent ? "Pass" : "Fail")
+					dataKeyPresent ? "present" : "absent", dataKeyPresent ? "Pass" : "Fail")
 
 			if (parsed.errors) {
 				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "GraphQL errors key", "absent on success",
-				String.valueOf(parsed.errors), "Fail")
+						String.valueOf(parsed.errors), "Fail")
 				KeywordUtil.markFailed("GraphQlApiClient: GraphQL errors: ${parsed.errors}")
 				return null
 			} else {
@@ -735,8 +733,8 @@ class GraphQlApiClient {
 			dataType   : args.dataType?.toString()
 		]
 		if (vars.values().any {
-			!it
-		}) {
+					!it
+				}) {
 			KeywordUtil.markFailed("GraphQlApiClient.createSubmission: studyID, dataCommons, name, intention, and dataType are required.")
 			return null
 		}
@@ -802,21 +800,21 @@ class GraphQlApiClient {
 		String respSubId = batchNode?.get('submissionID')?.toString()?.trim() ?: ""
 		// Call-site checks: batch echoes submission, has status string, type matches caller request.
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Batch submissionID matches request", submissionID,
-		respSubId ?: "(empty)", submissionID == respSubId ? "Pass" : "Fail")
+				respSubId ?: "(empty)", submissionID == respSubId ? "Pass" : "Fail")
 		if (submissionID != respSubId) {
 			KeywordUtil.markFailed("GraphQlApiClient.createBatch: response submissionID '${respSubId}' does not match request '${submissionID}'.")
 			return null
 		}
 		String batchStatCreate = batchNode?.get('status')?.toString() ?: ""
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Batch status (createBatch)", "non-empty",
-		batchStatCreate?.trim() ?: "(empty)", batchStatCreate?.trim() ? "Pass" : "Fail")
+				batchStatCreate?.trim() ?: "(empty)", batchStatCreate?.trim() ? "Pass" : "Fail")
 		if (!batchStatCreate?.trim()) {
 			KeywordUtil.markFailed("GraphQlApiClient.createBatch: response status is empty or missing.")
 			return null
 		}
 		String respType = batchNode?.get('type')?.toString() ?: "(empty)"
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Batch type matches request", type, respType,
-		type == respType?.trim() ? "Pass" : "Fail")
+				type == respType?.trim() ? "Pass" : "Fail")
 		if (type != respType?.trim()) {
 			KeywordUtil.markFailed("GraphQlApiClient.createBatch: response batch type '${respType?.trim()}' does not match request '${type}'.")
 			return null
@@ -845,8 +843,8 @@ class GraphQlApiClient {
 			return []
 		}
 		KeywordUtil.logInfo(
-		"putMetadataTsvsAndBuildUploadResults: S3 PUT log lines below show a redacted URL preview (scheme+host+path only, truncated); " +
-		"query string and signing parameters are omitted and are not the literal presigned URL.")
+				"putMetadataTsvsAndBuildUploadResults: S3 PUT log lines below show a redacted URL preview (scheme+host+path only, truncated); " +
+				"query string and signing parameters are omitted and are not the literal presigned URL.")
 		List<Map> uploadResults = []
 		for (Object rowObj : fileRows) {
 			Map row = rowObj as Map
@@ -876,7 +874,7 @@ class GraphQlApiClient {
 			String status = success ? "succeeded" : "failed"
 			String result = success ? "Pass" : "Fail"
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "S3 PUT presigned upload: ${fn}", message,
-			status, result)
+					status, result)
 			uploadResults.add([fileName: fn, succeeded: success])
 		}
 		return uploadResults
@@ -1049,7 +1047,7 @@ class GraphQlApiClient {
 		Map payload = data?.get('getSubmissionNodes') as Map
 		if (!payload) {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.getSubmissionNodes", "present in response",
-			"missing", "Fail")
+					"missing", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackGetSubmissionNodes: missing data.getSubmissionNodes in ${result}")
 			return null
 		}
@@ -1065,11 +1063,11 @@ class GraphQlApiClient {
 		List nodes = nodesListOk ? (nodesRaw as List) : []
 
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "getSubmissionNodes(${expNt}) total", String.valueOf(expectedTotal),
-		String.valueOf(totalVal), totalVal == expectedTotal ? "Pass" : "Fail")
+				String.valueOf(totalVal), totalVal == expectedTotal ? "Pass" : "Fail")
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "getSubmissionNodes(${expNt}) IDPropName", "non-empty",
-		idProp ?: "(empty)", idProp ? "Pass" : "Fail")
+				idProp ?: "(empty)", idProp ? "Pass" : "Fail")
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "getSubmissionNodes(${expNt}) properties", "non-empty list",
-		propsOk ? "size ${(propsRaw as List).size()}" : String.valueOf(propsRaw), propsOk ? "Pass" : "Fail")
+				propsOk ? "size ${(propsRaw as List).size()}" : String.valueOf(propsRaw), propsOk ? "Pass" : "Fail")
 
 		if (totalVal != expectedTotal) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackGetSubmissionNodes: expected total ${expectedTotal}, got ${totalVal}")
@@ -1089,7 +1087,7 @@ class GraphQlApiClient {
 		}
 		if (nodes.size() != expectedTotal) {
 			KeywordUtil.markFailed(
-			"GraphQlApiClient.verifyAndUnpackGetSubmissionNodes: expected ${expectedTotal} nodes, got ${nodes.size()}")
+					"GraphQlApiClient.verifyAndUnpackGetSubmissionNodes: expected ${expectedTotal} nodes, got ${nodes.size()}")
 			return null
 		}
 
@@ -1100,7 +1098,7 @@ class GraphQlApiClient {
 		}.toSet()
 		if (expectedIds.size() != expectedTotal) {
 			KeywordUtil.markFailed(
-			"GraphQlApiClient.verifyAndUnpackGetSubmissionNodes: expectedNodeIds size ${expectedIds.size()} != expectedTotal ${expectedTotal}")
+					"GraphQlApiClient.verifyAndUnpackGetSubmissionNodes: expectedNodeIds size ${expectedIds.size()} != expectedTotal ${expectedTotal}")
 			return null
 		}
 
@@ -1133,17 +1131,17 @@ class GraphQlApiClient {
 			}
 
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "node ${nId} submissionID", expSub ?: "(empty)",
-			nSub ?: "(empty)", subOk ? "Pass" : "Fail")
+					nSub ?: "(empty)", subOk ? "Pass" : "Fail")
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "node ${nId} nodeType", expNt ?: "(empty)",
-			nType ?: "(empty)", typeOk ? "Pass" : "Fail")
+					nType ?: "(empty)", typeOk ? "Pass" : "Fail")
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "node ${nId} status", "non-empty valid",
-			nStat ?: "(empty)", statOk ? "Pass" : "Fail")
+					nStat ?: "(empty)", statOk ? "Pass" : "Fail")
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "node ${nId} props JSON", "parseable",
-			propsParseOk ? "ok" : "(invalid or empty)", propsParseOk ? "Pass" : "Fail")
+					propsParseOk ? "ok" : "(invalid or empty)", propsParseOk ? "Pass" : "Fail")
 
 			if (!subOk || !typeOk || !idOk || !statOk || !propsParseOk) {
 				KeywordUtil.markFailed(
-				"GraphQlApiClient.verifyAndUnpackGetSubmissionNodes: node validation failed for nodeID=${nId} subOk=${subOk} typeOk=${typeOk} idOk=${idOk} statOk=${statOk} propsParseOk=${propsParseOk}")
+						"GraphQlApiClient.verifyAndUnpackGetSubmissionNodes: node validation failed for nodeID=${nId} subOk=${subOk} typeOk=${typeOk} idOk=${idOk} statOk=${statOk} propsParseOk=${propsParseOk}")
 				return null
 			}
 			if (seen.contains(nId)) {
@@ -1155,7 +1153,7 @@ class GraphQlApiClient {
 
 		if (seen != expectedIds) {
 			KeywordUtil.markFailed(
-			"GraphQlApiClient.verifyAndUnpackGetSubmissionNodes: nodeID set mismatch. Expected ${expectedIds}, got ${seen}")
+					"GraphQlApiClient.verifyAndUnpackGetSubmissionNodes: nodeID set mismatch. Expected ${expectedIds}, got ${seen}")
 			return null
 		}
 
@@ -1229,7 +1227,7 @@ class GraphQlApiClient {
 		Map payload = data?.get('deleteDataRecords') as Map
 		if (!payload) {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.deleteDataRecords", "present in response",
-			"missing", "Fail")
+					"missing", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackDeleteDataRecords: missing data.deleteDataRecords in ${result}")
 			return null
 		}
@@ -1237,9 +1235,9 @@ class GraphQlApiClient {
 		boolean ok = succObj instanceof Boolean ? (Boolean) succObj : Boolean.TRUE.equals(succObj)
 		String msg = payload.get('message')?.toString() ?: ""
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "deleteDataRecords success", "true",
-		String.valueOf(succObj), ok ? "Pass" : "Fail")
+				String.valueOf(succObj), ok ? "Pass" : "Fail")
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "deleteDataRecords message", "(logged)",
-		msg ?: "(empty)", ok ? "Pass" : "Fail")
+				msg ?: "(empty)", ok ? "Pass" : "Fail")
 		if (!ok) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackDeleteDataRecords: success is not true. message: ${msg}")
 			return null
@@ -1314,7 +1312,7 @@ class GraphQlApiClient {
 		Map payload = data?.get('submissionQCResults') as Map
 		if (!payload) {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.submissionQCResults", "present in response",
-			"missing", "Fail")
+					"missing", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackSubmissionQCResults: missing data.submissionQCResults in ${result}")
 			return null
 		}
@@ -1325,15 +1323,15 @@ class GraphQlApiClient {
 		int resultSize = listOk ? (resultsRaw as List).size() : -1
 
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "submissionQCResults total", String.valueOf(expectedTotal),
-		String.valueOf(totalVal), totalVal == expectedTotal ? "Pass" : "Fail")
+				String.valueOf(totalVal), totalVal == expectedTotal ? "Pass" : "Fail")
 		String expSize = String.valueOf(expectedTotal)
 		String actSize = listOk ? String.valueOf(resultSize) : "(not a list)"
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "submissionQCResults results size", expSize,
-		actSize, (listOk && resultSize == expectedTotal) ? "Pass" : "Fail")
+				actSize, (listOk && resultSize == expectedTotal) ? "Pass" : "Fail")
 
 		if (totalVal != expectedTotal) {
 			KeywordUtil.markFailed(
-			"GraphQlApiClient.verifyAndUnpackSubmissionQCResults: expected total ${expectedTotal}, got ${totalVal}")
+					"GraphQlApiClient.verifyAndUnpackSubmissionQCResults: expected total ${expectedTotal}, got ${totalVal}")
 			return null
 		}
 		if (!listOk) {
@@ -1342,7 +1340,7 @@ class GraphQlApiClient {
 		}
 		if (resultSize != expectedTotal) {
 			KeywordUtil.markFailed(
-			"GraphQlApiClient.verifyAndUnpackSubmissionQCResults: expected results size ${expectedTotal}, got ${resultSize}")
+					"GraphQlApiClient.verifyAndUnpackSubmissionQCResults: expected results size ${expectedTotal}, got ${resultSize}")
 			return null
 		}
 		return payload
@@ -1395,27 +1393,27 @@ class GraphQlApiClient {
 		Map payload = data?.get('submissionAction') as Map
 		if (!payload) {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "data.submissionAction", "present in response",
-			"missing", "Fail")
+					"missing", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackSubmissionAction: missing data.submissionAction in ${result}")
 			return null
 		}
 		String expId = expectedSubmissionId?.toString()?.trim()
 		String actId = payload.get('_id')?.toString()?.trim()
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "submissionAction _id", expId ?: "(empty)",
-		actId ?: "(empty)", expId && expId == actId ? "Pass" : "Fail")
+				actId ?: "(empty)", expId && expId == actId ? "Pass" : "Fail")
 		if (!expId || expId != actId) {
 			KeywordUtil.markFailed(
-			"GraphQlApiClient.verifyAndUnpackSubmissionAction: expected _id '${expId}', got '${actId}'")
+					"GraphQlApiClient.verifyAndUnpackSubmissionAction: expected _id '${expId}', got '${actId}'")
 			return null
 		}
 		String expSt = expectedStatus?.toString()?.trim()
 		if (expSt) {
 			String actSt = payload.get('status')?.toString()?.trim()
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "submissionAction status", expSt,
-			actSt ?: "(empty)", expSt == actSt ? "Pass" : "Fail")
+					actSt ?: "(empty)", expSt == actSt ? "Pass" : "Fail")
 			if (expSt != actSt) {
 				KeywordUtil.markFailed(
-				"GraphQlApiClient.verifyAndUnpackSubmissionAction: expected status '${expSt}', got '${actSt}'")
+						"GraphQlApiClient.verifyAndUnpackSubmissionAction: expected status '${expSt}', got '${actSt}'")
 				return null
 			}
 		}
@@ -1552,7 +1550,7 @@ class GraphQlApiClient {
 		Object raw = data?.get("retrieveCLIConfig")
 		if (!(raw instanceof CharSequence)) {
 			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "retrieveCLIConfig string", "present",
-				"missing", "Fail")
+					"missing", "Fail")
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackRetrieveCLIConfig: missing data.retrieveCLIConfig in ${result}")
 			return null
 		}
@@ -1568,22 +1566,22 @@ class GraphQlApiClient {
 
 		boolean hasApi = yaml.contains(expApi)
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "CLI config api-url contains ApiUrl", expApi,
-			hasApi ? "contains" : "(absent)", hasApi ? "Pass" : "Fail")
+				hasApi ? "contains" : "(absent)", hasApi ? "Pass" : "Fail")
 		boolean hasSub = yaml.contains("submission:") && yaml.contains(expSub)
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "CLI config submission id", expSub,
-			hasSub ? "present" : "(absent)", hasSub ? "Pass" : "Fail")
+				hasSub ? "present" : "(absent)", hasSub ? "Pass" : "Fail")
 		boolean hasData = yaml.contains(expData)
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "CLI config data folder path", expData,
-			hasData ? "present" : "(absent)", hasData ? "Pass" : "Fail")
+				hasData ? "present" : "(absent)", hasData ? "Pass" : "Fail")
 		boolean hasMan = yaml.contains(expMan)
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "CLI config manifest path", expMan,
-			hasMan ? "present" : "(absent)", hasMan ? "Pass" : "Fail")
+				hasMan ? "present" : "(absent)", hasMan ? "Pass" : "Fail")
 
 		String expectedJwt = normalizeBearerToken(GlobalVariable.SubmitterApiToken.toString())
 		String actualJwt = extractJwtFromCliConfigYaml(yaml)
 		boolean tokenOk = expectedJwt && actualJwt && expectedJwt == actualJwt
 		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "CLI config token matches SubmitterApiToken",
-			"(matches profile)", tokenOk ? "match" : "mismatch or missing", tokenOk ? "Pass" : "Fail")
+				"(matches profile)", tokenOk ? "match" : "mismatch or missing", tokenOk ? "Pass" : "Fail")
 
 		if (!hasApi || !hasSub || !hasData || !hasMan) {
 			KeywordUtil.markFailed("GraphQlApiClient.verifyAndUnpackRetrieveCLIConfig: YAML missing expected api-url, submission, data, or manifest content.")

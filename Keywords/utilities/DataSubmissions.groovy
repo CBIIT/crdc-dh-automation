@@ -3049,4 +3049,53 @@ class DataSubmissions extends TestRunner {
 			Utils.clearProjectDownloadsFolder()
 		}
 	}
+
+	/**
+	 * On the data submission summary, opens the update-submitter dialog, selects the second
+	 * submitter option, and saves.
+	 */
+	@Keyword
+	static void updateSubmitterName() {
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Summary/EditSubmitterName-Pencil')
+		WebUI.delay(2)
+		// MUI Select opens on mousedown. clickTab only fires a JavaScript click, so the list never opens.
+		TestObject submitterDd = findTestObject('CRDC/AILocators/DataSubmissions/Detail/Summary/UpdateDataSubmission/Submitter-Dd')
+		WebUI.waitForElementClickable(submitterDd, 20)
+		WebDriver driver = DriverFactory.getWebDriver()
+		WebElement submitterEl = WebUI.findWebElement(submitterDd, 10)
+		new Actions(driver).moveToElement(submitterEl).click().perform()
+		TestObject submitterOption = findTestObject('CRDC/AILocators/DataSubmissions/Detail/Summary/UpdateDataSubmission/SubmitterDd-Option-2')
+		WebUI.waitForElementClickable(submitterOption, 20)
+		WebUI.click(submitterOption)
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Summary/UpdateDataSubmission/Save-Btn')
+	}
+
+	/**
+	 * After validation, open Validation Results (Expanded), filter Issue Type to
+	 * "Updating existing data", open See details, and submit a new permissible-value request.
+	 *
+	 * @param submittedIdentifier Submitted Identifier of the row (for example chek234)
+	 * @param justification Text entered in the Request New PV justification field
+	 */
+	@Keyword
+	void requestNewPermissibleValue(String submittedIdentifier, String justification) {
+		WebUIUtils.clickTab('CRDC/DataSubmissions/Validation/ValidationResults-Tab')
+		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 60)
+		WebUIUtils.clickTab('CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn')
+		WebUI.delay(2)
+		applyValidationResultsFilters('All', 'All', 'Updating existing data')
+		clickSeeDetailsForSubmittedId(submittedIdentifier)
+		TestObject requestPvBtn = findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationResults/RequestNewPv/RequestNewPv-Btn')
+		WebUI.waitForElementClickable(requestPvBtn, 20)
+		WebUI.click(requestPvBtn)
+		TestObject justificationTxt = findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationResults/RequestNewPv/Justification-Txt')
+		WebUI.waitForElementVisible(justificationTxt, 20)
+		WebDriver driver = DriverFactory.getWebDriver()
+		WebElement justificationEl = WebUI.findWebElement(justificationTxt, 10)
+		new Actions(driver).moveToElement(justificationEl).click().sendKeys(justification).perform()
+		justificationEl.sendKeys(Keys.TAB)
+		TestObject submitBtn = findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationResults/RequestNewPv/Submit-Btn')
+		WebUI.waitForElementClickable(submitBtn, 20)
+		WebUI.click(submitBtn)
+	}
 }
