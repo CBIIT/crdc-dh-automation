@@ -30,5 +30,7 @@ CustomKeywords.'utilities.DataSubmissions.completeDataSubmission'()
 
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('DS Complete', 'Dcp', dsId, dsName, 'Submitter')
 CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('DS Complete', 'Dcp', dsId, dsName, 'FedleadBcc')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('DS Complete', 'Dcp', dsId, dsName, 'DcpBcc')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('DS Complete', 'Dcp', dsId, dsName, 'AdminBcc')
 
 WebUI.closeBrowser()

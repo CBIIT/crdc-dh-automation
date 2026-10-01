@@ -23,6 +23,10 @@ CustomKeywords.'utilities.SubmissionRequest.clickSubmitButton'()
 
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('SR Submit', 'Submitter', srId, studyName, 'Submitter')
 CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Submit', 'Submitter', srId, studyName, 'FedleadBcc')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Submit', 'Submitter', srId, studyName, 'DcpBcc')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Submit', 'Submitter', srId, studyName, 'AdminBcc')
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('SR Available for Review', 'Submitter', srId, studyName, 'Fedlead')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Available for Review', 'Submitter', srId, studyName, 'DcpBcc')
+CustomKeywords.'utilities.NotificationEmailLog.logBccEmails'('SR Available for Review', 'Submitter', srId, studyName, 'AdminBcc')
 
 WebUI.closeBrowser()
