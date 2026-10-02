@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Submit-Btn</name>
+   <tag></tag>
+   <elementGuidId>e1a7c5f8-0b6c-4d4e-9a95-6f2c8b0d5e47</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;delete-dialog&apos;]//*[@data-testid=&apos;delete-dialog-confirm-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;delete-dialog&apos;]//*[@data-testid=&apos;delete-dialog-confirm-button&apos;]</value>
+      <webElementGuid>f2b8d6a9-1c7d-4e5f-8b06-7a3d9c1e6f58</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

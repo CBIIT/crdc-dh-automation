@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>SubmitterDd-Option-2</name>
+   <tag></tag>
+   <elementGuidId>f4676a29-ed2e-40a9-9b20-99c0ece93bdd</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>(//*[@Id=&quot;mui-component-select-submitterID&quot;])//following::li[2]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>(//*[@Id=&quot;mui-component-select-submitterID&quot;])//following::li[2]</value>
+      <webElementGuid>9be9db58-5a7f-4897-8590-502eb669ac64</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

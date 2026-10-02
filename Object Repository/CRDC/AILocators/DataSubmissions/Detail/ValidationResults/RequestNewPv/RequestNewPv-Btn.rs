@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>RequestNewPv-Btn</name>
+   <tag></tag>
+   <elementGuidId>a7c3e1b4-6d28-4f0a-9c51-2b8e4d6f1a03</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;request-pv-button&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;request-pv-button&apos;]</value>
+      <webElementGuid>b8d4f2c5-7e39-4a1b-8d62-3c9f5e7a2b14</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
