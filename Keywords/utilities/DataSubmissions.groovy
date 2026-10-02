@@ -1331,7 +1331,12 @@ class DataSubmissions extends TestRunner {
 		List<List<String>> actualRows = readValidationResultsTableFromUI(node, severity, issueType)
 		Map<String, List<String>> actualBySubmittedId = new LinkedHashMap<>()
 		for (List<String> row : actualRows) {
-			if (row.size() >= 1 && !row.get(0).isEmpty()) actualBySubmittedId.put(row.get(0).trim(), row)
+			if (row.size() < 1 || row.get(0).isEmpty()) continue
+			String id = row.get(0).trim()
+			String actIssue = row.size() >= 2 ? row.get(1) : ""
+			if (!actualBySubmittedId.containsKey(id) || actIssue.equals(issueType)) {
+				actualBySubmittedId.put(id, row)
+			}
 		}
 		List<String> errors = new ArrayList<>()
 		String sectionName = "Validation Results"
@@ -2020,8 +2025,7 @@ class DataSubmissions extends TestRunner {
 			(t != null ? t.replaceAll(/\s+/, ' ').trim() : "") == normalizedTarget
 		}
 		if (matchStudy == null) {
-			KeywordUtil.markFailed("Study option '${study}' not found in dropdown.")
-			return
+			KeywordUtil.markFailedAndStop("Study option '${study}' not found in dropdown.")
 		}
 		KeywordUtil.logInfo("Found the study to create DS: '${study}'")
 
@@ -2031,8 +2035,7 @@ class DataSubmissions extends TestRunner {
 			(t != null ? t.replaceAll(/\s+/, ' ').trim() : "") == normalizedTarget
 		}
 		if (matchStudy == null) {
-			KeywordUtil.markFailed("Study option '${study}' disappeared before click.")
-			return
+			KeywordUtil.markFailedAndStop("Study option '${study}' disappeared before click.")
 		}
 
 		new Actions(driver).moveToElement(matchStudy).perform()
@@ -2052,6 +2055,8 @@ class DataSubmissions extends TestRunner {
 				new Actions(driver).moveToElement(matchStudy).perform()
 				WebUI.delay(0.2)
 				new Actions(driver).moveToElement(matchStudy).click().perform()
+			} else {
+				KeywordUtil.markFailedAndStop("Study option '${study}' not found in dropdown after click retry.")
 			}
 		}
 
