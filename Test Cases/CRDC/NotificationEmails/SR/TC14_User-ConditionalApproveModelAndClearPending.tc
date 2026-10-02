@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>User submits one Open-access SR, Fedlead Approves it with Require Data Model changes pending, then Admin clears that pending flag. The case appends the expected model-pending and pending-cleared email rows to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
+   <name>TC14_User-ConditionalApproveModelAndClearPending</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>21a7e062-6c18-4f59-c14a-5ebf89134621</testCaseGuid>
+</TestCaseEntity>

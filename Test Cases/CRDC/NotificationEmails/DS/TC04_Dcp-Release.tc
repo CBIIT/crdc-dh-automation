@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Submitter submits one Data Submission, DCP releases it, then the case appends the expected release-email row to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
+   <name>TC04_Dcp-Release</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>0d8b81ac-cdc5-4c96-9708-b7ddcc09914e</testCaseGuid>
+</TestCaseEntity>

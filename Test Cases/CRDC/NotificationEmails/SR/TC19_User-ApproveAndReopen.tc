@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TestCaseEntity>
-   <description>User submits one SR, Fedlead Approves it then Reopens it from the Approved list. The case appends the expected approve and reopen email rows to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
-   <name>TC19_User-ApproveAndReopen</name>
-   <tag>Filter</tag>
-   <comment></comment>
-   <recordOption>OTHER</recordOption>
-   <testCaseGuid>19a7e062-6c18-4f59-c14a-5ebf89134619</testCaseGuid>
-</TestCaseEntity>

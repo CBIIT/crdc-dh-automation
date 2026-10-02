@@ -31,8 +31,9 @@ Auth files (gitignored) live in PythonFiles/CRDC/gmail/:
 credentials.json is only for the one-time browser login that creates those tokens.
 Plus-aliases (qa+crdc-automation-submitter@...) land in the To mailbox.
 Bcc rows search the matching BCC inbox; the address must not appear in To or Cc.
-Cc rows search the matching Fedlead or Admin inbox; the address must be in Cc
-and not in To.
+Cc on FedleadCc/AdminCc searches the Fedlead or Admin BCC inbox. Cc on
+SubmitterCc (DS Config Change) searches the qa@ To mailbox; the address must be
+in Cc and not in To.
 """
 from __future__ import annotations
 
@@ -526,6 +527,15 @@ def main():
 	failures = 0
 	to_search = []
 	bcc_search = []
+	has_bcc_or_cc = any(
+		item["env"] and item["recipient"] and item["kind"].casefold() in ("bcc", "cc")
+		for item in pending
+	)
+	services_by_email = {}
+	if has_bcc_or_cc:
+		services_by_email = load_bcc_services([
+			args.token_fedlead_bcc, args.token_dcp_bcc, args.token_admin_bcc])
+	bcc_inbox_emails = set(services_by_email.keys())
 	for item in pending:
 		if not item["env"]:
 			sheet.cell(item["idx"], COL_RESULT).value = "Fail"
@@ -542,10 +552,17 @@ def main():
 				kind_label = "To: address"
 			print("Fail row %s | missing Expected recipient (%s)" % (item["idx"], kind_label))
 			failures += 1
-		elif item["kind"].casefold() in ("bcc", "cc"):
-			bcc_search.append(item)
 		else:
-			to_search.append(item)
+			kind_cf = item["kind"].casefold()
+			if kind_cf == "bcc":
+				bcc_search.append(item)
+			elif kind_cf == "cc":
+				if item["recipient"].casefold() in bcc_inbox_emails:
+					bcc_search.append(item)
+				else:
+					to_search.append(item)
+			else:
+				to_search.append(item)
 
 	if to_search:
 		creds = load_creds(args.token)
@@ -554,7 +571,6 @@ def main():
 		failures += judge_search_rows(service, to_search, sheet, name_in_body_map)
 
 	if bcc_search:
-		services_by_email = load_bcc_services([args.token_fedlead_bcc, args.token_dcp_bcc, args.token_admin_bcc])
 		by_recipient = {}
 		for item in bcc_search:
 			by_recipient.setdefault(item["recipient"].casefold(), []).append(item)

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FolderEntity>
+   <description>CRDCDH-3140 phs_accession vs registered dbGaP ID validation</description>
+   <name>CRDCDH-3140</name>
+   <tag></tag>
+   <folderType>TESTCASE</folderType>
+</FolderEntity>

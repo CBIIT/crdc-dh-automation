@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>EditSubmitterName-Pencil</name>
+   <tag></tag>
+   <elementGuidId>1e8a2c3d-b9e8-4508-bb1e-2095d55713aa</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>(//*[@data-testId=&quot;update-submission-button&quot;])[1]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>(//*[@data-testId=&quot;update-submission-button&quot;])[1]</value>
+      <webElementGuid>5eb1866e-a310-451a-ab0c-aa1765fb451a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-3140: Valid phs_accession phs123456 matches registered dbGaP on autoQAdbGaPID study. GC metadata only.</description>
+   <name>TC01_CRDCDH-3140_ValidDbGaPMatch</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>af07ca28-aded-49f7-8f5c-162394551f72</testCaseGuid>
+</TestCaseEntity>

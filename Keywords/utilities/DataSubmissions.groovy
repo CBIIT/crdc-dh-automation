@@ -1331,7 +1331,12 @@ class DataSubmissions extends TestRunner {
 		List<List<String>> actualRows = readValidationResultsTableFromUI(node, severity, issueType)
 		Map<String, List<String>> actualBySubmittedId = new LinkedHashMap<>()
 		for (List<String> row : actualRows) {
-			if (row.size() >= 1 && !row.get(0).isEmpty()) actualBySubmittedId.put(row.get(0).trim(), row)
+			if (row.size() < 1 || row.get(0).isEmpty()) continue
+			String id = row.get(0).trim()
+			String actIssue = row.size() >= 2 ? row.get(1) : ""
+			if (!actualBySubmittedId.containsKey(id) || actIssue.equals(issueType)) {
+				actualBySubmittedId.put(id, row)
+			}
 		}
 		List<String> errors = new ArrayList<>()
 		String sectionName = "Validation Results"
@@ -2020,8 +2025,7 @@ class DataSubmissions extends TestRunner {
 			(t != null ? t.replaceAll(/\s+/, ' ').trim() : "") == normalizedTarget
 		}
 		if (matchStudy == null) {
-			KeywordUtil.markFailed("Study option '${study}' not found in dropdown.")
-			return
+			KeywordUtil.markFailedAndStop("Study option '${study}' not found in dropdown.")
 		}
 		KeywordUtil.logInfo("Found the study to create DS: '${study}'")
 
@@ -2031,8 +2035,7 @@ class DataSubmissions extends TestRunner {
 			(t != null ? t.replaceAll(/\s+/, ' ').trim() : "") == normalizedTarget
 		}
 		if (matchStudy == null) {
-			KeywordUtil.markFailed("Study option '${study}' disappeared before click.")
-			return
+			KeywordUtil.markFailedAndStop("Study option '${study}' disappeared before click.")
 		}
 
 		new Actions(driver).moveToElement(matchStudy).perform()
@@ -2052,6 +2055,8 @@ class DataSubmissions extends TestRunner {
 				new Actions(driver).moveToElement(matchStudy).perform()
 				WebUI.delay(0.2)
 				new Actions(driver).moveToElement(matchStudy).click().perform()
+			} else {
+				KeywordUtil.markFailedAndStop("Study option '${study}' not found in dropdown after click retry.")
 			}
 		}
 
@@ -3048,5 +3053,54 @@ class DataSubmissions extends TestRunner {
 		} finally {
 			Utils.clearProjectDownloadsFolder()
 		}
+	}
+
+	/**
+	 * On the data submission summary, opens the update-submitter dialog, selects the second
+	 * submitter option, and saves.
+	 */
+	@Keyword
+	static void updateSubmitterName() {
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Summary/EditSubmitterName-Pencil')
+		WebUI.delay(2)
+		// MUI Select opens on mousedown. clickTab only fires a JavaScript click, so the list never opens.
+		TestObject submitterDd = findTestObject('CRDC/AILocators/DataSubmissions/Detail/Summary/UpdateDataSubmission/Submitter-Dd')
+		WebUI.waitForElementClickable(submitterDd, 20)
+		WebDriver driver = DriverFactory.getWebDriver()
+		WebElement submitterEl = WebUI.findWebElement(submitterDd, 10)
+		new Actions(driver).moveToElement(submitterEl).click().perform()
+		TestObject submitterOption = findTestObject('CRDC/AILocators/DataSubmissions/Detail/Summary/UpdateDataSubmission/SubmitterDd-Option-2')
+		WebUI.waitForElementClickable(submitterOption, 20)
+		WebUI.click(submitterOption)
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/Summary/UpdateDataSubmission/Save-Btn')
+	}
+
+	/**
+	 * After validation, open Validation Results (Expanded), filter Issue Type to
+	 * "Updating existing data", open See details, and submit a new permissible-value request.
+	 *
+	 * @param submittedIdentifier Submitted Identifier of the row (for example chek234)
+	 * @param justification Text entered in the Request New PV justification field
+	 */
+	@Keyword
+	void requestNewPermissibleValue(String submittedIdentifier, String justification) {
+		WebUIUtils.clickTab('CRDC/DataSubmissions/Validation/ValidationResults-Tab')
+		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 60)
+		WebUIUtils.clickTab('CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn')
+		WebUI.delay(2)
+		applyValidationResultsFilters('All', 'All', 'Updating existing data')
+		clickSeeDetailsForSubmittedId(submittedIdentifier)
+		TestObject requestPvBtn = findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationResults/RequestNewPv/RequestNewPv-Btn')
+		WebUI.waitForElementClickable(requestPvBtn, 20)
+		WebUI.click(requestPvBtn)
+		TestObject justificationTxt = findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationResults/RequestNewPv/Justification-Txt')
+		WebUI.waitForElementVisible(justificationTxt, 20)
+		WebDriver driver = DriverFactory.getWebDriver()
+		WebElement justificationEl = WebUI.findWebElement(justificationTxt, 10)
+		new Actions(driver).moveToElement(justificationEl).click().sendKeys(justification).perform()
+		justificationEl.sendKeys(Keys.TAB)
+		TestObject submitBtn = findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationResults/RequestNewPv/Submit-Btn')
+		WebUI.waitForElementClickable(submitBtn, 20)
+		WebUI.click(submitBtn)
 	}
 }

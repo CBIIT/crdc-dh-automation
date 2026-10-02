@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TestCaseEntity>
-   <description>User submits the Profile Request Access form, then the case appends the expected Admin email row to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
-   <name>TC08_Admin-RequestAccess</name>
-   <tag>Filter</tag>
-   <comment></comment>
-   <recordOption>OTHER</recordOption>
-   <testCaseGuid>c3d9f1e5-5f04-4b27-b08c-4e0f26a39d12</testCaseGuid>
-</TestCaseEntity>

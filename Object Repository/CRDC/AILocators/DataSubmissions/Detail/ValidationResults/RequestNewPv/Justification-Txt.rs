@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Justification-Txt</name>
+   <tag></tag>
+   <elementGuidId>c9e5a3d6-8f4a-4b2c-9e73-4d0a6f8b3c25</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;request-pv-description&apos;]//textarea</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;request-pv-description&apos;]//textarea</value>
+      <webElementGuid>d0f6b4e7-9a5b-4c3d-8f84-5e1b7a9c4d36</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
