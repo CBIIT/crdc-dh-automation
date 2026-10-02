@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TestCaseEntity>
-   <description>Master inactivates then restores each of the five PBAC automation users. The case appends an Account Disabled email row per role to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
-   <name>TC24_AdminFedleadDcpSubmitterUser-AccountDisabled</name>
-   <tag>Filter</tag>
-   <comment></comment>
-   <recordOption>OTHER</recordOption>
-   <testCaseGuid>24e8a061-7d29-4f60-b15b-6fc89025724d</testCaseGuid>
-</TestCaseEntity>

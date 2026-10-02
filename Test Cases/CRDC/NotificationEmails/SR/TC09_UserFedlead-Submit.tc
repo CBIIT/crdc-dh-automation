@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>User submits one new Submission Request and appends expected Received (User) and Available for Review (Fedlead) email rows to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
+   <name>TC09_UserFedlead-Submit</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>16a7e062-6c18-4f59-c14a-5ebf89134616</testCaseGuid>
+</TestCaseEntity>

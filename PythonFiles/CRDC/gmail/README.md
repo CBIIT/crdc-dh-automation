@@ -1,6 +1,6 @@
 # CRDC email notification verification
 
-Katalon UI tests live under `Test Cases/CRDC/NotificationEmails/`: **SR/** (submit, cancel, reject, approve, inquire, reopen, conditional approve, pending cleared), **DS/** (create/submit through complete), **Miscellaneous/** (Request Access and similar), and **VerifyNotificationEmails** in the parent folder.
+Katalon UI tests live under `Test Cases/CRDC/NotificationEmails/`: **SR/** (submit, cancel, reject, approve, inquire, reopen, conditional approve, pending cleared), **DS/** (create/submit through complete, config change, PV request), **Miscellaneous/** (Request Access and similar), and **VerifyNotificationEmails** in the parent folder. Test case numbers are per folder (DS TC01–TC08, SR TC01–TC16, and so on).
 
 This is a **two-step pipeline**. Katalon only drives the UI and writes expected rows. Python only judges Gmail later. Neither talks to the other at runtime.
 
@@ -30,12 +30,14 @@ One PBAC checkbox that sends more than one template packs Triggers, subjects, an
 | DS Release | TRUE | Dcp |
 | DS Reject | TRUE | Submitter |
 | DS Complete | TRUE | Submitter |
+| DS Config Change | FALSE | AlternateSubmitter (To); prior Submitter Cc |
+| DS PV Request | FALSE | Dcp (Cc Fedlead, Admin) |
 | Request Access | TRUE | Admin |
 | Account Disabled | TRUE | Admin, Fedlead, Dcp, Submitter, User (one case, five rows) |
 
 Tests do not hardcode expected subjects or body snippets. Fill Trigger on a Permissions email row to include it in `logEmails`. Leave Trigger blank on the `access:request` permission row (the Request Access button). Do not add extra Permissions rows for extra templates; pack tokens on the existing checkbox row, or fill Trigger / subject / **Expected body contains** on the matching existing row. Packed examples: **When review decision made** (`SR Reject | SR Approve | SR Inquire`) and **When canceled/restored** (`SR Cancel | SR Restore`). Conditional-approve bodies live on the three `pending_*` rows; the cleared template lives on **When conditionally approved**. One mail goes To: the Submitter (optional BCC). Unique study titles keep Gmail rows apart when the subject is the same as `SR Approve`. Clean approve uses `look forward to supporting your study` so a pending-condition Decision mail cannot Pass an `SR Approve` row.
 
-SR and DS cases call `logBccEmails(..., 'FedleadBcc')` after each `logEmails` except **SR Available for Review** (To: Fedlead; **DcpBcc** and **AdminBcc** are still logged) and **DS Create** (Fedlead and Admin are **Cc**, via `logCcEmails` `FedleadCc` / `AdminCc`; no Bcc). They also call `logBccEmails(..., 'DcpBcc')` after those same actions, plus Available for Review, except **DS Create**, **DS Withdraw**, and **DS Release** (DCP is already To). They call `logBccEmails(..., 'AdminBcc')` after every SR/DS trigger we log except **DS Create** (AdminCc instead), including Available for Review, Withdraw, and Release. **Request Access** and **Account Disabled** stay To-only. `pbac.fedlead@gmail.com`, `vincentnihtestfour@gmail.com`, and `pbacmaster@gmail.com` already have all SR/DS notification checkboxes on (manual CRDC setup; tests do not call `EnableAllPermissions` on these users).
+SR and DS cases call `logBccEmails(..., 'FedleadBcc')` after each `logEmails` except **SR Available for Review** (To: Fedlead; **DcpBcc** and **AdminBcc** are still logged), **DS Create**, and **DS PV Request** (Fedlead and Admin are **Cc**, via `logCcEmails` `FedleadCc` / `AdminCc`; no Bcc on those). They also call `logBccEmails(..., 'DcpBcc')` after those same actions, plus Available for Review, except **DS Create**, **DS Withdraw**, **DS Release**, and **DS PV Request** (DCP is already To on those). **DS Config Change** logs To on the new submitter (`AlternateSubmitterEmail`, QA option 2), `SubmitterCc` on the prior automation submitter, plus Fedlead, DCP, and Admin Bcc. **DS PV Request** logs Fedlead and Admin **Cc** only (same `FedleadCc` / `AdminCc` as DS Create). They call `logBccEmails(..., 'AdminBcc')` after every SR/DS trigger we log except **DS Create** and **DS PV Request** (AdminCc instead), including Available for Review, Withdraw, Release, and Config Change. **Request Access** and **Account Disabled** stay To-only. `pbac.fedlead@gmail.com`, `vincentnihtestfour@gmail.com`, and `pbacmaster@gmail.com` already have all SR/DS notification checkboxes on (manual CRDC setup; tests do not call `EnableAllPermissions` on these users).
 
 ## 2. TC01 — Submitter submits an SR
 
@@ -135,7 +137,7 @@ Only then:
 
 To is the Submitter. Submit still sends create/submit mail; this case does not log `DS Create` or `DS Submit`.
 
-## 8. TC07 — DCP completes a DS
+## 8. DS TC06 — DCP completes a DS
 
 TC02 steps 1–3 as Submitter → `Login.switchUser('Dcp')` → `DataSubmissions.releaseDataSubmission(dsId)` → `DataSubmissions.completeDataSubmission()` (`clickTab` Complete, `clickTab` Yes, wait until status is Completed).
 
@@ -150,7 +152,37 @@ Only then:
 
 To is the Submitter. Submit and Release still send mail; this case does not log `DS Create`, `DS Submit`, or `DS Release`.
 
-## 9. TC08 — User requests access
+## 9. DS TC07 — DCP changes submitter (config change)
+
+Submitter creates one DS → `Login.switchUser('Dcp')` → open upload activity → `DataSubmissions.updateSubmitterName()`.
+
+Only then:
+
+`logEmails('DS Config Change', 'Dcp', dsId, dsName, 'AlternateSubmitter')`
+
+`logCcEmails('DS Config Change', 'Dcp', dsId, dsName, 'SubmitterCc')`
+
+`logBccEmails('DS Config Change', 'Dcp', dsId, dsName, 'FedleadBcc')`
+
+`logBccEmails('DS Config Change', 'Dcp', dsId, dsName, 'DcpBcc')`
+`logBccEmails('DS Config Change', 'Dcp', dsId, dsName, 'AdminBcc')`
+
+To is the newly assigned submitter (`AlternateSubmitterEmail` on **CRDC_QA**, must match `SubmitterDd-Option-2`). Cc is the prior submitter (`SubmitterEmail`). Create may still send DCP create mail; this case does not log `DS Create`.
+
+## 10. DS TC08 — Submitter requests a new PV
+
+Submitter creates one DS, uploads metadata (`TC09_SubmitterRquestNew-PV`), validates, then `DataSubmissions.requestNewPermissibleValue(...)`.
+
+Only then:
+
+`logEmails('DS PV Request', 'Submitter', dsId, dsName, 'Dcp')`
+
+`logCcEmails('DS PV Request', 'Submitter', dsId, dsName, 'FedleadCc')`
+`logCcEmails('DS PV Request', 'Submitter', dsId, dsName, 'AdminCc')`
+
+To is DCP. Fedlead and Admin are Cc (not Bcc). No DcpCc (DCP is already To).
+
+## 11. Miscellaneous TC01 — User requests access
 
 Login User → `Pbac.submitAccessRequest()` (Profile → Request Access, Institution `AutoTest-Institution`, study `AutoTest-Study`, unique Additional Info, native Submit). Stops if the dialog does not close.
 
@@ -158,9 +190,9 @@ Only then:
 
 `logEmails('Request Access', 'User', created.id, created.name, 'Admin')`
 
-To is Admin. Entity type is blank (Miscellaneous). `created.id` and `created.name` are the Additional Info token. Admin’s Request Access email checkbox is already on by default; this case does not turn permissions on. Request Access stays To-only (no `logBccEmails`).
+To is Admin. Entity type is **Misc**. `created.id` and `created.name` are the Additional Info token. Admin’s Request Access email checkbox is already on by default; this case does not turn permissions on. Request Access stays To-only (no `logBccEmails`).
 
-## 10. TC09 — Submitter cancels and restores an In Progress SR
+## 12. TC09 — Submitter cancels and restores an In Progress SR
 
 TC01 steps 1–2, then `SubmissionRequest.cancelSubmissionRequestButton()`, then `SubmissionRequest.restoreSubmissionRequest(studyName)` (list, Status Canceled plus study, Restore icon, reason, Confirm). Does **not** Submit.
 
@@ -182,7 +214,7 @@ Only then:
 
 To is the Submitter (`toRole`). Cancel and Restore share one PBAC checkbox; this case logs both packed tokens.
 
-## 11. TC10 — Fedlead rejects an SR
+## 13. TC10 — Fedlead rejects an SR
 
 TC01 steps 1–3 as Submitter → `Login.switchUser('Fedlead')` → `SubmissionRequest.rejectSubmissionRequest(studyName)`.
 
@@ -197,7 +229,7 @@ Only then:
 
 To is the Submitter. `logBccEmails` writes **Recipient kind** = Bcc rows for `FedleadBccEmail`, `DcpBccEmail`, and `AdminBccEmail` (CRDC_QA only). Verify searches each mailbox; the address must not be in To or Cc. Submit still sends TC01 mail; this case does not log `SR Submit`.
 
-## 12. TC11 — Fedlead approves and reopens an SR
+## 14. TC11 — Fedlead approves and reopens an SR
 
 TC01 steps 1–3 as Submitter → `Login.switchUser('Fedlead')` → `SubmissionRequest.approveSubmissionRequest(studyName)` (no pending-condition checkboxes) → `logEmails('SR Approve', ...)` → `SubmissionRequest.reopenApprovedSubmissionRequest(studyName)` (list, Status Approved plus study, Reopen, Confirm without changing Owner).
 
@@ -219,7 +251,7 @@ Then:
 
 Approve is logged before Reopen so a missing Reopen button still leaves the approve checklist rows. To is the Submitter for both. Approve and Reopen are separate PBAC checkboxes; this case logs both. Inquire Resume does not send the reopen mail. Submit mail is not logged here.
 
-## 13. TC12 — Fedlead inquires on an SR
+## 15. TC12 — Fedlead inquires on an SR
 
 TC01 steps 1–3 as Submitter → `Login.switchUser('Fedlead')` → `SubmissionRequest.inquireSubmissionRequest(studyName)` (Request Additional Information, comment, Confirm to move to Inquired).
 
@@ -234,7 +266,7 @@ Only then:
 
 To is the Submitter. Same BCC rule as TC10. Submit mail is not logged here.
 
-## 14. TC13 — Conditional approve (data model) and clear pending
+## 16. TC13 — Conditional approve (data model) and clear pending
 
 TC01 steps 1–3 as Submitter (Open access so dbGaP/GPA do not fire) → `Login.switchUser('Fedlead')` → `SubmissionRequest.approveSubmissionRequestWithModelChangePending(studyName)` (Approve dialog, check Require Data Model changes, comment, Confirm) → `logEmails('SR Conditional Model', ...)` → `Login.switchUser('Admin')` → `ManageStudies.navigateToManageStudies()` → `editExistingStudy(studyName, [pendingConditions: [false]])`.
 
@@ -256,7 +288,7 @@ Then:
 
 Model pending is logged before the Admin clear so a missing study-edit still leaves the model checklist rows. To is the Submitter for both. Catalog rows **Pending on model update** and **When conditionally approved**. Same Decision subject as `SR Approve`; unique study title keeps Gmail rows apart. Do not log `SR Approve` for this study. TC11 stays a clean approve. Submit mail is not logged here.
 
-## 15. TC14 — Fedlead conditionally approves an SR (missing dbGaP)
+## 17. TC14 — Fedlead conditionally approves an SR (missing dbGaP)
 
 TC01 steps 1–3 as Submitter with `fillSubmissionRequestAllSections(..., 'Controlled', 'No', ...)` → `Login.switchUser('Fedlead')` → `SubmissionRequest.approveSubmissionRequest(studyName)` (no pending-condition checkboxes).
 
@@ -271,7 +303,7 @@ Only then:
 
 To is the Submitter. Catalog row **Pending on dbGaPID**. Controlled with an empty GPA name may send the multi-condition template; the dbGaP sentence is still in that body. Submit mail is not logged here.
 
-## 16. TC15 — Fedlead conditionally approves an SR (image de-identification pending)
+## 18. TC15 — Fedlead conditionally approves an SR (image de-identification pending)
 
 TC01 steps 1–3 as Submitter (Open access) → `Login.switchUser('Fedlead')` → `SubmissionRequest.approveSubmissionRequestWithImageDeidPending(studyName)` (Approve dialog, check image de-identification, comment, Confirm).
 
@@ -286,7 +318,7 @@ Only then:
 
 To is the Submitter. Catalog row **Pending on image de-identification**. Submit mail is not logged here.
 
-## 17. TC16 — User submits an SR
+## 19. TC16 — User submits an SR
 
 Same as TC01 with `loginToCrdcOtp('User')`.
 
@@ -304,70 +336,71 @@ Same as TC01 with `loginToCrdcOtp('User')`.
 
 To is User for Received and Fedlead for Available for Review. Available for Review has DcpBcc and AdminBcc (no Fedlead Bcc). Unique study title keeps this Fedlead row apart from TC01.
 
-## 18. TC17 — User cancels and restores an In Progress SR
+## 20. TC17 — User cancels and restores an In Progress SR
 
 Same as TC09 with User login. Actor and `toRole` are `User` on both `SR Cancel` and `SR Restore`. Same `logBccEmails` after each.
 
-## 19. TC18 — Fedlead rejects a User-owned SR
+## 21. TC18 — Fedlead rejects a User-owned SR
 
 Same as TC10: User creates and submits, Fedlead rejects. `logEmails('SR Reject', 'Fedlead', srId, studyName, 'User')` then `logBccEmails` FedleadBcc, DcpBcc, and AdminBcc.
 
-## 20. TC19 — Fedlead approves and reopens a User-owned SR
+## 22. TC19 — Fedlead approves and reopens a User-owned SR
 
 Same as TC11 with User as applicant. Both `SR Approve` and `SR Reopen` use `toRole 'User'`. Actor stays Fedlead. Same `logBccEmails` after each.
 
-## 21. TC20 — Fedlead inquires on a User-owned SR
+## 23. TC20 — Fedlead inquires on a User-owned SR
 
 Same as TC12 with User as applicant. `logEmails('SR Inquire', 'Fedlead', srId, studyName, 'User')` then `logBccEmails` FedleadBcc, DcpBcc, and AdminBcc.
 
-## 22. TC21 — Conditional approve (data model) and clear pending, User-owned
+## 24. TC21 — Conditional approve (data model) and clear pending, User-owned
 
 Same as TC13 with User as applicant. `SR Conditional Model` and `SR Pending Cleared` use `toRole 'User'`. Actor is Fedlead then Admin. Same `logBccEmails` after each.
 
-## 23. TC22 — Fedlead conditionally approves a User-owned SR (missing dbGaP)
+## 25. TC22 — Fedlead conditionally approves a User-owned SR (missing dbGaP)
 
 Same as TC14 with User as applicant. `logEmails('SR Conditional dbGaP', 'Fedlead', srId, studyName, 'User')` then `logBccEmails` FedleadBcc, DcpBcc, and AdminBcc.
 
-## 24. TC23 — Fedlead conditionally approves a User-owned SR (image de-identification pending)
+## 26. TC23 — Fedlead conditionally approves a User-owned SR (image de-identification pending)
 
 Same as TC15 with User as applicant. `logEmails('SR Conditional Image', 'Fedlead', srId, studyName, 'User')` then `logBccEmails` FedleadBcc, DcpBcc, and AdminBcc.
 
-## 25. TC24 — Master disables each of the five automation accounts
+## 27. TC24 — Master disables each of the five automation accounts
 
 Login Master → Profile → Manage Users → `Pbac.disableThenRestoreUserAccounts(['Admin', 'Fedlead', 'Dcp', 'Submitter', 'User'])`. For each role: Inactive + Save, `logEmails`, Active + Save. Do not pass Master. Restore runs in `try/finally` so Active still happens if logging fails; restore failure `markFailedAndStop`. Inactive is the only send; Active is restore only. `account:inactivated` is default-on and disabled, so EnableAllPermissions is enough.
 
 `logEmails('Account Disabled', 'Master', email, 'pbac.{role}-automation', role)`
 
-`email` is the profile inbox (`AdminEmail` … `UserEmail`) for To:. Name is the lowercase `pbac.{role}-automation` token so Verify can require it in the Dear line. Entity type blank (Miscellaneous), same as TC08. Account Disabled stays To-only (no `logBccEmails`). Do not inactivate `pbac.fedlead@gmail.com`, `vincentnihtestfour@gmail.com`, or `pbacmaster@gmail.com` in this case.
+`email` is the profile inbox (`AdminEmail` … `UserEmail`) for To:. Name is the lowercase `pbac.{role}-automation` token so Verify can require it in the Dear line. Entity type **Misc**, same as Miscellaneous TC01 (Request Access). Account Disabled stays To-only (no `logBccEmails`). Do not inactivate `pbac.fedlead@gmail.com`, `vincentnihtestfour@gmail.com`, or `pbacmaster@gmail.com` in this case.
 
-## 26. VerifyNotificationEmails
+## 28. VerifyNotificationEmails
 
 No browser. `NotificationEmailLog.verifyNotificationEmails()` runs `PythonFiles/CRDC/VerifyNotificationEmails.py` with `Utils.getPythonExecutablePath()`. The case **fails** if the process exits non-zero (any Fail for today, or the checklist is missing). Pass/Skip rows are left unchanged. Last case in `CRDC_EmailNotifications`.
 
-## 27. logEmails, logBccEmails, and logCcEmails
+## 29. logEmails, logBccEmails, and logCcEmails
 
 One timestamp. Find the catalog row whose **Trigger** cell contains that token (plain value or ` | `-separated). Write one checklist row:
 
 - Action on the checklist = Trigger argument
+- Entity type = **SR**, **DS**, or **Misc** from the Permissions **Group** cell (Submission Request Emails, Data Submission Emails, Miscellaneous)
 - Actor = who clicked (script argument; Submitter except TC05/TC06/TC07 Dcp, TC08/TC16/TC17 User, TC10/TC11/TC12/TC14/TC15/TC18/TC19/TC20/TC22/TC23 Fedlead, TC13/TC21 Fedlead then Admin, and TC24 Master)
-- Expected recipient = profile email for the `toRole` argument (`SubmitterEmail` / `FedleadEmail` / `DcpEmail` / `AdminEmail` / `UserEmail`), or `FedleadBccEmail` / `DcpBccEmail` / `AdminBccEmail` when `logBccEmails` uses `bccRole` `FedleadBcc` / `DcpBcc` / `AdminBcc`, or when `logCcEmails` uses `ccRole` `FedleadCc` / `AdminCc` (same Gmail inboxes)
+- Expected recipient = profile email for the `toRole` argument (`SubmitterEmail` / `AlternateSubmitterEmail` / `FedleadEmail` / `DcpEmail` / `AdminEmail` / `UserEmail`), or `FedleadBccEmail` / `DcpBccEmail` / `AdminBccEmail` when `logBccEmails` uses `bccRole` `FedleadBcc` / `DcpBcc` / `AdminBcc`, or when `logCcEmails` uses `ccRole` `FedleadCc` / `AdminCc` (Fedlead/Admin Bcc Gmail inboxes), or `SubmitterEmail` when `logCcEmails` uses `SubmitterCc` (qa@ To mailbox)
 - Recipient kind = `To` (`logEmails`), `Bcc` (`logBccEmails`), or `Cc` (`logCcEmails`). Blank on older rows means To
 - Environment from `G_Urlname` (`QA` / `QA2` / `STAGE`; `hub-qa2` is checked before `hub-qa`)
 - Name = study title, DS display name, the Request Access Additional Info token, or the `pbac.{role}-automation` token for Account Disabled
 - Expected body contains = catalog snippet at the same Trigger token index
 - Result left blank
 
-Blank `toRole` / `bccRole` / `ccRole` or unknown Trigger → test fails. `FedleadBccEmail`, `DcpBccEmail`, and `AdminBccEmail` are on **CRDC_QA** only; blank on other profiles stops `logBccEmails` and `logCcEmails`. Packed Trigger, Expected email subject, and Expected body contains (when that cell is non-empty) must have the same token count. One UI action that sends two different mails (TC01) uses two `logEmails` calls with two Triggers. SR and DS cases also call `logBccEmails` after each `logEmails` except **SR Available for Review** (DcpBcc and AdminBcc only) and **DS Create** (`logCcEmails` FedleadCc and AdminCc; no DcpBcc; DCP is To) and **DS Withdraw** / **DS Release** (no DcpBcc; DCP is To; FedleadBcc and AdminBcc still logged). Request Access and Account Disabled stay To-only. One checkbox with several templates (reject / approve / inquire) stays one Permissions row with packed tokens; the test passes the Trigger for that click.
+Blank `toRole` / `bccRole` / `ccRole` or unknown Trigger → test fails. `FedleadBccEmail`, `DcpBccEmail`, and `AdminBccEmail` are on **CRDC_QA** only; blank on other profiles stops `logBccEmails` and `logCcEmails`. Packed Trigger, Expected email subject, and Expected body contains (when that cell is non-empty) must have the same token count. One UI action that sends two different mails (TC01) uses two `logEmails` calls with two Triggers. SR and DS cases also call `logBccEmails` after each `logEmails` except **SR Available for Review** (DcpBcc and AdminBcc only), **DS Create**, and **DS PV Request** (`logCcEmails` FedleadCc and AdminCc; no DcpBcc; DCP is To on Create and PV) and **DS Withdraw** / **DS Release** (no DcpBcc; DCP is To; FedleadBcc and AdminBcc still logged). **DS Config Change** logs To on `AlternateSubmitter`, Cc on `SubmitterCc`, and all three Bcc. Request Access and Account Disabled stay To-only. One checkbox with several templates (reject / approve / inquire) stays one Permissions row with packed tokens; the test passes the Trigger for that click.
 
-`appendFromCatalog` does the lookup. `appendRow` writes one Excel row. Tests call `logEmails` and, for Fedlead, DCP, and Admin BCC, `logBccEmails`. DS Create Fedlead and Admin use `logCcEmails`.
+`appendFromCatalog` does the lookup. `appendRow` writes one Excel row. Tests call `logEmails` and, for most SR/DS triggers, Fedlead, DCP, and Admin Bcc via `logBccEmails`. **DS Create** and **DS PV Request** use `logCcEmails` for Fedlead and Admin instead.
 
-## 28. Checklist
+## 30. Checklist
 
 Append-only `OutputFiles/NotificationEmail_Checklist.xlsx`. UI tests never open Gmail.
 
-## 29. Verifier (run after mail should be in the inbox)
+## 31. Verifier (run after mail should be in the inbox)
 
-`PythonFiles/CRDC/VerifyNotificationEmails.py` against `qa@essential-soft.com` (plus-aliases like `qa+crdc-automation-submitter@…` land in the same mailbox) for **To** rows, and against the Fedlead, DCP, and Admin Gmail inboxes for **Bcc** and **Cc** rows (`token-fedlead-bcc.json`, `token-dcp-bcc.json`, `token-admin-bcc.json`). Each Bcc or Cc row is searched only in the mailbox whose token profile email matches Expected recipient.
+`PythonFiles/CRDC/VerifyNotificationEmails.py` against `qa@essential-soft.com` (plus-aliases like `qa+crdc-automation-submitter@…` land in the same mailbox) for **To** rows and for **Cc** rows whose Expected recipient is a qa+ alias (`SubmitterCc` on DS Config Change). **Bcc** rows and **Cc** rows for Fedlead/Admin (`FedleadCc` / `AdminCc`) use the Fedlead, DCP, and Admin Gmail inboxes (`token-fedlead-bcc.json`, `token-dcp-bcc.json`, `token-admin-bcc.json`). Each row is searched only in the mailbox that receives that address.
 
 For each of **today’s** checklist rows that are still blank or Fail it:
 
@@ -384,7 +417,7 @@ Writes **Pass** or **Fail**. Re-run retries Fail/blank only; Pass/Skip stay. Con
 
 If Gmail returns 403/429 `rateLimitExceeded`, Verify waits 60 seconds and retries the same call (up to 5 attempts). A full To+Bcc run can take several minutes. A row only Fails as **Gmail rate limit** after those retries are exhausted; the first quota error is not treated as missing mail.
 
-## 30. How you run it
+## 32. How you run it
 
 1. Refresh Katalon Data File `CRDC/Pbac/Permissions` if you changed Trigger/Expected email subject/Name in body/Expected body contains (or after removing a column).
 2. Run TC01 through TC24 as needed (profile `CRDC_QA` / `CRDC_QA2` / `CRDC_STAGE`).
