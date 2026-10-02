@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-3140: phs_accession phs001234 mismatches registered dbGaP phs123456 on autoQAdbGaPID study. GC metadata only.</description>
+   <name>TC03_CRDCDH-3140_MismatchDbGaPID</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>198c2470-761b-430f-9fd4-696535fe5c4a</testCaseGuid>
+</TestCaseEntity>
