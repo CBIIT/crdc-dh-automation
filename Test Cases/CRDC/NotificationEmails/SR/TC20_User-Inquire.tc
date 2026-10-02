@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TestCaseEntity>
-   <description>User submits one SR, Fedlead Inquires it, then appends the expected inquire email row to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
-   <name>TC20_User-Inquire</name>
-   <tag>Filter</tag>
-   <comment></comment>
-   <recordOption>OTHER</recordOption>
-   <testCaseGuid>20a7e062-6c18-4f59-c14a-5ebf89134620</testCaseGuid>
-</TestCaseEntity>

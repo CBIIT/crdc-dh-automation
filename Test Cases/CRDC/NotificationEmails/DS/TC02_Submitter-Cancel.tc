@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Submitter creates one Data Submission and cancels it, then appends the expected cancel-email row to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
+   <name>TC02_Submitter-Cancel</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>3c2859e6-4cb6-48fc-9997-dd370e0c5162</testCaseGuid>
+</TestCaseEntity>

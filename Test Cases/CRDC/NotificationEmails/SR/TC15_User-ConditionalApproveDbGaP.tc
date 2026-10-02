@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>User submits one Controlled-access SR with dbGaP unregistered, Fedlead Approves it with no pending checkboxes. The case appends the expected dbGaP-pending email row to OutputFiles/NotificationEmail_Checklist.xlsx. Does not verify inboxes.</description>
+   <name>TC15_User-ConditionalApproveDbGaP</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>22a7e062-6c18-4f59-c14a-5ebf89134622</testCaseGuid>
+</TestCaseEntity>

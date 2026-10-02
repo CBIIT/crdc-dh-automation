@@ -142,7 +142,8 @@ class NotificationEmailLog {
 	/**
 	 * After a UI action, write one Cc checklist row for the matching Permissions Trigger.
 	 * Same catalog lookup as logEmails. ccRole FedleadCc uses FedleadBccEmail (CRDC_QA).
-	 * ccRole AdminCc uses AdminBccEmail (CRDC_QA). DS Create only (CRDCDH-2614).
+	 * ccRole AdminCc uses AdminBccEmail (CRDC_QA). DS Create (CRDCDH-2614) and DS PV Request (CRDCDH-2887).
+	 * ccRole SubmitterCc uses SubmitterEmail (DS Config Change; prior submitter).
 	 * Verify searches that mailbox; the address must be in Cc and not in To.
 	 */
 	@Keyword
@@ -196,7 +197,7 @@ class NotificationEmailLog {
 	/**
 	 * Look up Trigger on Permissions email rows (pipe-separated tokens allowed) and
 	 * append one checklist row. Blank Trigger cells are ignored. Entity type comes from Group
-	 * (Submission Request Emails -> SR, Data Submission Emails -> DS).
+	 * (Submission Request Emails -> SR, Data Submission Emails -> DS, Miscellaneous -> Misc).
 	 */
 	private static void appendFromCatalog(String trigger, String timestamp, String actor, String id, String name,
 			String role, String recipientKind) {
@@ -227,8 +228,7 @@ class NotificationEmailLog {
 			found = true
 			String entityType = entityTypeFromGroup(testData.getValue("Group", i)?.toString()?.trim() ?: "")
 			String bodySnippet = bodies ? bodies[tokenIndex] : ""
-			boolean hiddenInbox = (recipientKind == RECIPIENT_KIND_BCC || recipientKind == RECIPIENT_KIND_CC)
-			String expectedRecipient = hiddenInbox ? emailForBccRole(role) : emailForRole(role)
+			String expectedRecipient = expectedRecipientForKind(role, recipientKind)
 			String logPrefix = "logEmails "
 			if (recipientKind == RECIPIENT_KIND_BCC) {
 				logPrefix = "logBccEmails "
@@ -256,7 +256,7 @@ class NotificationEmailLog {
 	}
 
 	/**
-	 * SR vs DS for the checklist Entity type column, from the Permissions Group cell.
+	 * SR, DS, or Misc for the checklist Entity type column, from the Permissions Group cell.
 	 */
 	private static String entityTypeFromGroup(String group) {
 		String g = group?.toLowerCase() ?: ""
@@ -266,29 +266,63 @@ class NotificationEmailLog {
 		if (g.contains("data submission")) {
 			return "DS"
 		}
+		if (g.contains("miscellaneous")) {
+			return "Misc"
+		}
 		return ""
 	}
 
 	/**
+	 * Resolve Expected recipient from role and Recipient kind (To, Bcc, or Cc).
+	 */
+	private static String expectedRecipientForKind(String role, String recipientKind) {
+		if (recipientKind == RECIPIENT_KIND_TO) {
+			return emailForRole(role)
+		}
+		if (recipientKind == RECIPIENT_KIND_BCC) {
+			return emailForBccRole(role)
+		}
+		if (recipientKind == RECIPIENT_KIND_CC) {
+			return emailForCcRole(role)
+		}
+		return emailForRole(role)
+	}
+
+	/**
+	 * Map logCcEmails ccRole to profile inbox. SubmitterCc uses SubmitterEmail (qa@ aliases).
+	 * FedleadCc and AdminCc use the Fedlead and Admin Bcc Gmail inboxes.
+	 */
+	private static String emailForCcRole(String ccRole) {
+		String role = ccRole?.toLowerCase() ?: ""
+		if (role == "submittercc") {
+			return emailForRole('Submitter')
+		}
+		return emailForBccRole(ccRole)
+	}
+
+	/**
 	 * Map logEmails toRole to the matching profile inbox
-	 * (SubmitterEmail, FedleadEmail, DcpEmail, AdminEmail, or UserEmail).
+	 * (SubmitterEmail, AlternateSubmitterEmail, FedleadEmail, DcpEmail, AdminEmail, or UserEmail).
 	 */
 	private static String emailForRole(String toRole) {
 		String role = toRole?.toLowerCase() ?: ""
 		if (role == "submitter") {
-			return inbox(GlobalVariable.SubmitterEmail)
+			return requireProfileEmail(GlobalVariable.SubmitterEmail, "SubmitterEmail")
+		}
+		if (role == "alternatesubmitter") {
+			return requireProfileEmail(GlobalVariable.AlternateSubmitterEmail, "AlternateSubmitterEmail")
 		}
 		if (role == "fedlead") {
-			return inbox(GlobalVariable.FedleadEmail)
+			return requireProfileEmail(GlobalVariable.FedleadEmail, "FedleadEmail")
 		}
 		if (role == "dcp") {
-			return inbox(GlobalVariable.DcpEmail)
+			return requireProfileEmail(GlobalVariable.DcpEmail, "DcpEmail")
 		}
 		if (role == "admin") {
-			return inbox(GlobalVariable.AdminEmail)
+			return requireProfileEmail(GlobalVariable.AdminEmail, "AdminEmail")
 		}
 		if (role == "user") {
-			return inbox(GlobalVariable.UserEmail)
+			return requireProfileEmail(GlobalVariable.UserEmail, "UserEmail")
 		}
 		KeywordUtil.markFailedAndStop("Unknown toRole: " + toRole)
 		return ""
@@ -302,25 +336,13 @@ class NotificationEmailLog {
 	private static String emailForBccRole(String bccRole) {
 		String role = bccRole?.toLowerCase() ?: ""
 		if (role == "fedleadbcc" || role == "fedleadcc") {
-			String email = inbox(GlobalVariable.FedleadBccEmail)
-			if (!email) {
-				KeywordUtil.markFailedAndStop("FedleadBccEmail is blank. Set it on profile CRDC_QA.")
-			}
-			return email
+			return requireProfileEmail(GlobalVariable.FedleadBccEmail, "FedleadBccEmail")
 		}
 		if (role == "dcpbcc") {
-			String email = inbox(GlobalVariable.DcpBccEmail)
-			if (!email) {
-				KeywordUtil.markFailedAndStop("DcpBccEmail is blank. Set it on profile CRDC_QA.")
-			}
-			return email
+			return requireProfileEmail(GlobalVariable.DcpBccEmail, "DcpBccEmail")
 		}
 		if (role == "adminbcc" || role == "admincc") {
-			String email = inbox(GlobalVariable.AdminBccEmail)
-			if (!email) {
-				KeywordUtil.markFailedAndStop("AdminBccEmail is blank. Set it on profile CRDC_QA.")
-			}
-			return email
+			return requireProfileEmail(GlobalVariable.AdminBccEmail, "AdminBccEmail")
 		}
 		KeywordUtil.markFailedAndStop("Unknown bccRole or ccRole: " + bccRole)
 		return ""
@@ -331,6 +353,17 @@ class NotificationEmailLog {
 	 */
 	private static String inbox(Object value) {
 		return value?.toString()?.trim() ?: ""
+	}
+
+	/**
+	 * Profile inbox for logEmails / logCcEmails (SubmitterCc) / logBccEmails. Stops the test if blank.
+	 */
+	private static String requireProfileEmail(Object value, String profileVarName) {
+		String email = inbox(value)
+		if (!email) {
+			KeywordUtil.markFailedAndStop(profileVarName + " is blank. Set it on the execution profile.")
+		}
+		return email
 	}
 
 	/**
