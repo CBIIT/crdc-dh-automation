@@ -172,4 +172,25 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1032/TC02_CRDC-DataSubmissions-DataView</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>f6e4245a-384d-4dab-8feb-9ae738211867</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3140/TC01_CRDCDH-3140_ValidDbGaPMatch</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>255c8ced-6e32-4d39-abd6-17bacef14bd8</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3140/TC02_CRDCDH-3140_ValidDbGaPWithSuffix</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>148617d2-7cb9-43ab-a523-ae668b7fce82</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3140/TC03_CRDCDH-3140_MismatchDbGaPID</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>

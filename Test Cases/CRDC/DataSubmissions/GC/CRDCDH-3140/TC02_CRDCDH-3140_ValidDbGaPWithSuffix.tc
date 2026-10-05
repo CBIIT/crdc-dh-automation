@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-3140: phs_accession phs123456.v1.p1 — major portion matches registered dbGaP phs123456. GC metadata only.</description>
+   <name>TC02_CRDCDH-3140_ValidDbGaPWithSuffix</name>
+   <tag>Filter</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>25f52ea0-7ea1-4baf-8236-a6d55e67b7d1</testCaseGuid>
+</TestCaseEntity>
