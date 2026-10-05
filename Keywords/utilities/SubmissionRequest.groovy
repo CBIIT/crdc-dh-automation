@@ -69,10 +69,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Cookie as Cookie
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.HashSet
 import com.kms.katalon.core.configuration.RunConfiguration;
 import java.nio.file.Files;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -90,10 +86,10 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 	public static WebDriver driver
 
-	/** US Eastern reference for date tolerances (e.g. publication review) — adjust if env differs. */
-	private static final ZoneId STATUS_BAR_DATE_ZONE = ZoneId.of("America/New_York")
-
 	private static final int VERIFY_STATUS_BAR_DEFAULT_WAIT_SEC = 30
+
+	/** Fixed future date for SR date pickers (Section B planned pub, Section D delivery/publication). Bump when it becomes past. */
+	private static final String SR_QUESTIONNAIRE_FUTURE_DATE = '05/12/2036'
 
 	//*************** Input functions start here ****************
 	/**
@@ -119,17 +115,21 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		return formattedDate;
 	}
 
-	/** Planned publication date on review uses MM/dd/yyyy; tolerate zone and JVM default skew. */
-	private static Set<String> buildAcceptablePublicationReviewDates() {
-		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MM/dd/yyyy")
-		Set<String> dates = new HashSet<>()
-		LocalDate hubToday = LocalDate.now(STATUS_BAR_DATE_ZONE)
-		dates.add(hubToday.minusDays(1).format(fmt))
-		dates.add(hubToday.format(fmt))
-		dates.add(hubToday.plusDays(1).format(fmt))
-		dates.add(getCurrentDate("MM/dd/yyyy"))
-		dates.add(Utils.getCurrentDate("MM/dd/yyyy"))
-		return dates
+	private static void enterSectionBPlannedPublicationExpectedDate(String objPath) {
+		TestObject pubDateField = findTestObject(objPath + 'ExpectedPubDate-Clndr')
+		WebUI.waitForElementPresent(pubDateField, 10)
+		WebUI.click(pubDateField)
+		WebUI.setText(pubDateField, clearText() + SR_QUESTIONNAIRE_FUTURE_DATE)
+		String actual = WebUI.getAttribute(pubDateField, 'value')?.trim()
+		if (!actual) {
+			actual = WebUI.getText(pubDateField)?.trim()
+		}
+		KeywordUtil.logInfo(
+			"Planned publication Expected Publication Date — intended: ${SR_QUESTIONNAIRE_FUTURE_DATE}, field value: '${actual}'")
+		if (actual != SR_QUESTIONNAIRE_FUTURE_DATE) {
+			KeywordUtil.markFailed(
+				"Planned publication Expected Publication Date is '${actual}'; expected '${SR_QUESTIONNAIRE_FUTURE_DATE}'")
+		}
 	}
 
 	/**
@@ -574,10 +574,8 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 				clearText() + testData.getValue('pland-publictn-title', dataRowNum)
 				)
 
-		TestObject pubDateField = findTestObject(objPath + 'ExpectedPubDate-Clndr')
-		WebUI.clearText(pubDateField)
-		WebUI.setText(pubDateField, getCurrentDate("MM/dd/yyyy"))
-		KeywordUtil.logInfo("Successfully entered planned publication");
+		enterSectionBPlannedPublicationExpectedDate(objPath)
+		KeywordUtil.logInfo("Successfully entered planned publication")
 	}
 
 	/**
@@ -753,9 +751,9 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		TestObject targetedDeliveryDate = findTestObject('CRDC/SubmissionRequest/Section-D/TragetSubmDelivryDate-TxtBx')
 		TestObject expectedPublicationDate = findTestObject('CRDC/SubmissionRequest/Section-D/ExpctdPublicationDate-TxtBx')
 		WebUI.clearText(targetedDeliveryDate)
-		WebUI.setText(targetedDeliveryDate, "05/12/2036")
+		WebUI.setText(targetedDeliveryDate, SR_QUESTIONNAIRE_FUTURE_DATE)
 		WebUI.clearText(expectedPublicationDate)
-		WebUI.setText(expectedPublicationDate, "05/12/2036")
+		WebUI.setText(expectedPublicationDate, SR_QUESTIONNAIRE_FUTURE_DATE)
 		//TestObject targetSubDeDate = findTestObject('CRDC/SubmissionRequest/Section-D/TragetSubmDelivryDate-TxtBx');
 
 		//		WebUI.scrollToElement(targetSubDeDate, 10)
@@ -777,6 +775,21 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		WebUI.click(todayDateLocator)
 	}
 
+	private static final String NOTISTACK_SNACKBAR_LOC = 'CRDC/AILocators/Global/Notistack-Snackbar'
+	private static final int NOTISTACK_DISMISS_WAIT_SEC = 20
+
+	/**
+	 * Notistack toasts (e.g. after Save) can intercept clicks on Section D fields near the top of the viewport.
+	 * Non-fatal if no snackbar was shown or Utils times out.
+	 */
+	private static void waitForSubmissionRequestNotistackDismissed() {
+		try {
+			Utils.waitForElementNotVisible(NOTISTACK_SNACKBAR_LOC, NOTISTACK_DISMISS_WAIT_SEC)
+		} catch (Throwable t) {
+			KeywordUtil.logInfo("waitForSubmissionRequestNotistackDismissed: ${t.message}")
+		}
+	}
+
 	/**
 	 * This function selects Data Types on the submission request form
 	 * @param buttonLable Toggle button label to be clicked (enter only one word per toggle button)
@@ -785,6 +798,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	public static void selectDataTypes(String... buttonLable) {
 
 		ePath = "CRDC/SubmissionRequest/Section-D/";
+		waitForSubmissionRequestNotistackDismissed()
 		TestData testData = findTestData('CRDC/SubmissionRequest/section-d');
 		Thread.sleep(1000)
 
@@ -825,6 +839,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	public static void selectFileTypes(int fileTypRN, int fileExtRN, int numOfFileRN, int dataSizeRN) {
 
 		TestData testData = findTestData('CRDC/SubmissionRequest/section-d');
+		waitForSubmissionRequestNotistackDismissed()
 
 		WebUI.scrollToElement(findTestObject(ePath+'FileType-RowOne-Dd'), 20)
 		WebUI.click(findTestObject(ePath+'FileType-RowOne-Dd'))
@@ -1185,12 +1200,9 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		WebUI.verifyMatch(actual, expctd, false)
 
 		actual = WebUI.getText(findTestObject(ePath+'ExpctdPubDate-Txt'))
-		Set<String> acceptablePubDates = buildAcceptablePublicationReviewDates()
-		KeywordUtil.logInfo("Actual Planned publication date is: " + actual + " (verified within tolerance window)")
-		if (!acceptablePubDates.contains(actual.trim())) {
-			KeywordUtil.markFailed("Planned publication date on review '${actual}' not in acceptable range (expected one of: ${(acceptablePubDates as List).sort().join(', ')})")
-			return
-		}
+		expctd = SR_QUESTIONNAIRE_FUTURE_DATE
+		KeywordUtil.logInfo("Actual Planned publication date is: " + actual + " Expected Planned publication date is: " + expctd)
+		WebUI.verifyMatch(actual, expctd, false)
 		KeywordUtil.logInfo("Successfully verified Publications information");
 	}
 
@@ -1355,12 +1367,12 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(new Date())
 
 		actual = WebUI.getText(findTestObject(ePath+'TragetSubmDelivryDate-Txt'))
-		expctd = "05/12/2036";
+		expctd = SR_QUESTIONNAIRE_FUTURE_DATE
 		KeywordUtil.logInfo("Actual target data submission delivery date is: " + actual +" Expected target data submission delivery date is: "+expctd);
 		WebUI.verifyMatch(actual, expctd, false)
 
 		actual = WebUI.getText(findTestObject(ePath+'ExpctdPubliDateSec-D-RevPage-Txt'))
-		expctd =  "05/12/2036"
+		expctd = SR_QUESTIONNAIRE_FUTURE_DATE
 		KeywordUtil.logInfo("Actual Publication date is: " + actual +"\nExpected Publication date is: "+expctd);
 		WebUI.verifyMatch(actual, expctd, false)
 		KeywordUtil.logInfo("Successfully verified Data Types delivery dates");

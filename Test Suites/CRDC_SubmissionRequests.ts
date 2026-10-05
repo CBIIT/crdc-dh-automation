@@ -36,14 +36,14 @@
       <guid>28dc72df-3822-44ca-9ee2-726081c84f07</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2219/TC01_CRDCDH-2219_SubmitterCanCancelSubissionRequest</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2219/TC01_CRDCDH-2219_SubmitterCanCancelSubmissionRequest</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>3f7dda7c-7f54-4b63-91f2-2962929a3002</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2219/TC02_CRDCDH-2219_FedLeadCanCancelSubissionRequest</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2219/TC02_CRDCDH-2219_FedLeadCanCancelSubmissionRequest</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
