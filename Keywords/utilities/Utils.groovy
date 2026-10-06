@@ -762,6 +762,56 @@ public class Utils {
 	}
 
 	/**
+	 * Waits for a file under project Downloads whose name starts with {@code fileNamePrefix} and ends with {@code fileNameSuffix},
+	 * with stable non-zero size (same partial-download rules as waitForFileInProjectDownloads).
+	 *
+	 * @param fileNamePrefix e.g. {@code CRDC_Submission_Request_}
+	 * @param fileNameSuffix e.g. {@code .xlsx}
+	 * @param timeoutSeconds max wait time
+	 * @return Absolute path to the matched file
+	 */
+	@Keyword
+	public static String waitForFileInProjectDownloadsByPrefix(String fileNamePrefix, String fileNameSuffix, int timeoutSeconds) {
+		File dir = new File(RunConfiguration.getProjectDir(), "Downloads");
+		if (!dir.exists()) {
+			dir.mkdirs();
+		}
+		long deadline = System.currentTimeMillis() + (long) timeoutSeconds * 1000L;
+		KeywordUtil.logInfo("waitForFileInProjectDownloadsByPrefix: prefix='" + fileNamePrefix + "' suffix='" + fileNameSuffix + "' in " + dir.getAbsolutePath());
+		while (System.currentTimeMillis() < deadline) {
+			File[] entries = dir.listFiles();
+			if (entries != null) {
+				for (File f : entries) {
+					if (!f.isFile() || f.length() <= 0L) {
+						continue;
+					}
+					String name = f.getName();
+					if (name.startsWith(fileNamePrefix) && name.endsWith(fileNameSuffix)) {
+						File partial = new File(dir, name + ".crdownload");
+						if (partial.exists()) {
+							continue;
+						}
+						long len1 = f.length();
+						Thread.sleep(500);
+						if (partial.exists()) {
+							continue;
+						}
+						long len2 = f.length();
+						if (len1 == len2) {
+							String path = f.getAbsolutePath();
+							KeywordUtil.markPassed("Downloaded file ready: " + path + " (" + len1 + " bytes)");
+							return path;
+						}
+					}
+				}
+			}
+			Thread.sleep(400);
+		}
+		KeywordUtil.markFailed("waitForFileInProjectDownloadsByPrefix: timeout after " + timeoutSeconds + "s for prefix '" + fileNamePrefix + "' in " + dir.getAbsolutePath());
+		return null;
+	}
+
+	/**
 	 * Deletes every file in the project Downloads directory (same path as waitForFileInProjectDownloads
 	 * and CustomBrowserDriver). Subdirectories are not removed; only direct child files are deleted
 	 * (including *.crdownload partial downloads). No-op when the folder is empty or missing (creates the folder if absent).

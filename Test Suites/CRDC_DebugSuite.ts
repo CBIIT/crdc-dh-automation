@@ -12,59 +12,31 @@
    <rerunImmediately>true</rerunImmediately>
    <testSuiteGuid>da511912-1a63-433b-97f8-db467341cdb4</testSuiteGuid>
    <testCaseLink>
-      <guid>fb510f1f-4842-4c14-90a7-8a3704c23a8d</guid>
+      <guid>82d3975d-eea1-417c-b969-3be49ab5ac2d</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/NotificationEmails/SR/TC09_UserFedlead-Submit</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3948/TC02_CRDCDH-3948_InProgress_SaveRequiresNewContent</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>679dc671-8fd2-41ef-9eae-00de76b28895</guid>
+      <guid>3820cce1-8617-40a9-b62d-3cb7d3b7bb83</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/NotificationEmails/SR/TC10_User-CancelAndRestore</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3948/TC04_CRDCDH-3948_Reopened_SaveRequiresNewContent</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>583ab679-1a81-4be8-a427-76e43e33d4f2</guid>
+      <guid>b736a931-5486-401d-83a1-addbf8891d8b</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/NotificationEmails/SR/TC11_User-Reject</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3948/TC01_CRDCDH-3948_New_SaveRequiresNewContent</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>80d0062e-978d-45dc-8472-3a76be0a2b6b</guid>
+      <guid>dc7853e9-ef04-4bfb-971f-f1f7b932bb04</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/NotificationEmails/SR/TC12_User-ApproveAndReopen</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>667b6a06-a4bc-4745-8ee6-9aacee9c9ac0</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/NotificationEmails/SR/TC13_User-Inquire</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>008044d0-f9b8-465c-8d0e-1c5d181c12e4</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/NotificationEmails/SR/TC14_User-ConditionalApproveModelAndClearPending</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>49942253-f7a5-4c2e-9ee8-a3d7e3040f25</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/NotificationEmails/SR/TC15_User-ConditionalApproveDbGaP</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
-   <testCaseLink>
-      <guid>3e482a2a-f36a-48e8-886e-6af55ff809b0</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/NotificationEmails/SR/TC16_User-ConditionalApproveImage</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3948/TC03_CRDCDH-3948_InRevision_SaveRequiresNewContent</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>
