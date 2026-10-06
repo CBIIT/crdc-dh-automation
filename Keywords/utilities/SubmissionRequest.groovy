@@ -21,6 +21,7 @@ import internal.GlobalVariable
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.By
+import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.StaleElementReferenceException
 import com.kms.katalon.core.mobile.keyword.internal.MobileDriverFactory
 import com.kms.katalon.core.webui.driver.DriverFactory
@@ -1740,6 +1741,101 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	/** ValidationReport section for submission-request UI checks (snackbar, etc.); aligns with list section naming. */
 	private static final String SECTION_SUBMISSION_REQUEST_UI = "Submission Request"
 
+	/** CRDCDH-3948: Save disabled tooltip when the form has no unsaved changes (full text). */
+	public static final String SR_SAVE_DISABLED_TOOLTIP = 'No changes have been made. Please make edits to the form then click save.'
+	/** CRDCDH-3948: Substring passed to verifyTooltipOnHover for the Save disabled tooltip. */
+	public static final String SR_SAVE_DISABLED_TOOLTIP_SUBSTRING = 'No changes have been made'
+	/** CRDCDH-3948 / QA: Import when re-imported Excel matches current form (e.g. TC01 New). */
+	public static final String SR_IMPORT_NO_CHANGES_MESSAGE = 'No changes were applied. The imported file matches the current form.'
+	/** ImportApplicationButton: parsed Excel has incomplete sections (TC02 uses InputFiles fixture with invalid/incomplete rows). */
+	public static final String SR_IMPORT_VALIDATION_ERRORS_MESSAGE = 'Your data has been imported, but some pages contain validation errors. Please review each page and resolve before submitting.'
+	/** CRDCDH-3948 TC02: copy of QA export CRDC_Submission_Request_KT (v3.5); incomplete C/D → validation-errors snackbar. */
+	public static final String SR_IMPORT_VALIDATION_ERRORS_FIXTURE = 'InputFiles/CRDC/SubmissionRequest/CRDCDH-3948/CRDCDH-3948_TC02_import-with-validation-errors.xlsx'
+	/** ImportApplicationButton / ImportDialog when parse or save fails (not used for TC02 happy validation-errors path). */
+	public static final String SR_IMPORT_FAILED_MESSAGE = 'Import failed. Your data could not be imported. Please check the file format and template, then try again.'
+	/** ImportApplicationButton: all parsed sections Completed after successful import (e.g. TC03/TC04 full form). */
+	public static final String SR_IMPORT_ALL_PASSED_VALIDATION_MESSAGE = 'Your data has been imported and all passed validation. You may proceed to Review & Submit.'
+
+	private static final String SR_SAVE_TOOLTIP_TRIGGER = 'CRDC/AILocators/SubmissionRequests/Form/Navigation/Save-Btn-TooltipTrigger'
+
+	/**
+	 * CRDCDH-3948 req 2: hover Save tooltip trigger and verify the disabled-save message.
+	 */
+	@Keyword
+	public static void verifySubmissionRequestSaveDisabledTooltip() {
+		WebUIUtils.verifyTooltipOnHover(SR_SAVE_TOOLTIP_TRIGGER, SR_SAVE_DISABLED_TOOLTIP, SR_SAVE_DISABLED_TOOLTIP_SUBSTRING)
+	}
+
+	/**
+	 * Export the current Submission Request form to Excel (sidebar Export Form), wait for download under project Downloads.
+	 *
+	 * @param timeoutSeconds Max wait for the exported .xlsx file
+	 * @return Absolute path to the downloaded file
+	 */
+	@Keyword
+	public static String exportSubmissionRequestFormExcel(int timeoutSeconds = 60) {
+		Utils.clearProjectDownloadsFolder()
+		WebUIUtils.clickTab('CRDC/AILocators/SubmissionRequests/Form/ExportForm/ExportForm-Btn')
+		String path = Utils.waitForFileInProjectDownloadsByPrefix('CRDC_Submission_Request_', '.xlsx', timeoutSeconds)
+		if (path == null || path.trim().isEmpty()) {
+			KeywordUtil.markFailed('exportSubmissionRequestFormExcel: no exported file under Downloads')
+		}
+		return path
+	}
+
+	/**
+	 * Import a Submission Request Excel file via Import Form dialog (upload + confirm).
+	 *
+	 * @param absolutePath Path to .xlsx (typically from exportSubmissionRequestFormExcel)
+	 */
+	@Keyword
+	public static void importSubmissionRequestExcel(String absolutePath) {
+		if (absolutePath == null || absolutePath.trim().isEmpty()) {
+			KeywordUtil.markFailed('importSubmissionRequestExcel: absolutePath is required.')
+			return
+		}
+		File importFile = new File(absolutePath.trim())
+		if (!importFile.isFile()) {
+			KeywordUtil.markFailed("importSubmissionRequestExcel: file not found: ${importFile.getAbsolutePath()}")
+			return
+		}
+		String filePath = importFile.getAbsolutePath()
+
+		WebUIUtils.clickTab('CRDC/AILocators/SubmissionRequests/Form/ImportForm/ImportForm-Btn')
+		WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/SubmissionRequests/Form/ImportDialog/Upload-Input'), 15)
+		WebUI.uploadFile(findTestObject('CRDC/AILocators/SubmissionRequests/Form/ImportDialog/Upload-Input'), filePath)
+		WebUI.delay(2)
+		WebUIUtils.clickTab('CRDC/AILocators/SubmissionRequests/Form/ImportDialog/Confirm-Btn')
+	}
+
+	/**
+	 * Return to the Submission Request questionnaire as the owner via the list (Resume or View on the study row).
+	 * Used when the test left the form and must reopen it in edit mode (e.g. CRDCDH-3948 dirty-state checks).
+	 * Not used by notification-email helpers (they never reopen the form) or PBAC (list-only reopen visibility).
+	 * Distinct from reopenApprovedSubmissionRequest (Fedlead Reopen on Approved rows, stays on list) and from
+	 * approve/inquire/reject flows (Fedlead Review on the row).
+	 *
+	 * @param studyName Study title or search string for the Study filter (minimum 3 characters)
+	 */
+	@Keyword
+	public static void openSubmissionRequestFormForStudy(String studyName) {
+		if (studyName == null || studyName.trim().isEmpty()) {
+			KeywordUtil.markFailed("openSubmissionRequestFormForStudy: studyName is required.")
+			return
+		}
+		String token = studyName.trim()
+		if (token.length() < 3) {
+			KeywordUtil.markFailed("openSubmissionRequestFormForStudy: studyName must be at least 3 characters (Submission Requests Study filter).")
+			return
+		}
+		KeywordUtil.logInfo("openSubmissionRequestFormForStudy: list navigation for study token.")
+		new SubmissionRequestList().navigateToSubmissionRequestsList()
+		SubmissionRequestList.applySubmissionRequestsListFilters([study: token] as Map<String, String>)
+		WebUI.delay(2)
+		clickResumeOrViewForStudyRow(token)
+		WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Navigation/Save-Btn'), 40)
+	}
+
 	/**
 	 * Federal-lead (or reviewer) flow: open Submission Requests list, filter by study, open Review for the matching row,
 	 * open the Review section in the form sidebar (progress bar), then Reject with a comment and confirm.
@@ -1915,81 +2011,74 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	}
 
 	/**
-	 * Verifies the Notistack/MUI error snackbar shown on Submission Request flows (e.g. after Approve when validation fails).
-	 * Matches the hub DOM: {@code div.notistack-MuiContent-error[role='alert']}; message text is read from {@code #notistack-snackbar} when present, otherwise from the alert container.
-	 * <p>
-	 * Reusable for any submission-request error toast by passing the expected text (substring or full message).
-	 * </p>
+	 * Verifies a Notistack toast on Submission Request flows using {@code CRDC/AILocators/Global/Notistack-Snackbar}
+	 * ({@code id="notistack-snackbar"}). Waits for visibility, then polls until the message text matches.
+	 * {@code snackbarVariant} is optional metadata for the ValidationReport label only (not used for DOM lookup).
 	 *
 	 * @param expectedMessageText Substring that must appear in the snackbar (default), or the full message when {@code exactMatch} is true
-	 * @param timeoutSeconds Max seconds to wait for the error snackbar to become visible
+	 * @param timeoutSeconds Max seconds to wait for the snackbar and message
 	 * @param exactMatch If true, normalized snackbar text must equal {@code expectedMessageText} (after trim/collapse whitespace)
-	 * @param reportSection Section name in the HTML ValidationReport (call {@link ValidationReport#generateValidationReport()} at end of test)
+	 * @param reportSection Section name in the HTML ValidationReport (call ValidationReport.generateValidationReport at end of test)
+	 * @param snackbarVariant Optional label for the report (e.g. error, info, success); does not change the locator
 	 */
 	@Keyword
-	public static void verifySubmissionRequestSnackbarError(String expectedMessageText, int timeoutSeconds = 20, boolean exactMatch = false, String reportSection = SECTION_SUBMISSION_REQUEST_UI) {
+	public static void verifySubmissionRequestSnackbarError(String expectedMessageText, int timeoutSeconds = 20, boolean exactMatch = false, String reportSection = SECTION_SUBMISSION_REQUEST_UI, String snackbarVariant = 'error') {
 		String section = (reportSection != null && !reportSection.trim().isEmpty()) ? reportSection.trim() : SECTION_SUBMISSION_REQUEST_UI
 		if (expectedMessageText == null || expectedMessageText.trim().isEmpty()) {
-			ValidationReport.addValidationReportItem(section, "Error snackbar message", "(non-empty expected text)", "(missing)", "Fail")
+			ValidationReport.addValidationReportItem(section, "Snackbar message", "(non-empty expected text)", "(missing)", "Fail")
 			KeywordUtil.markFailed("verifySubmissionRequestSnackbarError: expectedMessageText is required.")
 			return
 		}
-		WebDriver driver = DriverFactory.getWebDriver()
-		WebDriverWait wait = new WebDriverWait(driver, timeoutSeconds)
-		By snackbarLocator = By.cssSelector("div.notistack-MuiContent-error[role='alert']")
-		WebElement snackbar
+		String variantLabel = (snackbarVariant != null && !snackbarVariant.trim().isEmpty()) ? snackbarVariant.trim().toLowerCase() : 'error'
+		String reportLabel = "Notistack snackbar" + (variantLabel ? " (" + variantLabel + ")" : "")
+		TestObject snackbarTo = findTestObject(NOTISTACK_SNACKBAR_LOC)
 		try {
-			snackbar = wait.until(ExpectedConditions.visibilityOfElementLocated(snackbarLocator))
+			WebUI.waitForElementVisible(snackbarTo, timeoutSeconds)
 		} catch (Exception e) {
-			ValidationReport.addValidationReportItem(section, "Error snackbar (Notistack)", "visible within " + timeoutSeconds + "s", "not found: " + e.getMessage(), "Fail")
-			KeywordUtil.markFailed("verifySubmissionRequestSnackbarError: error snackbar did not appear within " + timeoutSeconds + "s. " + e.getMessage())
+			ValidationReport.addValidationReportItem(section, reportLabel, "visible within " + timeoutSeconds + "s", "not found: " + e.getMessage(), "Fail")
+			KeywordUtil.markFailed("verifySubmissionRequestSnackbarError: snackbar did not appear within " + timeoutSeconds + "s. " + e.getMessage())
 			return
 		}
 
-		String visibleText = readNotistackErrorSnackbarText(wait, snackbarLocator, snackbar)
-		if (visibleText == null) {
-			visibleText = ""
-		}
-		String normalizedVisible = visibleText.replaceAll("\\s+", " ").trim()
 		String expected = expectedMessageText.trim()
+		String normalizedExpected = expected.replaceAll("\\s+", " ").trim()
 		String expectedForReport = exactMatch ? ("equals: " + expected) : ("contains: " + expected)
+		long deadlineMs = System.currentTimeMillis() + (long) timeoutSeconds * 1000L
+		String visibleText = ""
+		String normalizedVisible = ""
+		boolean matched = false
+		while (System.currentTimeMillis() < deadlineMs) {
+			try {
+				visibleText = WebUI.getText(snackbarTo)
+				if (visibleText == null) {
+					visibleText = ""
+				}
+				normalizedVisible = visibleText.replaceAll("\\s+", " ").trim()
+				if (exactMatch) {
+					matched = normalizedVisible.equals(normalizedExpected)
+				} else {
+					matched = normalizedVisible.contains(expected)
+				}
+				if (matched) {
+					break
+				}
+			} catch (StaleElementReferenceException e) {
+				KeywordUtil.logInfo("verifySubmissionRequestSnackbarError: stale snackbar, retrying...")
+			}
+			Thread.sleep(500)
+		}
 
-		if (exactMatch) {
-			String normalizedExpected = expected.replaceAll("\\s+", " ").trim()
-			if (!normalizedVisible.equals(normalizedExpected)) {
-				ValidationReport.addValidationReportItem(section, "Error snackbar (Notistack)", expectedForReport, visibleText, "Fail")
+		if (!matched) {
+			ValidationReport.addValidationReportItem(section, reportLabel, expectedForReport, visibleText, "Fail")
+			if (exactMatch) {
 				KeywordUtil.markFailed("verifySubmissionRequestSnackbarError: expected exact message '" + expected + "' but got '" + visibleText + "'")
-				return
-			}
-		} else {
-			if (!normalizedVisible.contains(expected)) {
-				ValidationReport.addValidationReportItem(section, "Error snackbar (Notistack)", expectedForReport, visibleText, "Fail")
+			} else {
 				KeywordUtil.markFailed("verifySubmissionRequestSnackbarError: expected snackbar to contain '" + expected + "' but got '" + visibleText + "'")
-				return
 			}
+			return
 		}
-		ValidationReport.addValidationReportItem(section, "Error snackbar (Notistack)", expectedForReport, visibleText, "Pass")
+		ValidationReport.addValidationReportItem(section, reportLabel, expectedForReport, visibleText, "Pass")
 		KeywordUtil.logInfo("verifySubmissionRequestSnackbarError: verified snackbar message.")
-	}
-
-	private static String readNotistackErrorSnackbarText(WebDriverWait wait, By snackbarLocator, WebElement snackbar) {
-		try {
-			return extractSnackbarVisibleText(snackbar)
-		} catch (StaleElementReferenceException e) {
-			WebElement refreshed = wait.until(ExpectedConditions.visibilityOfElementLocated(snackbarLocator))
-			return extractSnackbarVisibleText(refreshed)
-		}
-	}
-
-	private static String extractSnackbarVisibleText(WebElement snackbar) {
-		List<WebElement> inner = snackbar.findElements(By.id("notistack-snackbar"))
-		if (!inner.isEmpty()) {
-			String t = inner.get(0).getText()
-			if (t != null && !t.trim().isEmpty()) {
-				return t
-			}
-		}
-		return snackbar.getText()
 	}
 
 	/**
@@ -2123,6 +2212,87 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		WebUI.delay(1)
 		btn.click()
 		return true
+	}
+
+	/**
+	 * On the Submission Requests list (caller applies filters first): find the row for {@code studyToken} and open the form.
+	 * Submitter row actions are Resume or View, not Review/Reopen. Row matching follows the same rules as
+	 * clickSubmissionRequestsListReviewForStudyRow and clickSubmissionRequestsListViewForStudyRow: full study text in the row,
+	 * else exactly one visible row with Resume/View after filter, else a suffix of the study title when the grid truncates Study.
+	 */
+	private static void clickResumeOrViewForStudyRow(String studyToken) {
+		WebDriver driver = DriverFactory.getWebDriver()
+		String tableXpath = TestRunner.givexpath("CRDC/AILocators/GenericTable/Table")
+		WebElement table = driver.findElement(By.xpath(tableXpath))
+		List<WebElement> rows = table.findElements(By.xpath(".//tbody//tr"))
+		if (rows.isEmpty()) {
+			KeywordUtil.markFailed("Submission request list: table has no data rows.")
+			return
+		}
+
+		for (WebElement row : rows) {
+			String rowText = row.getText()
+			if (rowText != null && rowText.contains(studyToken) && clickResumeOrViewControlInListRow(driver, row)) {
+				KeywordUtil.logInfo("clickResumeOrViewForStudyRow: matched row by full study token.")
+				return
+			}
+		}
+
+		List<WebElement> rowsWithAction = new ArrayList<>()
+		for (WebElement row : rows) {
+			if (!findResumeOrViewControlsInListRow(row).isEmpty()) {
+				rowsWithAction.add(row)
+			}
+		}
+		if (rowsWithAction.size() == 1) {
+			KeywordUtil.logInfo("clickResumeOrViewForStudyRow: using single filtered row (study text may be truncated in the grid).")
+			if (clickResumeOrViewControlInListRow(driver, rowsWithAction.get(0))) {
+				return
+			}
+		}
+
+		if (studyToken.length() > 10) {
+			String tailToken = studyToken.substring(studyToken.length() - 10)
+			for (WebElement row : rows) {
+				String rowText = row.getText()
+				if (rowText != null && rowText.contains(tailToken) && clickResumeOrViewControlInListRow(driver, row)) {
+					KeywordUtil.logInfo("clickResumeOrViewForStudyRow: matched row by suffix of study token.")
+					return
+				}
+			}
+		}
+
+		KeywordUtil.markFailed("Submission request list: could not find Resume or View control (full title not in row text and " +
+				(rowsWithAction.size() == 0 ? "no row has Resume/View." : (rowsWithAction.size() + " rows have Resume/View—ambiguous; narrow filters.")))
+	}
+
+	private static List<WebElement> findResumeControlsInListRow(WebElement row) {
+		return row.findElements(By.xpath(".//button[contains(normalize-space(.), 'Resume')] | .//a[contains(normalize-space(.), 'Resume')]"))
+	}
+
+	/** True if the row exposes Resume or View (used to detect a single actionable row when Study text is truncated). */
+	private static List<WebElement> findResumeOrViewControlsInListRow(WebElement row) {
+		List<WebElement> resume = findResumeControlsInListRow(row)
+		if (!resume.isEmpty()) {
+			return resume
+		}
+		return findViewControlsInListRow(row)
+	}
+
+	/**
+	 * Click the list-row control that opens the form for the submitter: Resume when present, otherwise View.
+	 * List actions are located by visible label; Reopen uses a separate AILocator on Approved rows.
+	 */
+	private static boolean clickResumeOrViewControlInListRow(WebDriver driver, WebElement row) {
+		List<WebElement> resumeControls = findResumeControlsInListRow(row)
+		if (!resumeControls.isEmpty()) {
+			WebElement btn = resumeControls.get(0)
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", btn)
+			WebUI.delay(1)
+			btn.click()
+			return true
+		}
+		return clickViewControlInListRow(driver, row)
 	}
 
 	private static void fedLeadClickNextToNextSection() {

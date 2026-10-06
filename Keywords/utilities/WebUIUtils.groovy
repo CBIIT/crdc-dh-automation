@@ -276,6 +276,21 @@ class WebUIUtils {
 		}
 	}
 
+	@Keyword
+	static void verifyButtonEnabled(String objectRepositoryPath, boolean expectedEnabled) {
+		verifyButtonEnabled(findTestObject(objectRepositoryPath), expectedEnabled)
+	}
+
+	@Keyword
+	static void waitUntilStableForButtonEnabledOrDisabled(String objectRepositoryPath, String enabledOrDisabled, int timeoutSeconds) {
+		waitUntilStableForButtonEnabledOrDisabled(findTestObject(objectRepositoryPath), enabledOrDisabled, timeoutSeconds)
+	}
+
+	@Keyword
+	static void verifyTooltipOnHover(String triggerObjectRepositoryPath, String expectedText, String substringToFind) {
+		verifyTooltipOnHover(findTestObject(triggerObjectRepositoryPath), expectedText, substringToFind)
+	}
+
 	/**
 	 * Waits for the element to be clickable, retrying on StaleElementReferenceException (e.g. after tab switch when DOM re-renders).
 	 * Up to 5 attempts; each attempt uses the full timeout so we re-find the element on retry.

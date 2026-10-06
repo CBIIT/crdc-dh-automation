@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-3948: In Revision SRF (post-inquire) — Save disabled until dirty.</description>
+   <name>TC03_CRDCDH-3948_InRevision_SaveRequiresNewContent</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>c3948013-3333-4a48-8b03-394801000003</testCaseGuid>
+</TestCaseEntity>

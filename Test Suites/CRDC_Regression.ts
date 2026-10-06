@@ -15,7 +15,7 @@
       <guid>6a8ff107-32ea-4268-9362-701e3a93f9a9</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-1353/TC01_CRDCDH-1353_OnlySubmRequWithUniqueStudyNameCanBeApproved</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-1353/TC01_CRDCDH-1353_OnlySRWithUniqueStudyNameCanBeApproved</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>

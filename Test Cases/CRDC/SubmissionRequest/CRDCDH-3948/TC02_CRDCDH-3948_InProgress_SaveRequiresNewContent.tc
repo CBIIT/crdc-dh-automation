@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-3948: In Progress SRF — Save disabled until dirty after reopening the form from the list.</description>
+   <name>TC02_CRDCDH-3948_InProgress_SaveRequiresNewContent</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>c3948012-2222-4a48-8b02-394801000002</testCaseGuid>
+</TestCaseEntity>
