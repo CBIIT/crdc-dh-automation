@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description></description>
-   <name>TC01_CRDCDH-1353_OnlySubmRequWithUniqueStudyNameCanBeApproved</name>
+   <name>TC01_CRDCDH-1353_OnlySRWithUniqueStudyNameCanBeApproved</name>
    <tag>Filter</tag>
    <comment></comment>
    <recordOption>OTHER</recordOption>

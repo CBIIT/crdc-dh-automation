@@ -15,7 +15,7 @@
       <guid>df4cda73-4752-47ec-823e-352cf604238f</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-1353/TC01_CRDCDH-1353_OnlySubmRequWithUniqueStudyNameCanBeApproved</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-1353/TC01_CRDCDH-1353_OnlySRWithUniqueStudyNameCanBeApproved</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
@@ -72,6 +72,34 @@
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
       <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-304/TC01_CRDCDH-304_VerifyPrinInvInformationAutoPopulated</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>c3948011-aaaa-4a48-8b01-394801000011</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3948/TC01_CRDCDH-3948_New_SaveRequiresNewContent</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>c3948012-bbbb-4a48-8b02-394801000012</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3948/TC02_CRDCDH-3948_InProgress_SaveRequiresNewContent</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>c3948013-cccc-4a48-8b03-394801000013</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3948/TC03_CRDCDH-3948_InRevision_SaveRequiresNewContent</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>c3948014-dddd-4a48-8b04-394801000014</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3948/TC04_CRDCDH-3948_Reopened_SaveRequiresNewContent</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>

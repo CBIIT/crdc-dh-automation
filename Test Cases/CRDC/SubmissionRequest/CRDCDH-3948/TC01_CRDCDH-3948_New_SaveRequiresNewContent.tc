@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-3948: New SRF — Save disabled until dirty; import no-change; save transitions to In Progress.</description>
+   <name>TC01_CRDCDH-3948_New_SaveRequiresNewContent</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>c3948011-1111-4a48-8b01-394801000001</testCaseGuid>
+</TestCaseEntity>

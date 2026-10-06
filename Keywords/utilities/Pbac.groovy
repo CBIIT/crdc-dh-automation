@@ -1090,6 +1090,37 @@ class Pbac extends TestRunner {
 				return false
 			}
 		}
+		permissionToCheck["submission_request:reopen"] = { String userRole, String scenario ->
+			KeywordUtil.logInfo("Verifying SR Reopen...")
+			try {
+				Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 30)
+				WebUI.delay(1)
+				SubmissionRequest.clickHome()
+				TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
+				WebUI.delay(2)
+				SubmissionRequestList.applySubmissionRequestsListFilters([
+					submitterName: '',
+					program: '',
+					study: '',
+					status: 'Approved'
+				])
+				List<WebElement> rows = WebUI.findWebElements(findTestObject('CRDC/SubmissionRequest/SubmReqListTable-Row'), 20)
+				boolean noPermissionRow = rows.size() == 1 &&
+					rows[0].getText().contains('do not have the appropriate permissions')
+				boolean noApprovedRows = rows.isEmpty() || noPermissionRow
+				if (scenario.equalsIgnoreCase('positive') && noApprovedRows) {
+					KeywordUtil.markFailed(
+						'Approved submission required for reopen PBAC check; seed QA with at least one Approved SR visible to this role.')
+					return false
+				}
+				boolean reopenPresent = WebUIUtils.fastElementPresent('CRDC/AILocators/SubmissionRequests/List/Reopen-Btn')
+				KeywordUtil.logInfo("SR Reopen list rows: ${rows.size()}, Reopen control present: ${reopenPresent}")
+				return reopenPresent
+			} catch (Exception e) {
+				KeywordUtil.logInfo("Error verifying permission - submission_request:reopen -> ${e.message}")
+				return false
+			}
+		}
 		permissionToCheck["data_submission:view"] = {
 			KeywordUtil.logInfo("Verifying DS View...")
 			try {
@@ -1384,7 +1415,8 @@ class Pbac extends TestRunner {
 					KeywordUtil.markFailed("[ERROR] Exception during permission '${permission}': ${e.message}")
 				}
 			} else {
-				KeywordUtil.logInfo("[FUTURE DEVELOPMENT] No verification method mapped yet for '${permission}' — skipping.")
+				KeywordUtil.logInfo(
+					"Skipping '${permission}' — email/notification permission (see NotificationEmails suite).")
 			}
 		}
 	}

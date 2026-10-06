@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Import-Dialog</name>
+   <tag></tag>
+   <elementGuidId>a1b2c3d4-e5f6-4789-a012-394801000009</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;import-dialog&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;import-dialog&apos;]</value>
+      <webElementGuid>a1b2c3d4-e5f6-4789-a012-39480100000a</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

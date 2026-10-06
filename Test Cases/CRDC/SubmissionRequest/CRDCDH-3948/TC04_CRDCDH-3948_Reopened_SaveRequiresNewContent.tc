@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-3948: Reopened SRF — Save disabled until dirty; save transitions status.</description>
+   <name>TC04_CRDCDH-3948_Reopened_SaveRequiresNewContent</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>c3948014-4444-4a48-8b04-394801000004</testCaseGuid>
+</TestCaseEntity>
