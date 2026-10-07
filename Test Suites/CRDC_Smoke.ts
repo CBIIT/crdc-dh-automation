@@ -15,7 +15,7 @@
       <guid>9f291c07-f796-43a6-8835-d2ce3e92a732</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC10_DataSubmissionsListAndFilter</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC10_DataSubmissionsListAndFilter</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
@@ -29,35 +29,35 @@
       <guid>b0ab31ba-ca01-4384-af47-bc2c8dec8c0b</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC12_SubmissionRequestsListAndFilter</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC12_SubmissionRequestsListAndFilter</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>4e274902-eba3-4404-89de-25f47f638aa5</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC08_ManageStudiesListAndFilter</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC08_ManageStudiesListAndFilter</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>13405e82-87a3-41ac-81ce-cb19bb466288</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC09_ManageProgramsListAndFilter</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC09_ManageProgramsListAndFilter</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>d96db697-65a6-499c-a230-b0fea3cb15ed</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC03_TableSortingVerification</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC03_TableSortingVerification</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>f9b67898-3959-4251-a0ed-6ca31c5125d9</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC04_PaginationVerification</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC04_PaginationVerification</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-3913: Manage Studies CSV export — tooltips, empty state, filters, full export (not paginated), filename, columns. Admin full flow; Fed Lead smoke.</description>
+   <name>TC01_CRDCDH-3913_ManageStudiesCsvExport</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>39130101-3913-4a13-8391-391301391301</testCaseGuid>
+</TestCaseEntity>
