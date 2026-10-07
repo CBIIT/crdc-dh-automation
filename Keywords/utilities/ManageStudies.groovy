@@ -10,8 +10,12 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.StaleElementReferenceException
 
+import com.kms.katalon.core.testobject.TestObject
+
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.ArrayList
+import java.util.Arrays
 import java.util.Date
 import java.util.LinkedHashMap
 import java.util.List
@@ -28,7 +32,14 @@ import java.util.Map
 class ManageStudies extends TestRunner {
 
 	private static final String SECTION_MANAGE_STUDIES = "Manage Studies"
+	private static final String SECTION_MANAGE_STUDIES_EXPORT = "Manage Studies Export"
 	private static final int DEFAULT_TIMEOUT = 30
+
+	private static final String TOOLTIP_EXPORT_ENABLED = "Export the current list of Studies to CSV."
+	private static final String TOOLTIP_EXPORT_EMPTY = "No results to export. No studies match your filters."
+	private static final List<String> EXPECTED_MANAGE_STUDIES_CSV_HEADERS = Arrays.asList(
+			"Name", "Acronym", "dbGaPID", "Access Type", "Principal Investigator", "ORCID",
+			"Program", "Data Concierge", "Status", "Created Date")
 
 	/**
 	 * Navigate to Manage Studies from the global header and wait for the list page to be ready.
@@ -81,9 +92,10 @@ class ManageStudies extends TestRunner {
 
 	/**
 	 * Apply filter criteria to the Manage Studies list. Skips null or empty values.
-	 * Supported criteria keys: studyName, program, dbGaP. Program is applied via dropdown (click then select option by text).
+	 * Supported criteria keys: studyName, program, dbGaP, status (All|Active|Inactive), accessType (All|Open|Controlled).
+	 * Program is applied via dropdown (click then select option by text).
 	 *
-	 * @param criteria Map with optional keys: studyName (String), program (String), dbGaP (String)
+	 * @param criteria Map with optional keys: studyName (String), program (String), dbGaP (String), status (String), accessType (String)
 	 */
 	@Keyword
 	void applyManageStudiesFilters(Map<String, String> criteria) {
@@ -121,6 +133,12 @@ class ManageStudies extends TestRunner {
 					WebUI.setText(findTestObject("CRDC/AILocators/Studies/List/Filters/DbGaPID-TxtBx"), dbGaP)
 					WebUI.delay(1)
 				}
+			}
+			if (criteria.status != null && !criteria.status.trim().isEmpty()) {
+				selectManageStudiesFilterOption("CRDC/AILocators/Studies/List/Filters/Status-Ddn", "status-option-" + criteria.status.trim())
+			}
+			if (criteria.accessType != null && !criteria.accessType.trim().isEmpty()) {
+				selectManageStudiesFilterOption("CRDC/AILocators/Studies/List/Filters/AccessType-Ddn", "accessType-option-" + criteria.accessType.trim())
 			}
 			WebUI.delay(2)
 			KeywordUtil.logInfo("applyManageStudiesFilters: completed")
@@ -525,4 +543,218 @@ class ManageStudies extends TestRunner {
 			KeywordUtil.markFailed("editExistingStudy: " + e.getMessage())
 		}
 	}
+
+	/**
+	 * Resets Manage Studies list filters to defaults: empty study/dbGaP, program All, status Active, access All.
+	 */
+	@Keyword
+	void resetManageStudiesFilters() {
+		KeywordUtil.logInfo("--- resetManageStudiesFilters ---")
+		try {
+			if (WebUI.waitForElementPresent(findTestObject("CRDC/AILocators/Studies/List/Filters/StudyName-TxtBx"), 5)) {
+				WebUI.clearText(findTestObject("CRDC/AILocators/Studies/List/Filters/StudyName-TxtBx"))
+			}
+			if (WebUI.waitForElementPresent(findTestObject("CRDC/AILocators/Studies/List/Filters/DbGaPID-TxtBx"), 5)) {
+				WebUI.clearText(findTestObject("CRDC/AILocators/Studies/List/Filters/DbGaPID-TxtBx"))
+			}
+			selectManageStudiesFilterOption("CRDC/AILocators/Studies/List/Filters/Program-Ddn", "programID-option-All")
+			selectManageStudiesFilterOption("CRDC/AILocators/Studies/List/Filters/Status-Ddn", "status-option-Active")
+			selectManageStudiesFilterOption("CRDC/AILocators/Studies/List/Filters/AccessType-Ddn", "accessType-option-All")
+			WebUI.delay(2)
+			KeywordUtil.logInfo("resetManageStudiesFilters: completed")
+		} catch (Exception e) {
+			KeywordUtil.markFailed("resetManageStudiesFilters: " + e.getMessage())
+		}
+	}
+
+	/**
+	 * Opens a Manage Studies MUI filter dropdown and selects a menu item by its data-testid
+	 * (e.g. status-option-Active, accessType-option-Open, programID-option-All).
+	 *
+	 * @param dropdownRepositoryPath Object Repository path to the filter select control
+	 * @param optionDataTestId Full data-testid value of the MenuItem to click
+	 */
+	private void selectManageStudiesFilterOption(String dropdownRepositoryPath, String optionDataTestId) {
+		WebDriver driver = DriverFactory.getWebDriver()
+		if (WebUI.waitForElementPresent(findTestObject(dropdownRepositoryPath), 5)) {
+			WebUI.waitForElementClickable(findTestObject(dropdownRepositoryPath), 5)
+			WebUI.click(findTestObject(dropdownRepositoryPath))
+			WebUI.delay(1)
+			WebElement option = driver.findElement(By.xpath("//*[@data-testid='" + optionDataTestId.replace("'", "''") + "']"))
+			option.click()
+			WebUI.delay(1)
+		}
+	}
+
+	/**
+	 * Verifies the export control is visible, enabled, and shows the enabled-state tooltip when the table has rows.
+	 */
+	@Keyword
+	void verifyManageStudiesExportUiWhenHasData() {
+		KeywordUtil.logInfo("--- verifyManageStudiesExportUiWhenHasData ---")
+		WebUIUtils.verifyElementDisplayed(findTestObject('CRDC/AILocators/Studies/List/ExportStudies-Btn'))
+		TestObject exportBtn = findTestObject('CRDC/AILocators/Studies/List/ExportStudies-Btn')
+		WebUIUtils.waitUntilStableForButtonEnabledOrDisabled(exportBtn, 'enabled', 30)
+		WebUIUtils.verifyButtonEnabled(exportBtn, true)
+		WebUIUtils.verifyTooltipOnHover(
+				findTestObject('CRDC/AILocators/Studies/List/ExportStudies-Tooltip'),
+				TOOLTIP_EXPORT_ENABLED,
+				'Export the current list of Studies')
+	}
+
+	/**
+	 * Verifies export is disabled with the empty-result tooltip. Call after filters yield zero rows.
+	 */
+	@Keyword
+	void verifyManageStudiesExportUiWhenEmpty() {
+		KeywordUtil.logInfo("--- verifyManageStudiesExportUiWhenEmpty ---")
+		int total = WebUIUtils.getTableTotalEntryCount(0)
+		if (total != 0) {
+			KeywordUtil.markFailed("verifyManageStudiesExportUiWhenEmpty: expected table total 0, got " + total)
+			return
+		}
+		TestObject exportBtn = findTestObject('CRDC/AILocators/Studies/List/ExportStudies-Btn')
+		WebUIUtils.waitUntilStableForButtonEnabledOrDisabled(exportBtn, 'disabled', 30)
+		WebUIUtils.verifyButtonEnabled(exportBtn, false)
+		WebUIUtils.verifyTooltipOnHover(
+				findTestObject('CRDC/AILocators/Studies/List/ExportStudies-Tooltip'),
+				TOOLTIP_EXPORT_EMPTY,
+				'No results to export')
+	}
+
+	/**
+	 * Clears downloads, clicks export, verifies crdc-manage-studies-YYYY-MM-DD-HH-mm-ss.csv filename pattern.
+	 *
+	 * @return Absolute path to the downloaded CSV, or null on failure
+	 */
+	@Keyword
+	String clickManageStudiesExportAndVerifyDownloadedFileName() {
+		KeywordUtil.logInfo("--- clickManageStudiesExportAndVerifyDownloadedFileName ---")
+		Utils.clearProjectDownloadsFolder()
+		TestObject exportBtn = findTestObject('CRDC/AILocators/Studies/List/ExportStudies-Btn')
+		if (!WebUIUtils.waitForElementClickableWithStaleRetry(exportBtn, 60)) {
+			KeywordUtil.markFailed("clickManageStudiesExportAndVerifyDownloadedFileName: export button not clickable")
+			return null
+		}
+		WebUI.click(exportBtn)
+		String path = Utils.waitForFileInProjectDownloadsByPrefix('crdc-manage-studies-', '.csv', 60)
+		if (path == null || path.isEmpty()) {
+			KeywordUtil.markFailed("clickManageStudiesExportAndVerifyDownloadedFileName: no CSV in Downloads")
+			return null
+		}
+		String fileName = new File(path).getName()
+		def matcher = (fileName =~ /^crdc-manage-studies-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}\.csv$/)
+		if (!matcher.matches()) {
+			ValidationReport.addValidationReportItem(SECTION_MANAGE_STUDIES_EXPORT, "Downloaded file name",
+					"pattern: crdc-manage-studies-YYYY-MM-DD-HH-mm-ss.csv", fileName, "Fail")
+			KeywordUtil.markFailed("clickManageStudiesExportAndVerifyDownloadedFileName: filename does not match pattern. Got: " + fileName)
+			return null
+		}
+		ValidationReport.addValidationReportItem(SECTION_MANAGE_STUDIES_EXPORT, "Downloaded file name",
+				"pattern: crdc-manage-studies-YYYY-MM-DD-HH-mm-ss.csv", fileName, "Pass")
+		KeywordUtil.logInfo("clickManageStudiesExportAndVerifyDownloadedFileName: verified " + fileName)
+		return path
+	}
+
+	/**
+	 * Verifies CSV header columns match expected export columns and excludes Action.
+	 *
+	 * @param csvFilePath Absolute path to downloaded CSV
+	 */
+	@Keyword
+	void verifyManageStudiesExportCsvHeaders(String csvFilePath) {
+		KeywordUtil.logInfo("--- verifyManageStudiesExportCsvHeaders ---")
+		if (csvFilePath == null || csvFilePath.isEmpty()) {
+			KeywordUtil.markFailed("verifyManageStudiesExportCsvHeaders: csvFilePath is empty")
+			return
+		}
+		File csvFile = new File(csvFilePath)
+		List<String> headers = Utils.readCsvHeaderFields(csvFile)
+		if (headers.isEmpty()) {
+			KeywordUtil.markFailed("verifyManageStudiesExportCsvHeaders: no header row in " + csvFilePath)
+			return
+		}
+		boolean hasAction = headers.any { it != null && "Action".equalsIgnoreCase(it.trim()) }
+		String actionStatus = hasAction ? "Fail" : "Pass"
+		ValidationReport.addValidationReportItem(SECTION_MANAGE_STUDIES_EXPORT, "CSV excludes Action column", "absent", hasAction ? "present" : "absent", actionStatus)
+		if (hasAction) {
+			KeywordUtil.markFailed("verifyManageStudiesExportCsvHeaders: Action column must not be exported")
+			return
+		}
+		boolean headersMatch = headers.equals(EXPECTED_MANAGE_STUDIES_CSV_HEADERS)
+		ValidationReport.addValidationReportItem(SECTION_MANAGE_STUDIES_EXPORT, "CSV header columns",
+				EXPECTED_MANAGE_STUDIES_CSV_HEADERS.toString(), headers.toString(), headersMatch ? "Pass" : "Fail")
+		if (!headersMatch) {
+			KeywordUtil.markFailed("verifyManageStudiesExportCsvHeaders: header mismatch. Expected ${EXPECTED_MANAGE_STUDIES_CSV_HEADERS}, got ${headers}")
+		}
+	}
+
+	/**
+	 * Verifies CSV data row count matches the filtered UI total (export is not limited to the current page).
+	 *
+	 * @param expectedRows Total from getTableTotalEntryCount for current filters
+	 * @param csvFilePath Absolute path to downloaded CSV
+	 */
+	@Keyword
+	void verifyManageStudiesExportCsvRowCount(int expectedRows, String csvFilePath) {
+		KeywordUtil.logInfo("--- verifyManageStudiesExportCsvRowCount: expected ${expectedRows} ---")
+		if (csvFilePath == null || csvFilePath.isEmpty()) {
+			KeywordUtil.markFailed("verifyManageStudiesExportCsvRowCount: csvFilePath is empty")
+			return
+		}
+		File csvFile = new File(csvFilePath)
+		int csvRows = Utils.countCsvDataRowsExcludingHeader(csvFile)
+		String status = (csvRows == expectedRows) ? "Pass" : "Fail"
+		ValidationReport.addValidationReportItem(SECTION_MANAGE_STUDIES_EXPORT, "CSV data rows vs filtered UI total",
+				String.valueOf(expectedRows), String.valueOf(csvRows), status)
+		if (status == "Fail") {
+			KeywordUtil.markFailed("verifyManageStudiesExportCsvRowCount: UI total ${expectedRows}, CSV data rows ${csvRows} in ${csvFile.name}")
+		}
+	}
+
+	/**
+	 * When the study filter is applied, verifies each exported row reflects that filter. The UI study search
+	 * matches study name or acronym, so the token must appear in CSV Name or Acronym (not Name alone).
+	 *
+	 * @param csvFilePath Absolute path to downloaded CSV
+	 * @param studyFilterToken Substring from the study filter field (case-sensitive contains)
+	 */
+	@Keyword
+	void verifyManageStudiesExportCsvNameColumnContains(String csvFilePath, String studyFilterToken) {
+		if (studyFilterToken == null || studyFilterToken.trim().isEmpty()) {
+			KeywordUtil.logInfo("verifyManageStudiesExportCsvNameColumnContains: skipped (no token)")
+			return
+		}
+		String token = studyFilterToken.trim()
+		KeywordUtil.logInfo("--- verifyManageStudiesExportCsvNameColumnContains: token '" + token + "' ---")
+		File csvFile = new File(csvFilePath)
+		if (!csvFile.exists()) {
+			KeywordUtil.markFailed("verifyManageStudiesExportCsvNameColumnContains: file not found")
+			return
+		}
+		String text = new String(java.nio.file.Files.readAllBytes(csvFile.toPath()), java.nio.charset.StandardCharsets.UTF_8)
+		List<String> records = Utils.splitCsvIntoRecords(text)
+		if (records.size() <= 1) {
+			ValidationReport.addValidationReportItem(SECTION_MANAGE_STUDIES_EXPORT, "CSV rows match study filter",
+					"each row Name or Acronym contains '" + token + "'", "no data rows", "Pass")
+			return
+		}
+		int violations = 0
+		for (int i = 1; i < records.size(); i++) {
+			List<String> fields = Utils.parseCsvRecordFields(records.get(i))
+			String name = fields.size() > 0 ? (fields.get(0) ?: "") : ""
+			String acronym = fields.size() > 1 ? (fields.get(1) ?: "") : ""
+			boolean rowMatches = name.contains(token) || acronym.contains(token)
+			if (!rowMatches) {
+				violations++
+			}
+		}
+		String status = violations == 0 ? "Pass" : "Fail"
+		ValidationReport.addValidationReportItem(SECTION_MANAGE_STUDIES_EXPORT, "CSV rows match study filter",
+				"each row Name or Acronym contains '" + token + "'", violations == 0 ? "all match" : violations + " row(s) mismatch", status)
+		if (violations > 0) {
+			KeywordUtil.markFailed("verifyManageStudiesExportCsvNameColumnContains: ${violations} row(s) missing '" + token + "' in Name or Acronym")
+		}
+	}
+
 }

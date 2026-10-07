@@ -845,4 +845,104 @@ public class Utils {
 		}
 		KeywordUtil.logInfo("clearProjectDownloadsFolder: removed " + removed + " file(s) under " + dir.getAbsolutePath());
 	}
+
+	/**
+	 * Splits a UTF-8 CSV into logical records (quote-aware). Commas and newlines inside quoted fields stay in one record.
+	 */
+	public static List<String> splitCsvIntoRecords(String text) {
+		List<String> records = new ArrayList<>()
+		if (text == null || text.isEmpty()) {
+			return records
+		}
+		StringBuilder cur = new StringBuilder()
+		boolean inQuotes = false
+		for (int i = 0; i < text.length(); i++) {
+			char c = text.charAt(i)
+			if (c == '"') {
+				if (inQuotes && i + 1 < text.length() && text.charAt(i + 1) == '"') {
+					cur.append('"')
+					i++
+				} else {
+					inQuotes = !inQuotes
+					cur.append(c)
+				}
+			} else if (!inQuotes && (c == '\n' || c == '\r')) {
+				if (c == '\r' && i + 1 < text.length() && text.charAt(i + 1) == '\n') {
+					i++
+				}
+				String rec = cur.toString().trim()
+				if (!rec.isEmpty()) {
+					records.add(rec)
+				}
+				cur.setLength(0)
+			} else {
+				cur.append(c)
+			}
+		}
+		String last = cur.toString().trim()
+		if (!last.isEmpty()) {
+			records.add(last)
+		}
+		return records
+	}
+
+	/**
+	 * Parses one CSV record into field values (handles quoted fields and escaped quotes).
+	 */
+	public static List<String> parseCsvRecordFields(String record) {
+		List<String> fields = new ArrayList<>()
+		if (record == null) {
+			return fields
+		}
+		StringBuilder cur = new StringBuilder()
+		boolean inQuotes = false
+		for (int i = 0; i < record.length(); i++) {
+			char c = record.charAt(i)
+			if (c == '"') {
+				if (inQuotes && i + 1 < record.length() && record.charAt(i + 1) == '"') {
+					cur.append('"')
+					i++
+				} else {
+					inQuotes = !inQuotes
+				}
+			} else if (c == ',' && !inQuotes) {
+				fields.add(cur.toString().trim())
+				cur.setLength(0)
+			} else {
+				cur.append(c)
+			}
+		}
+		fields.add(cur.toString().trim())
+		return fields
+	}
+
+	/**
+	 * Counts data rows in a UTF-8 CSV file (first row treated as header).
+	 */
+	public static int countCsvDataRowsExcludingHeader(File csvFile) {
+		if (csvFile == null || !csvFile.exists()) {
+			return 0
+		}
+		String text = new String(java.nio.file.Files.readAllBytes(csvFile.toPath()), java.nio.charset.StandardCharsets.UTF_8)
+		List<String> records = splitCsvIntoRecords(text)
+		if (records.isEmpty()) {
+			return 0
+		}
+		return Math.max(0, records.size() - 1)
+	}
+
+	/**
+	 * Returns header column names from the first row of a CSV file.
+	 */
+	public static List<String> readCsvHeaderFields(File csvFile) {
+		if (csvFile == null || !csvFile.exists()) {
+			return new ArrayList<>()
+		}
+		String text = new String(java.nio.file.Files.readAllBytes(csvFile.toPath()), java.nio.charset.StandardCharsets.UTF_8)
+		List<String> records = splitCsvIntoRecords(text)
+		if (records.isEmpty()) {
+			return new ArrayList<>()
+		}
+		return parseCsvRecordFields(records.get(0))
+	}
 }
