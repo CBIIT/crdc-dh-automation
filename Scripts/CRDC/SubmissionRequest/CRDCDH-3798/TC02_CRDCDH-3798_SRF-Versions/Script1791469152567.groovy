@@ -1,6 +1,6 @@
 /*
  * CRDCDH-3798 TC02 — Step 2: Show All Versions, SRF Version column, Form Version hidden in GUI; 4b Reopen only on latest approved row.
- * Phase 5 (ownership transfer / prior-owner visibility) deferred until Reopen dialog Owner control is on QA.
+ * Phase 5 (Fed Lead owner transfer on Reopen): TC03.
  */
 import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
 

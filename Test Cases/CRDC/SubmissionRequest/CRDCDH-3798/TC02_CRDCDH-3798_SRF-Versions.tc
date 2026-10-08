@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
-   <description>CRDCDH-3798 Step 2 + 4b: Show All Versions, SRF Version column, Reopen only on latest approved row. Phase 5 deferred.</description>
+   <description>CRDCDH-3798 Step 2 + 4b: Show All Versions, SRF Version column, Reopen only on latest approved row.</description>
    <name>TC02_CRDCDH-3798_SRF-Versions</name>
    <tag></tag>
-   <comment>Double approve cycle; list UI and per-row Reopen eligibility. Phase 5 owner transfer blocked on UI.</comment>
+   <comment>Double approve cycle; list UI and per-row Reopen eligibility. Owner transfer on Reopen: see TC03.</comment>
    <recordOption>OTHER</recordOption>
    <testCaseGuid>a3798002-2222-4a48-8b04-379802000002</testCaseGuid>
 </TestCaseEntity>

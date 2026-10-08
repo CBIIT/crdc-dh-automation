@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
-   <description>CRDCDH-3798 Phase 5: Fed Lead owner transfer on Reopen; User edits REOPENED SRF; Submitter cannot Resume/View latest.</description>
+   <description>CRDCDH-3798 Phase 5: Fed Lead assigns User on Reopen; User Resume/View on Reopened list row, edit/save to In Progress; prior owner (Submitter) no Resume/View on In Progress latest row.</description>
    <name>TC03_CRDCDH-3798_SRF-Reopen-OwnerTransfer</name>
    <tag></tag>
-   <comment>Fedlead transfer to User; User edit/save; Submitter no Resume/View on REOPENED (partial multi-version access).</comment>
+   <comment>Fed Lead owner autocomplete to pbac.user-automation; list filters use dropdown labels Reopened and In Progress. Multi-version prior-owner access not covered here (see TC02).</comment>
    <recordOption>OTHER</recordOption>
    <testCaseGuid>a3798003-3333-4a48-8b04-379803000003</testCaseGuid>
 </TestCaseEntity>
