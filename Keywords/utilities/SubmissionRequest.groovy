@@ -1706,39 +1706,33 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			return
 		}
 		String token = ownerMatchText.trim()
-		TestObject ownerInputTo = findTestObject(REOPEN_DIALOG_OWNER_INPT)
-		if (!WebUI.waitForElementPresent(ownerInputTo, 10)) {
+		String escaped = token.replace("'", "''")
+		if (!WebUI.waitForElementPresent(findTestObject(REOPEN_DIALOG_OWNER_INPT), 10)) {
 			KeywordUtil.markFailed('selectReopenDialogOwner: Owner field not found in Reopen dialog.')
 			return
 		}
-		WebDriver driver = DriverFactory.getWebDriver()
-		WebElement input = WebUI.findWebElement(ownerInputTo, 10)
-		input.click()
+		WebUIUtils.clickTab(REOPEN_DIALOG_OWNER_INPT)
 		WebUI.delay(0.5)
-		// MUI Autocomplete is React-controlled; WebUI.setText appends if the prior value is not replaced.
-		String os = System.getProperty('os.name', '').toLowerCase()
-		Keys modKey = os.contains('mac') ? Keys.COMMAND : Keys.CONTROL
-		new Actions(driver).keyDown(modKey).sendKeys('a').keyUp(modKey).sendKeys(token).perform()
+		WebUIUtils.clearTextfieldByOs(REOPEN_DIALOG_OWNER_INPT)
+		WebUI.sendKeys(findTestObject(REOPEN_DIALOG_OWNER_INPT), token)
 		WebUI.delay(2)
-		String valueAfterType = input.getAttribute('value')
+		String valueAfterType = WebUI.getAttribute(findTestObject(REOPEN_DIALOG_OWNER_INPT), 'value')
 		KeywordUtil.logInfo('selectReopenDialogOwner: input value after search text: ' + (valueAfterType != null ? valueAfterType : '(null)'))
-		String escaped = token.replace("'", "''")
-		String optionXpath = "//ul[@role='listbox']//li[contains(normalize-space(.), '" + escaped + "')]"
-		WebDriverWait wait = new WebDriverWait(driver, 10)
-		WebElement option = null
-		try {
-			option = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(optionXpath)))
-		} catch (Exception ignored) {
-			List<WebElement> fallback = driver.findElements(By.xpath("//li[contains(normalize-space(.), '" + escaped + "')]"))
-			if (!fallback.isEmpty()) {
-				option = fallback.get(0)
-			}
+		TestObject ownerListOption = new TestObject('ReopenDialog_OwnerListOption')
+		ownerListOption.addProperty('xpath', ConditionType.EQUALS,
+				"//ul[@role='listbox']//li[contains(normalize-space(.), '" + escaped + "')]", true)
+		boolean optionReady = WebUI.waitForElementClickable(ownerListOption, 10, FailureHandling.OPTIONAL)
+		if (!optionReady) {
+			ownerListOption = new TestObject('ReopenDialog_OwnerListOption_Fallback')
+			ownerListOption.addProperty('xpath', ConditionType.EQUALS,
+					"//li[contains(normalize-space(.), '" + escaped + "')]", true)
+			optionReady = WebUI.waitForElementClickable(ownerListOption, 10, FailureHandling.OPTIONAL)
 		}
-		if (option == null) {
+		if (!optionReady) {
 			KeywordUtil.markFailed('selectReopenDialogOwner: no list option contains "' + token + '"')
 			return
 		}
-		option.click()
+		WebUI.click(ownerListOption)
 		WebUI.delay(1)
 		KeywordUtil.logInfo('selectReopenDialogOwner: selected option matching ' + token)
 	}
