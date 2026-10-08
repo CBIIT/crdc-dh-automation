@@ -1677,6 +1677,72 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		WebUI.delay(2)
 	}
 
+	private static final String REOPEN_DIALOG_OWNER_AUTOCOMPLETE = 'CRDC/AILocators/SubmissionRequests/ReopenDialog/Owner-Autocomplete'
+	private static final String REOPEN_DIALOG_OWNER_INPT = 'CRDC/AILocators/SubmissionRequests/ReopenDialog/Owner-Inpt'
+
+	/**
+	 * Assert the Reopen dialog Owner control is shown (Fed Lead/Admin) or hidden (Submitter owner).
+	 * Call after openReopenDialogForStudy while the delete-dialog is open.
+	 */
+	@Keyword
+	public static void verifyReopenOwnerControlVisible(boolean expectedVisible) {
+		boolean present = WebUIUtils.fastElementPresent(REOPEN_DIALOG_OWNER_AUTOCOMPLETE)
+		String label = 'Reopen dialog Owner field'
+		if (present == expectedVisible) {
+			ValidationReport.addValidationReportItem('Submission Request Reopen', label, String.valueOf(expectedVisible), String.valueOf(present), 'Pass')
+		} else {
+			ValidationReport.addValidationReportItem('Submission Request Reopen', label, String.valueOf(expectedVisible), String.valueOf(present), 'Fail')
+			KeywordUtil.markFailed(label + ': expected visible=' + expectedVisible + ', actual=' + present)
+		}
+	}
+
+	/**
+	 * Select a new owner on the Reopen dialog (Admin/Fed Lead). Types a PBAC account prefix (e.g. pbac.user-automation), then clicks the matching MUI list option.
+	 */
+	@Keyword
+	public static void selectReopenDialogOwner(String ownerMatchText) {
+		if (ownerMatchText == null || ownerMatchText.trim().isEmpty()) {
+			KeywordUtil.markFailed('selectReopenDialogOwner: ownerMatchText is required.')
+			return
+		}
+		String token = ownerMatchText.trim()
+		TestObject ownerInputTo = findTestObject(REOPEN_DIALOG_OWNER_INPT)
+		if (!WebUI.waitForElementPresent(ownerInputTo, 10)) {
+			KeywordUtil.markFailed('selectReopenDialogOwner: Owner field not found in Reopen dialog.')
+			return
+		}
+		WebDriver driver = DriverFactory.getWebDriver()
+		WebElement input = WebUI.findWebElement(ownerInputTo, 10)
+		input.click()
+		WebUI.delay(0.5)
+		// MUI Autocomplete is React-controlled; WebUI.setText appends if the prior value is not replaced.
+		String os = System.getProperty('os.name', '').toLowerCase()
+		Keys modKey = os.contains('mac') ? Keys.COMMAND : Keys.CONTROL
+		new Actions(driver).keyDown(modKey).sendKeys('a').keyUp(modKey).sendKeys(token).perform()
+		WebUI.delay(2)
+		String valueAfterType = input.getAttribute('value')
+		KeywordUtil.logInfo('selectReopenDialogOwner: input value after search text: ' + (valueAfterType != null ? valueAfterType : '(null)'))
+		String escaped = token.replace("'", "''")
+		String optionXpath = "//ul[@role='listbox']//li[contains(normalize-space(.), '" + escaped + "')]"
+		WebDriverWait wait = new WebDriverWait(driver, 10)
+		WebElement option = null
+		try {
+			option = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(optionXpath)))
+		} catch (Exception ignored) {
+			List<WebElement> fallback = driver.findElements(By.xpath("//li[contains(normalize-space(.), '" + escaped + "')]"))
+			if (!fallback.isEmpty()) {
+				option = fallback.get(0)
+			}
+		}
+		if (option == null) {
+			KeywordUtil.markFailed('selectReopenDialogOwner: no list option contains "' + token + '"')
+			return
+		}
+		option.click()
+		WebUI.delay(1)
+		KeywordUtil.logInfo('selectReopenDialogOwner: selected option matching ' + token)
+	}
+
 	/**
 	 * After list filters are applied, assert whether the Reopen list action is visible (any matching row).
 	 */
@@ -1701,6 +1767,36 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		} else {
 			ValidationReport.addValidationReportItem('Submission Request Reopen', label, String.valueOf(expectedVisible), String.valueOf(present), 'Fail')
 			KeywordUtil.markFailed("assertReopenButtonVisibleForStudy: expected Reopen present=" + expectedVisible + ", actual=" + present)
+		}
+	}
+
+	/**
+	 * After list filters are applied, assert whether Resume or View is visible on the filtered list (owner can open the SRF form).
+	 * statusFilter must match Status dropdown labels exactly (e.g. Reopened, In Progress), not status-bar uppercase text.
+	 */
+	@Keyword
+	public static void assertResumeOrViewVisibleForStudy(String studyName, boolean expectedVisible, String statusFilter = null) {
+		if (studyName == null || studyName.trim().length() < 3) {
+			KeywordUtil.markFailed("assertResumeOrViewVisibleForStudy: studyName must be at least 3 characters.")
+			return
+		}
+		SubmissionRequestList listHelper = new SubmissionRequestList()
+		listHelper.navigateToSubmissionRequestsList()
+		listHelper.resetSubmissionRequestsFilters()
+		Map<String, String> criteria = [study: studyName.trim()] as Map<String, String>
+		if (statusFilter != null && !statusFilter.trim().isEmpty()) {
+			criteria.status = statusFilter.trim()
+		}
+		SubmissionRequestList.applySubmissionRequestsListFilters(criteria)
+		boolean resume = WebUIUtils.fastElementPresent('CRDC/AILocators/SubmissionRequests/List/Resume-Btn')
+		boolean view = WebUIUtils.fastElementPresent('CRDC/AILocators/SubmissionRequests/List/View-Btn')
+		boolean present = resume || view
+		String label = "Resume or View visible (study filter, status=" + (statusFilter ?: 'any') + ")"
+		if (expectedVisible == present) {
+			ValidationReport.addValidationReportItem('Submission Request Reopen', label, String.valueOf(expectedVisible), String.valueOf(present), 'Pass')
+		} else {
+			ValidationReport.addValidationReportItem('Submission Request Reopen', label, String.valueOf(expectedVisible), String.valueOf(present), 'Fail')
+			KeywordUtil.markFailed("assertResumeOrViewVisibleForStudy: expected Resume/View present=" + expectedVisible + ", actual=" + present)
 		}
 	}
 

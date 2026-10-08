@@ -29,9 +29,10 @@ CustomKeywords.'utilities.SubmissionRequest.clickSubmitButton'()
 CustomKeywords.'utilities.Login.switchUser'('Fedlead')
 CustomKeywords.'utilities.SubmissionRequest.approveSubmissionRequest'(studyName)
 
-// Step 3: Submitter opens Reopen dialog — verify title, message, study/program; Cancel — verify row still Approved with Reopen available for owner.
+// Step 3: Submitter opens Reopen dialog — no Owner field; verify title, message, study/program; Cancel — row still Approved with Reopen for owner.
 CustomKeywords.'utilities.Login.switchUser'('Submitter')
 CustomKeywords.'utilities.SubmissionRequest.openReopenDialogForStudy'(studyName)
+CustomKeywords.'utilities.SubmissionRequest.verifyReopenOwnerControlVisible'(false)
 CustomKeywords.'utilities.SubmissionRequest.verifyReopenSubmissionRequestDialog'()
 CustomKeywords.'utilities.SubmissionRequest.cancelReopenDialog'()
 CustomKeywords.'utilities.SubmissionRequest.assertReopenButtonVisibleForStudy'(studyName, true, 'Approved')

@@ -156,19 +156,28 @@ class SubmissionRequestList extends TestRunner {
 							driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS)
 						}
 						int optionWaitSeconds = 5
+						List<String> statusOptionsNotFound = []
 						for (String raw : statusValues) {
 							String escaped = raw.replace("'", "''")
 							try {
 								List<WebElement> listboxCandidates = driver.findElements(By.xpath("//*[@role='listbox']"))
 								if (listboxCandidates.isEmpty()) listboxCandidates = driver.findElements(By.cssSelector("ul.MuiList-root"))
-								if (listboxCandidates.isEmpty()) break
-									WebElement listboxRef = listboxCandidates.get(0)
+								if (listboxCandidates.isEmpty()) {
+									statusOptionsNotFound.add(raw)
+									break
+								}
+								WebElement listboxRef = listboxCandidates.get(0)
 								WebElement opt = new WebDriverWait(driver, optionWaitSeconds).until(ExpectedConditions.presenceOfNestedElementLocatedBy(listboxRef, By.xpath(".//li[normalize-space(text())='" + escaped + "']")))
 								opt.click()
 								WebUI.delay(1)
 							} catch (Exception ex) {
 								KeywordUtil.logInfo("applySubmissionRequestsListFilters: Status option not found: '" + raw + "' - " + ex.getMessage())
+								statusOptionsNotFound.add(raw)
 							}
+						}
+						if (!statusOptionsNotFound.isEmpty()) {
+							KeywordUtil.markFailed("applySubmissionRequestsListFilters: Status option(s) not found in dropdown (use UI labels e.g. Approved, Reopened, In Progress): " + statusOptionsNotFound)
+							return
 						}
 						WebUI.delay(1)
 						try {
