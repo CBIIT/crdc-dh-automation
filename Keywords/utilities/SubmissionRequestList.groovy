@@ -202,22 +202,13 @@ class SubmissionRequestList extends TestRunner {
 	List<List<String>> readSubmissionRequestsTableRows() {
 		List<List<String>> result = new ArrayList<>()
 		try {
-			WebDriver driver = DriverFactory.getWebDriver()
-			String tableXpath = TestRunner.givexpath("CRDC/AILocators/GenericTable/Table")
-			WebElement table = driver.findElement(By.xpath(tableXpath))
-			List<WebElement> headerEls = table.findElements(By.xpath(".//thead//th"))
-			List<String> headers = new ArrayList<>()
-			for (WebElement h : headerEls) headers.add(h.getText().trim())
-			List<WebElement> rows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
-			if (rows == null) {
+			List<WebElement> rows = getListTableRows()
+			if (rows.isEmpty()) {
 				KeywordUtil.logInfo("Submission Requests table row count: 0")
 				return result
 			}
 			for (WebElement row : rows) {
-				List<WebElement> cells = row.findElements(By.tagName("td"))
-				List<String> cellTexts = new ArrayList<>()
-				for (WebElement cell : cells) cellTexts.add(cellTextForTableMatch(cell))
-				result.add(cellTexts)
+				result.add(rowCellTexts(row))
 			}
 			KeywordUtil.logInfo("Submission Requests table row count: " + result.size())
 		} catch (Exception e) {
@@ -284,6 +275,11 @@ class SubmissionRequestList extends TestRunner {
 		}
 	}
 
+	/**
+	 * Column index for a header label in the current GenericTable (case-insensitive exact match).
+	 *
+	 * @return index or -1 if not found
+	 */
 	private static int indexOfHeaderIgnoreCase(List<String> headers, String headerLabel) {
 		if (headers == null || headerLabel == null) return -1
 		String target = headerLabel.trim().toLowerCase()
@@ -293,7 +289,10 @@ class SubmissionRequestList extends TestRunner {
 		return -1
 	}
 
-	/** Full value for table matching when the UI shows truncated-text-label but aria-label has the full string. */
+	/**
+	 * Text used for table assertions when a cell renders truncated visible text.
+	 * Prefers full value from truncated-text-wrapper aria-label when present; otherwise cell getText().
+	 */
 	private static String cellTextForTableMatch(WebElement cell) {
 		if (cell == null) return ''
 		List<WebElement> wrappers = cell.findElements(By.cssSelector("[data-testid='truncated-text-wrapper']"))
@@ -305,7 +304,73 @@ class SubmissionRequestList extends TestRunner {
 	}
 
 	/**
+	 * Visible GenericTable body rows on the current page (Submission Requests list uses the shared GenericTable).
+	 */
+	private static List<WebElement> getListTableRows() {
+		List<WebElement> rows = Utils.getListWebElements('CRDC/AILocators/GenericTable/TableRow')
+		return (rows == null) ? new ArrayList<>() : rows
+	}
+
+	/**
+	 * Cell values for one table row, in column order, using cellTextForTableMatch for each td.
+	 */
+	private static List<String> rowCellTexts(WebElement row) {
+		List<String> cellTexts = new ArrayList<>()
+		if (row == null) return cellTexts
+		List<WebElement> cells = row.findElements(By.tagName('td'))
+		for (WebElement cell : cells) {
+			cellTexts.add(cellTextForTableMatch(cell))
+		}
+		return cellTexts
+	}
+
+	/**
+	 * Display name for a GenericTable th: visible text, or generic-table-header-* data-testid suffix when text is empty.
+	 */
+	private static String headerCellLabel(WebElement headerCell) {
+		if (headerCell == null) return ''
+		String text = headerCell.getText()?.replaceAll(/\s+/, ' ')?.trim()
+		if (text != null && !text.isEmpty()) return text
+		String testId = headerCell.getAttribute('data-testid') ?: ''
+		if (testId.startsWith('generic-table-header-')) {
+			return testId.replace('generic-table-header-', '')
+		}
+		return ''
+	}
+
+	/**
+	 * Header labels for the GenericTable on the current page (scoped to CRDC/AILocators/GenericTable/Table).
+	 */
+	private static List<String> readGenericTableHeaderLabels() {
+		List<String> headers = new ArrayList<>()
+		try {
+			WebDriver driver = DriverFactory.getWebDriver()
+			String tableXpath = TestRunner.givexpath('CRDC/AILocators/GenericTable/Table')
+			WebElement table = driver.findElement(By.xpath(tableXpath))
+			List<WebElement> headerEls = table.findElements(By.xpath('.//thead//th'))
+			for (WebElement h : headerEls) {
+				headers.add(headerCellLabel(h))
+			}
+		} catch (Exception e) {
+			KeywordUtil.logInfo('readGenericTableHeaderLabels: ' + e.getMessage())
+		}
+		return headers
+	}
+
+	/**
+	 * Index of the SRF Version column, with fallback to a legacy header named Version.
+	 */
+	private static int resolveSrfVersionColumnIndex(List<String> headers) {
+		int srfCol = indexOfHeaderIgnoreCase(headers, 'SRF Version')
+		if (srfCol < 0) {
+			srfCol = indexOfHeaderIgnoreCase(headers, 'Version')
+		}
+		return srfCol
+	}
+
+	/**
 	 * Toggle Show All Versions on the Submission Requests list filter header.
+	 * Clicks the checkbox only when its selected state differs from showAll.
 	 */
 	@Keyword
 	static void setShowAllVersions(boolean showAll) {
@@ -315,14 +380,16 @@ class SubmissionRequestList extends TestRunner {
 			KeywordUtil.markFailed("setShowAllVersions: Show All Versions control not found (data-testid show-all-versions-checkbox).")
 			return
 		}
-		WebElement checkbox = DriverFactory.getWebDriver().findElement(By.xpath(TestRunner.givexpath(locator)))
-		boolean checked = checkbox.isSelected()
+		boolean checked = WebUI.findWebElement(findTestObject(locator), DEFAULT_TIMEOUT).isSelected()
 		if (showAll != checked) {
 			WebUI.click(findTestObject(locator))
 			WebUI.delay(2)
 		}
 	}
 
+	/**
+	 * CRDCDH-3798 Step 2: Show All Versions filter checkbox should be unchecked on initial list load.
+	 */
 	@Keyword
 	static void verifyShowAllVersionsDefaultUnchecked() {
 		String locator = 'CRDC/AILocators/SubmissionRequests/List/Filters/ShowAllVersions-Chkbx'
@@ -330,12 +397,14 @@ class SubmissionRequestList extends TestRunner {
 			KeywordUtil.markFailed("verifyShowAllVersionsDefaultUnchecked: checkbox not found.")
 			return
 		}
-		WebElement checkbox = DriverFactory.getWebDriver().findElement(By.xpath(TestRunner.givexpath(locator)))
-		boolean checked = checkbox.isSelected()
+		boolean checked = WebUI.findWebElement(findTestObject(locator), DEFAULT_TIMEOUT).isSelected()
 		ValidationReport.addValidationReportItem(SECTION_SUBMISSION_REQUESTS, 'Show All Versions default', 'unchecked', checked ? 'checked' : 'unchecked', checked ? 'Fail' : 'Pass')
 		if (checked) KeywordUtil.markFailed("Show All Versions should be unchecked by default.")
 	}
 
+	/**
+	 * CRDCDH-3798 Step 2: SRF Version column header is present in the Submission Requests table.
+	 */
 	@Keyword
 	static void verifySubmissionRequestsSrfVersionColumnVisible() {
 		boolean present = WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/SubmissionRequests/List/Table/SRFVersion-Header'), 10)
@@ -343,11 +412,20 @@ class SubmissionRequestList extends TestRunner {
 		if (!present) KeywordUtil.markFailed("SRF Version column header not found.")
 	}
 
+	/**
+	 * CRDCDH-3798 Step 2: Form Version and legacy Version column headers must not appear on the list GenericTable.
+	 * SRF Version is allowed; only exact header labels Form Version and Version (not SRF Version) fail this check.
+	 */
 	@Keyword
 	static void verifySubmissionRequestsFormVersionColumnHiddenInGui() {
-		WebDriver driver = DriverFactory.getWebDriver()
-		boolean formVersionVisible = !driver.findElements(By.xpath("//th[normalize-space()='Form Version']")).isEmpty()
-		boolean legacyVersionVisible = !driver.findElements(By.xpath("//th[normalize-space()='Version']")).isEmpty()
+		List<String> headers = readGenericTableHeaderLabels()
+		boolean formVersionVisible = false
+		boolean legacyVersionVisible = false
+		for (String h : headers) {
+			String label = (h ?: '').trim()
+			if (label.equalsIgnoreCase('Form Version')) formVersionVisible = true
+			if (label.equalsIgnoreCase('Version')) legacyVersionVisible = true
+		}
 		boolean hidden = !formVersionVisible && !legacyVersionVisible
 		ValidationReport.addValidationReportItem(SECTION_SUBMISSION_REQUESTS, 'Form/legacy Version column hidden in GUI', 'hidden', hidden ? 'hidden' : 'visible', hidden ? 'Pass' : 'Fail')
 		if (!hidden) KeywordUtil.markFailed("Form Version or legacy Version column should not be visible in the GUI table.")
@@ -364,17 +442,9 @@ class SubmissionRequestList extends TestRunner {
 		String token = studyToken.trim().toLowerCase()
 		List<List<String>> rows = new SubmissionRequestList().readSubmissionRequestsTableRows()
 		if (rows.isEmpty()) return versions
-		WebDriver driver = DriverFactory.getWebDriver()
-		String tableXpath = TestRunner.givexpath('CRDC/AILocators/GenericTable/Table')
-		WebElement table = driver.findElement(By.xpath(tableXpath))
-		List<WebElement> headerEls = table.findElements(By.xpath('.//thead//th'))
-		List<String> headers = new ArrayList<>()
-		for (WebElement h : headerEls) headers.add(h.getText().trim())
+		List<String> headers = readGenericTableHeaderLabels()
 		int studyCol = indexOfHeaderIgnoreCase(headers, 'Study')
-		int srfCol = indexOfHeaderIgnoreCase(headers, 'SRF Version')
-		if (srfCol < 0) {
-			srfCol = indexOfHeaderIgnoreCase(headers, 'Version')
-		}
+		int srfCol = resolveSrfVersionColumnIndex(headers)
 		if (studyCol < 0 || srfCol < 0) {
 			KeywordUtil.logInfo("getSrVersionNumbersForStudy: Study col=" + studyCol + ", SRF Version col=" + srfCol)
 			return versions
@@ -389,6 +459,10 @@ class SubmissionRequestList extends TestRunner {
 		return versions
 	}
 
+	/**
+	 * With Show All Versions on, verifies at least minRowCount SRF version rows for the study and that
+	 * version numbers read top-to-bottom are in descending order (list default sort).
+	 */
 	@Keyword
 	static void verifySrVersionsDescendingForStudy(String studyToken, int minRowCount) {
 		List<Integer> versions = getSrVersionNumbersForStudy(studyToken)
@@ -425,7 +499,8 @@ class SubmissionRequestList extends TestRunner {
 	}
 
 	/**
-	 * Assert Reopen control visibility on the table row matching study token and SRF Version number.
+	 * Assert Reopen control visibility on the single row matching studyToken (Study column) and srfVersion.
+	 * Locates Reopen via Reopen-Btn Object Repository xpath scoped to the matched row.
 	 */
 	@Keyword
 	static void assertReopenOnRowWithSrVersion(String studyToken, int srfVersion, boolean expectedVisible) {
@@ -433,12 +508,33 @@ class SubmissionRequestList extends TestRunner {
 			KeywordUtil.markFailed("assertReopenOnRowWithSrVersion: studyToken must be at least 3 characters.")
 			return
 		}
-		String escapedStudy = studyToken.trim().replace("'", "''")
-		String tokenLower = escapedStudy.toLowerCase()
-		String reopenXpath = "//tr[(.//td[contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" +
-			tokenLower + "')] or .//*[@data-testid='truncated-text-wrapper' and contains(translate(@aria-label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" +
-			tokenLower + "')]) and .//td[normalize-space()='" + srfVersion + "']]//*[@data-testid='reopen-application-button']"
-		boolean present = DriverFactory.getWebDriver().findElements(By.xpath(reopenXpath)).size() > 0
+		List<String> headers = readGenericTableHeaderLabels()
+		int studyCol = indexOfHeaderIgnoreCase(headers, 'Study')
+		int srfCol = resolveSrfVersionColumnIndex(headers)
+		if (studyCol < 0 || srfCol < 0) {
+			KeywordUtil.markFailed("assertReopenOnRowWithSrVersion: Study or SRF Version column not found.")
+			return
+		}
+		String token = studyToken.trim().toLowerCase()
+		boolean rowFound = false
+		boolean present = false
+		for (WebElement row : getListTableRows()) {
+			List<String> cells = rowCellTexts(row)
+			if (cells.size() <= Math.max(studyCol, srfCol)) continue
+			String studyCell = cells[studyCol] ?: ''
+			if (!studyCell.toLowerCase().contains(token)) continue
+			String verText = cells[srfCol]?.trim()
+			if (!verText?.isInteger() || verText.toInteger() != srfVersion) continue
+			rowFound = true
+			String reopenXpath = TestRunner.givexpath('CRDC/AILocators/SubmissionRequests/List/Reopen-Btn')
+			if (reopenXpath.startsWith('//')) reopenXpath = '.' + reopenXpath
+			present = !row.findElements(By.xpath(reopenXpath)).isEmpty()
+			break
+		}
+		if (!rowFound) {
+			KeywordUtil.markFailed("assertReopenOnRowWithSrVersion: no row for study token and SRF version " + srfVersion)
+			return
+		}
 		String label = "Reopen on SRF version " + srfVersion
 		if (present == expectedVisible) {
 			ValidationReport.addValidationReportItem(SECTION_SUBMISSION_REQUESTS, label, String.valueOf(expectedVisible), String.valueOf(present), 'Pass')
