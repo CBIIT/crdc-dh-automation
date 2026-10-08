@@ -1595,6 +1595,115 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	 *
 	 * @param studyName Study title or search string for the Study filter (minimum 3 characters)
 	 */
+	private static void navigateToApprovedStudyOnList(String studyName) {
+		String token = studyName.trim()
+		new SubmissionRequestList().navigateToSubmissionRequestsList()
+		SubmissionRequestList.applySubmissionRequestsListFilters([study: token, status: 'Approved'] as Map<String, String>)
+	}
+
+	/**
+	 * Open the Reopen confirmation dialog for an Approved submission (list filter by study).
+	 */
+	@Keyword
+	public static void openReopenDialogForStudy(String studyName) {
+		if (studyName == null || studyName.trim().isEmpty()) {
+			KeywordUtil.markFailed("openReopenDialogForStudy: studyName is required.")
+			return
+		}
+		if (studyName.trim().length() < 3) {
+			KeywordUtil.markFailed("openReopenDialogForStudy: studyName must be at least 3 characters.")
+			return
+		}
+		KeywordUtil.logInfo("openReopenDialogForStudy: study token length=" + studyName.trim().length())
+		navigateToApprovedStudyOnList(studyName)
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/SubmissionRequests/List/Reopen-Btn'), 30, 'SR Reopen')
+		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/List/Reopen-Btn'))
+		WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/DeleteDialog/Dialog'), 10)
+	}
+
+	/**
+	 * Verify Reopen Submission Request dialog copy and study/program summary (CRDCDH-3670).
+	 * Uses shared DeleteDialog test objects. Program/study abbreviations default to last entered Section B values.
+	 */
+	@Keyword
+	public static void verifyReopenSubmissionRequestDialog(String studyAbbreviation = null, String programAbbreviation = null) {
+		String studyTitle = (lastEnteredStudyTitle ?: '').trim()
+		String studyAbbr = (studyAbbreviation != null && !studyAbbreviation.trim().isEmpty())
+			? studyAbbreviation.trim() : (lastEnteredStudyAbbreviation ?: '')
+		String programName = (programAbbreviation != null && !programAbbreviation.trim().isEmpty())
+			? programAbbreviation.trim() : (lastEnteredProgramName ?: '')
+		boolean ok = true
+		String headerText = WebUI.getText(findTestObject('CRDC/AILocators/DeleteDialog/Header-Lbl')).trim()
+		if (!headerText.contains('Reopen Submission Request')) {
+			KeywordUtil.markFailed("verifyReopenSubmissionRequestDialog: expected header to contain 'Reopen Submission Request', actual '" + headerText + "'")
+			ok = false
+		}
+		String description = WebUI.getText(findTestObject('CRDC/AILocators/DeleteDialog/Description-Lbl'))?.trim() ?: ''
+		if (!description.contains('Reopen an Approved Submission Request for Editing')) {
+			KeywordUtil.markFailed("verifyReopenSubmissionRequestDialog: expected description to contain 'Reopen an Approved Submission Request for Editing', actual: " + description)
+			ok = false
+		}
+		String studyValue = WebUI.getAttribute(findTestObject('CRDC/AILocators/SubmissionRequests/ReopenDialog/Study-TxtBx'), 'value')?.trim() ?: ''
+		if (studyTitle && !studyValue.contains(studyTitle)) {
+			KeywordUtil.markFailed("verifyReopenSubmissionRequestDialog: study field value missing title '" + studyTitle + "', actual: " + studyValue)
+			ok = false
+		}
+		if (studyAbbr && !studyValue.contains(studyAbbr)) {
+			KeywordUtil.markFailed("verifyReopenSubmissionRequestDialog: study field value missing abbreviation '" + studyAbbr + "', actual: " + studyValue)
+			ok = false
+		}
+		String programValue = WebUI.getAttribute(findTestObject('CRDC/AILocators/SubmissionRequests/ReopenDialog/Program-TxtBx'), 'value')?.trim() ?: ''
+		if (programName && !programValue.contains(programName)) {
+			KeywordUtil.markFailed("verifyReopenSubmissionRequestDialog: program field value missing '" + programName + "', actual: " + programValue)
+			ok = false
+		}
+		if (ok) {
+			ValidationReport.addValidationReportItem('Submission Request Reopen', 'Reopen dialog', 'title, message, study/program fields', 'verified', 'Pass')
+		}
+	}
+
+	@Keyword
+	public static void cancelReopenDialog() {
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/DeleteDialog/Cancel-Btn'), 30, 'SR Reopen Cancel')
+		WebUI.click(findTestObject('CRDC/AILocators/DeleteDialog/Cancel-Btn'))
+		Utils.waitForElementToDisappear('CRDC/AILocators/DeleteDialog/Dialog', 30)
+	}
+
+	@Keyword
+	public static void confirmReopenDialog() {
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'), 30, 'SR Reopen Confirm')
+		WebUI.click(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'))
+		Utils.waitForElementToDisappear('CRDC/AILocators/DeleteDialog/Dialog', 30)
+		WebUI.delay(2)
+	}
+
+	/**
+	 * After list filters are applied, assert whether the Reopen list action is visible (any matching row).
+	 */
+	@Keyword
+	public static void assertReopenButtonVisibleForStudy(String studyName, boolean expectedVisible, String statusFilter = 'Approved') {
+		if (studyName == null || studyName.trim().length() < 3) {
+			KeywordUtil.markFailed("assertReopenButtonVisibleForStudy: studyName must be at least 3 characters.")
+			return
+		}
+		SubmissionRequestList listHelper = new SubmissionRequestList()
+		listHelper.navigateToSubmissionRequestsList()
+		listHelper.resetSubmissionRequestsFilters()
+		Map<String, String> criteria = [study: studyName.trim()] as Map<String, String>
+		if (statusFilter != null && !statusFilter.trim().isEmpty()) {
+			criteria.status = statusFilter.trim()
+		}
+		SubmissionRequestList.applySubmissionRequestsListFilters(criteria)
+		boolean present = WebUIUtils.fastElementPresent('CRDC/AILocators/SubmissionRequests/List/Reopen-Btn')
+		String label = "Reopen visible (study filter, status=" + (statusFilter ?: 'any') + ")"
+		if (expectedVisible == present) {
+			ValidationReport.addValidationReportItem('Submission Request Reopen', label, String.valueOf(expectedVisible), String.valueOf(present), 'Pass')
+		} else {
+			ValidationReport.addValidationReportItem('Submission Request Reopen', label, String.valueOf(expectedVisible), String.valueOf(present), 'Fail')
+			KeywordUtil.markFailed("assertReopenButtonVisibleForStudy: expected Reopen present=" + expectedVisible + ", actual=" + present)
+		}
+	}
+
 	@Keyword
 	public static void reopenApprovedSubmissionRequest(String studyName) {
 		if (studyName == null || studyName.trim().isEmpty()) {
@@ -1607,14 +1716,8 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			return
 		}
 		KeywordUtil.logInfo("reopenApprovedSubmissionRequest: navigating to Submission Requests list; study token length=" + token.length())
-		new SubmissionRequestList().navigateToSubmissionRequestsList()
-		SubmissionRequestList.applySubmissionRequestsListFilters([study: token, status: 'Approved'] as Map<String, String>)
-		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/SubmissionRequests/List/Reopen-Btn'), 30, 'SR Reopen')
-		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/List/Reopen-Btn'))
-		WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/DeleteDialog/Dialog'), 10)
-		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'), 30, 'SR Reopen Confirm')
-		WebUI.click(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'))
-		Utils.waitForElementToDisappear('CRDC/AILocators/DeleteDialog/Dialog', 30)
+		openReopenDialogForStudy(token)
+		confirmReopenDialog()
 		KeywordUtil.logInfo("reopenApprovedSubmissionRequest: completed for study token.")
 	}
 
@@ -1829,7 +1932,9 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			return
 		}
 		KeywordUtil.logInfo("openSubmissionRequestFormForStudy: list navigation for study token.")
-		new SubmissionRequestList().navigateToSubmissionRequestsList()
+		SubmissionRequestList listHelper = new SubmissionRequestList()
+		listHelper.navigateToSubmissionRequestsList()
+		listHelper.resetSubmissionRequestsFilters()
 		SubmissionRequestList.applySubmissionRequestsListFilters([study: token] as Map<String, String>)
 		WebUI.delay(2)
 		clickResumeOrViewForStudyRow(token)

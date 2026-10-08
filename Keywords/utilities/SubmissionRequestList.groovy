@@ -216,7 +216,7 @@ class SubmissionRequestList extends TestRunner {
 			for (WebElement row : rows) {
 				List<WebElement> cells = row.findElements(By.tagName("td"))
 				List<String> cellTexts = new ArrayList<>()
-				for (WebElement cell : cells) cellTexts.add(cell.getText().trim())
+				for (WebElement cell : cells) cellTexts.add(cellTextForTableMatch(cell))
 				result.add(cellTexts)
 			}
 			KeywordUtil.logInfo("Submission Requests table row count: " + result.size())
@@ -281,6 +281,170 @@ class SubmissionRequestList extends TestRunner {
 			}
 		} catch (Exception e) {
 			KeywordUtil.markFailed("resetSubmissionRequestsFilters: " + e.getMessage())
+		}
+	}
+
+	private static int indexOfHeaderIgnoreCase(List<String> headers, String headerLabel) {
+		if (headers == null || headerLabel == null) return -1
+		String target = headerLabel.trim().toLowerCase()
+		for (int i = 0; i < headers.size(); i++) {
+			if (headers[i] != null && headers[i].trim().toLowerCase() == target) return i
+		}
+		return -1
+	}
+
+	/** Full value for table matching when the UI shows truncated-text-label but aria-label has the full string. */
+	private static String cellTextForTableMatch(WebElement cell) {
+		if (cell == null) return ''
+		List<WebElement> wrappers = cell.findElements(By.cssSelector("[data-testid='truncated-text-wrapper']"))
+		for (WebElement w : wrappers) {
+			String aria = w.getAttribute('aria-label')
+			if (aria != null && !aria.trim().isEmpty()) return aria.trim()
+		}
+		return cell.getText().trim()
+	}
+
+	/**
+	 * Toggle Show All Versions on the Submission Requests list filter header.
+	 */
+	@Keyword
+	static void setShowAllVersions(boolean showAll) {
+		KeywordUtil.logInfo("setShowAllVersions: " + showAll)
+		String locator = 'CRDC/AILocators/SubmissionRequests/List/Filters/ShowAllVersions-Chkbx'
+		if (!WebUI.waitForElementPresent(findTestObject(locator), 10)) {
+			KeywordUtil.markFailed("setShowAllVersions: Show All Versions control not found (data-testid show-all-versions-checkbox).")
+			return
+		}
+		WebElement checkbox = DriverFactory.getWebDriver().findElement(By.xpath(TestRunner.givexpath(locator)))
+		boolean checked = checkbox.isSelected()
+		if (showAll != checked) {
+			WebUI.click(findTestObject(locator))
+			WebUI.delay(2)
+		}
+	}
+
+	@Keyword
+	static void verifyShowAllVersionsDefaultUnchecked() {
+		String locator = 'CRDC/AILocators/SubmissionRequests/List/Filters/ShowAllVersions-Chkbx'
+		if (!WebUI.waitForElementPresent(findTestObject(locator), 10)) {
+			KeywordUtil.markFailed("verifyShowAllVersionsDefaultUnchecked: checkbox not found.")
+			return
+		}
+		WebElement checkbox = DriverFactory.getWebDriver().findElement(By.xpath(TestRunner.givexpath(locator)))
+		boolean checked = checkbox.isSelected()
+		ValidationReport.addValidationReportItem(SECTION_SUBMISSION_REQUESTS, 'Show All Versions default', 'unchecked', checked ? 'checked' : 'unchecked', checked ? 'Fail' : 'Pass')
+		if (checked) KeywordUtil.markFailed("Show All Versions should be unchecked by default.")
+	}
+
+	@Keyword
+	static void verifySubmissionRequestsSrfVersionColumnVisible() {
+		boolean present = WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/SubmissionRequests/List/Table/SRFVersion-Header'), 10)
+		ValidationReport.addValidationReportItem(SECTION_SUBMISSION_REQUESTS, 'SRF Version column', 'visible', present ? 'visible' : 'missing', present ? 'Pass' : 'Fail')
+		if (!present) KeywordUtil.markFailed("SRF Version column header not found.")
+	}
+
+	@Keyword
+	static void verifySubmissionRequestsFormVersionColumnHiddenInGui() {
+		WebDriver driver = DriverFactory.getWebDriver()
+		boolean formVersionVisible = !driver.findElements(By.xpath("//th[normalize-space()='Form Version']")).isEmpty()
+		boolean legacyVersionVisible = !driver.findElements(By.xpath("//th[normalize-space()='Version']")).isEmpty()
+		boolean hidden = !formVersionVisible && !legacyVersionVisible
+		ValidationReport.addValidationReportItem(SECTION_SUBMISSION_REQUESTS, 'Form/legacy Version column hidden in GUI', 'hidden', hidden ? 'hidden' : 'visible', hidden ? 'Pass' : 'Fail')
+		if (!hidden) KeywordUtil.markFailed("Form Version or legacy Version column should not be visible in the GUI table.")
+	}
+
+	/**
+	 * Returns SRF Version values for rows whose Study column contains studyToken (case-insensitive).
+	 * Study cells may show truncated visible text; cell values use truncated-text-wrapper aria-label when present.
+	 */
+	@Keyword
+	static List<Integer> getSrVersionNumbersForStudy(String studyToken) {
+		List<Integer> versions = new ArrayList<>()
+		if (studyToken == null || studyToken.trim().isEmpty()) return versions
+		String token = studyToken.trim().toLowerCase()
+		List<List<String>> rows = new SubmissionRequestList().readSubmissionRequestsTableRows()
+		if (rows.isEmpty()) return versions
+		WebDriver driver = DriverFactory.getWebDriver()
+		String tableXpath = TestRunner.givexpath('CRDC/AILocators/GenericTable/Table')
+		WebElement table = driver.findElement(By.xpath(tableXpath))
+		List<WebElement> headerEls = table.findElements(By.xpath('.//thead//th'))
+		List<String> headers = new ArrayList<>()
+		for (WebElement h : headerEls) headers.add(h.getText().trim())
+		int studyCol = indexOfHeaderIgnoreCase(headers, 'Study')
+		int srfCol = indexOfHeaderIgnoreCase(headers, 'SRF Version')
+		if (srfCol < 0) {
+			srfCol = indexOfHeaderIgnoreCase(headers, 'Version')
+		}
+		if (studyCol < 0 || srfCol < 0) {
+			KeywordUtil.logInfo("getSrVersionNumbersForStudy: Study col=" + studyCol + ", SRF Version col=" + srfCol)
+			return versions
+		}
+		for (List<String> row : rows) {
+			if (row.size() <= Math.max(studyCol, srfCol)) continue
+			String studyCell = row[studyCol] ?: ''
+			if (!studyCell.toLowerCase().contains(token)) continue
+			String verText = row[srfCol]?.trim()
+			if (verText?.isInteger()) versions.add(verText.toInteger())
+		}
+		return versions
+	}
+
+	@Keyword
+	static void verifySrVersionsDescendingForStudy(String studyToken, int minRowCount) {
+		List<Integer> versions = getSrVersionNumbersForStudy(studyToken)
+		boolean countOk = versions.size() >= minRowCount
+		ValidationReport.addValidationReportItem(SECTION_SUBMISSION_REQUESTS, 'SRF version row count', ">= " + minRowCount, String.valueOf(versions.size()), countOk ? 'Pass' : 'Fail')
+		if (!countOk) {
+			KeywordUtil.markFailed("Expected at least " + minRowCount + " version rows, got " + versions.size())
+			return
+		}
+		for (int i = 1; i < versions.size(); i++) {
+			if (versions[i] > versions[i - 1]) {
+				KeywordUtil.markFailed("SRF versions not descending: " + versions)
+				return
+			}
+		}
+		ValidationReport.addValidationReportItem(SECTION_SUBMISSION_REQUESTS, 'SRF versions sort', 'descending', versions.toString(), 'Pass')
+	}
+
+	/**
+	 * 4b: Reopen is visible only on the row with the highest SRF Version for the study; hidden on all other version rows.
+	 * studyToken should match list Study cells (typically study abbreviation; see truncated-text-wrapper aria-label).
+	 */
+	@Keyword
+	static void verifyReopenOnlyOnLatestSrVersionForStudy(String studyToken) {
+		List<Integer> versions = getSrVersionNumbersForStudy(studyToken)
+		if (versions.isEmpty()) {
+			KeywordUtil.markFailed('verifyReopenOnlyOnLatestSrVersionForStudy: no SRF versions found for study token: ' + studyToken)
+			return
+		}
+		int latest = versions.max()
+		for (Integer v : versions) {
+			assertReopenOnRowWithSrVersion(studyToken, v, v == latest)
+		}
+	}
+
+	/**
+	 * Assert Reopen control visibility on the table row matching study token and SRF Version number.
+	 */
+	@Keyword
+	static void assertReopenOnRowWithSrVersion(String studyToken, int srfVersion, boolean expectedVisible) {
+		if (studyToken == null || studyToken.trim().length() < 3) {
+			KeywordUtil.markFailed("assertReopenOnRowWithSrVersion: studyToken must be at least 3 characters.")
+			return
+		}
+		String escapedStudy = studyToken.trim().replace("'", "''")
+		String tokenLower = escapedStudy.toLowerCase()
+		String reopenXpath = "//tr[(.//td[contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" +
+			tokenLower + "')] or .//*[@data-testid='truncated-text-wrapper' and contains(translate(@aria-label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" +
+			tokenLower + "')]) and .//td[normalize-space()='" + srfVersion + "']]//*[@data-testid='reopen-application-button']"
+		boolean present = DriverFactory.getWebDriver().findElements(By.xpath(reopenXpath)).size() > 0
+		String label = "Reopen on SRF version " + srfVersion
+		if (present == expectedVisible) {
+			ValidationReport.addValidationReportItem(SECTION_SUBMISSION_REQUESTS, label, String.valueOf(expectedVisible), String.valueOf(present), 'Pass')
+		} else {
+			ValidationReport.addValidationReportItem(SECTION_SUBMISSION_REQUESTS, label, String.valueOf(expectedVisible), String.valueOf(present), 'Fail')
+			KeywordUtil.markFailed(label + ": expected " + expectedVisible + ", actual " + present)
 		}
 	}
 }
