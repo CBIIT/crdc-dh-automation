@@ -160,11 +160,25 @@ When implementing or modifying functions in this project:
 
 Before writing Selenium, WebDriver, Actions, or xpath in a keyword or script, search `WebUIUtils`, `Utils`, `DataSubmissions`, `Pbac`, `Login`, and `SubmissionRequest` for a method that already does it. Call that method. Do not inline a copy.
 
-**WebUIUtils (prefer these):** `clickTab` (clicks by Object Repository path), `clearTextfieldByOs` (pass the path string, not a local TestObject), `scrollToElement`, `waitUntilElementTextEquals`, `verifyElementText`, `verifyButtonEnabled`, `verifyElementDisplayed`.
+**WebUIUtils (prefer these):** `clickTab` (clicks by Object Repository path), `clearTextfieldByOs` (pass the path string, not a local TestObject), `scrollToElement`, `waitUntilElementTextEquals`, `waitUntilEnabledOrStop`, `waitForElementClickableWithStaleRetry`, `fastElementPresent`, `verifyElementText`, `verifyButtonEnabled`, `verifyElementDisplayed`.
 
 **Utils:** `getListWebElements` (lists from an Object Repository path), `waitForElementToAppear`, `waitForElementToDisappear`.
 
-Pass locator paths as strings (`WebUIUtils.clickTab('CRDC/AILocators/...')`, `WebUI.sendKeys(findTestObject('CRDC/AILocators/...'), text)`). Do not store `findTestObject` in a local TestObject unless the object is parameterized or reused in a loop. Do not hardcode xpath; add an AILocators object and pass its path. Do not copy Actions / WebDriverWait / `By.xpath` boilerplate from `createDataSubmission` unless this widget has the same overlay or stale-element problem.
+**Katalon WebUI (prefer over raw Selenium):** `WebUI.waitForElementPresent`, `waitForElementVisible`, `waitForElementClickable`, `WebUI.click`, `WebUI.sendKeys`, `WebUI.getAttribute` on `findTestObject(...)` — not on `WebUI.findWebElement` + `WebElement` unless an existing utility already wraps that pattern.
+
+### Do not default to raw WebDriver in keywords
+
+In `Keywords/utilities/*` and test scripts, **do not** introduce:
+
+- `DriverFactory.getWebDriver()` + `findElement` / `findElements` / `WebElement.click()`
+- `WebUI.findWebElement` + direct `WebElement` interaction when `WebUI.click`, `sendKeys`, or `getAttribute` on a TestObject works
+- `new WebDriverWait(driver, …)` + `ExpectedConditions` when `WebUI.waitForElementClickable` / `WebUIUtils.waitUntil*` / `Utils.waitForElementToAppear` fit
+
+**MUI listbox / autocomplete options** with dynamic text: build a one-off `TestObject` with `addProperty('xpath', ConditionType.EQUALS, '…', true)` (same pattern as Section B data-type dropdown in SubmissionRequest), then `WebUI.waitForElementClickable` + `WebUI.click`. Prefer a new AILocator `.rs` when the xpath is fixed.
+
+**Text fields (including MUI autocomplete):** `WebUIUtils.clickTab(repositoryPath)` → `WebUIUtils.clearTextfieldByOs(repositoryPath)` → `WebUI.sendKeys(findTestObject(repositoryPath), value)`. Do not use `WebUI.setText` on React-controlled fields when it appends instead of replacing.
+
+Pass locator paths as strings (`WebUIUtils.clickTab('CRDC/AILocators/...')`, `WebUI.sendKeys(findTestObject('CRDC/AILocators/...'), text)`). Do not store `findTestObject` in a local TestObject unless the object is parameterized or reused in a loop. Do not hardcode xpath in scripts; add an AILocators object when the locator is stable. Do not copy Actions / WebDriverWait / `By.xpath` boilerplate from legacy keywords unless no WebUI/WebUIUtils path exists and you document why in a short comment.
 
 ### Maximize Use of Existing Keywords
 
