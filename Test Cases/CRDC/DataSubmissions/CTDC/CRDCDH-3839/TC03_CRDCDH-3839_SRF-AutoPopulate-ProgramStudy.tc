@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-3839 TC03 CTDC: metadata-only DS for AUTOQA - AutomationQA_CRDCDH-3839; upload omits CTDC system-populated-props; after validate, program/study match CRDCDH-3839_TC03/expected/.</description>
+   <name>TC03_CRDCDH-3839_SRF-AutoPopulate-ProgramStudy</name>
+   <tag>Filter</tag>
+   <comment>Script documents upload vs expected TSVs. Upload omits program_name, program_short_name, program_full_description, study_name, study_short_name, study_description. Verifies no validation errors, Data View UI and download vs expected/CTDC_*_expected.tsv. SRF must include program_full_description at approval.</comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>d3e4f5a6-b7c8-4901-d2e3-f4a5b6c7d8e9</testCaseGuid>
+</TestCaseEntity>

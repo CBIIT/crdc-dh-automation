@@ -44,7 +44,8 @@ import com.kms.katalon.core.testobject.TestObject
  * Data Submissions: Data View and Validation Results verification keywords.
  * Contains all keywords for verifying Data View tab (headers, row content vs metadata, download vs expected TSV)
  * and Validation Results tab (headers, UI vs expected TSV by node/severity/issue type).
- * Verify-only and upload-only are separate: use uploadFolder(tcName) then verifyDataViewMatchesMetadataForTC(tcName) for a two-step flow.
+ * Verify-only and upload-only are separate: use uploadFolder(tcName) then verifyDataViewMatchesMetadataForTC(tcName) for upload TSVs,
+ * or verifyDataViewMatchesExpectedTsvForTC(tcName) for golden files under expected/.
  * Moved from SubmissionRequest and Pbac.
  */
 class DataSubmissions extends TestRunner {
@@ -786,12 +787,12 @@ class DataSubmissions extends TestRunner {
 		String baseDir = RunConfiguration.getProjectDir()
 		File expectedDir = new File(baseDir, "InputFiles/CRDC/MetadataData/${tcName}/expected")
 		if (!expectedDir.exists() || !expectedDir.isDirectory()) {
-			KeywordUtil.markFailed("downloadAndCompareExpectedForTC: expected folder not found: ${expectedDir.absolutePath}")
+			KeywordUtil.markFailed("expected TSV folder not found: ${expectedDir.absolutePath}")
 			return []
 		}
 		List<File> fileList = expectedDir.listFiles()?.findAll { it.isFile() && it.name.endsWith("_expected.tsv") } ?: []
 		if (fileList.isEmpty()) {
-			KeywordUtil.markFailed("downloadAndCompareExpectedForTC: no *_expected.tsv files in ${expectedDir.absolutePath}")
+			KeywordUtil.markFailed("no *_expected.tsv files in ${expectedDir.absolutePath}")
 			return []
 		}
 		List<List<?>> out = []
@@ -1771,6 +1772,25 @@ class DataSubmissions extends TestRunner {
 			TestRunner.clickTab('CRDC/DataSubmissions/Validation/DataView-Tab')
 		for (int i = 0; i < relativePaths.size(); i++) {
 			verifyDataViewMatchesMetadata(relativePaths.get(i), nodes.get(i))
+		}
+	}
+
+	/**
+	 * Verify Data View tab matches golden TSVs in InputFiles/CRDC/MetadataData/&lt;tcName&gt;/expected/.
+	 * Use when upload files omit columns filled by the validator (e.g. SRF auto-populate). Assumes validation already ran.
+	 * @param tcName Test case folder name (e.g. CRDCDH-3839_TC01)
+	 */
+	@Keyword
+	void verifyDataViewMatchesExpectedTsvForTC(String tcName) {
+		List<List<?>> expectedList = listExpectedFilesForTC(tcName)
+		if (expectedList.isEmpty()) return
+		String expectedFolder = "InputFiles/CRDC/MetadataData/${tcName}/expected"
+		TestRunner.clickTab('CRDC/DataSubmissions/Validation/DataView-Tab')
+		for (List<?> pair in expectedList) {
+			String node = (String) pair.get(0)
+			File expectedFile = new File((String) pair.get(1))
+			String relativePath = "${expectedFolder}/${expectedFile.name}"
+			verifyDataViewMatchesMetadata(relativePath, node)
 		}
 	}
 
