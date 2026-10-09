@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-3839 TC02 ICDC: metadata-only DS; upload omits system-populated-props; validate; Data View vs CRDCDH-3839_TC02/expected/. Same fixture study as GC TC01.</description>
+   <name>TC02_CRDCDH-3839_SRF-AutoPopulate-ProgramStudy</name>
+   <tag>Filter</tag>
+   <comment>See script header for omitted ICDC columns (clinical_study_* program fields) and expected TSV paths.</comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>c2d3e4f5-a6b7-4890-c1d2-e3f4a5b6c7d8</testCaseGuid>
+</TestCaseEntity>

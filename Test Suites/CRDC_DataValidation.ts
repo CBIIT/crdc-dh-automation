@@ -193,4 +193,11 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3140/TC03_CRDCDH-3140_MismatchDbGaPID</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>a1b2c3d4-e5f6-4789-a012-3456789abcde</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3839/TC01_CRDCDH-3839_SRF-AutoPopulate-ProgramStudy</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>

@@ -1,0 +1,2 @@
+type	dates_of_conduct	nci_id	nct_id	other_study_outcome	program.program_short_name	recist_objective_response_rate	study_accession	study_age_group	study_biobank	study_data_sharing_plan	study_description	study_id	study_justification	study_name	study_outcome	study_population	study_short_name	study_type	study_version	status
+study	555_test	nci	nct	otheroutcome	NCTN	recistrate	phs003839	Adolescent and Young Adult	Mount_Sinai_Microbiome_stool	shareplan	CRDCDH-3839	CRDCDH3839_study01	justi	AutomationQA_CRDCDH-3839-CTDC	std outcome	popu	AUTOQA	Basic Science Research	1.1.0	Passed
