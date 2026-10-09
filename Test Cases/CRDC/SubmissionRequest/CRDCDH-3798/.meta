@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FolderEntity>
-   <description></description>
-   <name>AuxiliaryTests</name>
+   <description>CRDCDH-3798 SRF Reopen and version list</description>
+   <name>CRDCDH-3798</name>
    <tag></tag>
    <folderType>TESTCASE</folderType>
 </FolderEntity>

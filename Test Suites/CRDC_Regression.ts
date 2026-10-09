@@ -99,91 +99,98 @@
       <guid>db5317d3-242a-40cc-b4e6-a49f2c1c1ebf</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC02_DeleteNodeFromDataView</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC02_DeleteNodeFromDataView</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>8552d745-2553-4b9b-983e-84c227d5b71c</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC03_TableSortingVerification</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC03_TableSortingVerification</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>0dbfe528-6374-435f-9801-c55f521ac1a8</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC04_PaginationVerification</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC04_PaginationVerification</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>28a5b433-aa9e-45a1-a7f7-3517527bcc21</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC05_DeleteRowsFromDataView</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC05_DeleteRowsFromDataView</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>14ba17d5-a8b1-4e29-8245-c922919c0ab2</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC08_ManageStudiesListAndFilter</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC08_ManageStudiesListAndFilter</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>39130104-3913-4a13-8391-391304391304</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/CRDCDH-3913/TC01_CRDCDH-3913_ManageStudiesCsvExport</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>d4357f1a-fc9d-41a5-a68f-797c655e7b80</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC09_ManageProgramsListAndFilter</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC09_ManageProgramsListAndFilter</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>0493b900-fc3a-49d3-91ae-c5afca8bce72</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC10_DataSubmissionsListAndFilter</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC10_DataSubmissionsListAndFilter</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>c536ede7-fb00-4c33-a557-02e6c1f49874</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC11_MongoDBQuerySubmissions</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC11_MongoDBQuerySubmissions</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>4f16d76f-fdd8-44ca-b492-61c72e166a42</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC12_SubmissionRequestsListAndFilter</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC12_SubmissionRequestsListAndFilter</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>32b857f3-346a-477d-a9b6-59889ae312d3</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC13_CreateNewStudy</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC13_CreateNewStudy</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>79f92965-c15f-4821-941f-87e2b5b326b0</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC14_EditExistingStudy</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC14_EditExistingStudy</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>cac90187-4d66-43eb-a620-b911ad095590</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC15_CreateNewProgram</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC15_CreateNewProgram</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>a1e7f3bc-c2e9-4db0-a9e3-d87fdb3e3d3d</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/DataSubmissions/AuxiliaryTests/TC16_EditExistingProgram</testCaseId>
+      <testCaseId>Test Cases/CRDC/AuxiliaryTests/TC16_EditExistingProgram</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>

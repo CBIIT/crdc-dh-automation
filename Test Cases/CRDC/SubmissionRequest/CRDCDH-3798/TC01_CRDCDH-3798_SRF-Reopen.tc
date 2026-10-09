@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-3798 Step 1: Submitter reopen dialog, owner reopen, non-owner list access, In Progress eligibility (4a).</description>
+   <name>TC01_CRDCDH-3798_SRF-Reopen</name>
+   <tag></tag>
+   <comment>Fedlead approve only; Submitter reopens; User non-owner; second SR In Progress without Reopen.</comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a3798001-1111-4a48-8b04-379801000001</testCaseGuid>
+</TestCaseEntity>

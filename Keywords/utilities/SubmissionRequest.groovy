@@ -1595,6 +1595,205 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	 *
 	 * @param studyName Study title or search string for the Study filter (minimum 3 characters)
 	 */
+	private static void navigateToApprovedStudyOnList(String studyName) {
+		String token = studyName.trim()
+		new SubmissionRequestList().navigateToSubmissionRequestsList()
+		SubmissionRequestList.applySubmissionRequestsListFilters([study: token, status: 'Approved'] as Map<String, String>)
+	}
+
+	/**
+	 * Open the Reopen confirmation dialog for an Approved submission (list filter by study).
+	 */
+	@Keyword
+	public static void openReopenDialogForStudy(String studyName) {
+		if (studyName == null || studyName.trim().isEmpty()) {
+			KeywordUtil.markFailed("openReopenDialogForStudy: studyName is required.")
+			return
+		}
+		if (studyName.trim().length() < 3) {
+			KeywordUtil.markFailed("openReopenDialogForStudy: studyName must be at least 3 characters.")
+			return
+		}
+		KeywordUtil.logInfo("openReopenDialogForStudy: study token length=" + studyName.trim().length())
+		navigateToApprovedStudyOnList(studyName)
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/SubmissionRequests/List/Reopen-Btn'), 30, 'SR Reopen')
+		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/List/Reopen-Btn'))
+		WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/DeleteDialog/Dialog'), 10)
+	}
+
+	/**
+	 * Verify Reopen Submission Request dialog copy and study/program summary (CRDCDH-3670).
+	 * Uses shared DeleteDialog test objects. Program/study abbreviations default to last entered Section B values.
+	 */
+	@Keyword
+	public static void verifyReopenSubmissionRequestDialog(String studyAbbreviation = null, String programAbbreviation = null) {
+		String studyTitle = (lastEnteredStudyTitle ?: '').trim()
+		String studyAbbr = (studyAbbreviation != null && !studyAbbreviation.trim().isEmpty())
+			? studyAbbreviation.trim() : (lastEnteredStudyAbbreviation ?: '')
+		String programName = (programAbbreviation != null && !programAbbreviation.trim().isEmpty())
+			? programAbbreviation.trim() : (lastEnteredProgramName ?: '')
+		boolean ok = true
+		String headerText = WebUI.getText(findTestObject('CRDC/AILocators/DeleteDialog/Header-Lbl')).trim()
+		if (!headerText.contains('Reopen Submission Request')) {
+			KeywordUtil.markFailed("verifyReopenSubmissionRequestDialog: expected header to contain 'Reopen Submission Request', actual '" + headerText + "'")
+			ok = false
+		}
+		String description = WebUI.getText(findTestObject('CRDC/AILocators/DeleteDialog/Description-Lbl'))?.trim() ?: ''
+		if (!description.contains('Reopen an Approved Submission Request for Editing')) {
+			KeywordUtil.markFailed("verifyReopenSubmissionRequestDialog: expected description to contain 'Reopen an Approved Submission Request for Editing', actual: " + description)
+			ok = false
+		}
+		String studyValue = WebUI.getAttribute(findTestObject('CRDC/AILocators/SubmissionRequests/ReopenDialog/Study-TxtBx'), 'value')?.trim() ?: ''
+		if (studyTitle && !studyValue.contains(studyTitle)) {
+			KeywordUtil.markFailed("verifyReopenSubmissionRequestDialog: study field value missing title '" + studyTitle + "', actual: " + studyValue)
+			ok = false
+		}
+		if (studyAbbr && !studyValue.contains(studyAbbr)) {
+			KeywordUtil.markFailed("verifyReopenSubmissionRequestDialog: study field value missing abbreviation '" + studyAbbr + "', actual: " + studyValue)
+			ok = false
+		}
+		String programValue = WebUI.getAttribute(findTestObject('CRDC/AILocators/SubmissionRequests/ReopenDialog/Program-TxtBx'), 'value')?.trim() ?: ''
+		if (programName && !programValue.contains(programName)) {
+			KeywordUtil.markFailed("verifyReopenSubmissionRequestDialog: program field value missing '" + programName + "', actual: " + programValue)
+			ok = false
+		}
+		if (ok) {
+			ValidationReport.addValidationReportItem('Submission Request Reopen', 'Reopen dialog', 'title, message, study/program fields', 'verified', 'Pass')
+		}
+	}
+
+	@Keyword
+	public static void cancelReopenDialog() {
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/DeleteDialog/Cancel-Btn'), 30, 'SR Reopen Cancel')
+		WebUI.click(findTestObject('CRDC/AILocators/DeleteDialog/Cancel-Btn'))
+		Utils.waitForElementToDisappear('CRDC/AILocators/DeleteDialog/Dialog', 30)
+	}
+
+	@Keyword
+	public static void confirmReopenDialog() {
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'), 30, 'SR Reopen Confirm')
+		WebUI.click(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'))
+		Utils.waitForElementToDisappear('CRDC/AILocators/DeleteDialog/Dialog', 30)
+		WebUI.delay(2)
+	}
+
+	private static final String REOPEN_DIALOG_OWNER_AUTOCOMPLETE = 'CRDC/AILocators/SubmissionRequests/ReopenDialog/Owner-Autocomplete'
+	private static final String REOPEN_DIALOG_OWNER_INPT = 'CRDC/AILocators/SubmissionRequests/ReopenDialog/Owner-Inpt'
+
+	/**
+	 * Assert the Reopen dialog Owner control is shown (Fed Lead/Admin) or hidden (Submitter owner).
+	 * Call after openReopenDialogForStudy while the delete-dialog is open.
+	 */
+	@Keyword
+	public static void verifyReopenOwnerControlVisible(boolean expectedVisible) {
+		boolean present = WebUIUtils.fastElementPresent(REOPEN_DIALOG_OWNER_AUTOCOMPLETE)
+		String label = 'Reopen dialog Owner field'
+		if (present == expectedVisible) {
+			ValidationReport.addValidationReportItem('Submission Request Reopen', label, String.valueOf(expectedVisible), String.valueOf(present), 'Pass')
+		} else {
+			ValidationReport.addValidationReportItem('Submission Request Reopen', label, String.valueOf(expectedVisible), String.valueOf(present), 'Fail')
+			KeywordUtil.markFailed(label + ': expected visible=' + expectedVisible + ', actual=' + present)
+		}
+	}
+
+	/**
+	 * Select a new owner on the Reopen dialog (Admin/Fed Lead). Types a PBAC account prefix (e.g. pbac.user-automation), then clicks the matching MUI list option.
+	 */
+	@Keyword
+	public static void selectReopenDialogOwner(String ownerMatchText) {
+		if (ownerMatchText == null || ownerMatchText.trim().isEmpty()) {
+			KeywordUtil.markFailed('selectReopenDialogOwner: ownerMatchText is required.')
+			return
+		}
+		String token = ownerMatchText.trim()
+		String escaped = token.replace("'", "''")
+		if (!WebUI.waitForElementPresent(findTestObject(REOPEN_DIALOG_OWNER_INPT), 10)) {
+			KeywordUtil.markFailed('selectReopenDialogOwner: Owner field not found in Reopen dialog.')
+			return
+		}
+		WebUIUtils.clickTab(REOPEN_DIALOG_OWNER_INPT)
+		WebUI.delay(0.5)
+		WebUIUtils.clearTextfieldByOs(REOPEN_DIALOG_OWNER_INPT)
+		WebUI.sendKeys(findTestObject(REOPEN_DIALOG_OWNER_INPT), token)
+		WebUI.delay(2)
+		String valueAfterType = WebUI.getAttribute(findTestObject(REOPEN_DIALOG_OWNER_INPT), 'value')
+		KeywordUtil.logInfo('selectReopenDialogOwner: input value after search text: ' + (valueAfterType != null ? valueAfterType : '(null)'))
+		TestObject ownerListOption = new TestObject('ReopenDialog_OwnerListOption')
+		ownerListOption.addProperty('xpath', ConditionType.EQUALS,
+				"//ul[@role='listbox']//li[contains(normalize-space(.), '" + escaped + "')]", true)
+		boolean optionReady = WebUI.waitForElementClickable(ownerListOption, 10, FailureHandling.OPTIONAL)
+		if (!optionReady) {
+			ownerListOption = new TestObject('ReopenDialog_OwnerListOption_Fallback')
+			ownerListOption.addProperty('xpath', ConditionType.EQUALS,
+					"//li[contains(normalize-space(.), '" + escaped + "')]", true)
+			optionReady = WebUI.waitForElementClickable(ownerListOption, 10, FailureHandling.OPTIONAL)
+		}
+		if (!optionReady) {
+			KeywordUtil.markFailed('selectReopenDialogOwner: no list option contains "' + token + '"')
+			return
+		}
+		WebUI.click(ownerListOption)
+		WebUI.delay(1)
+		KeywordUtil.logInfo('selectReopenDialogOwner: selected option matching ' + token)
+	}
+
+	/**
+	 * After list filters are applied, assert whether the Reopen list action is visible (any matching row).
+	 */
+	@Keyword
+	public static void assertReopenButtonVisibleForStudy(String studyName, boolean expectedVisible, String statusFilter = 'Approved') {
+		if (studyName == null || studyName.trim().length() < 3) {
+			KeywordUtil.markFailed("assertReopenButtonVisibleForStudy: studyName must be at least 3 characters.")
+			return
+		}
+		SubmissionRequestList listHelper = new SubmissionRequestList()
+		listHelper.navigateToSubmissionRequestsList()
+		listHelper.resetSubmissionRequestsFilters()
+		Map<String, String> criteria = [study: studyName.trim()] as Map<String, String>
+		if (statusFilter != null && !statusFilter.trim().isEmpty()) {
+			criteria.status = statusFilter.trim()
+		}
+		SubmissionRequestList.applySubmissionRequestsListFilters(criteria)
+		boolean present = WebUIUtils.fastElementPresent('CRDC/AILocators/SubmissionRequests/List/Reopen-Btn')
+		String label = "Reopen visible (study filter, status=" + (statusFilter ?: 'any') + ")"
+		if (expectedVisible == present) {
+			ValidationReport.addValidationReportItem('Submission Request Reopen', label, String.valueOf(expectedVisible), String.valueOf(present), 'Pass')
+		} else {
+			ValidationReport.addValidationReportItem('Submission Request Reopen', label, String.valueOf(expectedVisible), String.valueOf(present), 'Fail')
+			KeywordUtil.markFailed("assertReopenButtonVisibleForStudy: expected Reopen present=" + expectedVisible + ", actual=" + present)
+		}
+	}
+
+	/**
+	 * After list filters are applied, assert whether Resume or View is visible on the filtered list (owner can open the SRF form).
+	 * statusFilter must match Status dropdown labels exactly (e.g. Reopened, In Progress), not status-bar uppercase text.
+	 */
+	@Keyword
+	public static void assertResumeOrViewVisibleForStudy(String studyName, boolean expectedVisible, String statusFilter = null) {
+		if (studyName == null || studyName.trim().length() < 3) {
+			KeywordUtil.markFailed("assertResumeOrViewVisibleForStudy: studyName must be at least 3 characters.")
+			return
+		}
+		SubmissionRequestList listHelper = new SubmissionRequestList()
+		listHelper.navigateToSubmissionRequestsList()
+		listHelper.resetSubmissionRequestsFilters()
+		Map<String, String> criteria = [study: studyName.trim()] as Map<String, String>
+		if (statusFilter != null && !statusFilter.trim().isEmpty()) {
+			criteria.status = statusFilter.trim()
+		}
+		SubmissionRequestList.applySubmissionRequestsListFilters(criteria)
+		boolean resume = WebUIUtils.fastElementPresent('CRDC/AILocators/SubmissionRequests/List/Resume-Btn')
+		boolean view = WebUIUtils.fastElementPresent('CRDC/AILocators/SubmissionRequests/List/View-Btn')
+		boolean present = resume || view
+		String label = "Resume or View visible (study filter, status=" + (statusFilter ?: 'any') + ")"
+		if (expectedVisible == present) {
+			ValidationReport.addValidationReportItem('Submission Request Reopen', label, String.valueOf(expectedVisible), String.valueOf(present), 'Pass')
+		} else {
+			ValidationReport.addValidationReportItem('Submission Request Reopen', label, String.valueOf(expectedVisible), String.valueOf(present), 'Fail')
+			KeywordUtil.markFailed("assertResumeOrViewVisibleForStudy: expected Resume/View present=" + expectedVisible + ", actual=" + present)
+		}
+	}
+
 	@Keyword
 	public static void reopenApprovedSubmissionRequest(String studyName) {
 		if (studyName == null || studyName.trim().isEmpty()) {
@@ -1607,14 +1806,8 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			return
 		}
 		KeywordUtil.logInfo("reopenApprovedSubmissionRequest: navigating to Submission Requests list; study token length=" + token.length())
-		new SubmissionRequestList().navigateToSubmissionRequestsList()
-		SubmissionRequestList.applySubmissionRequestsListFilters([study: token, status: 'Approved'] as Map<String, String>)
-		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/SubmissionRequests/List/Reopen-Btn'), 30, 'SR Reopen')
-		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/List/Reopen-Btn'))
-		WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/DeleteDialog/Dialog'), 10)
-		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'), 30, 'SR Reopen Confirm')
-		WebUI.click(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'))
-		Utils.waitForElementToDisappear('CRDC/AILocators/DeleteDialog/Dialog', 30)
+		openReopenDialogForStudy(token)
+		confirmReopenDialog()
 		KeywordUtil.logInfo("reopenApprovedSubmissionRequest: completed for study token.")
 	}
 
@@ -1829,7 +2022,9 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			return
 		}
 		KeywordUtil.logInfo("openSubmissionRequestFormForStudy: list navigation for study token.")
-		new SubmissionRequestList().navigateToSubmissionRequestsList()
+		SubmissionRequestList listHelper = new SubmissionRequestList()
+		listHelper.navigateToSubmissionRequestsList()
+		listHelper.resetSubmissionRequestsFilters()
 		SubmissionRequestList.applySubmissionRequestsListFilters([study: token] as Map<String, String>)
 		WebUI.delay(2)
 		clickResumeOrViewForStudyRow(token)

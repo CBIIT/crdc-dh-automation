@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FolderEntity>
+   <description>Cross-cutting CRDC auxiliary checks (lists, pagination, Mongo, admin CRUD samples)</description>
+   <name>AuxiliaryTests</name>
+   <tag></tag>
+   <folderType>TESTCASE</folderType>
+</FolderEntity>
