@@ -67,4 +67,11 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-1051-ICDC/TC39_CRDC-VerifyCrossValidationICDC</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>e4f5a6b7-c8d9-4012-e3f4-a5b6c7d8e9f0</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-3839/TC02_CRDCDH-3839_SRF-AutoPopulate-ProgramStudy</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>

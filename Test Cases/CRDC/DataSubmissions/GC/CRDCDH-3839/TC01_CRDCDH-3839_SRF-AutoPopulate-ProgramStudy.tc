@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-3839 TC01: GC metadata-only DS; upload TSVs omit SRF auto-pop columns; after validate, program/study match golden files under CRDCDH-3839_TC01/expected/. Fixture study AUTOQA - AutomationQA_CRDCDH-3839 (AutoTest-Program) on CRDC_QA.</description>
+   <name>TC01_CRDCDH-3839_SRF-AutoPopulate-ProgramStudy</name>
+   <tag>Filter</tag>
+   <comment>See script header: upload vs expected TSVs, omitted columns, verifyNoValidationErrors + Data View UI/download vs expected/*.tsv. SRF approve must include program_full_description before study is used.</comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>b8e4c1a2-3f5d-4e6b-9c0d-1a2b3c4d5e6f</testCaseGuid>
+</TestCaseEntity>
