@@ -123,4 +123,25 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-1405/TC101_CRDC-1405-CLINoFileIdVerifyFinalManifest</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>cae7ce7d-c17e-4d9f-9e37-6957630028af</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-686-Partial/TC03_CRDC-VerifyInvalidStrPtrn-IncompibleConsCode</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>c6938add-f1cd-4eaa-a00b-58626fbd7751</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/CTDC/CRDCDH-699-CTDC/TC101_CRDC-699-VerifyValidationResultsLongFormErrorsCTDC</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>0f78f0df-c4b9-4a04-9d88-b2e612881f17</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-699-ICDC/TC36_CRDC-699-RequiredRelatedPropertyMissingICDC</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>

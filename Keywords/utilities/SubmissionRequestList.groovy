@@ -204,24 +204,53 @@ class SubmissionRequestList extends TestRunner {
 
 	/**
 	 * Read currently visible Submission Requests list table rows (GenericTable). Returns list of row data.
+	 * Waits for list refetch to finish, then reads cells with implicit wait at 0 to avoid slow per-cell blocking.
 	 *
 	 * @return List of rows, each row a List<String> of cell values in header order
 	 */
 	@Keyword
 	List<List<String>> readSubmissionRequestsTableRows() {
 		List<List<String>> result = new ArrayList<>()
+		WebDriver driver = DriverFactory.getWebDriver()
 		try {
-			List<WebElement> rows = getListTableRows()
-			if (rows.isEmpty()) {
-				KeywordUtil.logInfo("Submission Requests table row count: 0")
-				return result
-			}
-			for (WebElement row : rows) {
-				result.add(rowCellTexts(row))
+			waitForSubmissionRequestsListTableReady(DEFAULT_TIMEOUT)
+			for (int readAttempt = 1; readAttempt <= 3; readAttempt++) {
+				result = readSubmissionRequestsTableRowsFromDom(driver)
+				if (!result.isEmpty()) break
+				KeywordUtil.logInfo("readSubmissionRequestsTableRows: 0 rows on attempt " + readAttempt + ", re-waiting for table...")
+				waitForSubmissionRequestsListTableReady(10)
 			}
 			KeywordUtil.logInfo("Submission Requests table row count: " + result.size())
 		} catch (Exception e) {
 			KeywordUtil.logInfo("readSubmissionRequestsTableRows: " + e.getMessage())
+		}
+		return result
+	}
+
+	/**
+	 * Row count for generic-table-row on the current page (no per-cell reads).
+	 */
+	private static int countVisibleGenericTableRows() {
+		List<WebElement> rows = getListTableRows()
+		return rows == null ? 0 : rows.size()
+	}
+
+	/**
+	 * Read all visible table rows using WebDriver; caller should set implicit wait to 0 for performance.
+	 */
+	private static List<List<String>> readSubmissionRequestsTableRowsFromDom(WebDriver driver) {
+		List<List<String>> result = new ArrayList<>()
+		List<WebElement> rows = getListTableRows()
+		if (rows.isEmpty()) {
+			return result
+		}
+		try {
+			driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS)
+			for (WebElement row : rows) {
+				result.add(rowCellTexts(row))
+			}
+		} finally {
+			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS)
 		}
 		return result
 	}
@@ -236,8 +265,19 @@ class SubmissionRequestList extends TestRunner {
 	void verifySubmissionRequestsFilterResults(Map<String, Object> expectations, String reportSection = SECTION_SUBMISSION_REQUESTS) {
 		KeywordUtil.logInfo("--- verifySubmissionRequestsFilterResults ---")
 		try {
-			List<List<String>> rows = readSubmissionRequestsTableRows()
-			int count = rows.size()
+			boolean needFullRows = expectations != null && expectations.rowContains != null
+			int count
+			List<List<String>> rows = null
+
+			waitForSubmissionRequestsListTableReady(DEFAULT_TIMEOUT)
+
+			if (needFullRows) {
+				rows = readSubmissionRequestsTableRows()
+				count = rows.size()
+			} else {
+				count = countVisibleGenericTableRows()
+				KeywordUtil.logInfo("verifySubmissionRequestsFilterResults: row count=" + count)
+			}
 
 			if (expectations != null) {
 				if (expectations.expectAtLeastRows != null) {
@@ -247,6 +287,10 @@ class SubmissionRequestList extends TestRunner {
 					if (!pass) KeywordUtil.markFailed("verifySubmissionRequestsFilterResults: expected at least " + min + " rows, got " + count)
 				}
 				if (expectations.rowContains != null) {
+					if (rows == null) {
+						rows = readSubmissionRequestsTableRows()
+						count = rows.size()
+					}
 					String substring = expectations.rowContains.toString().trim()
 					boolean found = false
 					for (List<String> row : rows) {
@@ -310,6 +354,39 @@ class SubmissionRequestList extends TestRunner {
 			if (aria != null && !aria.trim().isEmpty()) return aria.trim()
 		}
 		return cell.getText().trim()
+	}
+
+	/**
+	 * After list filters, wait for GenericTable refetch: debounce, suspense/loading rows gone, stable row count.
+	 */
+	private void waitForSubmissionRequestsListTableReady(int timeoutSeconds) {
+		Thread.sleep(600)
+		try {
+			Utils.waitForElementToDisappear('CRDC/AILocators/GenericTable/Suspense-Loader', timeoutSeconds)
+		} catch (Exception e) {
+			KeywordUtil.logInfo("waitForSubmissionRequestsListTableReady: suspense loader: " + e.getMessage())
+		}
+		try {
+			Utils.waitForElementToDisappear('CRDC/AILocators/GenericTable/LoadingRow', timeoutSeconds)
+		} catch (Exception e) {
+			KeywordUtil.logInfo("waitForSubmissionRequestsListTableReady: loading row: " + e.getMessage())
+		}
+		long deadline = System.currentTimeMillis() + (long) timeoutSeconds * 1000L
+		int stableSamples = 0
+		int lastCount = -1
+		while (System.currentTimeMillis() < deadline && stableSamples < 2) {
+			int count = countVisibleGenericTableRows()
+			if (count == lastCount) {
+				stableSamples++
+			} else {
+				stableSamples = 0
+				lastCount = count
+			}
+			if (stableSamples < 2) {
+				Thread.sleep(500)
+			}
+		}
+		KeywordUtil.logInfo("waitForSubmissionRequestsListTableReady: stable row count=" + lastCount)
 	}
 
 	/**
@@ -551,5 +628,41 @@ class SubmissionRequestList extends TestRunner {
 			ValidationReport.addValidationReportItem(SECTION_SUBMISSION_REQUESTS, label, String.valueOf(expectedVisible), String.valueOf(present), 'Fail')
 			KeywordUtil.markFailed(label + ": expected " + expectedVisible + ", actual " + present)
 		}
+	}
+
+	/**
+	 * Open the first Submission Requests list row after filters are applied.
+	 * Asserts at least one table row, clicks the row action, then waits for the status bar (works for View/read-only and Edit).
+	 * @param action Optional. "view" (default) clicks Resume or View on the first row. "review" clicks Review (Fed Lead).
+	 */
+	@Keyword
+	void openFirstSubmissionRequestFromList(String action = 'view') {
+		KeywordUtil.logInfo("--- openFirstSubmissionRequestFromList: action=" + action + " ---")
+		verifySubmissionRequestsFilterResults([expectAtLeastRows: 1] as Map<String, Object>)
+		SubmissionRequest.clickFirstSubmissionRequestListRow(action)
+		boolean statusBarReady = WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/SubmissionRequests/StatusBar/Status-Lbl'), 40)
+		if (!statusBarReady) {
+			KeywordUtil.markFailed('openFirstSubmissionRequestFromList: status bar not visible after opening row (expected submission request form).')
+		}
+	}
+
+	/**
+	 * Navigate to the list, reset filters, filter by status, assert at least one row, then open the first row.
+	 * Uses existing QA data; no fixed submission request id is required.
+	 * @param status Status filter label exactly as shown in the list dropdown (e.g. Approved, In Progress, Rejected).
+	 * @param action Optional. "view" (default) or "review" — see openFirstSubmissionRequestFromList.
+	 */
+	@Keyword
+	void openFirstSubmissionRequestByStatus(String status, String action = 'view') {
+		if (status == null || status.trim().isEmpty()) {
+			KeywordUtil.markFailed("openFirstSubmissionRequestByStatus: status is required.")
+			return
+		}
+		KeywordUtil.logInfo("--- openFirstSubmissionRequestByStatus: " + status + " ---")
+		navigateToSubmissionRequestsList()
+		resetSubmissionRequestsFilters()
+		applySubmissionRequestsListFilters([status: status.trim()] as Map<String, String>)
+		WebUI.delay(2)
+		openFirstSubmissionRequestFromList(action)
 	}
 }

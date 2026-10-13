@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//*[@id=&apos;status-bar-review-comments-button&apos;]</value>
+         <value>//*[@id='status-bar-review-comments-button']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//*[@id=&apos;status-bar-review-comments-button&apos;]</value>
-      <webElementGuid>46283962-a055-4098-9041-3a66145ef8ec</webElementGuid>
+      <value>//*[@id='status-bar-review-comments-button']</value>
+      <webElementGuid>0048baa6-9f34-466c-8557-b8c563eb1032</webElementGuid>
    </webElementProperties>
 </WebElementEntity>
