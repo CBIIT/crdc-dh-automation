@@ -2799,7 +2799,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	}
 
 	/**
-	 * Click View Comments on the status bar and wait for the read-only review-comments-dialog.
+	 * Click View Comments on the status bar and wait for the review-comments-dialog.
 	 */
 	@Keyword
 	public static void openViewCommentsDialog() {

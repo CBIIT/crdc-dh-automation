@@ -1,7 +1,7 @@
 /*
  * CRDCDH-2226 TC02 + TC03 (CRDCDH-3594): Reject-dialog comment rules and Submitter View Comments after rejection.
  * Submitter submits a new request; Fed Lead checks the reject comment field, then rejects with a long comment;
- * Submitter confirms the comment appears read-only in View Comments.
+ * Submitter confirms the rejection comment appears in View Comments.
  */
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import utilities.SubmissionRequest
@@ -32,7 +32,7 @@ CustomKeywords.'utilities.SubmissionRequest.cancelReviewDecisionDialog'()
 // Step 4 — Fed Lead rejects with a long comment; request status becomes Rejected.
 CustomKeywords.'utilities.SubmissionRequest.rejectSubmissionRequest'(studyName, longComment)
 
-// Step 5 — Submitter opens the request, uses View Comments, and sees the rejection comment (read-only).
+// Step 5 — Submitter opens the request, uses View Comments, and sees the rejection comment text.
 CustomKeywords.'utilities.Login.switchUser'('Submitter')
 CustomKeywords.'utilities.SubmissionRequest.openSubmissionRequestFormForStudy'(studyName, 'Rejected')
 CustomKeywords.'utilities.SubmissionRequest.verifyViewCommentsButtonDisplayed'(true)
