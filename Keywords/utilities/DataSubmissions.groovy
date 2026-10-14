@@ -98,8 +98,11 @@ class DataSubmissions extends TestRunner {
 		boolean found = false
 		for (int attempt = 0; attempt < 5; attempt++) {
 			if (WebUI.waitForElementPresent(linkTo, 5)) {
-				found = true
-				break
+				String displayedName = WebUI.getText(linkTo)?.trim()
+				if (submissionName.trim() == displayedName) {
+					found = true
+					break
+				}
 			}
 			WebUI.delay(1)
 		}
