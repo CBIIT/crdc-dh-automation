@@ -2688,7 +2688,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			}
 			String key = historyDisplayStatusToKey(display)
 			if (key == null || !descriptions.containsKey(key)) {
-				KeywordUtil.logInfo('verifyFullHistoryStatusTooltips: skipping unknown status label: ' + display)
+				KeywordUtil.markFailed('verifyFullHistoryStatusTooltips: no expected tooltip configured for status label: ' + display)
 				continue
 			}
 			String expected = descriptions.get(key)?.toString()
