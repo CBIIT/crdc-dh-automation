@@ -37,7 +37,7 @@ CustomKeywords.'utilities.Login.switchUser'('Submitter')
 CustomKeywords.'utilities.SubmissionRequest.openSubmissionRequestFormForStudy'(studyName, 'Rejected')
 CustomKeywords.'utilities.SubmissionRequest.verifyViewCommentsButtonDisplayed'(true)
 CustomKeywords.'utilities.SubmissionRequest.openViewCommentsDialog'()
-CustomKeywords.'utilities.SubmissionRequest.verifyViewCommentsDialog'(commentPrefix, true)
+CustomKeywords.'utilities.SubmissionRequest.verifyViewCommentsDialog'(longComment, true)
 
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 WebUI.closeBrowser()
