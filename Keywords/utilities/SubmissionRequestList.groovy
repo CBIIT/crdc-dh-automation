@@ -118,9 +118,11 @@ class SubmissionRequestList extends TestRunner {
 
 			if (criteria.study != null && !criteria.study.trim().isEmpty()) {
 				String v = criteria.study.trim()
-				if (WebUI.waitForElementPresent(findTestObject(listFilters + "/Study-TxtBx"), 5)) {
-					WebUI.clearText(findTestObject(listFilters + "/Study-TxtBx"))
-					WebUI.setText(findTestObject(listFilters + "/Study-TxtBx"), v)
+				String studyPath = listFilters + "/Study-TxtBx"
+				if (WebUI.waitForElementPresent(findTestObject(studyPath), 5)) {
+					WebUIUtils.clickTab(studyPath)
+					WebUIUtils.clearTextfieldByOs(studyPath)
+					WebUI.sendKeys(findTestObject(studyPath), v)
 					WebUI.delay(1)
 				}
 			}
@@ -358,8 +360,10 @@ class SubmissionRequestList extends TestRunner {
 
 	/**
 	 * After list filters, wait for GenericTable refetch: debounce, suspense/loading rows gone, stable row count.
+	 * Call after applySubmissionRequestsListFilters when not using verifySubmissionRequestsFilterResults.
 	 */
-	private void waitForSubmissionRequestsListTableReady(int timeoutSeconds) {
+	@Keyword
+	void waitForSubmissionRequestsListTableReady(int timeoutSeconds = DEFAULT_TIMEOUT) {
 		Thread.sleep(600)
 		try {
 			Utils.waitForElementToDisappear('CRDC/AILocators/GenericTable/Suspense-Loader', timeoutSeconds)
