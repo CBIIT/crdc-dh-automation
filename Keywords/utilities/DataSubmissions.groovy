@@ -53,7 +53,7 @@ class DataSubmissions extends TestRunner {
 	// Expected data submission header values (set at login, createDataSubmission, or hardcoded; used by verifyDataSubmissionHeaders)
 	static String expectedSubmitter = null
 	static String expectedSubmissionName = null
-	/** UUID from the most recent createDataSubmission / Pbac.createDataSubmission (parsed from list row href). */
+	/** UUID from the most recent createDataSubmission / Pbac.createDataSubmission (parsed from URL after open). */
 	static String lastCreatedDataSubmissionId = null
 	static String expectedStudy = "autoQA"
 	static String expectedStudyTooltip = null
@@ -85,8 +85,9 @@ class DataSubmissions extends TestRunner {
 	}
 
 	/**
-	 * After create and list filter, read the submission UUID from the first row name link href, log it, and store lastCreatedDataSubmissionId.
-	 * @param submissionName Filtered submission display name (same value passed to the Submission Name filter).
+	 * After create: filter the list by submission name (unique auto-test_* names), expect exactly one row,
+	 * open that submission, and store lastCreatedDataSubmissionId from the upload-activity URL.
+	 * @param submissionName Submission display name used in the Submission Name filter.
 	 */
 	@Keyword
 	static void captureAndLogDataSubmissionIdFromList(String submissionName) {
@@ -94,30 +95,29 @@ class DataSubmissions extends TestRunner {
 			KeywordUtil.markFailed('captureAndLogDataSubmissionIdFromList: submissionName is required.')
 			return
 		}
-		TestObject linkTo = findTestObject('CRDC/AILocators/DataSubmissions/List/Table/SubmissionName-Link')
-		boolean found = false
-		for (int attempt = 0; attempt < 5; attempt++) {
-			if (WebUI.waitForElementPresent(linkTo, 5)) {
-				String displayedName = WebUI.getText(linkTo)?.trim()
-				if (submissionName.trim() == displayedName) {
-					found = true
-					break
-				}
-			}
-			WebUI.delay(1)
-		}
-		if (!found) {
-			KeywordUtil.markFailed("captureAndLogDataSubmissionIdFromList: submission list link not found after filtering by '${submissionName}'.")
+		String trimmed = submissionName.trim()
+		String filterPath = 'CRDC/AILocators/DataSubmissions/List/Filters/SubmissionName-TxtBx'
+		WebUIUtils.clickTab(filterPath)
+		WebUIUtils.clearTextfieldByOs(filterPath)
+		WebUI.sendKeys(findTestObject(filterPath), trimmed)
+		WebUI.delay(2)
+
+		List<WebElement> rows = Utils.getListWebElements('CRDC/AILocators/GenericTable/TableRow')
+		int rowCount = (rows == null) ? 0 : rows.size()
+		if (rowCount != 1) {
+			KeywordUtil.markFailed("captureAndLogDataSubmissionIdFromList: expected 1 list row after filtering by submission name '${trimmed}', found ${rowCount}.")
 			return
 		}
-		String href = WebUI.getAttribute(linkTo, 'href')
-		String id = parseSubmissionIdFromText(href)
+
+		WebUIUtils.clickTab('CRDC/DataSubmissions/DataSubmissionName-Link')
+		WebUI.delay(1)
+		String id = parseSubmissionIdFromText(WebUI.getUrl())
 		if (id == null) {
-			KeywordUtil.markFailed("captureAndLogDataSubmissionIdFromList: could not parse submission id from href '${href}'.")
+			KeywordUtil.markFailed("captureAndLogDataSubmissionIdFromList: could not parse submission id from URL '${WebUI.getUrl()}'.")
 			return
 		}
 		lastCreatedDataSubmissionId = id
-		KeywordUtil.logInfo("Data submission created — name: ${submissionName}, id: ${id}")
+		KeywordUtil.logInfo("Data submission created — name: ${trimmed}, id: ${id}")
 	}
 
 	/**
@@ -2142,9 +2142,7 @@ class DataSubmissions extends TestRunner {
 		//Create
 		TestRunner.clickTab('CRDC/DataSubmissions/Create/Create-Btn')
 		WebUI.delay(3)
-		WebUI.sendKeys(findTestObject('CRDC/AILocators/DataSubmissions/List/Filters/SubmissionName-TxtBx'), submissionName)
-		WebUI.delay(1)
-		captureAndLogDataSubmissionIdFromList(submissionName)
+		captureAndLogDataSubmissionIdFromList(submissionName) // filters list, opens submission, sets lastCreatedDataSubmissionId
 	}
 
 	private static final String HEADERS_SECTION = "Data Submission Headers"
