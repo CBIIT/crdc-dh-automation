@@ -22,7 +22,7 @@ CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 
 CustomKeywords.'utilities.DataSubmissions.uploadFolder'('CRDCDH-887_TC103')
-WebUI.delay(3)
+
 CustomKeywords.'utilities.DataSubmissions.verifyUploadActivitiesBatchRow'('Metadata', 2, 'Failed')
 
 CustomKeywords.'utilities.DataSubmissions.verifyUploadActivitiesFailedErrorsModal'('CRDCDH-887_TC103')
