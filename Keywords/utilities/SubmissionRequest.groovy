@@ -2009,9 +2009,11 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	 * approve/inquire/reject flows (Fedlead Review on the row).
 	 *
 	 * @param studyName Study title or search string for the Study filter (minimum 3 characters)
+	 * @param listStatus Optional status filter label (e.g. Rejected, Approved). Required when the SR is not in the
+	 *        list default status set (New, In Progress, Submitted, In Review, Inquired only).
 	 */
 	@Keyword
-	public static void openSubmissionRequestFormForStudy(String studyName) {
+	public static void openSubmissionRequestFormForStudy(String studyName, String listStatus = null) {
 		if (studyName == null || studyName.trim().isEmpty()) {
 			KeywordUtil.markFailed("openSubmissionRequestFormForStudy: studyName is required.")
 			return
@@ -2025,10 +2027,17 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		SubmissionRequestList listHelper = new SubmissionRequestList()
 		listHelper.navigateToSubmissionRequestsList()
 		listHelper.resetSubmissionRequestsFilters()
-		SubmissionRequestList.applySubmissionRequestsListFilters([study: token] as Map<String, String>)
-		WebUI.delay(2)
+		Map<String, String> criteria = [study: token]
+		if (listStatus != null && !listStatus.trim().isEmpty()) {
+			criteria.status = listStatus.trim()
+		}
+		SubmissionRequestList.applySubmissionRequestsListFilters(criteria)
+		listHelper.verifySubmissionRequestsFilterResults([expectAtLeastRows: 1] as Map<String, Object>)
 		clickResumeOrViewForStudyRow(token)
-		WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/SubmissionRequests/Form/Navigation/Save-Btn'), 40)
+		boolean formReady = WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/SubmissionRequests/StatusBar/Status-Lbl'), 40)
+		if (!formReady) {
+			KeywordUtil.markFailed('openSubmissionRequestFormForStudy: submission request form did not load (status bar not visible).')
+		}
 	}
 
 	/**
@@ -2593,5 +2602,260 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		if (!hasReadonlyAttr && !ariaDisabled) {
 			KeywordUtil.markFailed("fedLeadSubmitSubmissionRequestOnBehalfWithReadOnlySpotChecks: expected read-only control is still editable: " + to.getObjectId())
 		}
+	}
+
+	private static final String SECTION_CRDCDH_2226 = 'CRDCDH-2226'
+	private static final String REJECT_DIALOG_COMMENT = 'CRDC/AILocators/SubmissionRequests/RejectDialog/ReviewComment-TxtBx'
+	private static final String REJECT_DIALOG_COMMENT_COUNT = 'CRDC/AILocators/SubmissionRequests/RejectDialog/ReviewComment-CharacterCount'
+	private static final String REJECT_DIALOG_COMMENT_ERROR = 'CRDC/AILocators/SubmissionRequests/RejectDialog/ReviewComment-DialogError'
+	private static final String REJECT_DIALOG_CONFIRM = 'CRDC/AILocators/SubmissionRequests/RejectDialog/ConfirmReject-Btn'
+	private static final Map<String, String> STATUS_DESCRIPTIONS = [
+		'New': 'The request form was created.',
+		'In Progress': 'The request form was started but not submitted.',
+		'Submitted': 'The request form was submitted for review.',
+		'In Review': 'The request form is under evaluation by the Submission Review Committee.',
+		'Approved': 'The request form was reviewed and approved.',
+		'Rejected': 'The request form was reviewed and rejected.',
+		'Inquired': 'Additional information or clarification was requested from the submitter.',
+		'Canceled': 'The request form was manually canceled and is no longer active.',
+		'Deleted': 'The request form was automatically deleted by the system due to inactivity and is no longer active.'
+	]
+
+	/**
+	 * Click the list action on the first table row. Caller must already be on the Submission Requests list
+	 * (typically after applySubmissionRequestsListFilters).
+	 * @param action Optional. "view" (default) opens the form via Resume or View. "review" opens the Fed Lead Review flow.
+	 */
+	@Keyword
+	public static void clickFirstSubmissionRequestListRow(String action = 'view') {
+		WebDriver driver = DriverFactory.getWebDriver()
+		String tableXpath = TestRunner.givexpath('CRDC/AILocators/GenericTable/Table')
+		WebElement table = driver.findElement(By.xpath(tableXpath))
+		List<WebElement> rows = table.findElements(By.xpath(".//tbody//tr"))
+		if (rows.isEmpty()) {
+			KeywordUtil.markFailed('clickFirstSubmissionRequestListRow: table has no data rows.')
+			return
+		}
+		WebElement firstRow = rows.get(0)
+		boolean clicked = false
+		if (action != null && action.trim().equalsIgnoreCase('review')) {
+			clicked = clickReviewControlInListRow(driver, firstRow)
+		} else {
+			clicked = clickResumeOrViewControlInListRow(driver, firstRow)
+		}
+		if (!clicked) {
+			KeywordUtil.markFailed('clickFirstSubmissionRequestListRow: no ' + action + ' control on first row.')
+		}
+		WebUI.delay(2)
+	}
+
+	/**
+	 * From an open Submission Request form, click Full History on the status bar and wait for the history dialog.
+	 * Records a Pass entry in the validation report when the dialog appears.
+	 */
+	@Keyword
+	public static void openFullHistoryDialog() {
+		WebUIUtils.clickTab('CRDC/AILocators/SubmissionRequests/StatusBar/FullHistory-Btn')
+		boolean dialogOpen = WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/SubmissionRequests/StatusBar/History-Dialog'), 15)
+		if (!dialogOpen) {
+			ValidationReport.addValidationReportItem(SECTION_CRDCDH_2226, 'Full History dialog', 'open', 'not found', 'Fail')
+			KeywordUtil.markFailed('openFullHistoryDialog: status-bar-history-dialog did not appear.')
+			return
+		}
+		ValidationReport.addValidationReportItem(SECTION_CRDCDH_2226, 'Full History dialog', 'open', 'open', 'Pass')
+	}
+
+	/**
+	 * With Full History open, hover each history row status label and verify the MUI tooltip text.
+	 * Expected copy matches crdc-datahub-ui QuestionnaireTooltips STATUS_DESCRIPTIONS (built-in map when
+	 * expectedByStatus is null or empty). History labels are uppercase in the UI; they are mapped to status keys
+	 * before lookup. Unknown statuses are skipped with a log line. Each check is reported via ValidationReport.
+	 * @param expectedByStatus Optional map of status key to tooltip text; omit to use the default product copy.
+	 */
+	@Keyword
+	public static void verifyFullHistoryStatusTooltips(Map expectedByStatus = null) {
+		Map descriptions = (expectedByStatus != null && !expectedByStatus.isEmpty()) ? expectedByStatus : STATUS_DESCRIPTIONS
+		List<WebElement> statusEls = Utils.getListWebElements('CRDC/AILocators/SubmissionRequests/StatusBar/History-Item-Status')
+		if (statusEls == null || statusEls.isEmpty()) {
+			KeywordUtil.markFailed('verifyFullHistoryStatusTooltips: no history status elements found.')
+			return
+		}
+		for (int i = 0; i < statusEls.size(); i++) {
+			WebElement statusEl = statusEls.get(i)
+			String display = statusEl.getText()?.trim()
+			if (display == null || display.isEmpty()) {
+				continue
+			}
+			String key = historyDisplayStatusToKey(display)
+			if (key == null || !descriptions.containsKey(key)) {
+				KeywordUtil.markFailed('verifyFullHistoryStatusTooltips: no expected tooltip configured for status label: ' + display)
+				continue
+			}
+			String expected = descriptions.get(key)?.toString()
+			TestObject trigger = new TestObject('history_status_' + i)
+			trigger.addProperty('xpath', ConditionType.EQUALS, "//*[@data-testid='status-bar-history-dialog']//*[@data-testid='history-item-" + i + "-status']", true)
+			WebUIUtils.verifyTooltipOnHover(trigger, expected, expected.take(Math.min(20, expected.length())))
+		}
+	}
+
+	/** Maps a history row status label (e.g. APPROVED) to STATUS_DESCRIPTIONS key (e.g. Approved). */
+	private static String historyDisplayStatusToKey(String displayUpper) {
+		for (String key : STATUS_DESCRIPTIONS.keySet()) {
+			if (key.equalsIgnoreCase(displayUpper?.trim())) {
+				return key
+			}
+		}
+		return null
+	}
+
+	/**
+	 * Fed Lead flow: filter list by study, open Review, go to the Review section, then open a decision dialog
+	 * without entering a comment or confirming. Used to exercise ReviewFormDialog UI before submit/cancel.
+	 * @param studyName Study title or filter token (minimum 3 characters), same rules as rejectSubmissionRequest.
+	 * @param decision Optional. "reject" (default), "approve", or "inquire".
+	 */
+	@Keyword
+	public static void openReviewDecisionDialog(String studyName, String decision = 'reject') {
+		if (openSubmissionRequestReview(studyName, 'openReviewDecisionDialog') == null) {
+			return
+		}
+		String actionPath
+		String d = decision != null ? decision.trim().toLowerCase() : 'reject'
+		if (d == 'approve') {
+			actionPath = SR_FORM_BASE + '/Navigation/Approve-Btn'
+		} else if (d == 'inquire') {
+			actionPath = SR_FORM_BASE + '/Navigation/Inquire-Btn'
+		} else {
+			actionPath = SR_FORM_BASE + '/Navigation/Reject-Btn'
+		}
+		WebUI.scrollToElement(findTestObject(actionPath), 15)
+		WebUI.waitForElementClickable(findTestObject(actionPath), 15)
+		WebUI.click(findTestObject(actionPath))
+		WebUI.waitForElementPresent(findTestObject(REJECT_DIALOG_COMMENT), 10)
+	}
+
+	/**
+	 * Click Cancel on the open ReviewFormDialog (Approve/Reject/Inquire) and dismiss without saving a decision.
+	 */
+	@Keyword
+	public static void cancelReviewDecisionDialog() {
+		WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/SubmissionRequests/RejectDialog/Cancel-Btn'), 10)
+		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/RejectDialog/Cancel-Btn'))
+		WebUI.delay(1)
+	}
+
+	/**
+	 * On an open Reject ReviewFormDialog: type hello and check counter 5 / limit; then set limit+1 characters,
+	 * click Confirm, and check the max-length validation message. Does not complete reject.
+	 * @param maxLimit Maximum allowed characters (default 10000).
+	 */
+	@Keyword
+	public static void verifyReviewCommentFieldUi(int maxLimit = 10000) {
+		String limitLabel = String.format('%,d', maxLimit)
+		String overLimitError = 'Maximum of ' + limitLabel + ' characters allowed'
+
+		WebUI.waitForElementPresent(findTestObject(REJECT_DIALOG_COMMENT_COUNT), 10)
+		WebUI.click(findTestObject(REJECT_DIALOG_COMMENT))
+		WebUI.sendKeys(findTestObject(REJECT_DIALOG_COMMENT), 'hello')
+		WebUI.delay(1)
+		String expectedFive = '5 / ' + limitLabel
+		String actualFive = WebUI.getText(findTestObject(REJECT_DIALOG_COMMENT_COUNT))?.trim() ?: ''
+		boolean fiveOk = expectedFive == actualFive
+		ValidationReport.addValidationReportItem(SECTION_CRDCDH_2226, 'Review comment count after hello', expectedFive, actualFive ?: '(empty)', fiveOk ? 'Pass' : 'Fail')
+		if (!fiveOk) {
+			KeywordUtil.markFailed('verifyReviewCommentFieldUi: expected "' + expectedFive + '", got "' + actualFive + '"')
+			return
+		}
+
+		WebUI.click(findTestObject(REJECT_DIALOG_COMMENT))
+		WebUIUtils.clearTextfieldByOs(REJECT_DIALOG_COMMENT)
+		WebUI.sendKeys(findTestObject(REJECT_DIALOG_COMMENT), 'z'.repeat(maxLimit + 1))
+		WebUI.delay(2)
+
+		WebUI.click(findTestObject(REJECT_DIALOG_CONFIRM))
+		WebUI.delay(1)
+		WebUI.waitForElementVisible(findTestObject(REJECT_DIALOG_COMMENT_ERROR), 10)
+		String errorText = WebUI.getText(findTestObject(REJECT_DIALOG_COMMENT_ERROR))?.trim() ?: ''
+		boolean errorOk = errorText.contains(overLimitError)
+		ValidationReport.addValidationReportItem(SECTION_CRDCDH_2226, 'Review comment over-limit error', overLimitError, errorText ?: '(empty)', errorOk ? 'Pass' : 'Fail')
+		if (!errorOk) {
+			KeywordUtil.markFailed('verifyReviewCommentFieldUi: expected "' + overLimitError + '" after Confirm, got "' + errorText + '"')
+		}
+	}
+
+	/**
+	 * Assert whether the status bar View Comments button is present on the current Submission Request form.
+	 * The button appears when history includes at least one review comment.
+	 * @param expectedDisplayed true if the button should be visible (default).
+	 */
+	@Keyword
+	public static void verifyViewCommentsButtonDisplayed(boolean expectedDisplayed = true) {
+		boolean present = WebUIUtils.fastElementPresent('CRDC/AILocators/SubmissionRequests/StatusBar/ViewComments-Btn')
+		String status = (present == expectedDisplayed) ? 'Pass' : 'Fail'
+		ValidationReport.addValidationReportItem(SECTION_CRDCDH_2226, 'View Comments button', String.valueOf(expectedDisplayed), String.valueOf(present), status)
+		if (status == 'Fail') {
+			KeywordUtil.markFailed('verifyViewCommentsButtonDisplayed: expected ' + expectedDisplayed + ', actual ' + present)
+		}
+	}
+
+	/**
+	 * Click View Comments on the status bar and wait for the review-comments-dialog.
+	 */
+	@Keyword
+	public static void openViewCommentsDialog() {
+		WebUIUtils.clickTab('CRDC/AILocators/SubmissionRequests/StatusBar/ViewComments-Btn')
+		// Status bar opens the dialog in one click; legacy two-step flow uses comments-item-0-view when present.
+		if (WebUIUtils.fastElementPresent('CRDC/AILocators/SubmissionRequests/StatusBar/ReviewComments-View-Btn')) {
+			WebUIUtils.clickTab('CRDC/AILocators/SubmissionRequests/StatusBar/ReviewComments-View-Btn')
+		}
+		WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/SubmissionRequests/StatusBar/ReviewComments-Dialog'), 15)
+	}
+
+	/**
+	 * With review-comments-dialog open, verify title contains "Comments", optionally verify comment body text,
+	 * record results in ValidationReport, then click Close. UI shows the most recent history entry with a review comment.
+	 * @param expectedSubstring If non-null and non-empty, dialog text must contain this substring; if null, only checks non-empty body.
+	 * @param verifyTitleComments When true (default), fail if "Comments" is not in the dialog text.
+	 * @param mustNotContainSubstring If non-null and non-empty, dialog text must not contain this substring (e.g. older inquire comment).
+	 */
+	@Keyword
+	public static void verifyViewCommentsDialog(String expectedSubstring = null, boolean verifyTitleComments = true, String mustNotContainSubstring = null) {
+		TestObject dialogTo = findTestObject('CRDC/AILocators/SubmissionRequests/StatusBar/ReviewComments-Dialog')
+		WebUI.waitForElementVisible(dialogTo, 10)
+		String dialogText = WebUI.getText(dialogTo)?.trim() ?: ''
+		if (dialogText.isEmpty()) {
+			KeywordUtil.markFailed('verifyViewCommentsDialog: dialog text is empty.')
+			return
+		}
+		if (verifyTitleComments && !dialogText.contains('Comments')) {
+			ValidationReport.addValidationReportItem(SECTION_CRDCDH_2226, 'View Comments title', 'Comments', dialogText.take(80), 'Fail')
+			KeywordUtil.markFailed('verifyViewCommentsDialog: expected Comments in dialog.')
+			return
+		}
+		ValidationReport.addValidationReportItem(SECTION_CRDCDH_2226, 'View Comments title', 'Comments', 'present', 'Pass')
+
+		if (expectedSubstring != null && !expectedSubstring.trim().isEmpty()) {
+			boolean contains = dialogText.contains(expectedSubstring.trim())
+			ValidationReport.addValidationReportItem(SECTION_CRDCDH_2226, 'View Comments body', 'contains ' + expectedSubstring.take(40), contains ? 'found' : 'not found', contains ? 'Pass' : 'Fail')
+			if (!contains) {
+				KeywordUtil.markFailed('verifyViewCommentsDialog: comment body missing expected text.')
+				return
+			}
+		} else {
+			ValidationReport.addValidationReportItem(SECTION_CRDCDH_2226, 'View Comments body', 'non-empty', 'length ' + dialogText.length(), 'Pass')
+		}
+
+		if (mustNotContainSubstring != null && !mustNotContainSubstring.trim().isEmpty()) {
+			String stale = mustNotContainSubstring.trim()
+			boolean absent = !dialogText.contains(stale)
+			ValidationReport.addValidationReportItem(SECTION_CRDCDH_2226, 'View Comments body stale text', 'must not contain ' + stale.take(40), absent ? 'absent' : 'present', absent ? 'Pass' : 'Fail')
+			if (!absent) {
+				KeywordUtil.markFailed('verifyViewCommentsDialog: dialog still shows older comment text.')
+				return
+			}
+		}
+
+		WebUI.click(findTestObject('CRDC/AILocators/SubmissionRequests/StatusBar/ReviewComments-Dialog-Close'))
+		WebUI.delay(1)
 	}
 }
