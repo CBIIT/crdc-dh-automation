@@ -1,15 +1,17 @@
 import com.kms.katalon.core.util.KeywordUtil
-import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 
 import internal.GlobalVariable
 
 /*
  * CRDCDH-1551 / TC02_GetSubmissionNodes
  *
- * Upload pipeline (create → batch → PUT → updateBatch → validateSubmission), then:
- *  - getSubmissionNodes baseline (program, study, participant)
- *  - deleteDataRecords for one participant (async)
- *  - fixed delay, then getSubmissionNodes + verifyAndUnpackGetSubmissionNodes (8 participants)
+ * Flow:
+ *  1. Upload pipeline: createSubmission → createBatch → PUT TSVs → updateBatch
+ *  2. waitForMetadataBatchReady — do not validate until batch/files are Uploaded (replaces fixed sleep)
+ *  3. validateSubmission + verify (rejects "No metadata for validation")
+ *  4. getSubmissionNodes × 3 — baseline program / study / participant counts vs InputFiles/CRDC/API/*-stage.tsv
+ *  5. deleteDataRecords (one participant) — success = queued, not immediate
+ *  6. waitForGetSubmissionNodesAfterDelete — poll until delete visible, then verifyAndUnpackGetSubmissionNodes
  *
  * GraphQLOperations.xlsx: getSubmissionNodes, deleteDataRecords.
  */
@@ -22,7 +24,7 @@ String submissionName = "auto-api_" + timestamp
 KeywordUtil.logInfo("createSubmission name: ${submissionName}")
 
 Map subResp = CustomKeywords.'utilities.GraphQlApiClient.createSubmission'([
-	studyID    : '2ef65a9b-7f9f-42e9-8e65-d45c7b3ca74e',
+	studyID    : 'bfe2cd9f-c703-4869-8712-f48f41880242',
 	dataCommons: 'CDS',
 	name       : submissionName,
 	intention  : 'New/Update',
@@ -57,13 +59,22 @@ CustomKeywords.'utilities.GraphQlApiClient.updateBatch'([
 	files  : uploadResults
 ])
 
-WebUI.delay(5)
+// Hub ingests TSVs asynchronously after updateBatch; validate too early → empty nodes / "No metadata for validation".
+CustomKeywords.'utilities.GraphQlApiClient.waitForMetadataBatchReady'([
+	submissionID   : lastApiSubmissionId,
+	batchID        : batchId,
+	files          : fileBasenames,
+	timeoutSeconds : 180,
+	stableSeconds  : 10
+])
 
-CustomKeywords.'utilities.GraphQlApiClient.validateSubmission'([
+Map valResp = CustomKeywords.'utilities.GraphQlApiClient.validateSubmission'([
 	_id   : lastApiSubmissionId,
 	types : ['metadata'],
 	scope : 'All'
 ])
+
+CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackValidateSubmission'(valResp)
 
 
 // --- getSubmissionNodes (baseline) ---
@@ -136,21 +147,21 @@ Map delResp = CustomKeywords.'utilities.GraphQlApiClient.deleteDataRecords'([
 // Assert DataValidation.success and log message to ValidationReport.
 CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackDeleteDataRecords'(delResp)
 
-KeywordUtil.logInfo("deleteDataRecords queued for participant nodeID=${participantToDelete}; fixed delay then getSubmissionNodes (async delete)")
+int expectedParticipantTotalAfterDelete = expectedParticipantIdsAfterDelete.size()
 
-WebUI.delay(5)
+KeywordUtil.logInfo("deleteDataRecords queued for participant nodeID=${participantToDelete}; poll getSubmissionNodes until absent (async delete)")
 
-// Re-query participants only; expect total 8 and the remaining nodeIDs (deleted id must be absent).
-Map partRespAfter = CustomKeywords.'utilities.GraphQlApiClient.getSubmissionNodes'([
-	_id      : lastApiSubmissionId,
-	nodeType : 'participant',
-	status   : 'All',
-	first    : -1,
-	offset   : 0
+// Polls getSubmissionNodes internally; final payload is verified the same way as baseline participant read above.
+Map partRespAfter = CustomKeywords.'utilities.GraphQlApiClient.waitForGetSubmissionNodesAfterDelete'([
+	submissionID   : lastApiSubmissionId,
+	nodeType       : 'participant',
+	expectedTotal  : expectedParticipantTotalAfterDelete,
+	absentNodeIds  : [participantToDelete],
+	timeoutSeconds : 120
 ])
 
 CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackGetSubmissionNodes'(partRespAfter, lastApiSubmissionId, 'participant',
-	8, expectedParticipantIdsAfterDelete)
+	expectedParticipantTotalAfterDelete, expectedParticipantIdsAfterDelete)
 
 KeywordUtil.logInfo("getSubmissionNodes + deleteDataRecords verification complete for submission ${lastApiSubmissionId}")
 
