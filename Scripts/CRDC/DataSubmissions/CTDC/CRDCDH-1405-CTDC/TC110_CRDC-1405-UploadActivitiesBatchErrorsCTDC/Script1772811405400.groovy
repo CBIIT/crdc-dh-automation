@@ -25,7 +25,7 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmiss
 
 CustomKeywords.'utilities.DataSubmissions.uploadFolder'('CRDCDH-1405_TC110')
 
-CustomKeywords.'utilities.DataSubmissions.verifyUploadActivitiesBatchRow'('Metadata', 4, 'Failed')
+CustomKeywords.'utilities.DataSubmissions.verifyUploadActivitiesBatchRow'('Metadata', 3, 'Failed')
 
 CustomKeywords.'utilities.DataSubmissions.verifyUploadActivitiesFailedErrorsModal'('CRDCDH-1405_TC110')
 

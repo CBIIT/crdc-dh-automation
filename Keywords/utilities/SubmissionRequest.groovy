@@ -361,20 +361,24 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		WebUI.click(findTestObject('CRDC/SubmissionRequest/CrdcDdValue'))
 
 		if(ddValueToSelect.contains("Other")) {
-			WebUI.setText(findTestObject(ePath+'ProgramTitle-TxtBx'), findTestData(fPath).getValue('program-title', dataRowNum)+programTimeStamp);
+			String programTitleBase = findTestData(fPath).getValue('program-title', dataRowNum)
+			programTitleBase = (programTitleBase != null) ? programTitleBase.toString() : ""
+			lastEnteredProgramName = programTitleBase + programTimeStamp
+			WebUI.setText(findTestObject(ePath+'ProgramTitle-TxtBx'), lastEnteredProgramName);
 			WebUI.setText(findTestObject(ePath+'ProgAbbre-Txtbx'), findTestData(fPath).getValue('prog-abbreviation', dataRowNum)+programTimeStamp);
 			WebUI.setText(findTestObject(ePath+'ProgDescrptn-Txtbx'), findTestData(fPath).getValue('prog-description', dataRowNum));
 		}else if(ddValueToSelect.contains("CCDI")) {
+			lastEnteredProgramName = null
 
 			validateProgramFields(2);
 		}else if(ddValueToSelect.contains("CPTAC")) {
-
+			lastEnteredProgramName = null
 			validateProgramFields(3);
 		}else if(ddValueToSelect.contains("DCCPS")) {
-
+			lastEnteredProgramName = null
 			validateProgramFields(4);
 		}else if(ddValueToSelect.contains("HTAN")) {
-
+			lastEnteredProgramName = null
 			validateProgramFields(5);
 		}else {
 			KeywordUtil.markFailed("Invalid Drop-down Value! Check enterProgramInfo function")
@@ -409,14 +413,13 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	/**
 	 * Program title for an "Other" program last entered via {@link #enterProgramInfo(String, int)}:
 	 * {@code program-title} from test data for that row + {@link #programTimeStamp}.
-	 * Set with {@link #recordLastEnteredProgramNameForOtherProgramEntry(Object)} after the form is filled, for e.g. Manage Programs verification.
+	 * Cleared when a preset program (CCDI, CPTAC, etc.) is selected instead of Other.
 	 */
 	public static String lastEnteredProgramName
 
 	/**
-	 * After {@link #enterProgramInfo(String, int)} with program {@code Other}, stores the program title that was written to the form
-	 * (same as {@code program-title} + {@link #programTimeStamp} at the given data row) into {@link #lastEnteredProgramName}.
-	 * Call with the same row index you passed to {@link #enterProgramInfo} (e.g. the third argument to {@link #fillSubmissionRequestAllSections} for program).
+	 * Re-sync {@link #lastEnteredProgramName} from test data + {@link #programTimeStamp} (e.g. Manage Programs after Other program).
+	 * Not required when {@link #enterProgramInfo(String, int)} with Other already ran in the same test.
 	 *
 	 * @param programDataRowArg Row in {@code CRDC/SubmissionRequest/section-b} (accepts int, {@link Integer}, or numeric {@link String} from Katalon)
 	 */
@@ -2508,7 +2511,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	}
 
 	/**
-	 * Federal Lead: filter the list, open the row via **View** (In Progress), walk A→B→C→D using **Next** with one read-only
+	 * Federal Lead: reset list filters, filter by study + In Progress, open the row (View; Resume if shown), walk A→B→C→D using **Next** with one read-only
 	 * spot-check per section, advance to the final step, then submit on behalf (same flow as {@link #clickSubmitButton()}).
 	 * Section B study title is compared to {@link #lastEnteredStudyTitle} (set when the submitter ran {@link #enterStudyInfo(int)}).
 	 *
@@ -2538,10 +2541,15 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		int dRow = parseTestDataRowIndex(sectionDRow, 'fedLeadSubmitSubmissionRequestOnBehalfWithReadOnlySpotChecks')
 
 		KeywordUtil.logInfo("fedLeadSubmitSubmissionRequestOnBehalfWithReadOnlySpotChecks: list navigation for study token")
-		new SubmissionRequestList().navigateToSubmissionRequestsList()
-		SubmissionRequestList.applySubmissionRequestsListFilters([study: token] as Map<String, String>)
-		WebUI.delay(2)
-		clickSubmissionRequestsListViewForStudyRow(token)
+		SubmissionRequestList listHelper = new SubmissionRequestList()
+		listHelper.navigateToSubmissionRequestsList()
+		listHelper.resetSubmissionRequestsFilters()
+		SubmissionRequestList.applySubmissionRequestsListFilters([
+			study : token,
+			status: 'In Progress'
+		] as Map<String, String>)
+		listHelper.verifySubmissionRequestsFilterResults([expectAtLeastRows: 1] as Map<String, Object>)
+		clickResumeOrViewForStudyRow(token)
 
 		TestData tdA = findTestData('CRDC/SubmissionRequest/section-a')
 		TestData tdC = findTestData('CRDC/SubmissionRequest/section-c')

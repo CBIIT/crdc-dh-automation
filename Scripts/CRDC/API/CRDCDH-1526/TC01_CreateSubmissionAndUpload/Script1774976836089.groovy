@@ -36,7 +36,7 @@ String submissionName = "auto-api_" + timestamp
 KeywordUtil.logInfo("createSubmission name: ${submissionName} (length ${submissionName.length()})")
 
 Map subResp = CustomKeywords.'utilities.GraphQlApiClient.createSubmission'([
-	studyID    : '2ef65a9b-7f9f-42e9-8e65-d45c7b3ca74e',
+	studyID    : 'bfe2cd9f-c703-4869-8712-f48f41880242',
 	dataCommons: 'CDS',
 	name       : submissionName,
 	intention  : 'New/Update',
@@ -88,7 +88,13 @@ Map updatedBatch = CustomKeywords.'utilities.GraphQlApiClient.verifyAndUnpackUpd
 String finalBatchStatus = updatedBatch?.get('status')?.toString()
 KeywordUtil.logInfo("updateBatch final batch status: ${finalBatchStatus}")
 
-WebUI.delay(5) //handle race condition before validation
+CustomKeywords.'utilities.GraphQlApiClient.waitForMetadataBatchReady'([
+	submissionID   : lastApiSubmissionId,
+	batchID        : batchId,
+	files          : fileBasenames,
+	timeoutSeconds : 180,
+	stableSeconds  : 10
+])
 
 // Step 5 — validateSubmission (initialize validation run; success is not QC pass/fail)
 KeywordUtil.logInfo("validateSubmission submissionID=${lastApiSubmissionId} types=[metadata] scope=All")
