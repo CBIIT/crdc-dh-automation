@@ -790,6 +790,8 @@ class Pbac extends TestRunner {
 		WebUI.delay(3)
 		WebUI.sendKeys(findTestObject('CRDC/AILocators/DataSubmissions/List/Filters/SubmissionName-TxtBx'), submissionName)
 		WebUI.delay(1)
+		DataSubmissions.expectedSubmissionName = submissionName
+		DataSubmissions.captureAndLogDataSubmissionIdFromList(submissionName)
 	}
 
 	/**

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-2226 TC01 (CRDCDH-2158): Full History status tooltips. Approved then Rejected list filter, first row each, hover each history status vs STATUS_DESCRIPTIONS.</description>
+   <name>TC01_CRDCDH-2226_FullHistory-StatusTooltips</name>
+   <tag></tag>
+   <comment>Steps: Submitter login; Approved then Rejected via openFirstSubmissionRequestByStatus; openFullHistoryDialog and verifyFullHistoryStatusTooltips each. No fixed SR id.</comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>c2226101-1111-4a48-8b01-394801000001</testCaseGuid>
+</TestCaseEntity>

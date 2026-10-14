@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-2226 TC02+TC03 (CRDCDH-3594): Reject comment character counter and 10k limit; rejection with long comment; Submitter reads same comment in View Comments.</description>
+   <name>TC02_CRDCDH-2226_ReviewComment-AndViewComments</name>
+   <tag></tag>
+   <comment>1 Submitter: new request submitted. 2 Fed Lead: open Reject. 3 Comment UI (counter, limit); Cancel. 4 Reject with long comment. 5 Submitter: View Comments shows that comment.</comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>c2226101-2222-4a48-8b01-394801000002</testCaseGuid>
+</TestCaseEntity>
