@@ -584,7 +584,9 @@ class GraphQlApiClient {
 	}
 
 	/**
-	 * Verify validateSubmission response: success indicates the validation run was initialized (queued), not QC outcome.
+	 * Verify validateSubmission response: success means the validation job was accepted/queued, not that QC passed.
+	 * Also fails when message contains "No metadata for validation" (Hub had nothing to validate yet — usually upload/batch not ready).
+	 *
 	 * @param result Full parsed GraphQL body from validateSubmission
 	 * @param expectSuccess When true, require success == true (happy path).
 	 * @return data.validateSubmission map or null on failure
@@ -621,8 +623,16 @@ class GraphQlApiClient {
 					ok ? "true" : "false", "Pass")
 		}
 		Object msgObj = payload.get('message')
-		if (msgObj != null && msgObj.toString().trim()) {
-			KeywordUtil.logInfo("validateSubmission message: ${msgObj}")
+		String msg = msgObj != null ? msgObj.toString().trim() : ""
+		if (msg) {
+			KeywordUtil.logInfo("validateSubmission message: ${msg}")
+		}
+		if (expectSuccess && msg && msg.toLowerCase().contains('no metadata for validation')) {
+			ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "validateSubmission message", "no 'No metadata for validation'",
+					msg, "Fail")
+			KeywordUtil.markFailed(
+					"GraphQlApiClient.verifyAndUnpackValidateSubmission: metadata not ready for validation. message: ${msg}")
+			return null
 		}
 		return payload
 	}
@@ -978,7 +988,325 @@ class GraphQlApiClient {
 	}
 
 	/**
-	 * Run getSubmissionNodes query (Data View nodes for a submission and node type).
+	 * Same HTTP/GraphQL transport as post(), but for tight poll loops: no per-call ValidationReport rows and no full response log.
+	 * Used by waitForMetadataBatchReady and waitForGetSubmissionNodesAfterDelete so logs stay readable.
+	 */
+	private Map postSilently(String operationName, String query, Map variables) {
+		requireApiConfig()
+		if (!query?.toString()?.trim()) {
+			return null
+		}
+		URL url = new URL(GlobalVariable.ApiUrl.toString().trim())
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection()
+		InputStream stream = null
+		try {
+			conn.setRequestMethod("POST")
+			conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+			String jwt = normalizeBearerToken(GlobalVariable.SubmitterApiToken.toString())
+			conn.setRequestProperty("Authorization", "Bearer " + jwt)
+			conn.setDoOutput(true)
+			Map payload = [query: query]
+			if (operationName != null && !operationName.isEmpty()) {
+				payload.operationName = operationName
+			}
+			payload.variables = variables != null ? variables : [:]
+			conn.outputStream.withWriter("UTF-8") { Writer w ->
+				w << JsonOutput.toJson(payload)
+			}
+			int code = conn.responseCode
+			stream = code >= 400 ? conn.errorStream : conn.inputStream
+			String text = stream ? stream.getText("UTF-8") : ""
+			if (code < 200 || code >= 300) {
+				KeywordUtil.logInfo("GraphQlApiClient.postSilently(${operationName}): HTTP ${code}")
+				return null
+			}
+			def slurper = new JsonSlurper()
+			Map parsed = (Map) slurper.parseText(text ?: "{}")
+			if (parsed?.errors) {
+				KeywordUtil.logInfo("GraphQlApiClient.postSilently(${operationName}): GraphQL errors: ${parsed.errors}")
+				return null
+			}
+			return parsed
+		} catch (Exception e) {
+			KeywordUtil.logInfo("GraphQlApiClient.postSilently(${operationName}): ${e.message}")
+			return null
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close()
+				} catch (Exception ignored) {
+				}
+			}
+			if (conn != null) {
+				conn.disconnect()
+			}
+		}
+	}
+
+	/** Single listBatches call; returns data.listBatches map only (for batch-upload polling). */
+	private Map fetchListBatchesPayload(String submissionID) {
+		String queryDoc = loadGraphQlDocument("listBatches")
+		if (!queryDoc) {
+			return null
+		}
+		Map result = postSilently("listBatches", queryDoc, [submissionID: submissionID, first: 50])
+		return (result?.data as Map)?.get('listBatches') as Map
+	}
+
+	/**
+	 * Poll listBatches until the metadata batch is no longer Uploading and expected files are Uploaded (UI parity with
+	 * DataSubmissions.waitUntilNoBatchUploading). Call after updateBatch, before validateSubmission or getSubmissionNodes.
+	 *
+	 * Args: submissionID, batchID (required); files (optional list of fileName basenames); timeoutSeconds (default 180);
+	 * stableSeconds (default 10) — batch must stay ready that long before returning.
+	 * @return The batch map from listBatches when ready, or null after markFailed on timeout.
+	 */
+	@Keyword
+	Map waitForMetadataBatchReady(Map args) {
+		if (args == null) {
+			KeywordUtil.markFailed("GraphQlApiClient.waitForMetadataBatchReady: args map is required.")
+			return null
+		}
+		String submissionID = args.submissionID?.toString()?.trim()
+		String batchID = args.batchID?.toString()?.trim()
+		if (!submissionID || !batchID) {
+			KeywordUtil.markFailed("GraphQlApiClient.waitForMetadataBatchReady: submissionID and batchID are required.")
+			return null
+		}
+		int timeoutSeconds = 180
+		if (args.containsKey('timeoutSeconds') && args.timeoutSeconds != null) {
+			timeoutSeconds = args.timeoutSeconds instanceof Number ? ((Number) args.timeoutSeconds).intValue() : Integer.parseInt(args.timeoutSeconds.toString())
+		}
+		int stableSeconds = 10
+		if (args.containsKey('stableSeconds') && args.stableSeconds != null) {
+			stableSeconds = args.stableSeconds instanceof Number ? ((Number) args.stableSeconds).intValue() : Integer.parseInt(args.stableSeconds.toString())
+		}
+		Set<String> expectedFiles = new LinkedHashSet<>()
+		if (args.files instanceof List) {
+			for (Object nameObj : (List) args.files) {
+				String bn = nameObj?.toString()?.trim()
+				if (bn) {
+					expectedFiles.add(bn)
+				}
+			}
+		}
+		long deadline = System.currentTimeMillis() + timeoutSeconds * 1000L
+		Long clearSince = null
+		Map lastBatch = null
+		String lastReason = ""
+		while (System.currentTimeMillis() < deadline) {
+			Map payload = fetchListBatchesPayload(submissionID)
+			if (payload == null) {
+				lastReason = "listBatches request failed"
+				clearSince = null
+				Thread.sleep(2000)
+				continue
+			}
+			List batches = payload.get('batches') as List
+			Map batch = null
+			if (batches) {
+				for (Object bObj : batches) {
+					Map b = bObj as Map
+					if (batchID == b?.get('_id')?.toString()?.trim()) {
+						batch = b
+						break
+					}
+				}
+			}
+			if (batch == null) {
+				lastReason = "batch ${batchID} not found in listBatches"
+				lastBatch = null
+				clearSince = null
+				Thread.sleep(2000)
+				continue
+			}
+			lastBatch = batch
+			String batchStatus = batch.get('status')?.toString()?.trim() ?: ""
+			boolean uploading = batchStatus.equalsIgnoreCase('Uploading')
+			Object batchErrors = batch.get('errors')
+			boolean batchHasErrors = batchErrors != null && batchErrors instanceof List && !((List) batchErrors).isEmpty()
+			List files = batch.get('files') as List
+			boolean filesReady = true
+			String fileReason = ""
+			if (expectedFiles.isEmpty()) {
+				if (files == null || files.isEmpty()) {
+					filesReady = false
+					fileReason = "batch files list empty"
+				} else {
+					for (Object fObj : files) {
+						Map f = fObj as Map
+						String st = f?.get('status')?.toString()?.trim() ?: ""
+						Object errs = f?.get('errors')
+						boolean noErrors = errs == null || (errs instanceof List && ((List) errs).isEmpty())
+						if (!st.equalsIgnoreCase('Uploaded') || !noErrors) {
+							filesReady = false
+							fileReason = "file ${f?.get('fileName')} status=${st}"
+							break
+						}
+					}
+				}
+			} else {
+				Map<String, Map> byName = [:]
+				if (files) {
+					for (Object fObj : files) {
+						Map f = fObj as Map
+						String fn = f?.get('fileName')?.toString()?.trim()
+						if (fn) {
+							byName.put(fn, f)
+						}
+					}
+				}
+				for (String expFn : expectedFiles) {
+					Map f = byName.get(expFn)
+					if (f == null) {
+						filesReady = false
+						fileReason = "missing file ${expFn}"
+						break
+					}
+					String st = f.get('status')?.toString()?.trim() ?: ""
+					Object errs = f.get('errors')
+					boolean noErrors = errs == null || (errs instanceof List && ((List) errs).isEmpty())
+					if (!st.equalsIgnoreCase('Uploaded') || !noErrors) {
+						filesReady = false
+						fileReason = "file ${expFn} status=${st}"
+						break
+					}
+				}
+			}
+			boolean ready = !uploading && !batchHasErrors && filesReady
+			if (!ready) {
+				lastReason = uploading ? "batch status Uploading" : batchHasErrors ? "batch errors: ${batchErrors}" : fileReason
+				clearSince = null
+				Thread.sleep(2000)
+				continue
+			}
+			if (clearSince == null) {
+				clearSince = System.currentTimeMillis()
+			} else if ((System.currentTimeMillis() - clearSince) / 1000 >= stableSeconds) {
+				KeywordUtil.logInfo(
+						"waitForMetadataBatchReady: batch ${batchID} ready (status=${batchStatus}) for ${stableSeconds}s")
+				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Metadata batch ready (listBatches)", "not Uploading; files Uploaded",
+						"status=${batchStatus}", "Pass")
+				return batch
+			}
+			Thread.sleep(2000)
+		}
+		String statusSummary = lastBatch?.get('status')?.toString() ?: "(batch not found)"
+		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION, "Metadata batch ready (listBatches)", "ready within ${timeoutSeconds}s",
+				"last status=${statusSummary}; ${lastReason}", "Fail")
+		KeywordUtil.markFailed(
+				"GraphQlApiClient.waitForMetadataBatchReady: batch ${batchID} not ready after ${timeoutSeconds}s (last: ${lastReason}, status=${statusSummary})")
+		return null
+	}
+
+	/**
+	 * Single getSubmissionNodes call via postSilently (first: -1 = full list). Used only by waitForGetSubmissionNodesAfterDelete.
+	 * Scripts that need one read + logging should call the public getSubmissionNodes keyword instead.
+	 */
+	private Map fetchGetSubmissionNodesPayload(String submissionID, String nodeType, String status = 'All') {
+		String queryDoc = loadGraphQlDocument("getSubmissionNodes")
+		if (!queryDoc) {
+			return null
+		}
+		Map vars = [_id: submissionID, nodeType: nodeType, first: -1, offset: 0]
+		if (status != null && status.toString().trim()) {
+			vars.status = status.toString().trim()
+		}
+		Map result = postSilently("getSubmissionNodes", queryDoc, vars)
+		return (result?.data as Map)?.get('getSubmissionNodes') as Map
+	}
+
+	/**
+	 * After deleteDataRecords: the mutation returns success when the delete is queued, not when Data View is updated.
+	 * Poll getSubmissionNodes until total matches and deleted nodeIDs no longer appear, then return the last response
+	 * in the same shape as getSubmissionNodes so verifyAndUnpackGetSubmissionNodes can run unchanged.
+	 *
+	 * Args: submissionID (or _id), nodeType, expectedTotal, absentNodeIds (list of nodeID strings);
+	 * optional status (default All), timeoutSeconds (default 120).
+	 */
+	@Keyword
+	Map waitForGetSubmissionNodesAfterDelete(Map args) {
+		if (args == null) {
+			KeywordUtil.markFailed("GraphQlApiClient.waitForGetSubmissionNodesAfterDelete: args map is required.")
+			return null
+		}
+		String submissionID = args.submissionID?.toString()?.trim() ?: args._id?.toString()?.trim()
+		String nodeType = args.nodeType?.toString()?.trim()
+		if (!submissionID || !nodeType) {
+			KeywordUtil.markFailed("GraphQlApiClient.waitForGetSubmissionNodesAfterDelete: submissionID and nodeType are required.")
+			return null
+		}
+		int expectedTotal = -1
+		if (args.containsKey('expectedTotal') && args.expectedTotal != null) {
+			expectedTotal = args.expectedTotal instanceof Number ? ((Number) args.expectedTotal).intValue()
+					: Integer.parseInt(args.expectedTotal.toString())
+		}
+		if (expectedTotal < 0) {
+			KeywordUtil.markFailed("GraphQlApiClient.waitForGetSubmissionNodesAfterDelete: expectedTotal is required.")
+			return null
+		}
+		Set<String> absentIds = new LinkedHashSet<>()
+		if (args.absentNodeIds instanceof List) {
+			for (Object idObj : (List) args.absentNodeIds) {
+				String nid = idObj?.toString()?.trim()
+				if (nid) {
+					absentIds.add(nid)
+				}
+			}
+		}
+		int timeoutSeconds = 120
+		if (args.containsKey('timeoutSeconds') && args.timeoutSeconds != null) {
+			timeoutSeconds = args.timeoutSeconds instanceof Number ? ((Number) args.timeoutSeconds).intValue()
+					: Integer.parseInt(args.timeoutSeconds.toString())
+		}
+		String statusFilter = args.status != null ? args.status.toString().trim() : 'All'
+		long deadline = System.currentTimeMillis() + timeoutSeconds * 1000L
+		int lastTotal = -1
+		String lastAbsentStillPresent = ""
+		while (System.currentTimeMillis() < deadline) {
+			Map payload = fetchGetSubmissionNodesPayload(submissionID, nodeType, statusFilter)
+			if (payload == null) {
+				Thread.sleep(2000)
+				continue
+			}
+			Object totObj = payload.get('total')
+			lastTotal = totObj instanceof Number ? ((Number) totObj).intValue() : -1
+			List nodes = payload.get('nodes') as List
+			lastAbsentStillPresent = ""
+			if (absentIds && nodes) {
+				for (Object nObj : nodes) {
+					Map n = nObj as Map
+					String nid = n?.get('nodeID')?.toString()?.trim()
+					if (nid && absentIds.contains(nid)) {
+						lastAbsentStillPresent = nid
+						break
+					}
+				}
+			}
+			boolean totalOk = lastTotal == expectedTotal
+			boolean absentOk = !lastAbsentStillPresent
+			if (totalOk && absentOk) {
+				KeywordUtil.logInfo(
+						"waitForGetSubmissionNodesAfterDelete: ${nodeType} total=${lastTotal}, absent nodeIDs removed")
+				ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION,
+						"getSubmissionNodes after delete (${nodeType})", "total=${expectedTotal}, absent ids gone",
+						"total=${lastTotal}", "Pass")
+				return [data: [getSubmissionNodes: payload]]
+			}
+			Thread.sleep(2000)
+		}
+		ValidationReport.addValidationReportItem(VALIDATION_REPORT_SECTION,
+				"getSubmissionNodes after delete (${nodeType})", "ready within ${timeoutSeconds}s",
+				"last total=${lastTotal}; still present absent id=${lastAbsentStillPresent ?: '(none)'}", "Fail")
+		KeywordUtil.markFailed(
+				"GraphQlApiClient.waitForGetSubmissionNodesAfterDelete: expected total ${expectedTotal} with absent ids removed after ${timeoutSeconds}s (last total=${lastTotal}, absent still present=${lastAbsentStillPresent ?: 'n/a'})")
+		return null
+	}
+
+	/**
+	 * One-shot getSubmissionNodes (logged via post()). Use for baseline reads when the Hub state is already stable.
+	 * For post-delete checks, use waitForGetSubmissionNodesAfterDelete instead of a fixed delay + this keyword.
+	 *
 	 * Required args: _id or submissionID (submission _id), nodeType (e.g. program, study, participant).
 	 * Optional: status (default All on server if omitted), submittedID (maps to nodeID filter), first, offset, orderBy, sortDirection.
 	 */

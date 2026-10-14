@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
-   <description>CRDCDH-1551 — API: upload pipeline + getSubmissionNodes (program/study/participant), deleteDataRecords (one participant), delay then getSubmissionNodes verify 8 participants. Profiles: ApiUrl, SubmitterApiToken. Sets GlobalVariable.LastApiSubmissionId.</description>
+   <description>CRDCDH-1551 — API: upload pipeline (waitForMetadataBatchReady), validate, getSubmissionNodes baseline, deleteDataRecords (one participant), waitForGetSubmissionNodesAfterDelete then verify. Profiles: ApiUrl, SubmitterApiToken. Sets GlobalVariable.LastApiSubmissionId.</description>
    <name>TC02_GetSubmissionNodes</name>
    <tag>API,GraphQL,CRDCDH-1551</tag>
    <comment>Profile: ApiUrl, SubmitterApiToken. GraphQLOperations.xlsx: getSubmissionNodes, deleteDataRecords.</comment>

@@ -26,7 +26,7 @@ String submissionName = "auto-api_" + timestamp
 KeywordUtil.logInfo("createSubmission name: ${submissionName} (length ${submissionName.length()})")
 
 Map subResp = CustomKeywords.'utilities.GraphQlApiClient.createSubmission'([
-	studyID    : '2ef65a9b-7f9f-42e9-8e65-d45c7b3ca74e',
+	studyID    : 'bfe2cd9f-c703-4869-8712-f48f41880242',
 	dataCommons: 'CDS',
 	name       : submissionName,
 	intention  : 'New/Update',
