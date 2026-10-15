@@ -62,10 +62,10 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Validation/
 
 CustomKeywords.'utilities.WebUIUtils.verifyElementCount'(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), 2)
 
-//A tooltip will be displayed that reads, “Export all validation issues for this data submission to a CSV file.”
-CustomKeywords.'utilities.WebUIUtils.verifyTooltipOnHover'(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/Download-Btn-ValidationResultsTooltip'), 'Export all validation issues for this data submission to a CSV file', 'Export all validation issues')
+//A tooltip will be displayed that reads, "Export filtered validation issues to Excel."
+CustomKeywords.'utilities.WebUIUtils.verifyTooltipOnHover'(findTestObject('Object Repository/CRDC/DataSubmissions/Validation/Download-Btn-ValidationResultsTooltip'), 'Export filtered validation issues to Excel', 'Export filtered validation issues')
 
 //Generate HTML report
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()
 
-WebUI.closeBrowser()
+//WebUI.closeBrowser()
