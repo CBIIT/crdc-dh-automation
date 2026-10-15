@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
-   <description>Validation Results tab export button (export all validation issues to CSV). data-testid=export-validation-button.</description>
+   <description>Validation Results tab export button (export filtered validation issues to Excel). data-testid=export-validation-button.</description>
    <name>Download-Btn-ValidationResults</name>
    <tag></tag>
    <elementGuidId>4aab5525-70c1-4906-b832-93f6407833d7</elementGuidId>
