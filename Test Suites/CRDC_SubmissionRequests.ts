@@ -123,4 +123,25 @@
       <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3798/TC03_CRDCDH-3798_SRF-Reopen-OwnerTransfer</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>c2226101-1111-4a48-8b01-394801000011</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2226/TC01_CRDCDH-2226_FullHistory-StatusTooltips</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>c2226101-4444-4a48-8b01-394801000014</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2226/TC03_CRDCDH-2226_ViewComments-FromStatusBar</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>c2226101-2222-4a48-8b01-394801000012</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-2226/TC02_CRDCDH-2226_ReviewComment-AndViewComments</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>

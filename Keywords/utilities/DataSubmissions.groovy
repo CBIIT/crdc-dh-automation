@@ -53,6 +53,8 @@ class DataSubmissions extends TestRunner {
 	// Expected data submission header values (set at login, createDataSubmission, or hardcoded; used by verifyDataSubmissionHeaders)
 	static String expectedSubmitter = null
 	static String expectedSubmissionName = null
+	/** UUID from the most recent createDataSubmission / Pbac.createDataSubmission (parsed from URL after open). */
+	static String lastCreatedDataSubmissionId = null
 	static String expectedStudy = "autoQA"
 	static String expectedStudyTooltip = null
 	static String expectedProgram = "AUTOPROGRAM"
@@ -72,20 +74,65 @@ class DataSubmissions extends TestRunner {
 		return tab
 	}
 
+	private static final java.util.regex.Pattern SUBMISSION_ID_UUID_PATTERN = ~/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
+
+	private static String parseSubmissionIdFromText(String text) {
+		if (text == null || text.trim().isEmpty()) {
+			return null
+		}
+		java.util.regex.Matcher m = SUBMISSION_ID_UUID_PATTERN.matcher(text)
+		return m.find() ? m.group(0) : null
+	}
+
+	/**
+	 * After create: filter the list by submission name (unique auto-test_* names), expect exactly one row,
+	 * open that submission, and store lastCreatedDataSubmissionId from the upload-activity URL.
+	 * @param submissionName Submission display name used in the Submission Name filter.
+	 */
+	@Keyword
+	static void captureAndLogDataSubmissionIdFromList(String submissionName) {
+		if (submissionName == null || submissionName.trim().isEmpty()) {
+			KeywordUtil.markFailed('captureAndLogDataSubmissionIdFromList: submissionName is required.')
+			return
+		}
+		String trimmed = submissionName.trim()
+		String filterPath = 'CRDC/AILocators/DataSubmissions/List/Filters/SubmissionName-TxtBx'
+		WebUIUtils.clickTab(filterPath)
+		WebUIUtils.clearTextfieldByOs(filterPath)
+		WebUI.sendKeys(findTestObject(filterPath), trimmed)
+		WebUI.delay(2)
+
+		List<WebElement> rows = Utils.getListWebElements('CRDC/AILocators/GenericTable/TableRow')
+		int rowCount = (rows == null) ? 0 : rows.size()
+		if (rowCount != 1) {
+			KeywordUtil.markFailed("captureAndLogDataSubmissionIdFromList: expected 1 list row after filtering by submission name '${trimmed}', found ${rowCount}.")
+			return
+		}
+
+		WebUIUtils.clickTab('CRDC/DataSubmissions/DataSubmissionName-Link')
+		WebUI.delay(1)
+		String id = parseSubmissionIdFromText(WebUI.getUrl())
+		if (id == null) {
+			KeywordUtil.markFailed("captureAndLogDataSubmissionIdFromList: could not parse submission id from URL '${WebUI.getUrl()}'.")
+			return
+		}
+		lastCreatedDataSubmissionId = id
+		KeywordUtil.logInfo("Data submission created — name: ${trimmed}, id: ${id}")
+	}
+
 	/**
 	 * Extract submission ID from the current Data Hub upload-activity URL.
 	 * Use this when you want to set CRDC_SUBMISSION_ID from the browser URL (e.g. in a script).
 	 *
-	 * @param url full URL (e.g. WebUI.getUrl())
 	 * @return submission ID (UUID string) or null if not found
 	 */
 	@Keyword
 	static String getSubmissionIdFromUploadActivityUrl() {
 		String url = WebUI.getUrl()
-		if (url == null || WebUI.getUrl().trim().isEmpty()) return null
-		java.util.regex.Pattern p = ~/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
-		java.util.regex.Matcher m = p.matcher(url)
-		String submissionId = m.find() ? m.group(0) : null
+		if (url == null || url.trim().isEmpty()) {
+			return null
+		}
+		String submissionId = parseSubmissionIdFromText(url)
 		KeywordUtil.logInfo("Submission ID: ${submissionId}")
 		return submissionId
 	}
@@ -2095,8 +2142,7 @@ class DataSubmissions extends TestRunner {
 		//Create
 		TestRunner.clickTab('CRDC/DataSubmissions/Create/Create-Btn')
 		WebUI.delay(3)
-		WebUI.sendKeys(findTestObject('CRDC/AILocators/DataSubmissions/List/Filters/SubmissionName-TxtBx'), submissionName)
-		WebUI.delay(1)
+		captureAndLogDataSubmissionIdFromList(submissionName) // filters list, opens submission, sets lastCreatedDataSubmissionId
 	}
 
 	private static final String HEADERS_SECTION = "Data Submission Headers"

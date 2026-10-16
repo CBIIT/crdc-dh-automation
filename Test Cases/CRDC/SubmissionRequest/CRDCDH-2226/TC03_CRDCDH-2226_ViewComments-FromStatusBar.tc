@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-2226 TC04 (CRDCDH-3842): Two inquire rounds; View Comments shows latest Fed Lead comment, not the first.</description>
+   <name>TC03_CRDCDH-2226_ViewComments-FromStatusBar</name>
+   <tag></tag>
+   <comment>1 Submitter: new SR submitted. 2 Fed Lead: inquire (comment 1). 3 Submitter: edit, save, resubmit. 4 Fed Lead: inquire (comment 2). 5 Submitter: View Comments shows comment 2, not comment 1.</comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>c2226101-4444-4a48-8b01-394801000004</testCaseGuid>
+</TestCaseEntity>

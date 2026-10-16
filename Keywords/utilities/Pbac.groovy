@@ -290,6 +290,10 @@ class Pbac extends TestRunner {
 
 		String outputPath = RunConfiguration.getProjectDir() + "/OutputFiles/PBAC_Defaults_Results.xlsx"
 		File file = new File(outputPath)
+		File outputDir = file.getParentFile()
+		if (!outputDir.exists()) {
+			outputDir.mkdirs()
+		}
 		Workbook workbook = file.exists() ? new XSSFWorkbook(new FileInputStream(file)) : new XSSFWorkbook()
 		Sheet sheet = workbook.getSheet(userRole) ?: workbook.createSheet(userRole)
 
@@ -784,8 +788,8 @@ class Pbac extends TestRunner {
 		//Create
 		TestRunner.clickTab('CRDC/DataSubmissions/Create/Create-Btn')
 		WebUI.delay(3)
-		WebUI.sendKeys(findTestObject('CRDC/AILocators/DataSubmissions/List/Filters/SubmissionName-TxtBx'), submissionName)
-		WebUI.delay(1)
+		DataSubmissions.expectedSubmissionName = submissionName
+		DataSubmissions.captureAndLogDataSubmissionIdFromList(submissionName)
 	}
 
 	/**
