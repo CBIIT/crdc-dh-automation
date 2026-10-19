@@ -478,7 +478,7 @@ def ensure_git_parity_header(sheet):
 
 
 def resolve_email_branch(env):
-	"""Map checklist Environment to Git content branch."""
+	"""Map checklist Environment column to crdc-submission-portal-email-content branch (qa, qa2, stage)."""
 	token = (env or "").strip().casefold()
 	if token == "qa2":
 		return "qa2"
@@ -490,13 +490,18 @@ def resolve_email_branch(env):
 
 
 def run_git_parity_pass(args, sheet, rows, to_service, name_in_body_map):
-	"""For Pass To rows in allowlist, compare Gmail body to Git YAML copy."""
+	"""Second pass after Gmail judge: Git parity column for allowlisted To rows already Pass.
+
+	Re-fetches each message body from the To Gmail service, loads Git YAML per row
+	Environment, and calls email_git_parity.check_trigger_parity. Does not change Result.
+	"""
 	ensure_git_parity_header(sheet)
 	mapping = load_mapping(Path(args.git_parity_mapping))
 	content_dir = args.email_content_dir.strip() if args.email_content_dir else ""
 	constants_by_branch = {}
 
 	def constants_for_env(env):
+		"""Cache notification_email_values.yaml per Git branch (one fetch per QA/QA2/STAGE)."""
 		branch = resolve_email_branch(env)
 		if branch not in constants_by_branch:
 			try:
