@@ -714,10 +714,11 @@ class ManageStudies extends TestRunner {
 
 	/**
 	 * When the study filter is applied, verifies each exported row reflects that filter. The UI study search
-	 * matches study name or acronym, so the token must appear in CSV Name or Acronym (not Name alone).
+	 * matches study name or acronym (often case-insensitive), so the token must appear in CSV Name or Acronym.
+	 * Comparison is case-insensitive so fixtures such as acronym AUTOQA still match filter token autoQA.
 	 *
 	 * @param csvFilePath Absolute path to downloaded CSV
-	 * @param studyFilterToken Substring from the study filter field (case-sensitive contains)
+	 * @param studyFilterToken Substring from the study filter field (matched case-insensitively in Name or Acronym)
 	 */
 	@Keyword
 	void verifyManageStudiesExportCsvNameColumnContains(String csvFilePath, String studyFilterToken) {
@@ -726,7 +727,8 @@ class ManageStudies extends TestRunner {
 			return
 		}
 		String token = studyFilterToken.trim()
-		KeywordUtil.logInfo("--- verifyManageStudiesExportCsvNameColumnContains: token '" + token + "' ---")
+		String tokenLower = token.toLowerCase(java.util.Locale.ROOT)
+		KeywordUtil.logInfo("--- verifyManageStudiesExportCsvNameColumnContains: token '" + token + "' (case-insensitive) ---")
 		File csvFile = new File(csvFilePath)
 		if (!csvFile.exists()) {
 			KeywordUtil.markFailed("verifyManageStudiesExportCsvNameColumnContains: file not found")
@@ -736,7 +738,7 @@ class ManageStudies extends TestRunner {
 		List<String> records = Utils.splitCsvIntoRecords(text)
 		if (records.size() <= 1) {
 			ValidationReport.addValidationReportItem(SECTION_MANAGE_STUDIES_EXPORT, "CSV rows match study filter",
-					"each row Name or Acronym contains '" + token + "'", "no data rows", "Pass")
+					"each row Name or Acronym contains '" + token + "' (ignore case)", "no data rows", "Pass")
 			return
 		}
 		int violations = 0
@@ -744,16 +746,18 @@ class ManageStudies extends TestRunner {
 			List<String> fields = Utils.parseCsvRecordFields(records.get(i))
 			String name = fields.size() > 0 ? (fields.get(0) ?: "") : ""
 			String acronym = fields.size() > 1 ? (fields.get(1) ?: "") : ""
-			boolean rowMatches = name.contains(token) || acronym.contains(token)
+			String nameLower = name.toLowerCase(java.util.Locale.ROOT)
+			String acronymLower = acronym.toLowerCase(java.util.Locale.ROOT)
+			boolean rowMatches = nameLower.contains(tokenLower) || acronymLower.contains(tokenLower)
 			if (!rowMatches) {
 				violations++
 			}
 		}
 		String status = violations == 0 ? "Pass" : "Fail"
 		ValidationReport.addValidationReportItem(SECTION_MANAGE_STUDIES_EXPORT, "CSV rows match study filter",
-				"each row Name or Acronym contains '" + token + "'", violations == 0 ? "all match" : violations + " row(s) mismatch", status)
+				"each row Name or Acronym contains '" + token + "' (ignore case)", violations == 0 ? "all match" : violations + " row(s) mismatch", status)
 		if (violations > 0) {
-			KeywordUtil.markFailed("verifyManageStudiesExportCsvNameColumnContains: ${violations} row(s) missing '" + token + "' in Name or Acronym")
+			KeywordUtil.markFailed("verifyManageStudiesExportCsvNameColumnContains: ${violations} row(s) missing '" + token + "' in Name or Acronym (case-insensitive)")
 		}
 	}
 
