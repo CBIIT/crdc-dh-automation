@@ -12,24 +12,38 @@
    <rerunImmediately>true</rerunImmediately>
    <testSuiteGuid>da511912-1a63-433b-97f8-db467341cdb4</testSuiteGuid>
    <testCaseLink>
-      <guid>812a8e61-cbcc-4bfe-bd47-aad9ef4ccd32</guid>
+      <guid>8bd9299e-a1eb-4fed-a2e7-6057c783f97c</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3798/TC01_CRDCDH-3798_SRF-Reopen</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3948/TC01_CRDCDH-3948_New_SaveRequiresNewContent</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>872e0fe3-a8a2-4022-8944-7b256096b1db</guid>
+      <guid>f35fd64e-9d90-4fb1-8fa5-391e48eeac4e</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3798/TC02_CRDCDH-3798_SRF-Versions</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3948/TC01_CRDCDH-3948_New_SaveRequiresNewContent</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
-      <guid>1f3f3d9c-a230-4235-9a74-ccea87e398f4</guid>
+      <guid>47936d44-c084-4ca4-b939-9fb1c2689444</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3798/TC03_CRDCDH-3798_SRF-Reopen-OwnerTransfer</testCaseId>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3948/TC01_CRDCDH-3948_New_SaveRequiresNewContent</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>4cbe1326-00b8-410f-b144-f0b51796a037</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3948/TC01_CRDCDH-3948_New_SaveRequiresNewContent</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>0ccb40f4-2f45-4345-b9d3-8956769722a6</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/SubmissionRequest/CRDCDH-3948/TC01_CRDCDH-3948_New_SaveRequiresNewContent</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>
