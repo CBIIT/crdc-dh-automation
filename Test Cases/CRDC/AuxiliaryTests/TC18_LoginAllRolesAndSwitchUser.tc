@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Smoke test: logs in as Admin, then switchUser through Fedlead, Dcp, Submitter, User, and Master. No assertions beyond successful OTP login. Requires updated {Role}Email, {Role}Password, and {Role}Secret on the active profile.</description>
+   <name>TC18_LoginAllRolesAndSwitchUser</name>
+   <tag>Login</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>c8d9e0f1-a2b3-4c5d-6e7f-8091a2b3c4d5</testCaseGuid>
+</TestCaseEntity>

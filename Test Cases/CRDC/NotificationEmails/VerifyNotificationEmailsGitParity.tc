@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Runs VerifyNotificationEmails.py with --git-parity against today's checklist. Gmail Result unchanged; Git parity column Pass/Fail/Skip for five allowlisted To Actions. Fails on Gmail or Git parity Fail. Prerequisite: run the three email trigger cases first (same day, CRDC_QA) so checklist rows exist.</description>
+   <name>VerifyNotificationEmailsGitParity</name>
+   <tag>Filter</tag>
+   <comment>Does not send mail or drive the UI. Run these first on profile CRDC_QA to log today's checklist rows: NotificationEmails/SR/TC01_SubmitterFedlead-Submit, SR/TC04_Submitter-ApproveAndReopen, DS/TC01_SubmitterDcp-Submit. Or run suite CRDC_EmailNotifications_GitParity (runs those three then this verify case).</comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a1b2c3d4-e5f6-4789-a012-3456789abcde</testCaseGuid>
+</TestCaseEntity>

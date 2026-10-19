@@ -374,7 +374,28 @@ Login Master → Profile → Manage Users → `Pbac.disableThenRestoreUserAccoun
 
 ## 28. VerifyNotificationEmails
 
-No browser. `NotificationEmailLog.verifyNotificationEmails()` runs `PythonFiles/CRDC/VerifyNotificationEmails.py` with `Utils.getPythonExecutablePath()`. The case **fails** if the process exits non-zero (any Fail for today, or the checklist is missing). Pass/Skip rows are left unchanged. Last case in `CRDC_EmailNotifications`.
+No browser. `NotificationEmailLog.verifyNotificationEmails()` runs `PythonFiles/CRDC/VerifyNotificationEmails.py` with `Utils.getPythonExecutablePath()`. The case **fails** if the process exits non-zero (any Fail for today, or the checklist is missing). Pass/Skip rows are left unchanged. Last case in `CRDC_EmailNotifications`. OAuth errors (`invalid_grant`, `oauth2.googleapis.com` connection refused): **[TOKEN_REGENERATION.md](./TOKEN_REGENERATION.md)**.
+
+### Git content parity (optional, wave 1)
+
+`NotificationEmailLog.verifyNotificationEmailsWithGitParity()` (or **VerifyNotificationEmailsGitParity** / `CRDC_EmailNotifications_GitParity`) runs the same script with **`--git-parity`**. Default verify behavior is unchanged when the flag is omitted.
+
+After Gmail sets **Result** to **Pass** (including catalog subject and **Expected body contains**), Git parity compares **body copy only** from [crdc-submission-portal-email-content](https://github.com/CBIIT/crdc-submission-portal-email-content) to the matched Gmail message (YAML paragraph fragments and static template phrases; not full Handlebars). It does **not** re-check subject. **Result** stays Gmail-only; column **Git parity** is **Pass** / **Fail** / **Skip**. The run **fails** (exit 1) on Git **Fail** for an allowlisted row.
+
+| Check | Rule |
+|---|---|
+| Rows | **To** only; checklist **Action** in allowlist: `SR Submit`, `SR Available for Review`, `SR Approve`, `DS Create`, `DS Submit` |
+| Skip | All other Actions, Bcc/Cc, or non–Pass Gmail rows (Git parity cell **Skip** or blank) |
+| Content source | `CRDC_EMAIL_CONTENT_DIR` (local clone) **or** GitHub raw fetch; branch from checklist **Environment** (`QA` → `qa`, `QA2` → `qa2`, `STAGE` → `stage`), overridable via `CRDC_EMAIL_CONTENT_BRANCH` / `--email-content-branch` |
+| Mapping | `InputFiles/CRDC/email_git_parity_triggers.yaml`; env literals in `InputFiles/CRDC/email_git_parity_env.yaml` |
+| DS Create body | Git parity uses `notification-template-submission.html` phrases not duplicated in Gmail (**Expected body contains** already checks the opening line); plus checklist **Name** |
+| Portal URL | `--portal-url` or `CRDC_PORTAL_URL`; Katalon passes `G_Urlname` from `verifyNotificationEmailsWithGitParity()` |
+
+```bash
+python PythonFiles/CRDC/VerifyNotificationEmails.py --git-parity --portal-url "https://…"
+```
+
+QA smoke order: profile **CRDC_QA** → **SR TC01**, **SR TC04**, **DS TC01** → **VerifyNotificationEmailsGitParity**. Gmail Pass + Git Fail is valid when deployed backend copy lags the Git branch (CRDCDH-3776 signal).
 
 ## 29. logEmails, logBccEmails, and logCcEmails
 
@@ -433,6 +454,8 @@ That is the whole loop: catalog defines mail, UI tests only log after a real sub
 
 ## Auth files (not committed)
 
+**Tokens expired or `invalid_grant`?** See **[TOKEN_REGENERATION.md](./TOKEN_REGENERATION.md)** for step-by-step regenerate, VPN/network notes, copy commands, and verification.
+
 Verify only needs token files in this folder:
 
 - `token.json` — refresh token after one browser login as `qa@essential-soft.com` (To: plus-aliases land here)
@@ -476,4 +499,6 @@ open("token.json", "w").write(creds.to_json())
    - Admin BCC mailbox → `PythonFiles/CRDC/gmail/token-admin-bcc.json` (rename; do not overwrite the other tokens)
 7. Verify never opens a browser. If a token is revoked or expired beyond refresh, repeat step 5 for that Gmail user only.
 
-If the browser succeeds but Python cannot reach `oauth2.googleapis.com` (connection refused), the laptop blocked the token exchange; retry the script when the host is reachable. Do not commit `credentials.json` or any `token*.json`.
+If the browser succeeds but Python cannot reach `oauth2.googleapis.com` (connection refused), the laptop blocked the token exchange; retry off VPN or with proxy env vars. See **[TOKEN_REGENERATION.md](./TOKEN_REGENERATION.md)**. Do not commit `credentials.json` or any `token*.json`.
+
+The team often keeps four Desktop client files (`credentials-qa-esi.json`, `credentials-fedlead.json`, `credentials-dcp.json`, `credentials-admin.json`) in `~/gmail-oauth` and runs the four OAuth commands documented there (same scope as the single-file example above).

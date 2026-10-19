@@ -1,0 +1,64 @@
+# Maps checklist Action (catalog Trigger) to Git notification_email_values.yaml body keys.
+# Live copy is loaded from CRDC_EMAIL_CONTENT_DIR or GitHub (see email_git_parity.py).
+# Subject lines are verified by the Gmail judge (PBAC catalog); Git parity is body-only.
+# Environment-specific literals: InputFiles/CRDC/email_git_parity_env.yaml
+
+github:
+  owner: CBIIT
+  repo: crdc-submission-portal-email-content
+
+allowlist:
+  - SR Submit
+  - SR Available for Review
+  - SR Approve
+  - DS Create
+  - DS Submit
+
+triggers:
+  SR Submit:
+    body_keys:
+      - SUBMISSION_SUBMIT_RECEIVE_CONTENT_FIRST
+      - SUBMISSION_SUBMIT_RECEIVE_CONTENT_SECOND
+    variables:
+      study: checklist:Name
+      helpDesk: env:helpDesk
+
+  SR Available for Review:
+    body_keys:
+      - SUBMISSION_SUBMIT_SECOND_CONTENT
+    body_keys_flexible:
+      - key: SUBMISSION_SUBMIT_FIRST_CONTENT
+        variables:
+          study: checklist:Name
+        ignore_placeholders:
+          - pi
+    variables:
+      url: env:url
+
+  SR Approve:
+    body_keys:
+      - APPROVE_CONTENT
+      - APPROVE_SECOND_CONTENT
+      - APPROVE_THIRD_CONTENT
+    variables:
+      study: checklist:Name
+      contactEmail: env:contactEmail
+
+  DS Create:
+    html_static_phrases:
+      - "Please review the details below and work with the submitter to ensure a smooth data submission process"
+      - "Submission Details:"
+      - "Submission Name"
+      - "CRDC Submission Portal"
+    body_variables:
+      submissionName: checklist:Name
+
+  DS Submit:
+    body_keys:
+      - SUBMIT_DATA_SUBMISSION_CONTENT_FIRST
+      - SUBMIT_DATA_SUBMISSION_CONTENT_SECOND
+    variables:
+      submissionName: checklist:Name
+      dataCommonsName: env:dataCommonsDisplayName
+      contactName: env:contactName
+      contactEmail: env:contactEmail

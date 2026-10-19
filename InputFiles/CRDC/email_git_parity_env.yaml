@@ -1,0 +1,24 @@
+# Literals for $variable substitution during Git parity (per deployment tier).
+# Update when QA help desk / data commons display names change.
+# url is normally overridden by --portal-url from Katalon G_Urlname.
+
+QA:
+  helpDesk: "NCICRDC@mail.nih.gov."
+  contactEmail: "NCICRDC@mail.nih.gov"
+  contactName: "NA"
+  dataCommonsDisplayName: "Genomic Data Commons"
+  url: ""
+
+QA2:
+  helpDesk: "NCICRDC@mail.nih.gov."
+  contactEmail: "NCICRDC@mail.nih.gov"
+  contactName: "NA"
+  dataCommonsDisplayName: "Genomic Data Commons"
+  url: ""
+
+STAGE:
+  helpDesk: "NCICRDC@mail.nih.gov."
+  contactEmail: "NCICRDC@mail.nih.gov"
+  contactName: "NA"
+  dataCommonsDisplayName: "Genomic Data Commons"
+  url: ""

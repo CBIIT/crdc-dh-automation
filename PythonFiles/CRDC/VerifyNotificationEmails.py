@@ -51,6 +51,15 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from openpyxl import load_workbook
 
+import urllib.error
+
+from email_git_parity import (
+	check_trigger_parity,
+	git_parity_skip_reason,
+	load_email_constants,
+	load_mapping,
+)
+
 # Read-only Gmail scope. If you change this, delete token.json and re-authorize.
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 SHEET_NAME = "Checklist"
@@ -63,12 +72,18 @@ COL_RESULT = 10
 COL_ENV = 11
 COL_BODY_CONTAINS = 12
 COL_RECIPIENT_KIND = 13
+COL_ACTION = 3
+COL_ID = 5
+COL_GIT_PARITY = 14
+GIT_PARITY_HEADER = "Git parity"
 CATALOG_SHEET = "Permissions"
 
 # This file is PythonFiles/CRDC/VerifyNotificationEmails.py
 # parents[0] = PythonFiles/CRDC, parents[1] = repo root
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[1]
+DEFAULT_MAPPING = REPO_ROOT / "InputFiles" / "CRDC" / "email_git_parity_triggers.yaml"
+DEFAULT_EMAIL_BRANCH = os.environ.get("CRDC_EMAIL_CONTENT_BRANCH", "qa")
 DEFAULT_EXCEL = REPO_ROOT / "OutputFiles" / "NotificationEmail_Checklist.xlsx"
 DEFAULT_TOKEN = SCRIPT_DIR / "gmail" / "token.json"
 DEFAULT_TOKEN_FEDLEAD_BCC = SCRIPT_DIR / "gmail" / "token-fedlead-bcc.json"
@@ -283,7 +298,7 @@ def header_value(headers, name):
 
 def find_message(service, expected_subject, name, env, recipient, name_in_body_map, body_contains="",
 		recipient_kind="To"):
-	"""Return (actual Subject, None) if a matching message exists, else (None, reason).
+	"""Return (actual Subject, None, body_text) if a match exists, else (None, reason, None).
 
 	Lists up to 20 recent messages for the env-prefixed subject. When the catalog
 	requires Name in the body, the Gmail q also quotes Name so a later same-subject
@@ -311,7 +326,7 @@ def find_message(service, expected_subject, name, env, recipient, name_in_body_m
 		))
 		messages = result.get("messages") or []
 	if not messages:
-		return None, "no_mail"
+		return None, "no_mail", None
 	best_reason = "subject"
 	for m in messages:
 		full = gmail_execute(service.users().messages().get(userId="me", id=m["id"], format="full"))
@@ -332,7 +347,7 @@ def find_message(service, expected_subject, name, env, recipient, name_in_body_m
 			if to_matches(recipient, actual_to) or to_matches(recipient, actual_cc):
 				best_reason = "bcc_in_headers"
 				continue
-			return actual_subject, None
+			return actual_subject, None, text
 		if kind == "cc":
 			if to_matches(recipient, actual_to):
 				best_reason = "cc_in_to"
@@ -340,12 +355,12 @@ def find_message(service, expected_subject, name, env, recipient, name_in_body_m
 			if not to_matches(recipient, actual_cc):
 				best_reason = "cc"
 				continue
-			return actual_subject, None
+			return actual_subject, None, text
 		if not to_matches(recipient, actual_to):
 			best_reason = "to"
 			continue
-		return actual_subject, None
-	return None, best_reason
+		return actual_subject, None, text
+	return None, best_reason, None
 
 
 def parse_args():
@@ -372,6 +387,31 @@ def parse_args():
 		"--token-admin-bcc",
 		default=os.environ.get("GMAIL_TOKEN_ADMIN_BCC_PATH", str(DEFAULT_TOKEN_ADMIN_BCC)),
 		help="OAuth user token JSON for the Admin BCC inbox (token-admin-bcc.json)",
+	)
+	parser.add_argument(
+		"--git-parity",
+		action="store_true",
+		help="After Gmail Pass, compare allowlisted To rows to Git notification_email_values.yaml",
+	)
+	parser.add_argument(
+		"--email-content-branch",
+		default=os.environ.get("CRDC_EMAIL_CONTENT_BRANCH", DEFAULT_EMAIL_BRANCH),
+		help="Git branch for crdc-submission-portal-email-content (default qa)",
+	)
+	parser.add_argument(
+		"--email-content-dir",
+		default=os.environ.get("CRDC_EMAIL_CONTENT_DIR", ""),
+		help="Local clone path; if set, skip GitHub raw fetch",
+	)
+	parser.add_argument(
+		"--portal-url",
+		default=os.environ.get("CRDC_PORTAL_URL", ""),
+		help="Portal base URL for $url substitution (Katalon G_Urlname)",
+	)
+	parser.add_argument(
+		"--git-parity-mapping",
+		default=str(DEFAULT_MAPPING),
+		help="Path to email_git_parity_triggers.yaml",
 	)
 	return parser.parse_args()
 
@@ -428,6 +468,104 @@ def fail_detail(item, reason):
 	return "no mail with subject containing %r" % prefixed
 
 
+def ensure_git_parity_header(sheet):
+	"""Add Git parity column header on row 1 when missing."""
+	header_row = sheet[1]
+	existing = cell_str(header_row, COL_GIT_PARITY) if header_row else ""
+	if existing == GIT_PARITY_HEADER:
+		return
+	sheet.cell(1, COL_GIT_PARITY).value = GIT_PARITY_HEADER
+
+
+def resolve_email_branch(env):
+	"""Map checklist Environment column to crdc-submission-portal-email-content branch (qa, qa2, stage)."""
+	token = (env or "").strip().casefold()
+	if token == "qa2":
+		return "qa2"
+	if token == "stage":
+		return "stage"
+	if token == "qa":
+		return "qa"
+	return DEFAULT_EMAIL_BRANCH
+
+
+def run_git_parity_pass(args, sheet, rows, to_service, name_in_body_map):
+	"""Second pass after Gmail judge: Git parity column for allowlisted To rows already Pass.
+
+	Re-fetches each message body from the To Gmail service, loads Git YAML per row
+	Environment, and calls email_git_parity.check_trigger_parity. Does not change Result.
+	"""
+	ensure_git_parity_header(sheet)
+	mapping = load_mapping(Path(args.git_parity_mapping))
+	content_dir = args.email_content_dir.strip() if args.email_content_dir else ""
+	constants_by_branch = {}
+
+	def constants_for_env(env):
+		"""Cache notification_email_values.yaml per Git branch (one fetch per QA/QA2/STAGE)."""
+		branch = resolve_email_branch(env)
+		if branch not in constants_by_branch:
+			try:
+				constants_by_branch[branch] = load_email_constants(content_dir or None, branch, mapping)
+			except (urllib.error.URLError, FileNotFoundError, OSError) as err:
+				raise RuntimeError("Git parity: failed to load email content for branch %s: %s" % (branch, err))
+		return constants_by_branch[branch]
+
+	failures = 0
+	for item in rows:
+		result = sheet.cell(item["idx"], COL_RESULT).value
+		if str(result or "").strip() != "Pass":
+			continue
+		skip = git_parity_skip_reason(item.get("action") or "", item.get("kind") or "To", mapping)
+		if skip:
+			sheet.cell(item["idx"], COL_GIT_PARITY).value = "Skip"
+			print("Git parity Skip row %s | %s" % (item["idx"], skip))
+			continue
+		if not to_service:
+			sheet.cell(item["idx"], COL_GIT_PARITY).value = "Fail"
+			print("Git parity Fail row %s | no To Gmail service" % item["idx"])
+			failures += 1
+			continue
+		try:
+			actual, miss, body_text = find_message(
+				to_service, item["subject"], item["name"], item["env"], item["recipient"],
+				name_in_body_map, item["body_contains"], item.get("kind") or "To")
+		except HttpError as error:
+			sheet.cell(item["idx"], COL_GIT_PARITY).value = "Fail"
+			print("Git parity Fail row %s | Gmail API %s" % (item["idx"], error))
+			failures += 1
+			continue
+		if not actual or not body_text:
+			sheet.cell(item["idx"], COL_GIT_PARITY).value = "Fail"
+			print("Git parity Fail row %s | %s" % (item["idx"], fail_detail(item, miss)))
+			failures += 1
+			continue
+		try:
+			constants = constants_for_env(item["env"])
+		except RuntimeError as err:
+			sheet.cell(item["idx"], COL_GIT_PARITY).value = "Fail"
+			print("Git parity Fail row %s | %s" % (item["idx"], err))
+			failures += 1
+			continue
+		checklist = {"name": item["name"], "id": item.get("id") or ""}
+		ok, detail = check_trigger_parity(
+			item.get("action") or "",
+			mapping,
+			constants,
+			body_text,
+			checklist,
+			item["env"],
+			args.portal_url or "",
+		)
+		if ok:
+			sheet.cell(item["idx"], COL_GIT_PARITY).value = "Pass"
+			print("Git parity Pass row %s | %s" % (item["idx"], item.get("action")))
+		else:
+			sheet.cell(item["idx"], COL_GIT_PARITY).value = "Fail"
+			print("Git parity Fail row %s | %s" % (item["idx"], detail))
+			failures += 1
+	return failures
+
+
 def judge_search_rows(service, items, sheet, name_in_body_map):
 	"""Search one Gmail service for checklist rows. Write Pass or Fail. Return Fail count.
 
@@ -440,7 +578,7 @@ def judge_search_rows(service, items, sheet, name_in_body_map):
 		rate_limited = False
 		miss = None
 		try:
-			actual, miss = find_message(
+			actual, miss, _body = find_message(
 				service, item["subject"], item["name"], item["env"], item["recipient"],
 				name_in_body_map, item["body_contains"], kind)
 		except HttpError as error:
@@ -502,6 +640,8 @@ def main():
 		rows.append({
 			"idx": idx,
 			"timestamp": timestamp,
+			"action": cell_str(row, COL_ACTION),
+			"id": cell_str(row, COL_ID),
 			"name": cell_str(row, COL_NAME),
 			"subject": cell_str(row, COL_SUBJECT),
 			"recipient": cell_str(row, COL_RECIPIENT),
@@ -564,11 +704,20 @@ def main():
 			else:
 				to_search.append(item)
 
+	to_service = None
 	if to_search:
 		creds = load_creds(args.token)
-		service = build("gmail", "v1", credentials=creds)
-		print("Authorized Gmail as", gmail_execute(service.users().getProfile(userId="me")).get("emailAddress"))
-		failures += judge_search_rows(service, to_search, sheet, name_in_body_map)
+		to_service = build("gmail", "v1", credentials=creds)
+		print("Authorized Gmail as", gmail_execute(to_service.users().getProfile(userId="me")).get("emailAddress"))
+		failures += judge_search_rows(to_service, to_search, sheet, name_in_body_map)
+	elif args.git_parity:
+		try:
+			creds = load_creds(args.token)
+			to_service = build("gmail", "v1", credentials=creds)
+			print("Authorized Gmail as", gmail_execute(to_service.users().getProfile(userId="me")).get("emailAddress"))
+		except FileNotFoundError as err:
+			print(err)
+			failures += 1
 
 	if bcc_search:
 		by_recipient = {}
@@ -583,6 +732,10 @@ def main():
 					failures += 1
 				continue
 			failures += judge_search_rows(service_bcc, items, sheet, name_in_body_map)
+
+	if args.git_parity:
+		git_failures = run_git_parity_pass(args, sheet, rows, to_service, name_in_body_map)
+		failures += git_failures
 
 	workbook.save(excel_path)
 	print("Updated", excel_path)

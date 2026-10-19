@@ -71,7 +71,6 @@ public class CustomBrowserDriver {
 				chromePrefs.put("download.default_directory", projectDownloadsDir.getAbsolutePath())
 				chromePrefs.put("profile.default_content_setting_values.automatic_downloads", 1)
 				options.setExperimentalOption("prefs", chromePrefs)
-				options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/18.1.1");
 				options.setExperimentalOption("useAutomationExtension", false);
 				options.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
 				drv  = new ChromeDriver(options)
@@ -90,7 +89,6 @@ public class CustomBrowserDriver {
 				options.addArguments("--disable-gpu");
 				options.addArguments("--lang=en-US")
 				options.addArguments("--timezone=EDT")
-				options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.6778.85 Safari/18.1.1");
 				DesiredCapabilities dc = new DesiredCapabilities();
 				dc.setCapability(ChromeOptions.CAPABILITY, options);
 				Map<String, Object> chromePrefs = new HashMap<String, Object>()

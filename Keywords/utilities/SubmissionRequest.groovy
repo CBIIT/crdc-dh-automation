@@ -2623,6 +2623,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		'Submitted': 'The request form was submitted for review.',
 		'In Review': 'The request form is under evaluation by the Submission Review Committee.',
 		'Approved': 'The request form was reviewed and approved.',
+		'Reopened': 'The approved request form was reopened for editing.',
 		'Rejected': 'The request form was reviewed and rejected.',
 		'Inquired': 'Additional information or clarification was requested from the submitter.',
 		'Canceled': 'The request form was manually canceled and is no longer active.',

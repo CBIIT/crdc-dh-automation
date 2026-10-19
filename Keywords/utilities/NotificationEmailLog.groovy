@@ -46,7 +46,8 @@ class NotificationEmailLog {
 		"Result",
 		"Environment",
 		"Expected body contains",
-		"Recipient kind"
+		"Recipient kind",
+		"Git parity"
 	] as String[]
 	private static final String ENV_PREFIX_NOTE = "Subject is prefixed with [Environment] (QA, QA2, or STAGE)."
 	private static final String CATALOG_DATA_FILE = "CRDC/Pbac/Permissions"
@@ -163,6 +164,52 @@ class NotificationEmailLog {
 	 */
 	@Keyword
 	static void verifyNotificationEmails() {
+		runVerifyNotificationEmailsScript([])
+	}
+
+	/**
+	 * Same as verifyNotificationEmails, plus --git-parity against live notification_email_values.yaml.
+	 * Passes portal URL from G_Urlname for $url substitution.
+	 */
+	@Keyword
+	static void verifyNotificationEmailsWithGitParity() {
+		List<String> extraArgs = ["--git-parity"]
+		String portalUrl = GlobalVariable.G_Urlname?.toString()?.trim()
+		if (portalUrl) {
+			extraArgs.add("--portal-url")
+			extraArgs.add(portalUrl)
+		}
+		runVerifyNotificationEmailsScript(extraArgs)
+	}
+
+	/**
+	 * Short message for markFailedAndStop; full script output is already streamed via logInfo.
+	 */
+	private static String summarizeVerifyScriptFailures(String output) {
+		if (!output?.trim()) {
+			return "See script INFO lines above."
+		}
+		List<String> lines = output.split("\n").collect { it?.trim() }.findAll { it }
+		List<String> failures = lines.findAll { String line ->
+			line.startsWith("Fail row ") ||
+				line.startsWith("Git parity Fail ") ||
+				line.contains("Checklist not found:") ||
+				line.contains("Gmail API error") ||
+				line.contains("Permissions catalog not found:") ||
+				(line.contains("not found in ") && line.startsWith("Sheet "))
+		}
+		if (failures.isEmpty()) {
+			failures = lines.findAll { String line ->
+				line.contains("Fail") || line.contains("RuntimeError") || line.contains("Error:")
+			}
+		}
+		if (failures.isEmpty()) {
+			return "See script INFO lines above."
+		}
+		return failures.join("\n")
+	}
+
+	private static void runVerifyNotificationEmailsScript(List<String> extraArgs) {
 		String pythonExe = Utils.getPythonExecutablePath()
 		String scriptPath = RunConfiguration.getProjectDir() + "/PythonFiles/CRDC/VerifyNotificationEmails.py"
 		File script = new File(scriptPath)
@@ -170,8 +217,12 @@ class NotificationEmailLog {
 			KeywordUtil.markFailedAndStop("VerifyNotificationEmails.py not found at " + scriptPath)
 			return
 		}
-		KeywordUtil.logInfo("Running " + scriptPath + " with " + pythonExe)
-		ProcessBuilder pb = new ProcessBuilder(pythonExe, scriptPath)
+		List<String> cmd = [pythonExe, scriptPath]
+		if (extraArgs) {
+			cmd.addAll(extraArgs)
+		}
+		KeywordUtil.logInfo("Running " + cmd.join(" "))
+		ProcessBuilder pb = new ProcessBuilder(cmd)
 		pb.redirectErrorStream(true)
 		pb.directory(new File(RunConfiguration.getProjectDir()))
 		try {
@@ -185,7 +236,9 @@ class NotificationEmailLog {
 			}
 			int exitCode = proc.waitFor()
 			if (exitCode != 0) {
-				KeywordUtil.markFailedAndStop("VerifyNotificationEmails.py reported failures (exit " + exitCode + "):\n" + output.toString())
+				String summary = summarizeVerifyScriptFailures(output.toString())
+				KeywordUtil.markFailedAndStop(
+					"VerifyNotificationEmails.py reported failures (exit " + exitCode + "):\n" + summary)
 			} else {
 				KeywordUtil.logInfo("VerifyNotificationEmails.py completed with no Fail rows")
 			}
