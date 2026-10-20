@@ -7,9 +7,10 @@ import utilities.DataSubmissions;
 
 /**
  * TC201_CRDCDH-3026: Verifies Data Explorer metadata view for released study data.
- * - Logs in as Submitter, navigates to Data Explorer, opens the first study from the list,
- * - Verifies metadata table for specified node types (program, study) against expected TSVs
- *   from InputFiles/CRDC/MetadataData/CRDCDH-3026/ (or Metadata/ subfolder).
+ * QA seed (manual): Hub study automation_CompletedStudy - AutomationCompletedStudy (program/submitter linked);
+ * upload InputFiles/CRDC/MetadataData/CRDCDH-3026/, validate, release. TC does not create the DS.
+ * - Logs in as Submitter, filters Data Explorer by study acronym, opens first list row,
+ * - Verifies metadata for program, study, participant, sample vs CRDCDH-3026 expected TSVs.
  * - Generates ValidationReport HTML at the end.
  */
 WebUI.closeBrowser()
@@ -22,7 +23,7 @@ WebUI.delay(2)
 CustomKeywords.'utilities.ValidationReport.clearValidationReportCollector'()
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataExplorer-Tab')
 WebUI.delay(2)
-WebUI.sendKeys(findTestObject('CRDC/AILocators/DataExplorer/List/Filters/StudyName-TxtBx'), "autoQA")
+WebUI.sendKeys(findTestObject('CRDC/AILocators/DataExplorer/List/Filters/StudyName-TxtBx'), 'automation_CompletedStudy')
 WebUI.delay(2)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataExplorer/StudyView/DataSubmissionName-Link')
 WebUI.delay(2)
