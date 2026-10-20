@@ -144,4 +144,11 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/ICDC/CRDCDH-699-ICDC/TC36_CRDC-699-RequiredRelatedPropertyMissingICDC</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>e7154414-8f3d-4fc5-8622-1d132c064c87</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-3026/TC201_VerifyDataExplorerMetadataView</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>
