@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
-   <description></description>
+   <description>CRDCDH-3026 TC201: Data Explorer metadata vs InputFiles/CRDC/MetadataData/CRDCDH-3026/. Requires QA seed — released GC DS for Hub study automation_CompletedStudy / AutomationCompletedStudy (upload CRDCDH-3026 folder manually).</description>
    <name>TC201_VerifyDataExplorerMetadataView</name>
    <tag>Filter</tag>
    <comment></comment>
