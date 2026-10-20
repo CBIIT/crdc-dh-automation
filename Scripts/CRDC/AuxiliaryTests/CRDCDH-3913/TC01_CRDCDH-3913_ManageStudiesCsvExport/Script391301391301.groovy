@@ -6,6 +6,7 @@ import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
  *
  * Roles: Admin (full flow including filtered export), then Federal Lead (export UI + default-list CSV).
  * Env data: study filter token autoQA, program AutoTest-Program, status Active, accessType Open.
+ * CSV name/acronym check is case-insensitive (e.g. acronym AUTOQA matches filter autoQA; see CRDCDH-3839 fixture).
  */
 
 // --- Setup: fresh browser, Admin login ---
@@ -53,7 +54,7 @@ if (filteredTotal > 10) {
 }
 
 // Step 6: Export CSV — verify filename crdc-manage-studies-YYYY-MM-DD-HH-mm-ss.csv, header columns (no Action),
-//         data row count equals filtered UI total, and each row Name or Acronym contains study filter token autoQA.
+//         data row count equals filtered UI total, and each row Name or Acronym contains study filter token autoQA (ignore case).
 String csvPath = CustomKeywords.'utilities.ManageStudies.clickManageStudiesExportAndVerifyDownloadedFileName'()
 CustomKeywords.'utilities.ManageStudies.verifyManageStudiesExportCsvHeaders'(csvPath)
 CustomKeywords.'utilities.ManageStudies.verifyManageStudiesExportCsvRowCount'(filteredTotal, csvPath)

@@ -46,7 +46,7 @@ CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Admin')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/Login/UserProfile-Dd')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/ManageUsers-Btn')
 
-//Positive scenario-- Edit user permissions and write expected checkbox statuses to output sheet 
+//Negative scenario-- Edit user permissions and write expected checkbox statuses to output sheet 
 CustomKeywords.'utilities.Pbac.editPbacPermissions'('Dcp', 'negative')
 
 //Logout

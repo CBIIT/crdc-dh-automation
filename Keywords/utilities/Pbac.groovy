@@ -937,17 +937,21 @@ class Pbac extends TestRunner {
 		permissionToCheck["submission_request:view"] = {
 			KeywordUtil.logInfo("Verifying SR View...")
 			try {
-				Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 30)
 				WebUI.delay(1) //Race condition upon login
 				SubmissionRequest.clickHome()
 				TestRunner.clickTab('CRDC/NavBar/SubmissionRequest-Tab')
-				WebUI.delay(2)
+				Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 30)
 				List<WebElement> rows = WebUI.findWebElements(findTestObject("CRDC/SubmissionRequest/SubmReqListTable-Row"), 20)
 				if (rows.size() == 1 && rows[0].getText().contains("do not have the appropriate permissions")) {
 					KeywordUtil.logInfo("The empty table message is displayed as expected")
 					return false
 				}
 				KeywordUtil.logInfo("Number of rows in SR list found: " + rows.size())
+				if (rows.size() > 1) {
+					String ts = new SimpleDateFormat('yyyyMMdd-HHmmss').format(new Date())
+					KeywordUtil.logInfo("Capturing screenshot: SR list shows data rows instead of permission-denied message (${ts})")
+					WebUI.takeScreenshot("PBAC_FAIL_submission_request_view_SR_list_${ts}")
+				}
 				return rows.size() > 0
 			} catch (Exception e) {
 				KeywordUtil.logInfo("Error verifying permission - submission_request:view -> ${e.message}")
@@ -1132,7 +1136,7 @@ class Pbac extends TestRunner {
 				boolean dataSubmissionsExist = true, dataExplorerExist = true;
 				SubmissionRequest.clickHome()
 				TestRunner.clickTab('CRDC/NavBar/DataSubmissions-Tab')
-				WebUI.delay(3)
+				Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 30)
 				List<WebElement> rows = WebUI.findWebElements(findTestObject("CRDC/DataSubmissions/DataSubmListTable-Row"), 20)
 				if (rows.size() == 1 && rows[0].getText().contains("do not have the appropriate permissions")) {
 					KeywordUtil.logInfo("The Data Submissions empty table message is displayed")
@@ -1142,7 +1146,7 @@ class Pbac extends TestRunner {
 
 				SubmissionRequest.clickHome()
 				TestRunner.clickTab('CRDC/NavBar/DataExplorer-Tab')
-				WebUI.delay(3)
+				Utils.waitForElementToDisappear('CRDC/DataSubmissions/Loading-Icon', 30)
 				List<WebElement> rowsDataExplorer = WebUI.findWebElements(findTestObject("CRDC/DataSubmissions/DataSubmListTable-Row"), 20)
 				if (rowsDataExplorer.size() == 1 && rowsDataExplorer[0].getText().contains("do not have the appropriate permissions")) {
 					KeywordUtil.logInfo("The Data Explorer empty table message is displayed")
