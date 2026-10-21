@@ -162,9 +162,9 @@ public class Utils {
 			pyExecutablePath = "python3";
 		} else {
 			KeywordUtil.logInfo("Running locally. Using local Python executable path...");
-			//pyExecutablePath = "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3";
+			pyExecutablePath = "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3";
 			//pyExecutablePath = "C:/Users/kallakuriv2/AppData/Local/Programs/Python/Python312/python.exe";
-			pyExecutablePath = "/Users/leungvw/vincent_testEnv/bin/python3";
+			//pyExecutablePath = "/Users/leungvw/vincent_testEnv/bin/python3";
 			//pyExecutablePath = "C:/Users/epishinavv/AppData/Local/Programs/Python/Python312/python.exe";
 		}
 

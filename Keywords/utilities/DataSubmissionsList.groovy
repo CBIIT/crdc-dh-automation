@@ -17,7 +17,7 @@ import org.openqa.selenium.interactions.Actions
 import java.util.ArrayList
 import java.util.List
 import java.util.Map
-import java.util.concurrent.TimeUnit
+import java.time.Duration
 
 /**
  * Data Submissions List: Keywords for navigating, filtering, and verifying the main Data Submissions list page
@@ -130,7 +130,7 @@ class DataSubmissionsList extends TestRunner {
 					if (listbox != null) {
 						// Deselect all currently selected options
 						try {
-							driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS)
+							driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(0))
 							int maxDeselect = 20
 							while (maxDeselect-- > 0) {
 								List<WebElement> listboxCandidates = driver.findElements(By.xpath("//*[@role='listbox']"))
@@ -144,7 +144,7 @@ class DataSubmissionsList extends TestRunner {
 								((JavascriptExecutor) driver).executeScript("arguments[0].click();", toClick) // much faster than regular Selenium
 							}
 						} finally {
-							driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS)
+							driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10))
 						}
 						// Select only the requested option(s)
 						int optionWaitSeconds = 5
@@ -155,7 +155,7 @@ class DataSubmissionsList extends TestRunner {
 								if (listboxCandidates.isEmpty()) listboxCandidates = driver.findElements(By.cssSelector("ul.MuiList-root"))
 								if (listboxCandidates.isEmpty()) break
 								WebElement listboxRef = listboxCandidates.get(0)
-								WebElement opt = new WebDriverWait(driver, optionWaitSeconds).until(ExpectedConditions.presenceOfNestedElementLocatedBy(listboxRef, By.xpath(".//li[normalize-space(text())='" + escaped + "']")))
+								WebElement opt = new WebDriverWait(driver, Duration.ofSeconds(optionWaitSeconds)).until(ExpectedConditions.presenceOfNestedElementLocatedBy(listboxRef, By.xpath(".//li[normalize-space(text())='" + escaped + "']")))
 								opt.click()
 								WebUI.delay(1)
 							} catch (Exception ex) {
