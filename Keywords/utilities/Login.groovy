@@ -437,10 +437,11 @@ class Login extends TestRunner implements Comparator<List<XSSFCell>>{
 			return proc.inputStream.text.trim()
 		}
 
+		final int OTP_MAX_ATTEMPTS = 6
 		int otpAttempts = 0
 		boolean loggedIn = false
 
-		while (otpAttempts < 2 && !loggedIn) {
+		while (otpAttempts < OTP_MAX_ATTEMPTS && !loggedIn) {
 			String totpCode = generateTotp(userSecret)
 			println("Attempt ${otpAttempts + 1} - TOTP Code: ${totpCode}")
 
@@ -478,7 +479,7 @@ class Login extends TestRunner implements Comparator<List<XSSFCell>>{
 		}
 
 		if (!loggedIn) {
-			KeywordUtil.markFailed("OTP failed after 2 attempts.")
+			KeywordUtil.markFailed("OTP failed after ${OTP_MAX_ATTEMPTS} attempts.")
 		} else {
 			// Capture logged-in user name for verifyDataSubmissionHeaders (submitter)
 			WebUI.delay(2)

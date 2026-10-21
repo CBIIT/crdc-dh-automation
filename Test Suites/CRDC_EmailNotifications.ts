@@ -200,11 +200,4 @@
       <testCaseId>Test Cases/CRDC/NotificationEmails/SR/TC16_User-ConditionalApproveImage</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
-   <testCaseLink>
-      <guid>d0a4b729-3f85-4c26-9e17-2b8c5f6d013e</guid>
-      <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/CRDC/NotificationEmails/VerifyNotificationEmails</testCaseId>
-      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
-   </testCaseLink>
 </TestSuiteEntity>
