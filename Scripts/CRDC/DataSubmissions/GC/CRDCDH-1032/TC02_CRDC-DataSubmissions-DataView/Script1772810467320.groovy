@@ -62,8 +62,12 @@ CustomKeywords.'utilities.DataSubmissions.verifyDataSubmissionTableHeaders'('Dat
 //Validate data
 CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 
-//Download Data View export TSV files for each node and compare to expected TSVs
-CustomKeywords.'utilities.DataSubmissions.downloadAndCompareExpectedForTC'('TC02')
+// Disabled: downloadAndCompareExpectedForTC compares the Data View export including the status
+// column. TC02 reuses shared study/program/node IDs, so status depends on released/completed
+// data in the environment and is not stable. Data View download content is covered by
+// CRDCDH-3839 TC01–TC03 and CRDCDH-2864 TC103/TC104. This case still checks Data View vs
+// upload (ignoring type/status) via verifyDataViewMatchesMetadataForTC.
+// CustomKeywords.'utilities.DataSubmissions.downloadAndCompareExpectedForTC'('TC02')
 
 //Verify rows per page options
 CustomKeywords.'utilities.WebUIUtils.verifyRowsPerPageOptions'([5, 10, 20, 50])
