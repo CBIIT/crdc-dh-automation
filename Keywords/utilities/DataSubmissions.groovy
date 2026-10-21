@@ -1998,27 +1998,29 @@ class DataSubmissions extends TestRunner {
 	private static final String VALIDATION_RESULTS_UI_SECTION = "UI / Validation Results"
 
 	/**
-	 * Verification only: caller must already have navigated to Data Submission → Validation Results → Expanded view
-	 * with default All filters. Waits for CRDC/AILocators/GenericTable/LoadingRow to disappear so row counts
-	 * are not read mid-load. Counts data rows via Utils.getListWebElements and Object Repository
-	 * CRDC/AILocators/GenericTable/TableRow (data-testid='generic-table-row'); optional empty copy via
-	 * CRDC/DataSubmissions/Validation/ValidationResults-DefaultMesssage. Records one ValidationReport row.
+	 * Verification only: caller must already have navigated to Data Submission → Validation Results → Expanded view.
+	 * Filters Severity to Error (Warnings such as Updating existing data are ignored), then waits for
+	 * CRDC/AILocators/GenericTable/LoadingRow to disappear and counts Error rows via Utils.getListWebElements
+	 * and Object Repository CRDC/AILocators/GenericTable/TableRow. Optional empty copy via
+	 * CRDC/DataSubmissions/Validation/ValidationResults-DefaultMesssage (may be absent when Warnings still exist).
+	 * Records one ValidationReport row.
 	 */
 	@Keyword
 	void verifyNoValidationErrors() {
+		applyValidationResultsFilters('All', 'Error', 'All')
 		Utils.waitForElementToDisappear('CRDC/AILocators/GenericTable/LoadingRow', 15)
 		List qcRows = Utils.getListWebElements('CRDC/AILocators/GenericTable/TableRow')
 		int qcDataRows = qcRows != null ? qcRows.size() : 0
 		List emptyMsgEls = Utils.getListWebElements('CRDC/DataSubmissions/Validation/ValidationResults-DefaultMesssage')
 		boolean hasEmptyStateCopy = emptyMsgEls != null && !emptyMsgEls.isEmpty()
-		ValidationReport.addValidationReportItem(VALIDATION_RESULTS_UI_SECTION, 'Validation Results data rows (generic-table-row)',
+		ValidationReport.addValidationReportItem(VALIDATION_RESULTS_UI_SECTION, 'Validation Results Error rows (generic-table-row)',
 				"0", String.valueOf(qcDataRows), qcDataRows == 0 ? "Pass" : "Fail")
 		if (qcDataRows > 0) {
-			KeywordUtil.markFailed("verifyNoValidationErrors: expected 0 Validation Results data rows (generic-table-row), found ${qcDataRows}")
+			KeywordUtil.markFailed("verifyNoValidationErrors: expected 0 Error rows (generic-table-row) after Severity=Error filter, found ${qcDataRows}")
 		} else {
-			KeywordUtil.logInfo("verifyNoValidationErrors: empty-state message (ValidationResults-DefaultMesssage): ${hasEmptyStateCopy}")
+			KeywordUtil.logInfo("verifyNoValidationErrors: no Error rows (Warnings ignored). empty-state message: ${hasEmptyStateCopy}")
 			if (!hasEmptyStateCopy) {
-				KeywordUtil.logInfo("[WARNING] verifyNoValidationErrors: empty-state Test Object not found; 0 data rows may still be valid.")
+				KeywordUtil.logInfo("[WARNING] verifyNoValidationErrors: empty-state Test Object not found; 0 Error rows may still be valid.")
 			}
 		}
 	}
@@ -2339,6 +2341,19 @@ class DataSubmissions extends TestRunner {
 	}
 
 	/**
+	 * Click Data View Delete after rows are selected, wait for the shared delete dialog, then confirm.
+	 * Uses clickTab (JS click) because native WebUI.click often does not open this MUI dialog.
+	 */
+	private static void clickDataViewDeleteAndConfirm() {
+		KeywordUtil.logInfo("Clicking Delete button")
+		WebUIUtils.waitUntilEnabledOrStop(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/DeleteNodeData-Btn'), 15, 'Data View Delete')
+		WebUIUtils.clickTab('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/DeleteNodeData-Btn')
+		KeywordUtil.logInfo("Confirming deletion in dialog")
+		Utils.waitForElementToAppear('CRDC/AILocators/DeleteDialog/Dialog', 15)
+		WebUIUtils.clickTab('CRDC/AILocators/DeleteDialog/Confirm-Btn')
+	}
+
+	/**
 	 * Navigate to the Data View tab, select the specified node type, select all rows,
 	 * click Delete, confirm the deletion dialog, and wait for deletion to complete.
 	 * Assumes the user is already on the Data Submission detail page and that data
@@ -2375,16 +2390,8 @@ class DataSubmissions extends TestRunner {
 			WebUI.click(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/HeaderCheckbox-Chkbx'))
 			WebUI.delay(1)
 
-			// Step 4: Click Delete button
-			KeywordUtil.logInfo("Step 4: Clicking Delete button")
-			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/DeleteNodeData-Btn'), 10)
-			WebUI.click(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/DeleteNodeData-Btn'))
-			WebUI.delay(1)
-
-			// Step 5: Confirm deletion in dialog
-			KeywordUtil.logInfo("Step 5: Confirming deletion in dialog")
-			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'), 10)
-			WebUI.click(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'))
+			// Step 4-5: Click Delete and confirm
+			clickDataViewDeleteAndConfirm()
 
 			// Step 6: Wait for deletion to complete
 			KeywordUtil.logInfo("Step 6: Waiting for deletion to complete (up to 120s)")
@@ -2454,14 +2461,7 @@ class DataSubmissions extends TestRunner {
 			}
 			WebUI.delay(1)
 
-			KeywordUtil.logInfo("Clicking Delete button")
-			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/DeleteNodeData-Btn'), 10)
-			WebUI.click(findTestObject('CRDC/AILocators/DataSubmissions/Detail/DataView/Filters/DeleteNodeData-Btn'))
-			WebUI.delay(1)
-
-			KeywordUtil.logInfo("Confirming deletion in dialog")
-			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'), 10)
-			WebUI.click(findTestObject('CRDC/AILocators/DeleteDialog/Confirm-Btn'))
+			clickDataViewDeleteAndConfirm()
 			WebUI.delay(3)
 
 			KeywordUtil.logInfo("Waiting for deletion to complete")

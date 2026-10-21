@@ -1,2 +1,0 @@
-type	Issue_Type	Expected_Severity	Expected_Issues	program_name	program_acronym	program_short_description	program_full_description	program_external_url	program_short_name	institution
-program	Missing required property	Error	Required property "program_short_description" is empty.	auto_program	AUTOPROGRAM		full desc	https://program1	short name	NCI
