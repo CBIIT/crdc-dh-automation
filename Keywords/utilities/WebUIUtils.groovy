@@ -18,6 +18,7 @@ import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.Select
 import org.openqa.selenium.support.ui.WebDriverWait
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -347,7 +348,7 @@ class WebUIUtils {
 	@Keyword
 	static void clickTab(String tabName) {
 		WebDriver driver = DriverFactory.getWebDriver()
-		WebDriverWait wait = new WebDriverWait(driver, DEFAULT_TIMEOUT)
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_TIMEOUT))
 		JavascriptExecutor js = (JavascriptExecutor) driver
 		TestObject obj = findTestObject(tabName)
 		String tabXpath = obj.findPropertyValue('xpath')
@@ -413,7 +414,7 @@ class WebUIUtils {
 		WebUI.refresh()
 		WebUI.waitForPageLoad(timeout)
 		WebDriver driver = DriverFactory.getWebDriver()
-		WebDriverWait wait = new WebDriverWait(driver, timeout)
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout))
 		wait.until { d -> ((JavascriptExecutor) d).executeScript("return document.readyState") == "complete" }
 		KeywordUtil.logInfo("refreshPageAndWaitForLoad: page refreshed and fully loaded.")
 	}
@@ -1314,7 +1315,7 @@ class WebUIUtils {
 		String xpath = TestRunner.givexpath(locatorKey)
 		long deadline = System.currentTimeMillis() + (timeoutSeconds * 1000L)
 		try {
-			driver.manage().timeouts().implicitlyWait(0, java.util.concurrent.TimeUnit.SECONDS)
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(0))
 			while (System.currentTimeMillis() <= deadline) {
 				List<WebElement> matches = driver.findElements(By.xpath(xpath))
 				boolean displayed = matches.any { WebElement el ->
@@ -1334,7 +1335,7 @@ class WebUIUtils {
 			KeywordUtil.logInfo("fastElementPresent: " + e.getMessage())
 			return false
 		} finally {
-			driver.manage().timeouts().implicitlyWait(10, java.util.concurrent.TimeUnit.SECONDS)
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10))
 		}
 	}
 

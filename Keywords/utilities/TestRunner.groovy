@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration
 import javax.print.DocFlavor.STRING
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -133,7 +133,7 @@ public class TestRunner implements Comparator<List<XSSFCell>>{
 		KeywordUtil.markPassed("Data loaded from input file for the test case." )
 		driver = CustomBrowserDriver.createWebDriver();
 		System.out.println("This is the driver: " + driver)
-		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
 		excelparsingKatalon(sheetData_K, driver);
 	}
 
@@ -393,7 +393,7 @@ public class TestRunner implements Comparator<List<XSSFCell>>{
 		WebElement resultTab
 		String trim
 
-		WebDriverWait wait = new WebDriverWait(driver,30);
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		System.out.println("This is the stat value of cases/total (in case of cart) before converting to int: "+statVal1)
 		int statValue = convStringtoInt(statVal1);
 		System.out.println("This is the passed value of stat for this run: "+statValue)

@@ -11,6 +11,7 @@ import org.openqa.selenium.WebElement
 import org.openqa.selenium.StaleElementReferenceException
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
+import java.time.Duration
 import org.openqa.selenium.TimeoutException
 
 import java.text.SimpleDateFormat
@@ -39,7 +40,7 @@ class ManagePrograms extends TestRunner {
 	/** Returns true if element matching xpath appears within timeoutSeconds; false otherwise. No Katalon keyword logging. */
 	private static boolean waitForElementPresentByXpath(WebDriver driver, String xpath, int timeoutSeconds) {
 		try {
-			WebDriverWait wait = new WebDriverWait(driver, timeoutSeconds)
+			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds))
 			wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpath)))
 			return true
 		} catch (TimeoutException e) {
