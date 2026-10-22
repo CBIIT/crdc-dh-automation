@@ -27,7 +27,9 @@ import internal.GlobalVariable
 
 /**
  * Append-only Excel checklist for email-notification helper tests.
- * logEmails, logBccEmails, and logCcEmails do not open inboxes. verifyNotificationEmails runs the Gmail judge.
+ * logEmails, logBccEmails, and logCcEmails do not open inboxes.
+ * verifyNotificationEmails runs the Gmail judge. verifyNotificationEmailsWithGitParity
+ * runs Gmail then Git content parity in one process.
  */
 class NotificationEmailLog {
 

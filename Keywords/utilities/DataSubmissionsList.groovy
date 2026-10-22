@@ -391,6 +391,35 @@ class DataSubmissionsList extends TestRunner {
 	}
 
 	/**
+	 * Preflight: fail and stop if any Data Submissions for the given study are already Submitted or Released.
+	 * Filters the list by Status Submitted and Released and the Study box (dbGaP / study name / acronym).
+	 * Does not write ValidationReport items; leftover rows are environment state, not a product assertion.
+	 *
+	 * @param studyFilter Study name, acronym, or dbGaP ID token for the Study filter (must be unique enough to avoid other studies)
+	 */
+	@Keyword
+	void failIfSubmittedOrReleasedExistForStudy(String studyFilter) {
+		if (studyFilter == null || studyFilter.trim().isEmpty()) {
+			KeywordUtil.markFailedAndStop("failIfSubmittedOrReleasedExistForStudy: studyFilter is required")
+		}
+		String token = studyFilter.trim()
+		KeywordUtil.logInfo("--- failIfSubmittedOrReleasedExistForStudy: " + token + " ---")
+		navigateToDataSubmissionsList()
+		applyDataSubmissionsListFilters([status: 'Submitted, Released', dbGaP: token])
+		List<List<String>> rows = readDataSubmissionsListTableRows()
+		int count = (rows == null) ? 0 : rows.size()
+		if (count > 0) {
+			int logLimit = Math.min(count, 5)
+			for (int i = 0; i < logLimit; i++) {
+				KeywordUtil.logInfo("leftover DS row " + (i + 1) + ": " + rows.get(i).join(" | "))
+			}
+			KeywordUtil.markFailedAndStop("There are existing data submissions in Submitted or Released status for study '" + token + "' that need to be cleared.")
+		}
+		KeywordUtil.logInfo("failIfSubmittedOrReleasedExistForStudy: no Submitted or Released DS for study '" + token + "'")
+		resetDataSubmissionsListFilters()
+	}
+
+	/**
 	 * Reset Data Submissions list filters by clicking the reset button.
 	 */
 	@Keyword
