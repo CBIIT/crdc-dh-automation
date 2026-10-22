@@ -374,11 +374,11 @@ Login Master → Profile → Manage Users → `Pbac.disableThenRestoreUserAccoun
 
 ## 28. VerifyNotificationEmails
 
-No browser. `NotificationEmailLog.verifyNotificationEmails()` runs `PythonFiles/CRDC/VerifyNotificationEmails.py` with `Utils.getPythonExecutablePath()`. The case **fails** if the process exits non-zero (any Fail for today, or the checklist is missing). Pass/Skip rows are left unchanged. Last case in `CRDC_EmailNotifications`. OAuth errors (`invalid_grant`, `oauth2.googleapis.com` connection refused): **[TOKEN_REGENERATION.md](./TOKEN_REGENERATION.md)**.
+No browser. `NotificationEmailLog.verifyNotificationEmailsWithGitParity()` runs `PythonFiles/CRDC/VerifyNotificationEmails.py --git-parity` with `Utils.getPythonExecutablePath()` (Gmail then Git parity in one process). The case **fails** if the process exits non-zero (any Gmail Fail, Git Fail, or the checklist is missing). Pass/Skip rows are left unchanged. `verifyNotificationEmails()` is Gmail-only if you omit `--git-parity`. OAuth errors (`invalid_grant`, `oauth2.googleapis.com` connection refused): **[TOKEN_REGENERATION.md](./TOKEN_REGENERATION.md)**.
 
-### Git content parity (optional, wave 1)
+### Git content parity
 
-`NotificationEmailLog.verifyNotificationEmailsWithGitParity()` (or **VerifyNotificationEmailsGitParity** / `CRDC_EmailNotifications_GitParity`) runs the same script with **`--git-parity`**. Default verify behavior is unchanged when the flag is omitted.
+`NotificationEmailLog.verifyNotificationEmailsWithGitParity()` runs the same script with **`--git-parity`**. Gmail Fail rows do not skip the Git pass; Git still scores allowlisted To rows that Gmail-Passed.
 
 After Gmail sets **Result** to **Pass** (including catalog subject and **Expected body contains**), Git parity compares **body copy only** from [crdc-submission-portal-email-content](https://github.com/CBIIT/crdc-submission-portal-email-content) to the matched Gmail message (YAML paragraph fragments and static template phrases; not full Handlebars). It does **not** re-check subject. **Result** stays Gmail-only; column **Git parity** is **Pass** / **Fail** / **Skip**. The run **fails** (exit 1) on Git **Fail** for an allowlisted row.
 
@@ -395,7 +395,7 @@ After Gmail sets **Result** to **Pass** (including catalog subject and **Expecte
 python PythonFiles/CRDC/VerifyNotificationEmails.py --git-parity --portal-url "https://…"
 ```
 
-QA smoke order: profile **CRDC_QA** → **SR TC01**, **SR TC04**, **DS TC01** → **VerifyNotificationEmailsGitParity**. Gmail Pass + Git Fail is valid when deployed backend copy lags the Git branch (CRDCDH-3776 signal).
+QA smoke order: profile **CRDC_QA** → **SR TC01**, **SR TC04**, **DS TC01** → **VerifyNotificationEmails**. Gmail Pass + Git Fail is valid when deployed backend copy lags the Git branch (CRDCDH-3776 signal).
 
 ## 29. logEmails, logBccEmails, and logCcEmails
 

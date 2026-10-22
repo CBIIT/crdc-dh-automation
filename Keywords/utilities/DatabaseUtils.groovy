@@ -335,6 +335,43 @@ public class DatabaseUtils {
 	}
 
 	/**
+	 * Poll findRecordFromDataFile until a document is found or timeoutSeconds elapses.
+	 * Use after an async Mongo update (for example Complete flipping release.status to Deleted).
+	 * Fails if still null after the timeout.
+	 *
+	 * @param dataFilePath Data file path (e.g. Data Files/CRDC/DataSubmissions/DBQueries)
+	 * @param queryKey Query key in that data file (e.g. status)
+	 * @param params Map of {{paramName}} values for the query template
+	 * @param timeoutSeconds How long to poll (poll interval is 5 seconds)
+	 * @return The first matching Document, or null if none before timeout
+	 */
+	@Keyword
+	public static Document waitForRecordFromDataFile(String dataFilePath, String queryKey, Map params, int timeoutSeconds) {
+		int timeout = timeoutSeconds > 0 ? timeoutSeconds : 60
+		long deadline = System.currentTimeMillis() + (timeout * 1000L)
+		int attempt = 0
+		Document doc = null
+		KeywordUtil.logInfo("waitForRecordFromDataFile: polling up to ${timeout}s for key '${queryKey}' params ${params}")
+		while (System.currentTimeMillis() <= deadline) {
+			attempt++
+			doc = findRecordFromDataFile(dataFilePath, queryKey, params)
+			if (doc != null) {
+				KeywordUtil.logInfo("waitForRecordFromDataFile: found document on attempt ${attempt}")
+				return doc
+			}
+			long remainingMs = deadline - System.currentTimeMillis()
+			if (remainingMs <= 0) {
+				break
+			}
+			long sleepMs = Math.min(5000L, remainingMs)
+			KeywordUtil.logInfo("waitForRecordFromDataFile: no document yet (attempt ${attempt}); waiting ${sleepMs}ms")
+			Thread.sleep(sleepMs)
+		}
+		KeywordUtil.markFailed("waitForRecordFromDataFile: no document for key '${queryKey}' within ${timeout}s. params=${params}")
+		return null
+	}
+
+	/**
 	 * Verify that at least one record was returned. Fails the test if null or empty.
 	 * @param doc Document from findOne (or findRecordFromDataFile)
 	 */

@@ -21,6 +21,7 @@ CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Admin')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/Login/UserProfile-Dd')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/ManageUsers-Btn')
 CustomKeywords.'utilities.Pbac.editPbacPermissions'('Dcp', 'positive')
+CustomKeywords.'utilities.DataSubmissionsList.failIfSubmittedOrReleasedExistForStudy'('AutomationQA_CV-CRDCDH-3138')
 CustomKeywords.'utilities.SubmissionRequest.logoutFromCrdc'()
 WebUI.closeBrowser()
 
