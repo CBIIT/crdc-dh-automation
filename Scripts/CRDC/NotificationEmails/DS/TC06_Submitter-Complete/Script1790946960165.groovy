@@ -26,6 +26,7 @@ CustomKeywords.'utilities.DataSubmissions.submitDataSubmission'()
 
 CustomKeywords.'utilities.Login.switchUser'('Dcp')
 CustomKeywords.'utilities.DataSubmissions.releaseDataSubmission'(dsId)
+WebUI.delay(5) //account for race condition where DS Completed email is not received if completing immediately after release 
 CustomKeywords.'utilities.DataSubmissions.completeDataSubmission'()
 
 CustomKeywords.'utilities.NotificationEmailLog.logEmails'('DS Complete', 'Dcp', dsId, dsName, 'Submitter')
