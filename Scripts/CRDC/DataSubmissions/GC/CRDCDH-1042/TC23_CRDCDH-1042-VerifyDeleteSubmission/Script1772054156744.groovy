@@ -42,7 +42,7 @@ CustomKeywords.'utilities.Login.navigateToCrdc'()
 WebUI.setViewPortSize(1920, 1080)
 CustomKeywords.'utilities.Login.loginToCrdcOtp'('Submitter')
 WebUI.delay(2)
-CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/DataSubmissions-Tab')
+CustomKeywords.'utilities.DataSubmissionsList.failIfSubmittedOrReleasedExistForStudy'('AutomationQA_Study')
 CustomKeywords.'utilities.DataSubmissions.createDataSubmission'('New', 'metadata only','GC','autoQA - AutomationQA_Study')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/DataSubmissionName-Link')
 CustomKeywords.'utilities.WebUIUtils.verifyButtonEnabled'(findTestObject('CRDC/AILocators/DataSubmissions/Detail/ValidationControls/ValidationType-Both-RadioBtn'), false)
@@ -118,18 +118,14 @@ Map statusReleased = [
 ]
 def record1 = CustomKeywords.'utilities.DatabaseUtils.findRecordFromDataFile'("Data Files/CRDC/DataSubmissions/DBQueries", "status", statusReleased)
 CustomKeywords.'utilities.DatabaseUtils.verifyRecordReturned'(record1)
-WebUI.delay(120)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/Complete-Btn')
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/AILocators/DataSubmissions/Detail/Actions/CompleteConfirmationYes-Btn')
-WebUI.delay(5)
-//Database verification after deletion
 Map statusDeleted = [
 	status       : "Deleted",
 	submissionID : deleteTargetSubId,
 	nodeID	 : "auto_cons_1"
 ]
-def record2 = CustomKeywords.'utilities.DatabaseUtils.findRecordFromDataFile'("Data Files/CRDC/DataSubmissions/DBQueries", "status", statusDeleted)
-CustomKeywords.'utilities.DatabaseUtils.verifyRecordReturned'(record2)
+CustomKeywords.'utilities.DatabaseUtils.waitForRecordFromDataFile'("Data Files/CRDC/DataSubmissions/DBQueries", "status", statusDeleted, 60)
 CustomKeywords.'utilities.DatabaseUtils.close'()
 CustomKeywords.'utilities.SubmissionRequest.logoutFromCrdc'()
 CustomKeywords.'utilities.ValidationReport.generateValidationReport'()

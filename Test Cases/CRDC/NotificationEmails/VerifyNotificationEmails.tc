@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
-   <description>Runs PythonFiles/CRDC/VerifyNotificationEmails.py against today's NotificationEmail_Checklist.xlsx rows. Fails if the script reports any Fail (or the checklist is missing). Does not drive the UI.</description>
+   <description>Runs PythonFiles/CRDC/VerifyNotificationEmails.py --git-parity against today's NotificationEmail_Checklist.xlsx rows (Gmail then Git parity in one process). Fails if the script reports any Fail (or the checklist is missing). Does not drive the UI.</description>
    <name>VerifyNotificationEmails</name>
    <tag>Filter</tag>
    <comment></comment>
