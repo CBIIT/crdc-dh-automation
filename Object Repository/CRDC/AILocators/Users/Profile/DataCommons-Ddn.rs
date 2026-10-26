@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>//*[@aria-labelledby=&apos;userDataCommons&apos;]</value>
+         <value>//*[@id='mui-component-select-dataCommons']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -18,7 +18,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>//*[@aria-labelledby=&apos;userDataCommons&apos;]</value>
-      <webElementGuid>0acaa524-3fcb-4e87-9d86-ce07c04971a7</webElementGuid>
+      <value>//*[@id='mui-component-select-dataCommons']</value>
+      <webElementGuid>40b2288e-fd15-4a60-81e2-1f91e36acbbd</webElementGuid>
    </webElementProperties>
 </WebElementEntity>

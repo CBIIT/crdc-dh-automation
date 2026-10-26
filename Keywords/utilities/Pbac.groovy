@@ -86,6 +86,14 @@ class Pbac extends TestRunner {
 	private static final String PBAC_NOTISTACK_SNACKBAR_LOC = 'CRDC/AILocators/Global/Notistack-Snackbar'
 	private static final int PBAC_NOTISTACK_WAIT_SEC = 20
 	private static final int PBAC_MANAGE_USERS_TABLE_WAIT_SEC = 25
+	/** Display labels in the Edit User Role dropdown, keyed by Pbac role (Fedlead, Dcp, Admin, Submitter, User). */
+	private static final Map<String, String> ROLE_DISPLAY_MAP = [
+		'User'     : 'User',
+		'Submitter': 'Submitter',
+		'Dcp'      : 'Data Commons Personnel',
+		'Fedlead'  : 'Federal Lead',
+		'Admin'    : 'Admin'
+	]
 
 	/**
 	 * Notistack toasts (e.g. after Save) intercept PBAC checkbox clicks on slow CI; wait until hidden or gone.
@@ -116,11 +124,13 @@ class Pbac extends TestRunner {
 	}
 
 	/**
-	 * Native-click the Edit User Role dropdown. clickTab JS-click reports success but does not
-	 * open the MUI list. Retries StaleElementReferenceException after the form remounts on Edit.
+	 * Native-click an Edit User MUI select (Role by default; pass DataCommons-Ddn for that field).
+	 * clickTab JS-click reports success but does not open the MUI list. Retries
+	 * StaleElementReferenceException after the form remounts on Edit.
+	 * @param locatorKey Object Repository path; defaults to CRDC/ManageUsers/Role-Ddn
 	 */
-	private static void clickPbacRoleDropdown() {
-		TestObject to = findTestObject('CRDC/ManageUsers/Role-Ddn')
+	private static void clickPbacRoleDropdown(String locatorKey = 'CRDC/ManageUsers/Role-Ddn') {
+		TestObject to = findTestObject(locatorKey)
 		if (!WebUIUtils.waitForElementClickableWithStaleRetry(to, 10)) {
 			return
 		}
@@ -130,7 +140,7 @@ class Pbac extends TestRunner {
 				return
 			} catch (StepFailedException e) {
 				if (e.getCause() instanceof StaleElementReferenceException) {
-					KeywordUtil.logInfo("clickPbacRoleDropdown: stale element, retrying (attempt ${i + 1}/3)...")
+					KeywordUtil.logInfo("clickPbacRoleDropdown(${locatorKey}): stale element, retrying (attempt ${i + 1}/3)...")
 					WebUI.delay(1)
 					if (!WebUIUtils.waitForElementClickableWithStaleRetry(to, 10)) {
 						return
@@ -140,7 +150,7 @@ class Pbac extends TestRunner {
 				}
 			}
 		}
-		KeywordUtil.markFailed("Unable to click Role-Ddn after stale retries")
+		KeywordUtil.markFailed("Unable to click ${locatorKey} after stale retries")
 	}
 
 	private static void clickPbacPermissionCheckbox(WebElement cb) {
@@ -482,16 +492,7 @@ class Pbac extends TestRunner {
 	@Keyword
 	public static void resetPermissions(String role) {
 		KeywordUtil.logInfo("Resetting permissions for role: ${role}")
-		// Map displayed roles in dropdown to internal names
-		Map<String, String> roleDisplayMap = [
-			'User'     : 'User',
-			'Submitter': 'Submitter',
-			'Dcp'      : 'Data Commons Personnel',
-			'Fedlead'  : 'Federal Lead',
-			'Admin'    : 'Admin'
-		]
-
-		String roleDisplay = roleDisplayMap[role]
+		String roleDisplay = ROLE_DISPLAY_MAP[role]
 		if (!roleDisplay) {
 			KeywordUtil.markFailed("Invalid role passed to resetPermissions: ${role}")
 			return
@@ -501,7 +502,7 @@ class Pbac extends TestRunner {
 		KeywordUtil.logInfo("Clicked role dropdown")
 
 		// Find an alternate role to toggle to
-		String alternateRole = roleDisplayMap.values().find { it != roleDisplay }
+		String alternateRole = ROLE_DISPLAY_MAP.values().find { it != roleDisplay }
 		if (!alternateRole) {
 			KeywordUtil.markFailed("Could not find alternate role to switch to.")
 			return
@@ -1425,6 +1426,139 @@ class Pbac extends TestRunner {
 			} else {
 				KeywordUtil.logInfo(
 					"Skipping '${permission}' — email/notification permission (see NotificationEmails suite).")
+			}
+		}
+	}
+
+	/**
+	 * CRDCDH-502: Data Commons field on Edit User is only for Data Commons Personnel.
+	 * Caller must already be on Manage Users as Admin. Never Saves.
+	 * Opens pbac.Dcp-automation for the full field checks (present, enabled, asterisk, multi-select).
+	 * Then opens pbac.Submitter-automation and cycles Role through User / Submitter / Federal Lead /
+	 * Admin (field hidden) and Data Commons Personnel (field appears), then Cancel.
+	 */
+	@Keyword
+	public static void verifyDCPFields() {
+		findAndEditUserByName('Dcp')
+		try {
+			assertDataCommonsFieldVisible("Edit Dcp: Data Commons")
+		} finally {
+			cancelEditUserWithoutSaving()
+		}
+
+		findAndEditUserByName('Submitter')
+		try {
+			WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/Users/Profile/Cancel-Btn'), 15)
+			ROLE_DISPLAY_MAP.each { String roleKey, String roleDisplay ->
+				if (roleKey == 'Dcp') {
+					return
+				}
+				clickPbacRoleDropdown()
+				TestObject roleOption = findTestObject('CRDC/ManageUsers/RoleDdn-Option', [('role') : roleDisplay])
+				WebUI.waitForElementClickable(roleOption, 10)
+				WebUI.click(roleOption)
+				WebUI.delay(2)
+				boolean hiddenPresent = WebUIUtils.fastElementPresent('CRDC/AILocators/Users/Profile/DataCommons-Ddn', 3)
+				String hiddenActual = hiddenPresent ? "displayed" : "not present"
+				ValidationReport.addValidationReportItem('CRDCDH-502 Data Commons', "Edit Submitter Role=${roleDisplay}: Data Commons hidden", "not present", hiddenActual, hiddenPresent ? "Fail" : "Pass")
+				if (hiddenPresent) {
+					KeywordUtil.markFailed("Edit Submitter Role=${roleDisplay}: Data Commons hidden: expected 'not present' but was '${hiddenActual}'")
+				}
+			}
+
+			clickPbacRoleDropdown()
+			TestObject dcpOption = findTestObject('CRDC/ManageUsers/RoleDdn-Option', [('role') : ROLE_DISPLAY_MAP['Dcp']])
+			WebUI.waitForElementClickable(dcpOption, 10)
+			WebUI.click(dcpOption)
+			WebUI.delay(2)
+			boolean shown = WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/Users/Profile/DataCommons-Ddn'), 10, FailureHandling.OPTIONAL)
+			ValidationReport.addValidationReportItem('CRDCDH-502 Data Commons', "Edit Submitter after Role=${ROLE_DISPLAY_MAP['Dcp']}: Data Commons appears", "displayed", shown ? "displayed" : "not present", shown ? "Pass" : "Fail")
+			if (!shown) {
+				KeywordUtil.markFailed("Edit Submitter after Role=${ROLE_DISPLAY_MAP['Dcp']}: Data Commons appears: expected 'displayed' but was 'not present'")
+			}
+		} finally {
+			cancelEditUserWithoutSaving()
+		}
+	}
+
+	/**
+	 * Leave Edit User via Cancel (clickTab) and wait until the Manage Users table is back
+	 * (waitForManageUsersTable). Never clicks Save. No-op if Cancel is not on the page.
+	 */
+	private static void cancelEditUserWithoutSaving() {
+		if (!WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/Users/Profile/Cancel-Btn'), 5, FailureHandling.OPTIONAL)) {
+			KeywordUtil.logInfo("cancelEditUserWithoutSaving: Cancel not present; assuming already on Manage Users.")
+			return
+		}
+		WebUIUtils.clickTab('CRDC/AILocators/Users/Profile/Cancel-Btn')
+		WebUI.delay(1)
+		WebUI.waitForPageLoad(15)
+		driver = DriverFactory.getWebDriver()
+		waitForManageUsersTable(driver)
+	}
+
+	/**
+	 * CRDCDH-502 checks for a visible Data Commons field on the current Edit User form:
+	 * present, not Mui-disabled, required asterisk shown, and at least two list options.
+	 * Opens the MUI select with clickPbacRoleDropdown (same native click as Role), reads
+	 * listbox options, then Escape so nothing is selected or saved.
+	 * @param labelPrefix ValidationReport label prefix (which user / role state this is)
+	 */
+	private static void assertDataCommonsFieldVisible(String labelPrefix) {
+		WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/Users/Profile/Cancel-Btn'), 15)
+
+		boolean present = WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/Users/Profile/DataCommons-Ddn'), 10, FailureHandling.OPTIONAL)
+		ValidationReport.addValidationReportItem('CRDCDH-502 Data Commons', "${labelPrefix} present", "displayed", present ? "displayed" : "not present", present ? "Pass" : "Fail")
+		if (!present) {
+			KeywordUtil.markFailed("${labelPrefix} present: expected 'displayed' but was 'not present'")
+			return
+		}
+
+		boolean visible = WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/Users/Profile/DataCommons-Ddn'), 10, FailureHandling.OPTIONAL)
+		ValidationReport.addValidationReportItem('CRDCDH-502 Data Commons', "${labelPrefix} visible", "visible", visible ? "visible" : "not visible", visible ? "Pass" : "Fail")
+		if (!visible) {
+			KeywordUtil.markFailed("${labelPrefix} visible: expected 'visible' but was 'not visible'")
+		}
+
+		String cssClass = WebUI.getAttribute(findTestObject('CRDC/AILocators/Users/Profile/DataCommons-Ddn'), 'class') ?: ''
+		boolean enabled = !cssClass.contains('Mui-disabled')
+		ValidationReport.addValidationReportItem('CRDCDH-502 Data Commons', "${labelPrefix} enabled", "enabled", enabled ? "enabled" : "Mui-disabled", enabled ? "Pass" : "Fail")
+		if (!enabled) {
+			KeywordUtil.markFailed("${labelPrefix} enabled: expected 'enabled' but was 'Mui-disabled'")
+		}
+
+		boolean asteriskVisible = WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/Users/Profile/DataCommons-Asterisk'), 10, FailureHandling.OPTIONAL)
+		ValidationReport.addValidationReportItem('CRDCDH-502 Data Commons', "${labelPrefix} required asterisk", "asterisk visible", asteriskVisible ? "asterisk visible" : "asterisk not visible", asteriskVisible ? "Pass" : "Fail")
+		if (!asteriskVisible) {
+			KeywordUtil.markFailed("${labelPrefix} required asterisk: expected 'asterisk visible' but was 'asterisk not visible'")
+		}
+
+		boolean opened = false
+		for (int i = 0; i < 2; i++) {
+			clickPbacRoleDropdown('CRDC/AILocators/Users/Profile/DataCommons-Ddn')
+			if (WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/Users/Profile/DataCommons-Ddn-Option'), 5, FailureHandling.OPTIONAL)) {
+				opened = true
+				break
+			}
+		}
+		if (!opened) {
+			ValidationReport.addValidationReportItem('CRDCDH-502 Data Commons', "${labelPrefix} multi-select options", "at least 2 options", "dropdown did not open", "Fail")
+			KeywordUtil.markFailed("${labelPrefix} multi-select options: expected 'at least 2 options' but was 'dropdown did not open'")
+			return
+		}
+		try {
+			List<WebElement> options = WebUI.findWebElements(findTestObject('CRDC/AILocators/Users/Profile/DataCommons-Ddn-Option'), 10)
+			List<String> names = options.collect { it.getText()?.trim() }.findAll { it }
+			boolean multi = names.size() >= 2
+			ValidationReport.addValidationReportItem('CRDCDH-502 Data Commons', "${labelPrefix} multi-select options", "at least 2 options", "${names.size()} options: ${names}", multi ? "Pass" : "Fail")
+			if (!multi) {
+				KeywordUtil.markFailed("${labelPrefix} multi-select options: expected 'at least 2 options' but was '${names.size()} options: ${names}'")
+			}
+		} finally {
+			try {
+				new Actions(DriverFactory.getWebDriver()).sendKeys(Keys.ESCAPE).perform()
+			} catch (Exception e) {
+				KeywordUtil.logInfo("Escape to close Data Commons list: ${e.message}")
 			}
 		}
 	}
