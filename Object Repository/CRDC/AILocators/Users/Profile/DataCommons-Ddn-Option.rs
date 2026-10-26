@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataCommons-Ddn-Option</name>
+   <tag></tag>
+   <elementGuidId>c5020dd1-0a01-4b02-8502-d0c0ddn0pt10</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//ul[@role=&apos;listbox&apos;]//li[@role=&apos;option&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//ul[@role=&apos;listbox&apos;]//li[@role=&apos;option&apos;]</value>
+      <webElementGuid>c5020dd1-0a01-4b02-8502-d0c0ddn0pt11</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

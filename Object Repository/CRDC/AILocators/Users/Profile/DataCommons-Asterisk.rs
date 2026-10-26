@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>DataCommons-Asterisk</name>
+   <tag></tag>
+   <elementGuidId>c5020ast-0a01-4b02-8502-d0c0ast3r1sk</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;userDataCommons&apos;]//span[normalize-space()=&apos;*&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;userDataCommons&apos;]//span[normalize-space()=&apos;*&apos;]</value>
+      <webElementGuid>c5020ast-0a01-4b02-8502-d0c0ast3r1s2</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

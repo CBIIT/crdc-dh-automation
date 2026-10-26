@@ -194,6 +194,13 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
+      <guid>25540a01-2554-4a13-9c02-0d021754dv01</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/GC/CRDCDH-2554/TC01_CRDCDH-2554-ParentNodesAsLists</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
       <guid>a1b2c3d4-e5f6-4789-a012-3456789abcde</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
