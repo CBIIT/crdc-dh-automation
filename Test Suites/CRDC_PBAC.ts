@@ -138,6 +138,13 @@
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
+      <guid>c2175ts1-2175-4c02-8502-c2175pbac001</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/Pbac/CRDCDH-2175/TC01_CRDCDH-2175-RequestAccessStudiesInstitution</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
       <guid>2789072d-19f4-40e8-a6a6-edffa91a5bb7</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>

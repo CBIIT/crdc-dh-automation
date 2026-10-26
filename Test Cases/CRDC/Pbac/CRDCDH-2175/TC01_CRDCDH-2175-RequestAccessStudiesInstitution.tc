@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-2175: Submitter User Profile Request Access — tooltip, Studies multi-select (format, required), Organization removed, Institution list + type-in, required helpers on empty Submit. Cancels; does not submit (email submit is NotificationEmails TC01 / Pbac.submitAccessRequest).</description>
+   <name>TC01_CRDCDH-2175-RequestAccessStudiesInstitution</name>
+   <tag></tag>
+   <comment>1 Submitter: User Profile. 2 Hover Request Access: tooltip Request role change, study access, or institution update. 3 Open dialog. 4 Studies present + required asterisk. 5 Institution present + required asterisk. 6 Organization not present. 7 Empty Submit: both helpers This field is required; dialog stays open. 8 Studies list: at least 2 options, format Abbr - Full Name or name only (sort not asserted). 9 Institution list: at least 2 options, sorted ascending. 10 Type a unique name not in the list; value kept. 11 Cancel; never Submit.</comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>21750a01-2175-4a13-9c02-0d021750d001</testCaseGuid>
+</TestCaseEntity>

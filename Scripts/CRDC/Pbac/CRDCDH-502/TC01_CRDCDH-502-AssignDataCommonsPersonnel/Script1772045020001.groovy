@@ -2,9 +2,17 @@ import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 
 /*
  * TC01_CRDCDH-502-AssignDataCommonsPersonnel
- * Admin Edit User: full Data Commons checks on a DCP user, then on Submitter cycle Role
- * through User / Submitter / Federal Lead / Admin (field hidden) and Data Commons Personnel
- * (field appears). Does not Save role changes on pbac.*-automation users.
+ *
+ * Flow:
+ * 1. Login as Admin; open Manage Users.
+ * 2. Edit pbac.Dcp-automation. Verify Data Commons is present, visible, enabled,
+ *    has a required asterisk, and the list has at least 2 options. Escape to close
+ *    the list. Cancel (never Save).
+ * 3. Edit pbac.Submitter-automation. Cycle Role to User, Submitter, Federal Lead,
+ *    and Admin — Data Commons stays hidden. Switch Role to Data Commons Personnel —
+ *    the field appears. Cancel (never Save).
+ *
+ * Does not cover DCP DS-activity email (CRDCDH-1810).
  */
 
 WebUI.closeBrowser()

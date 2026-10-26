@@ -858,6 +858,15 @@ class Pbac extends TestRunner {
 	}
 
 	/**
+	 * Click Request Access on the current User Profile and wait for the dialog.
+	 * Caller must already be on Profile. Escape closes this dialog; do not send Escape to dismiss the Studies list.
+	 */
+	private static void openAccessRequestDialog() {
+		WebUIUtils.clickTab('CRDC/AILocators/AccessRequest/RequestAccess-Btn')
+		Utils.waitForElementToAppear('CRDC/AILocators/AccessRequest/Dialog', 10)
+	}
+
+	/**
 	 * Open Profile Request Access and submit Institution AutoTest-Institution plus study AutoTest-Study.
 	 * Returns id and name (unique Additional Info token) for NotificationEmailLog.logEmails.
 	 * Caller must already be logged in as User. Stops if the dialog does not close after Submit.
@@ -868,13 +877,11 @@ class Pbac extends TestRunner {
 		String studyName = 'AutoTest-Study'
 		String additionalInfo = 'TC08 Request Access ' + new SimpleDateFormat('yyyy-MM-dd HH:mm:ss').format(new Date())
 
-		// Open Profile Request Access
 		WebUI.delay(2)
 		SubmissionRequest.clickHome()
 		SubmissionRequest.clickAccountDropdown()
 		WebUIUtils.clickTab('CRDC/AILocators/Global/Header/Desktop/UserProfile-Link')
-		WebUIUtils.clickTab('CRDC/AILocators/AccessRequest/RequestAccess-Btn')
-		Utils.waitForElementToAppear('CRDC/AILocators/AccessRequest/Dialog', 10)
+		openAccessRequestDialog()
 
 		// Enter institution
 		WebUIUtils.clickTab('CRDC/AILocators/AccessRequest/Institution-TxtBx')
@@ -928,6 +935,141 @@ class Pbac extends TestRunner {
 			KeywordUtil.markFailedAndStop("Request Access dialog did not close after Submit")
 		}
 		return [id: additionalInfo, name: additionalInfo]
+	}
+
+	/**
+	 * CRDCDH-2175: Request Access dialog on User Profile — Studies (multi, required, abbr - name),
+	 * no Organization field, Institution (required, type-in if missing, list sorted), required helpers
+	 * on empty Submit. Tooltip on the Request Access button. Caller must already be on Profile.
+	 * Cancels the dialog; never submits. Does not assert Studies list sort (display text is not studyName).
+	 */
+	@Keyword
+	public static void verifyRequestAccessFields() {
+		String tooltip = 'Request role change, study access, or institution update.'
+		WebUIUtils.verifyTooltipOnHover('CRDC/AILocators/AccessRequest/RequestAccess-Btn', tooltip, 'Request role change')
+
+		openAccessRequestDialog()
+		try {
+			boolean studiesPresent = WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/AccessRequest/Studies-Ddn'), 10, FailureHandling.OPTIONAL)
+			ValidationReport.addValidationReportItem('CRDCDH-2175 Request Access', 'Studies present', 'displayed', studiesPresent ? 'displayed' : 'not present', studiesPresent ? 'Pass' : 'Fail')
+			if (!studiesPresent) {
+				KeywordUtil.markFailed("Studies present: expected 'displayed' but was 'not present'")
+			}
+
+			boolean studiesAsterisk = WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/AccessRequest/Studies-Asterisk'), 10, FailureHandling.OPTIONAL)
+			ValidationReport.addValidationReportItem('CRDCDH-2175 Request Access', 'Studies required asterisk', 'asterisk visible', studiesAsterisk ? 'asterisk visible' : 'asterisk not visible', studiesAsterisk ? 'Pass' : 'Fail')
+			if (!studiesAsterisk) {
+				KeywordUtil.markFailed("Studies required asterisk: expected 'asterisk visible' but was 'asterisk not visible'")
+			}
+
+			boolean instPresent = WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/AccessRequest/Institution-TxtBx'), 10, FailureHandling.OPTIONAL)
+			ValidationReport.addValidationReportItem('CRDCDH-2175 Request Access', 'Institution present', 'displayed', instPresent ? 'displayed' : 'not present', instPresent ? 'Pass' : 'Fail')
+			if (!instPresent) {
+				KeywordUtil.markFailed("Institution present: expected 'displayed' but was 'not present'")
+			}
+
+			boolean instAsterisk = WebUI.waitForElementVisible(findTestObject('CRDC/AILocators/AccessRequest/Institution-Asterisk'), 10, FailureHandling.OPTIONAL)
+			ValidationReport.addValidationReportItem('CRDCDH-2175 Request Access', 'Institution required asterisk', 'asterisk visible', instAsterisk ? 'asterisk visible' : 'asterisk not visible', instAsterisk ? 'Pass' : 'Fail')
+			if (!instAsterisk) {
+				KeywordUtil.markFailed("Institution required asterisk: expected 'asterisk visible' but was 'asterisk not visible'")
+			}
+
+			boolean orgPresent = WebUIUtils.fastElementPresent('CRDC/AILocators/AccessRequest/Organization-Fld', 3)
+			ValidationReport.addValidationReportItem('CRDCDH-2175 Request Access', 'Organization field removed', 'not present', orgPresent ? 'displayed' : 'not present', orgPresent ? 'Fail' : 'Pass')
+			if (orgPresent) {
+				KeywordUtil.markFailed("Organization field removed: expected 'not present' but was 'displayed'")
+			}
+
+			// Empty Submit while defaults are still blank. Autocomplete Cmd+A+Backspace after type-in does not always update RHF.
+			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/AccessRequest/Submit-Btn'), 10, FailureHandling.STOP_ON_FAILURE)
+			WebUI.click(findTestObject('CRDC/AILocators/AccessRequest/Submit-Btn'))
+			WebUI.delay(1)
+
+			String instError = (WebUI.getText(findTestObject('CRDC/AILocators/AccessRequest/Institution-Error')) ?: '').trim()
+			boolean instRequired = instError == 'This field is required'
+			ValidationReport.addValidationReportItem('CRDCDH-2175 Request Access', 'Institution required helper', 'This field is required', instError ?: '(empty)', instRequired ? 'Pass' : 'Fail')
+			if (!instRequired) {
+				KeywordUtil.markFailed("Institution required helper: expected 'This field is required' but was '${instError ?: '(empty)'}'")
+			}
+
+			String studiesError = (WebUI.getText(findTestObject('CRDC/AILocators/AccessRequest/Studies-Error')) ?: '').trim()
+			boolean studiesRequired = studiesError == 'This field is required'
+			ValidationReport.addValidationReportItem('CRDCDH-2175 Request Access', 'Studies required helper', 'This field is required', studiesError ?: '(empty)', studiesRequired ? 'Pass' : 'Fail')
+			if (!studiesRequired) {
+				KeywordUtil.markFailed("Studies required helper: expected 'This field is required' but was '${studiesError ?: '(empty)'}'")
+			}
+
+			boolean dialogStillOpen = WebUIUtils.fastElementPresent('CRDC/AILocators/AccessRequest/Dialog', 3)
+			ValidationReport.addValidationReportItem('CRDCDH-2175 Request Access', 'Dialog still open after empty Submit', 'displayed', dialogStillOpen ? 'displayed' : 'not present', dialogStillOpen ? 'Pass' : 'Fail')
+			if (!dialogStillOpen) {
+				KeywordUtil.markFailed("Dialog still open after empty Submit: expected 'displayed' but was 'not present'")
+			}
+
+			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/AccessRequest/Studies-Ddn'), 10, FailureHandling.STOP_ON_FAILURE)
+			WebUI.click(findTestObject('CRDC/AILocators/AccessRequest/Studies-Ddn'))
+			Utils.waitForElementToAppear('CRDC/AILocators/AccessRequest/Studies-Ddn-Option', 10)
+			List<WebElement> studyEls = WebUI.findWebElements(findTestObject('CRDC/AILocators/AccessRequest/Studies-Ddn-Option'), 10)
+			List<String> studyNames = studyEls.collect { it.getText()?.replaceAll(/\s+/, ' ')?.trim() }.findAll { it }
+			boolean studyMulti = studyNames.size() >= 2
+			ValidationReport.addValidationReportItem('CRDCDH-2175 Request Access', 'Studies multi-select options', 'at least 2 options', "${studyNames.size()} options", studyMulti ? 'Pass' : 'Fail')
+			if (!studyMulti) {
+				KeywordUtil.markFailed("Studies multi-select options: expected 'at least 2 options' but was '${studyNames.size()} options'")
+			}
+
+			boolean studyFormatOk = studyNames.every { String n ->
+				if (n.contains(' - ')) {
+					String[] parts = n.split(' - ', 2)
+					return parts.length == 2 && parts[0] && parts[1]
+				}
+				return true
+			}
+			ValidationReport.addValidationReportItem('CRDCDH-2175 Request Access', 'Studies option format', 'Abbr - Full Name or name only', studyFormatOk ? 'ok' : "bad labels: ${studyNames}", studyFormatOk ? 'Pass' : 'Fail')
+			if (!studyFormatOk) {
+				KeywordUtil.markFailed("Studies option format: expected 'Abbr - Full Name or name only' but was 'bad labels: ${studyNames}'")
+			}
+
+			WebUIUtils.clickTab('CRDC/AILocators/AccessRequest/Studies-Menu-Backdrop')
+			Utils.waitForElementToDisappear('CRDC/AILocators/AccessRequest/Studies-Ddn-Option', 10)
+
+			WebUI.waitForElementClickable(findTestObject('CRDC/AILocators/AccessRequest/Institution-TxtBx'), 10, FailureHandling.STOP_ON_FAILURE)
+			WebUI.click(findTestObject('CRDC/AILocators/AccessRequest/Institution-TxtBx'))
+			if (!WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/AccessRequest/Institution-Ddn-Option'), 5, FailureHandling.OPTIONAL)) {
+				WebUI.sendKeys(findTestObject('CRDC/AILocators/AccessRequest/Institution-TxtBx'), Keys.chord(Keys.ARROW_DOWN))
+			}
+			Utils.waitForElementToAppear('CRDC/AILocators/AccessRequest/Institution-Ddn-Option', 10)
+			List<WebElement> instEls = WebUI.findWebElements(findTestObject('CRDC/AILocators/AccessRequest/Institution-Ddn-Option'), 10)
+			List<String> instNames = instEls.collect { it.getText()?.replaceAll(/\s+/, ' ')?.trim() }.findAll { it }
+			boolean instListed = instNames.size() >= 2
+			ValidationReport.addValidationReportItem('CRDCDH-2175 Request Access', 'Institution options', 'at least 2 options', "${instNames.size()} options", instListed ? 'Pass' : 'Fail')
+			if (!instListed) {
+				KeywordUtil.markFailed("Institution options: expected 'at least 2 options' but was '${instNames.size()} options'")
+			}
+			List<String> instLower = instNames.collect { it.toLowerCase() }
+			boolean instSorted = instLower == instLower.sort(false)
+			ValidationReport.addValidationReportItem('CRDCDH-2175 Request Access', 'Institution sorted', 'ascending', instSorted ? 'ascending' : "order: ${instNames}", instSorted ? 'Pass' : 'Fail')
+			if (!instSorted) {
+				KeywordUtil.markFailed("Institution sorted: expected 'ascending' but was 'order: ${instNames}'")
+			}
+
+			String fakeInstitution = 'CRDCDH2175-no-inst-' + System.currentTimeMillis()
+			WebUI.sendKeys(findTestObject('CRDC/AILocators/AccessRequest/Institution-TxtBx'), fakeInstitution)
+			WebUI.delay(1)
+			String typedValue = (WebUI.getAttribute(findTestObject('CRDC/AILocators/AccessRequest/Institution-TxtBx'), 'value') ?: '').trim()
+			boolean typeInOk = typedValue == fakeInstitution
+			ValidationReport.addValidationReportItem('CRDCDH-2175 Request Access', 'Institution type-in when not in list', fakeInstitution, typedValue, typeInOk ? 'Pass' : 'Fail')
+			if (!typeInOk) {
+				KeywordUtil.markFailed("Institution type-in when not in list: expected '${fakeInstitution}' but was '${typedValue}'")
+			}
+		} finally {
+			if (WebUI.waitForElementPresent(findTestObject('CRDC/AILocators/AccessRequest/Cancel-Btn'), 5, FailureHandling.OPTIONAL)) {
+				WebUIUtils.clickTab('CRDC/AILocators/AccessRequest/Cancel-Btn')
+				try {
+					Utils.waitForElementToDisappear('CRDC/AILocators/AccessRequest/Dialog', 10)
+				} catch (AssertionError e) {
+					KeywordUtil.logInfo("Request Access Cancel: dialog still present. ${e.message}")
+				}
+			}
+		}
 	}
 
 	/**
