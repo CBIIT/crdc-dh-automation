@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Institution-Asterisk</name>
+   <tag></tag>
+   <elementGuidId>c2175ast-0a01-4b02-2175-inst1tast3r1</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id=&apos;institution-input-label&apos;]//span[normalize-space()=&apos;*&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@id=&apos;institution-input-label&apos;]//span[normalize-space()=&apos;*&apos;]</value>
+      <webElementGuid>c2175ast-0a01-4b02-2175-inst1tast3r2</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

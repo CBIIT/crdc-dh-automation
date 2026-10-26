@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>Institution-Error</name>
+   <tag></tag>
+   <elementGuidId>c2175err-0a01-4b02-2175-inst1t3rror1</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@data-testid=&apos;access-request-dialog-error-institution&apos;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//*[@data-testid=&apos;access-request-dialog-error-institution&apos;]</value>
+      <webElementGuid>c2175err-0a01-4b02-2175-inst1t3rror2</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>CRDCDH-2554: GC metadata-only — file node sample.sample_id accepts pipe-delimited parent lists (spaces optional). Data View shows the list; Validation Results has no Error rows. Does not submit. Duplicate-row backward compat and release-package templates are out of scope.</description>
+   <name>TC01_CRDCDH-2554-ParentNodesAsLists</name>
+   <tag></tag>
+   <comment>1 Submitter: Data Submissions. 2 Create metadata-only GC DS on autoQA - AutomationQA_Study. 3 Upload CRDCDH-2554 TSVs (file rows with sample.sample_id pipe lists). 4 Data View matches upload including pipe parent cells. 5 Validate. 6 Validation Results Expanded: 0 Error rows (verifyNoValidationErrors). Never Submit.</comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>25540a01-2554-4a13-9c02-0d021754tc01</testCaseGuid>
+</TestCaseEntity>
