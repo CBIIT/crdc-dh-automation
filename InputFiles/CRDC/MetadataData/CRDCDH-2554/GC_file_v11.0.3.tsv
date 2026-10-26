@@ -1,0 +1,3 @@
+type	file_name	file_type	file_description	file_size	md5sum	experimental_strategy_and_data_subtypes	submission_version	checksum_value	checksum_algorithm	file_mapping_level	release_datetime	is_supplementary_file	file_id	study.study_id	participant.study_participant_id	sample.sample_id
+file	CRDCDH2554_b.txt	SVS	parent list with spaces	21	c2554b22222222222222222222222222	Pathology	TEST2	hello2	say2	Sample	test2	false	dg.4DFC/c2554a02-2554-4aa1-8aa1-000000000002	phs769076	auto_sp_2	auto_CDS2011_DNA | auto_CDS2009_DNA
+file	CRDCDH2554_a.xlsx	R File Format	parent list no spaces	8442	c2554a11111111111111111111111111	DNA Sequencing	TEST1	hello1	say1	Sample	test1	true	dg.4DFC/c2554a01-2554-4aa1-8aa1-000000000001	phs769076	auto_sp_1	auto_CDS2016_DNA | auto_CDS2014_DNA

@@ -3,7 +3,7 @@
    <description>CRDCDH-502: Admin Edit User — Data Commons is present, enabled, required (asterisk), and multi-select only when the role is Data Commons Personnel. Hidden for other roles. Cancels without Save so pbac.*-automation users stay unchanged. Does not cover DCP DS-activity email (CRDCDH-1810).</description>
    <name>TC01_CRDCDH-502-AssignDataCommonsPersonnel</name>
    <tag></tag>
-   <comment>1 Admin: Manage Users. 2 Edit pbac.Dcp-automation: Data Commons present, visible, enabled, required asterisk, at least 2 list options; Escape to close list; Cancel (never Save). 3 Edit pbac.Submitter-automation: Role User / Submitter / Federal Lead / Admin → Data Commons hidden; Role Data Commons Personnel → field appears; Cancel (never Save). Does not cover DCP DS-activity email (CRDCDH-1810).</comment>
+   <comment></comment>
    <recordOption>OTHER</recordOption>
    <testCaseGuid>5a02c0d1-5020-4a11-9c02-0d0502c0d001</testCaseGuid>
 </TestCaseEntity>
