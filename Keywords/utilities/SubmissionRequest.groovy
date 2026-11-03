@@ -126,10 +126,10 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 			actual = WebUI.getText(pubDateField)?.trim()
 		}
 		KeywordUtil.logInfo(
-			"Planned publication Expected Publication Date — intended: ${SR_QUESTIONNAIRE_FUTURE_DATE}, field value: '${actual}'")
+				"Planned publication Expected Publication Date — intended: ${SR_QUESTIONNAIRE_FUTURE_DATE}, field value: '${actual}'")
 		if (actual != SR_QUESTIONNAIRE_FUTURE_DATE) {
 			KeywordUtil.markFailed(
-				"Planned publication Expected Publication Date is '${actual}'; expected '${SR_QUESTIONNAIRE_FUTURE_DATE}'")
+					"Planned publication Expected Publication Date is '${actual}'; expected '${SR_QUESTIONNAIRE_FUTURE_DATE}'")
 		}
 	}
 
@@ -1632,9 +1632,9 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	public static void verifyReopenSubmissionRequestDialog(String studyAbbreviation = null, String programAbbreviation = null) {
 		String studyTitle = (lastEnteredStudyTitle ?: '').trim()
 		String studyAbbr = (studyAbbreviation != null && !studyAbbreviation.trim().isEmpty())
-			? studyAbbreviation.trim() : (lastEnteredStudyAbbreviation ?: '')
+				? studyAbbreviation.trim() : (lastEnteredStudyAbbreviation ?: '')
 		String programName = (programAbbreviation != null && !programAbbreviation.trim().isEmpty())
-			? programAbbreviation.trim() : (lastEnteredProgramName ?: '')
+				? programAbbreviation.trim() : (lastEnteredProgramName ?: '')
 		boolean ok = true
 		String headerText = WebUI.getText(findTestObject('CRDC/AILocators/DeleteDialog/Header-Lbl')).trim()
 		if (!headerText.contains('Reopen Submission Request')) {
@@ -1941,7 +1941,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	public static final String SR_SAVE_DISABLED_TOOLTIP = 'No changes have been made. Please make edits to the form then click save.'
 	/** CRDCDH-3948: Substring passed to verifyTooltipOnHover for the Save disabled tooltip. */
 	public static final String SR_SAVE_DISABLED_TOOLTIP_SUBSTRING = 'No changes have been made'
-	/** CRDCDH-3948 / QA: Import when re-imported Excel matches current form (e.g. TC01 New). */
+	/** CRDCDH-3948 req 3: unchanged re-import (TC01 New; TC03 In Revision; TC04 Reopened export round-trip). */
 	public static final String SR_IMPORT_NO_CHANGES_MESSAGE = 'No changes were applied. The imported file matches the current form.'
 	/** ImportApplicationButton: parsed Excel has incomplete sections (TC02 uses InputFiles fixture with invalid/incomplete rows). */
 	public static final String SR_IMPORT_VALIDATION_ERRORS_MESSAGE = 'Your data has been imported, but some pages contain validation errors. Please review each page and resolve before submitting.'
@@ -1949,7 +1949,7 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	public static final String SR_IMPORT_VALIDATION_ERRORS_FIXTURE = 'InputFiles/CRDC/SubmissionRequest/CRDCDH-3948/CRDCDH-3948_TC02_import-with-validation-errors.xlsx'
 	/** ImportApplicationButton / ImportDialog when parse or save fails (not used for TC02 happy validation-errors path). */
 	public static final String SR_IMPORT_FAILED_MESSAGE = 'Import failed. Your data could not be imported. Please check the file format and template, then try again.'
-	/** ImportApplicationButton: all parsed sections Completed after successful import (e.g. TC03/TC04 full form). */
+	/** Legacy ImportApplicationButton success when all sections Completed (pre–3948 no-op import; not used by 3948 TCs). */
 	public static final String SR_IMPORT_ALL_PASSED_VALIDATION_MESSAGE = 'Your data has been imported and all passed validation. You may proceed to Review & Submit.'
 
 	private static final String SR_SAVE_TOOLTIP_TRIGGER = 'CRDC/AILocators/SubmissionRequests/Form/Navigation/Save-Btn-TooltipTrigger'

@@ -34,11 +34,11 @@ CustomKeywords.'utilities.WebUIUtils.waitUntilStableForButtonEnabledOrDisabled'(
 CustomKeywords.'utilities.WebUIUtils.verifyButtonEnabled'('CRDC/AILocators/SubmissionRequests/Form/Navigation/Save-Btn', false)
 CustomKeywords.'utilities.SubmissionRequest.verifySubmissionRequestSaveDisabledTooltip'()
 
-// Step 4: Export and re-import unchanged Excel — verify all-passed validation snackbar; Save still disabled.
+// Step 4: Export and re-import unchanged Excel — verify no-change snackbar (3948 req 3); Save still disabled.
 String exportedExcel = CustomKeywords.'utilities.SubmissionRequest.exportSubmissionRequestFormExcel'(60)
 CustomKeywords.'utilities.SubmissionRequest.importSubmissionRequestExcel'(exportedExcel)
 CustomKeywords.'utilities.SubmissionRequest.verifySubmissionRequestSnackbarError'(
-	SubmissionRequest.SR_IMPORT_ALL_PASSED_VALIDATION_MESSAGE, 20, false, 'CRDCDH-3948', 'success')
+	SubmissionRequest.SR_IMPORT_NO_CHANGES_MESSAGE, 20, false, 'CRDCDH-3948', 'info')
 CustomKeywords.'utilities.WebUIUtils.waitUntilStableForButtonEnabledOrDisabled'('CRDC/AILocators/SubmissionRequests/Form/Navigation/Save-Btn', 'disabled', 15)
 CustomKeywords.'utilities.WebUIUtils.verifyButtonEnabled'('CRDC/AILocators/SubmissionRequests/Form/Navigation/Save-Btn', false)
 
