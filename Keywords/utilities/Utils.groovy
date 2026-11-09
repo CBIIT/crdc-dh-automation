@@ -78,7 +78,7 @@ public class Utils {
 
 		if (filePath !=null) {
 			KeywordUtil.markPassed("This is query file path: "+filePath.toString())
-			GlobalVariable.InputExcel=filePath.toString();
+			GlobalVariable.InputExcel = filePath.toString();
 		}else{
 			KeywordUtil.markFailed("Query file is not found. Check getQueryFilePath function")
 		}
@@ -147,21 +147,19 @@ public class Utils {
 	}
 
 
-
 	/**
-	 * This function returns the Python executable path based on the JENKINS_HOME environment variable.
-	 * @return String - Path to the Python executable
+	 * Returns the Python executable path based on the operating system.
+	 * @return Path to the Python executable
 	 */
 	public static String getPythonExecutablePath() {
-
-		String jenkinsHome = System.getenv("JENKINS_HOME");
+		String osName = System.getProperty("os.name", "");
 		String pyExecutablePath;
 
-		if (jenkinsHome != null) {
-			KeywordUtil.logInfo("Detected Jenkins environment. Using system Python executable...");
+		if (osName.toLowerCase(java.util.Locale.ROOT).contains("linux")) {
+			KeywordUtil.logInfo("Detected Linux. Using system Python executable...");
 			pyExecutablePath = "python3";
 		} else {
-			KeywordUtil.logInfo("Running locally. Using local Python executable path...");
+			KeywordUtil.logInfo("Detected " + osName + ". Using local Python executable...");
 			//pyExecutablePath = "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3";
 			//pyExecutablePath = "C:/Users/kallakuriv2/AppData/Local/Programs/Python/Python312/python.exe";
 			pyExecutablePath = "/Users/leungvw/vincent_testEnv/bin/python3";
@@ -171,15 +169,6 @@ public class Utils {
 		return pyExecutablePath;
 	}
 
-
-	/**
-	 * Returns true if the run is in a Jenkins environment (JENKINS_HOME set), false otherwise.
-	 * Use for environment-specific behavior such as baseline image selection.
-	 * @return boolean - true when running under Jenkins, false when running locally
-	 */
-	public static boolean isJenkinsRun() {
-		return System.getenv("JENKINS_HOME") != null;
-	}
 
 
 	/**
@@ -242,8 +231,8 @@ public class Utils {
 			XSSFWorkbook workbook = null;
 			XSSFSheet sheet;
 
-			if( file1.exists()){
-				System.out.println( "File exists, creating a new worksheet in the same file.")
+			if(file1.exists()){
+				System.out.println("File exists, creating a new worksheet in the same file.")
 				FileInputStream fileinp = new FileInputStream(excelPath);
 				workbook = new XSSFWorkbook(fileinp);
 				sheet = workbook.createSheet(webSheetName);
@@ -252,22 +241,22 @@ public class Utils {
 			else{
 				fos = new FileOutputStream(new File(excelPath));
 				System.out.println("File does not exist, creating a new file.")
-				workbook = new XSSFWorkbook();           // Create Workbook instance holding .xls file
+				workbook = new XSSFWorkbook(); // Create Workbook instance holding .xls file
 				sheet = workbook.createSheet(webSheetName);
 			}
 
 			List<String> writeData = new ArrayList<String>();
 			writeData = GlobalVariable.G_CaseData
-			for( int i = 0; i < writeData.size(); i++ ){
+			for(int i = 0; i <writeData.size(); i++){
 				Row row = sheet.createRow(i);
 				int cellNo = 0
 				ArrayList<String> cellData = writeData.get(i).split("\\|\\|");
-				for( String cellD: cellData ){
+				for(String cellD: cellData){
 					Cell cell = row.createCell(cellNo++);
 					cell.setCellValue(cellD);
 				}
 			}//for loop of in
-			workbook.write(fos);  //Write workbook into the excel
+			workbook.write(fos); //Write workbook into the excel
 			fos.close(); //Close the workbook
 			System.out.println("Web Data has been written to excel successfully");
 			workbook.close();
@@ -323,18 +312,18 @@ public class Utils {
 
 		System.out.println("============== Verification of the data ==============")
 
-		int l2row=0;
+		int l2row = 0;
 
-		while( l2row < l2.size() ){
+		while(l2row <l2.size()){
 
-			for( int l1row = 0; l1row < l1.size(); l1row++ ){
+			for(int l1row = 0; l1row <l1.size(); l1row++){
 
 				List<String> l1rowList = l1.get(l1row)
 				List<String> l2rowList = l2.get(l2row)
 				boolean l1NullFlag = false, l2NullFlag = false
 
-				int l1rowCount =l1row+2;
-				int l2rowCount =l2row+2;
+				int l1rowCount = l1row+2;
+				int l2rowCount = l2row+2;
 
 				System.out.println("UI  Data Entire Row:  " + l1rowList)
 				System.out.println("TSV Data Entire Row:  " + l2rowList)
@@ -345,10 +334,10 @@ public class Utils {
 					System.err.println("UI  Data Row: " + l1rowCount + " has " + l1rowList.size() + " columns.");
 					System.err.println("TSV Data Row: " + l2rowCount + " has " + l2rowList.size() + " columns.");
 					KeywordUtil.markFailed("*********** COLUMN COUNT MISMATCH *************");
-					return;  // Exit the function since the column counts do not match
+					return; // Exit the function since the column counts do not match
 				}
 
-				for(int col = 0; col < l2rowList.size(); col++ ){
+				for(int col = 0; col <l2rowList.size(); col++){
 
 					String l1Col = l1rowList.get(col);
 					String l2Col = l2rowList.get(col);
@@ -358,13 +347,13 @@ public class Utils {
 
 					//Check for empty cell in UI excel
 					if(l1Col == null || l1Value.trim().isEmpty()){
-						System.out.println("There is an empty cell in UI Data Row: " + l1rowCount + " Col: " + col );
+						System.out.println("There is an empty cell in UI Data Row: " + l1rowCount + " Col: " + col);
 						l1NullFlag = true
 					}
 
 					//Check for empty cell in DB excel
 					if(l2Col == null || l2Value.trim().isEmpty()){
-						System.out.println("There is an empty cellin TSV Data Row: " + l2rowCount + " Col: " + col );
+						System.out.println("There is an empty cellin TSV Data Row: " + l2rowCount + " Col: " + col);
 						l2NullFlag = true
 					}
 
@@ -401,7 +390,7 @@ public class Utils {
 					//						KeywordUtil.markFailed("*********** DATA MISMATCH in compareTwoLists *************");
 
 					String l1ValueClean = stripCpiBadge(l1Value)
-					String uiNorm  = normalizeSemicolonList(l1ValueClean)
+					String uiNorm = normalizeSemicolonList(l1ValueClean)
 					String tsvNorm = normalizeSemicolonList(l2Value)
 
 					// And tweak the equality check to allow exact match after cleaning:
@@ -545,7 +534,7 @@ public class Utils {
 
 		KeywordUtil.logInfo("Polling for disappearance of: " + xpath);
 
-		while ((System.currentTimeMillis() - start) / 1000 < timeoutSeconds) {
+		while ((System.currentTimeMillis() - start) / 1000 <timeoutSeconds) {
 			String script = "return document.evaluate(\"" + xpath + "\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue != null;";
 			boolean isPresent = (Boolean) js.executeScript(script);
 
@@ -581,7 +570,7 @@ public class Utils {
 
 		KeywordUtil.logInfo("Polling for non-visibility of: " + xpath);
 
-		while ((System.currentTimeMillis() - start) / 1000 < timeoutSeconds) {
+		while ((System.currentTimeMillis() - start) / 1000 <timeoutSeconds) {
 			String script = "var el = document.evaluate(arguments[0], document, null, " +
 					"XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; " +
 					"if (!el) return 'gone'; " +
@@ -703,7 +692,7 @@ public class Utils {
 
 		KeywordUtil.logInfo("Polling for appearance of: " + xpath);
 
-		while ((System.currentTimeMillis() - start) / 1000 < timeoutSeconds) {
+		while ((System.currentTimeMillis() - start) / 1000 <timeoutSeconds) {
 			String script = "return document.evaluate(\"" + xpath + "\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue != null;";
 			boolean isPresent = (Boolean) js.executeScript(script);
 
@@ -739,7 +728,7 @@ public class Utils {
 		long deadline = System.currentTimeMillis() + (long) timeoutSeconds * 1000L;
 		KeywordUtil.logInfo("waitForFileInProjectDownloads: expecting " + target.getAbsolutePath());
 
-		while (System.currentTimeMillis() < deadline) {
+		while (System.currentTimeMillis() <deadline) {
 			if (partial.exists()) {
 				Thread.sleep(400);
 				continue;
@@ -778,7 +767,7 @@ public class Utils {
 		}
 		long deadline = System.currentTimeMillis() + (long) timeoutSeconds * 1000L;
 		KeywordUtil.logInfo("waitForFileInProjectDownloadsByPrefix: prefix='" + fileNamePrefix + "' suffix='" + fileNameSuffix + "' in " + dir.getAbsolutePath());
-		while (System.currentTimeMillis() < deadline) {
+		while (System.currentTimeMillis() <deadline) {
 			File[] entries = dir.listFiles();
 			if (entries != null) {
 				for (File f : entries) {
@@ -856,10 +845,10 @@ public class Utils {
 		}
 		StringBuilder cur = new StringBuilder()
 		boolean inQuotes = false
-		for (int i = 0; i < text.length(); i++) {
+		for (int i = 0; i <text.length(); i++) {
 			char c = text.charAt(i)
 			if (c == '"') {
-				if (inQuotes && i + 1 < text.length() && text.charAt(i + 1) == '"') {
+				if (inQuotes && i + 1 <text.length() && text.charAt(i + 1) == '"') {
 					cur.append('"')
 					i++
 				} else {
@@ -867,7 +856,7 @@ public class Utils {
 					cur.append(c)
 				}
 			} else if (!inQuotes && (c == '\n' || c == '\r')) {
-				if (c == '\r' && i + 1 < text.length() && text.charAt(i + 1) == '\n') {
+				if (c == '\r' && i + 1 <text.length() && text.charAt(i + 1) == '\n') {
 					i++
 				}
 				String rec = cur.toString().trim()
@@ -896,10 +885,10 @@ public class Utils {
 		}
 		StringBuilder cur = new StringBuilder()
 		boolean inQuotes = false
-		for (int i = 0; i < record.length(); i++) {
+		for (int i = 0; i <record.length(); i++) {
 			char c = record.charAt(i)
 			if (c == '"') {
-				if (inQuotes && i + 1 < record.length() && record.charAt(i + 1) == '"') {
+				if (inQuotes && i + 1 <record.length() && record.charAt(i + 1) == '"') {
 					cur.append('"')
 					i++
 				} else {
