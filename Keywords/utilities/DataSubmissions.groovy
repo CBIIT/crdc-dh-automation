@@ -38,6 +38,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
+import java.time.Duration
 import com.kms.katalon.core.testobject.TestObject
 
 /**
@@ -2085,7 +2086,7 @@ class DataSubmissions extends TestRunner {
 		String normalizedTarget = study.replaceAll(/\s+/, ' ').trim()
 		String studyOptionXpath = "//div[contains(@class,'MuiMenu-paper')]//li[contains(@data-testid,'study-option')]"
 
-		WebDriverWait menuWait = new WebDriverWait(driver, 10)
+		WebDriverWait menuWait = new WebDriverWait(driver, Duration.ofSeconds(10))
 		menuWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(studyOptionXpath)))
 
 		List<WebElement> studyDropdownOptions = driver.findElements(By.xpath(studyOptionXpath))
