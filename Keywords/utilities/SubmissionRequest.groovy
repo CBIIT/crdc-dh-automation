@@ -118,8 +118,9 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	private static void enterSectionBPlannedPublicationExpectedDate(String objPath) {
 		TestObject pubDateField = findTestObject(objPath + 'ExpectedPubDate-Clndr')
 		WebUI.waitForElementPresent(pubDateField, 10)
-		WebUI.click(pubDateField)
-		WebUI.setText(pubDateField, clearText() + SR_QUESTIONNAIRE_FUTURE_DATE)
+		WebUI.clearText(pubDateField)
+		WebUI.setText(pubDateField, SR_QUESTIONNAIRE_FUTURE_DATE)
+		new Actions(DriverFactory.getWebDriver()).sendKeys(Keys.ESCAPE).perform()
 		String actual = WebUI.getAttribute(pubDateField, 'value')?.trim()
 		if (!actual) {
 			actual = WebUI.getText(pubDateField)?.trim()
