@@ -836,6 +836,18 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 
 	/**
+	 * Waits for a MUI list option (CrdcDdValue) to be visible, then clicks it.
+	 * The option is not in the DOM until the list finishes opening.
+	 * @param optionLabel Text of the option; stored in CrdcUiElement for the CrdcDdValue xpath
+	 */
+	private static void clickCrdcDropdownValue(String optionLabel) {
+		GlobalVariable.CrdcUiElement = optionLabel
+		TestObject option = findTestObject('CRDC/SubmissionRequest/CrdcDdValue')
+		WebUI.waitForElementVisible(option, 10)
+		WebUI.click(option)
+	}
+
+	/**
 	 * This function selects File Types of the submission request form
 	 * @param  Row Number of the data to be selected/entered
 	 */
@@ -848,14 +860,11 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		WebUI.scrollToElement(findTestObject(ePath+'FileType-RowOne-Dd'), 20)
 		WebUI.click(findTestObject(ePath+'FileType-RowOne-Dd'))
 		String fileType = testData.getValue('file-type', fileTypRN)
-		GlobalVariable.CrdcUiElement = fileType;
-		Thread.sleep(500);
-		WebUI.click(findTestObject('CRDC/SubmissionRequest/CrdcDdValue'))
+		clickCrdcDropdownValue(fileType)
 
 		WebUI.click(findTestObject(ePath+'FileExtension-RowOne-Dd'))
 		String fileExten = testData.getValue('file-extension', fileExtRN);
-		GlobalVariable.CrdcUiElement = fileExten;
-		WebUI.click(findTestObject('CRDC/SubmissionRequest/CrdcDdValue'))
+		clickCrdcDropdownValue(fileExten)
 
 		WebUI.setText(findTestObject(ePath+'NumOfFiles-RowOne-Txtbx'), testData.getValue('num-of-file', numOfFileRN));
 		WebUI.setText(findTestObject(ePath+'EstimDtaSiz-RowOne-Txtbx'), testData.getValue('estimtd-data-size', dataSizeRN));
