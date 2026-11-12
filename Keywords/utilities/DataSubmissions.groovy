@@ -1037,30 +1037,23 @@ class DataSubmissions extends TestRunner {
 		return base.contains("_") ? base.substring(base.indexOf("_") + 1) : base
 	}
 
-	/** Load node -> submitted-identifier column name from Data File (Data Files/CRDC/DataSubmissions/ValidationResults-Mappings). Falls back to Excel if Data File not available. Used by DatabaseUtils.verifyRecordsInMongo. */
-	public static Map<String, String> loadValidationResultsMappings() {
+	/**
+	 * Load node -> submitted-identifier column name from DSV_ValidationResults-mappings.xlsx.
+	 * Sheet is GC, CTDC, ICDC, or PSDC. Chosen from MetadataData TSV prefixes (GC_, CTDC_, ICDC_, PSDC_)
+	 * when tcName is provided, then from tcName, then from the execution source only when it is a test case
+	 * path (not a test suite). Defaults to GC. Suite names such as CRDC_Smoke do not select the sheet.
+	 * Used by verifyValidationResultsVsExpected, verifyErrorDetailsForSubmittedIdForTC, and DatabaseUtils.verifyRecordsInMongo.
+	 * @param tcName MetadataData folder name (e.g. CRDCDH-699_TC101). Null when unknown.
+	 */
+	public static Map<String, String> loadValidationResultsMappings(String tcName = null) {
 		Map<String, String> nodeToColumn = new HashMap<>()
 		try {
-			String testCaseId = RunConfiguration.getExecutionSourceId()
-			String sheetName = "GC" // default
+			String executionSourceId = RunConfiguration.getExecutionSourceId()
+			String sheetName = resolveValidationResultsMappingSheet(tcName, executionSourceId)
 
-			if (testCaseId != null) {
-				String idUpper = testCaseId.toUpperCase()
-				if (idUpper.contains("GC")) {
-					sheetName = "GC"
-				} else if (idUpper.contains("CTDC")) {
-					sheetName = "CTDC"
-				} else if (idUpper.contains("ICDC")) {
-					sheetName = "ICDC"
-				}else if (idUpper.contains("PSDC")) {
-					sheetName = "PSDC"
-				}
-			}
+			KeywordUtil.logInfo("Loading ValidationResults-Mappings from Excel. Sheet: " + sheetName)
+			KeywordUtil.logInfo("tcName: " + tcName + " Execution source: " + executionSourceId)
 
-			KeywordUtil.logInfo("Loading ValidationResults-Mappings from Excel fallback. Sheet: " + sheetName)
-			KeywordUtil.logInfo("Test Case ID: " + testCaseId)
-
-			// Fallback to Excel if Data File not available
 			String path = RunConfiguration.getProjectDir() + "/InputFiles/CRDC/DataSubmissionValidation/DSV_ValidationResults-mappings.xlsx"
 			File f = new File(path)
 			if (f.exists()) {
@@ -1074,7 +1067,7 @@ class DataSubmissions extends TestRunner {
 							if (!nodeVal.isEmpty() && !colVal.isEmpty()) nodeToColumn.put(nodeVal, colVal)
 						}
 					}
-				}else {
+				} else {
 					KeywordUtil.markWarning("Sheet not found: " + sheetName)
 				}
 				wb.close()
@@ -1083,6 +1076,70 @@ class DataSubmissions extends TestRunner {
 			KeywordUtil.markWarning("Not able to get mapping from DSV_ValidationResults-mappings.xlsx - " + e.message)
 		}
 		return nodeToColumn
+	}
+
+	/**
+	 * Pick GC/CTDC/ICDC/PSDC from TSV file prefixes under MetadataData/tcName, then from tcName,
+	 * then from a Test Cases execution source. Ignores Test Suites ids so a mixed suite does not force GC.
+	 */
+	private static String resolveValidationResultsMappingSheet(String tcName, String executionSourceId) {
+		String fromTsv = sheetFromMetadataTsvPrefix(tcName)
+		if (fromTsv != null) return fromTsv
+		String fromTcName = sheetFromCommonsHint(tcName)
+		if (fromTcName != null) return fromTcName
+		if (executionSourceId != null && !isTestSuiteExecutionSource(executionSourceId)) {
+			String fromSource = sheetFromCommonsHint(executionSourceId)
+			if (fromSource != null) return fromSource
+		}
+		return "GC"
+	}
+
+	private static boolean isTestSuiteExecutionSource(String executionSourceId) {
+		if (executionSourceId == null) return false
+		String upper = executionSourceId.toUpperCase()
+		return upper.contains("TEST SUITES/") || upper.startsWith("TEST SUITES")
+	}
+
+	/**
+	 * Return the mapping sheet from a GC_/CTDC_/ICDC_/PSDC_ prefix on TSVs in MetadataData/tcName
+	 * (expected-ValidationResults, folder root, then Metadata).
+	 */
+	private static String sheetFromMetadataTsvPrefix(String tcName) {
+		if (tcName == null || tcName.trim().isEmpty()) return null
+		File root = new File(RunConfiguration.getProjectDir(), "InputFiles/CRDC/MetadataData/" + tcName)
+		if (!root.exists() || !root.isDirectory()) return null
+		List<File> dirs = Arrays.asList(new File(root, "expected-ValidationResults"), root, new File(root, "Metadata"))
+		for (File dir : dirs) {
+			if (!dir.exists() || !dir.isDirectory()) continue
+			File[] files = dir.listFiles({ File f -> f.isFile() && f.name.toLowerCase().endsWith(".tsv") } as FileFilter)
+			if (files == null) continue
+			for (File tsv : files) {
+				String sheet = sheetFromTsvFilenamePrefix(tsv.name)
+				if (sheet != null) return sheet
+			}
+		}
+		return null
+	}
+
+	private static String sheetFromTsvFilenamePrefix(String filename) {
+		if (filename == null) return null
+		String upper = filename.toUpperCase()
+		if (upper.startsWith("CTDC_")) return "CTDC"
+		if (upper.startsWith("ICDC_")) return "ICDC"
+		if (upper.startsWith("PSDC_")) return "PSDC"
+		if (upper.startsWith("GC_")) return "GC"
+		return null
+	}
+
+	/** CTDC/ICDC/PSDC before GC so a path like DataSubmissions/CTDC is not treated as GC. */
+	private static String sheetFromCommonsHint(String hint) {
+		if (hint == null || hint.trim().isEmpty()) return null
+		String upper = hint.toUpperCase()
+		if (upper.contains("CTDC")) return "CTDC"
+		if (upper.contains("ICDC")) return "ICDC"
+		if (upper.contains("PSDC")) return "PSDC"
+		if (upper.contains("GC")) return "GC"
+		return null
 	}
 
 	/** Find expected TSV file path for the given node in InputFiles/CRDC/MetadataData/&lt;tcName&gt;/expected-ValidationResults/ */
@@ -1365,7 +1422,7 @@ class DataSubmissions extends TestRunner {
 	@Keyword
 	void verifyValidationResultsVsExpected(String tcName, String node, String severity, String issueType) {
 		KeywordUtil.logInfo("--- Verifying Validation Results for node: " + node + ", severity: " + severity + ", issueType: " + issueType + " ---")
-		Map<String, String> mappings = loadValidationResultsMappings()
+		Map<String, String> mappings = loadValidationResultsMappings(tcName)
 		String submittedIdColumn = mappings.get(node)
 		if (submittedIdColumn == null || submittedIdColumn.isEmpty()) {
 			KeywordUtil.markFailed("verifyValidationResultsVsExpected: no mapping for node '" + node + "' in ValidationResults-Mappings")
@@ -1661,7 +1718,7 @@ class DataSubmissions extends TestRunner {
 			KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: No expected Validation Results files for TC '" + tcName + "'; skipping.")
 			return
 		}
-		Map<String, String> mappings = loadValidationResultsMappings()
+		Map<String, String> mappings = loadValidationResultsMappings(tcName)
 		for (String node : nodes) {
 			String submittedIdColumn = mappings.get(node)
 			if (submittedIdColumn == null || submittedIdColumn.isEmpty()) {
