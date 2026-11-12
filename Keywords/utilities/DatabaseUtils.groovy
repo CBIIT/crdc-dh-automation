@@ -629,7 +629,7 @@ public class DatabaseUtils {
 			KeywordUtil.markFailed("verifyRecordsInMongo: No nodes found for tcName '${tcName}'.")
 			return
 		}
-		Map<String, String> mappings = DataSubmissions.loadValidationResultsMappings()
+		Map<String, String> mappings = DataSubmissions.loadValidationResultsMappings(tcName)
 		String baseDir = RunConfiguration.getProjectDir()
 		connectFromGlobalVariable()
 		List<String> errors = new ArrayList<>()

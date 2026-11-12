@@ -836,6 +836,18 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 
 
 	/**
+	 * Waits for a MUI list option (CrdcDdValue) to be visible, then clicks it.
+	 * The option is not in the DOM until the list finishes opening.
+	 * @param optionLabel Text of the option; stored in CrdcUiElement for the CrdcDdValue xpath
+	 */
+	private static void clickCrdcDropdownValue(String optionLabel) {
+		GlobalVariable.CrdcUiElement = optionLabel
+		TestObject option = findTestObject('CRDC/SubmissionRequest/CrdcDdValue')
+		WebUI.waitForElementVisible(option, 10)
+		WebUI.click(option)
+	}
+
+	/**
 	 * This function selects File Types of the submission request form
 	 * @param  Row Number of the data to be selected/entered
 	 */
@@ -848,14 +860,11 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		WebUI.scrollToElement(findTestObject(ePath+'FileType-RowOne-Dd'), 20)
 		WebUI.click(findTestObject(ePath+'FileType-RowOne-Dd'))
 		String fileType = testData.getValue('file-type', fileTypRN)
-		GlobalVariable.CrdcUiElement = fileType;
-		Thread.sleep(500);
-		WebUI.click(findTestObject('CRDC/SubmissionRequest/CrdcDdValue'))
+		clickCrdcDropdownValue(fileType)
 
 		WebUI.click(findTestObject(ePath+'FileExtension-RowOne-Dd'))
 		String fileExten = testData.getValue('file-extension', fileExtRN);
-		GlobalVariable.CrdcUiElement = fileExten;
-		WebUI.click(findTestObject('CRDC/SubmissionRequest/CrdcDdValue'))
+		clickCrdcDropdownValue(fileExten)
 
 		WebUI.setText(findTestObject(ePath+'NumOfFiles-RowOne-Txtbx'), testData.getValue('num-of-file', numOfFileRN));
 		WebUI.setText(findTestObject(ePath+'EstimDtaSiz-RowOne-Txtbx'), testData.getValue('estimtd-data-size', dataSizeRN));
@@ -1850,6 +1859,41 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 	}
 
 	/**
+	 * Katalon 11 only: Click Save then Next with JS clicks so Enhanced Waiting does not abort on the in-flight save.
+	 * Waits until Save is enabled (form dirty), clicks Save, then waits for the save toast to appear
+	 * (save finished) rather than waiting for the toast to disappear. Falls back to Save disabled if
+	 * no toast. When waitForObjectPath is set, fails if that object is not present after Next.
+	 * Do not port this helper to Playwright. Playwright auto-waits on actionability; click Save then click Next is enough.
+	 * @param waitForObjectPath Optional Object Repository path to wait for after Next (e.g. Review PI name).
+	 */
+	@Keyword
+	public static void saveAndClickNext(String waitForObjectPath = null) {
+		String saveBtn = 'CRDC/SubmissionRequest/Save-Btn'
+		String nextBtn = 'CRDC/SubmissionRequest/Next-Btn'
+		WebUIUtils.waitUntilStableForButtonEnabledOrDisabled(saveBtn, 'enabled', 10)
+		WebUIUtils.clickTab(saveBtn)
+		boolean savedToast = WebUI.waitForElementVisible(findTestObject(NOTISTACK_SNACKBAR_LOC), 8, FailureHandling.OPTIONAL)
+		if (!savedToast) {
+			KeywordUtil.logInfo("saveAndClickNext: save snackbar did not appear; waiting for Save disabled")
+			WebUIUtils.waitUntilStableForButtonEnabledOrDisabled(saveBtn, 'disabled', 15)
+		}
+		WebUIUtils.clickTab(nextBtn)
+		if (waitForObjectPath == null || waitForObjectPath.trim().isEmpty()) {
+			return
+		}
+		TestObject nextSection = findTestObject(waitForObjectPath)
+		boolean present = WebUI.waitForElementPresent(nextSection, 10, FailureHandling.OPTIONAL)
+		if (!present) {
+			KeywordUtil.logInfo("saveAndClickNext: next section not present after first Next; clicking Next again")
+			WebUIUtils.clickTab(nextBtn)
+			present = WebUI.waitForElementPresent(nextSection, 10, FailureHandling.OPTIONAL)
+		}
+		if (!present) {
+			KeywordUtil.markFailedAndStop("saveAndClickNext: did not reach next section: " + waitForObjectPath)
+		}
+	}
+
+	/**
 	 * End-to-end completion of a Submission Request: fills required fields for Sections A through D using the
 	 * same row-driven test data files as the granular keywords ({@code section-a} … {@code section-d}),
 	 * saves and advances after each section, then submits (including the confirmation dialog).
@@ -1903,29 +1947,25 @@ class SubmissionRequest extends TestRunner implements Comparator<List<XSSFCell>>
 		KeywordUtil.logInfo('fillCompleteSubmissionRequestAllSectionsAndSubmit: Section A (PI, Primary Contact)')
 		enterPrincipalInvestigatorInfo(sectionARow)
 		enterPrimaryContactInfo(sectionARow)
-		WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
-		WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
+		saveAndClickNext()
 		verifyStatusBar('IN PROGRESS')
 
 		KeywordUtil.logInfo('fillCompleteSubmissionRequestAllSectionsAndSubmit: Section B (Program, Study, Funding)')
 		enterProgramInfo(programDd, programDataRow)
 		enterStudyInfo(studyDataRow)
 		enterFundingAgencyInfo(fundingDataRow)
-		WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
-		WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
+		saveAndClickNext('CRDC/SubmissionRequest/Section-C/OpenAccess-ChkBx')
 
 		KeywordUtil.logInfo('fillCompleteSubmissionRequestAllSectionsAndSubmit: Section C (Access, cancer, subjects)')
 		enterDataAccessTypeAndDbGapRegInfo(dataAccessType, dbGapRegistered)
 		enterCancerTypeAndSubjectsInfo(cancerType, speciesOfSubjects, sectionCDataRow)
-		WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
-		WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
+		saveAndClickNext('CRDC/SubmissionRequest/Section-D/TragetSubmDelivryDate-TxtBx')
 
 		KeywordUtil.logInfo('fillCompleteSubmissionRequestAllSectionsAndSubmit: Section D (dates, data types, files)')
 		enterTargetDeliveryAndExpectedPublicationDate()
 		selectDataTypes(firstDataType, secondDataType)
 		selectFileTypes(fileTypeRow, fileExtensionRow, numOfFilesRow, estimatedDataSizeRow)
-		WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
-		WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
+		saveAndClickNext('CRDC/SubmissionRequest/ReviewSubmit/PI_Name-Txt')
 
 		KeywordUtil.logInfo('fillCompleteSubmissionRequestAllSections: finished')
 	}
