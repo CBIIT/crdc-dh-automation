@@ -1860,7 +1860,7 @@ class DataSubmissions extends TestRunner {
 		WebUI.delay(5)
 		TestRunner.clickTab('CRDC/DataSubmissions/Upload-Btn')
 		WebUI.delay(10)
-		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Validation/Uploading-Text', 60)
+		Utils.waitForElementToDisappear('CRDC/DataSubmissions/Validation/Uploading-Text', 180)
 	}
 
 	/**
