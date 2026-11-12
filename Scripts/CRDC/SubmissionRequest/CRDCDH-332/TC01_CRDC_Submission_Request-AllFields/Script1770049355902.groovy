@@ -55,8 +55,7 @@ CustomKeywords.'utilities.SubmissionRequest.enterPrincipalInvestigatorInfo'(2)
 CustomKeywords.'utilities.SubmissionRequest.enterPrimaryContactInfo'(2)
 CustomKeywords.'utilities.SubmissionRequest.enterAdditionalContactInfo'(2)
 
-WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
-WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
+CustomKeywords.'utilities.SubmissionRequest.saveAndClickNext'()
 
 CustomKeywords.'utilities.SubmissionRequest.verifyStatusBar'('IN PROGRESS')
 
@@ -69,15 +68,13 @@ CustomKeywords.'utilities.SubmissionRequest.enterExistingAndPlannedPublicationsI
 
 CustomKeywords.'utilities.SubmissionRequest.enterRepositoryInfo'(1)
 
-WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
-WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
+CustomKeywords.'utilities.SubmissionRequest.saveAndClickNext'('CRDC/SubmissionRequest/Section-C/OpenAccess-ChkBx')
 
 CustomKeywords.'utilities.SubmissionRequest.enterDataAccessTypeAndDbGapRegInfo'('Controlled', 'Yes')
 
 CustomKeywords.'utilities.SubmissionRequest.enterCancerTypeAndSubjectsInfo'('Cholangiocarcinoma', 'Homo', 1)
 
-WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
-WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
+CustomKeywords.'utilities.SubmissionRequest.saveAndClickNext'('CRDC/SubmissionRequest/Section-D/TragetSubmDelivryDate-TxtBx')
 
 CustomKeywords.'utilities.SubmissionRequest.enterTargetDeliveryAndExpectedPublicationDate'()
 
@@ -85,8 +82,7 @@ CustomKeywords.'utilities.SubmissionRequest.selectDataTypes'('genomics', 'proteo
 
 CustomKeywords.'utilities.SubmissionRequest.selectFileTypes'(5, 6, 1, 1)
 
-WebUI.click(findTestObject('CRDC/SubmissionRequest/Save-Btn'))
-WebUI.click(findTestObject('CRDC/SubmissionRequest/Next-Btn'))
+CustomKeywords.'utilities.SubmissionRequest.saveAndClickNext'('CRDC/SubmissionRequest/ReviewSubmit/PI_Name-Txt')
 
 //Verification starts here
 CustomKeywords.'utilities.SubmissionRequest.verifyPrincipalInvestigatorInfo'(2)
