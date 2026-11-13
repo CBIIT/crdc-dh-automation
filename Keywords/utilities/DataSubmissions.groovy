@@ -1307,6 +1307,50 @@ class DataSubmissions extends TestRunner {
 	}
 
 	/**
+	 * Wait for a visible enabled option in any open MUI listbox, then click it.
+	 * Katalon 11 sets implicit wait to 0 and Selenium findElement returns leftover
+	 * hidden menus, so we must wait for a displayed li ourselves.
+	 * Playwright auto-waits for a visible option before click, so this helper
+	 * should not be ported; use getByRole option (or equivalent) instead.
+	 */
+	private void clickVisibleListboxOption(WebDriver driver, String optionText) {
+		String escaped = optionText == null ? "" : optionText.replace("'", "''")
+		String xpath = "//*[@role='listbox']//li[normalize-space()='" + escaped + "']"
+		WebElement opt = new WebDriverWait(driver, Duration.ofSeconds(10)).until { WebDriver d ->
+			List<WebElement> found = d.findElements(By.xpath(xpath))
+			return found.find { it.isDisplayed() && it.isEnabled() }
+		}
+		opt.click()
+	}
+
+	/**
+	 * Open a Validation Results filter dropdown and select an option.
+	 * Retries once if the menu did not open or the option was not visible.
+	 * This retry is a Katalon 11 / Selenium race workaround (dropdown click vs menu paint).
+	 * Playwright retries the click until the option is actionable, so do not port this loop.
+	 */
+	private void openFilterDropdownAndSelect(WebDriver driver, String dropdownObjectPath, String optionText) {
+		WebUI.waitForElementClickable(findTestObject(dropdownObjectPath), 35)
+		Exception last = null
+		for (int attempt = 1; attempt <= 2; attempt++) {
+			try {
+				WebUI.click(findTestObject(dropdownObjectPath))
+				clickVisibleListboxOption(driver, optionText)
+				return
+			} catch (Exception e) {
+				last = e
+				KeywordUtil.logInfo("openFilterDropdownAndSelect: attempt " + attempt + " failed for '" + optionText + "': " + e.getMessage())
+				try {
+					new Actions(driver).sendKeys(Keys.ESCAPE).perform()
+				} catch (Exception ignored) {
+				}
+				WebUI.delay(0.5)
+			}
+		}
+		throw last
+	}
+
+	/**
 	 * Shared Validation Results filter application used by both table verification flows.
 	 * Keeps one source of truth for node/severity/issueType interactions.
 	 */
@@ -1316,29 +1360,15 @@ class DataSubmissions extends TestRunner {
 		}
 		WebUI.delay(1)
 		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
-		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"), 35)
-		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn"))
-		WebUI.delay(1)
 		WebDriver driver = DriverFactory.getWebDriver()
-		if(node.equals("datafile")) {
-			node=node.replaceAll("datafile", "data file")
+		if (node.equals("datafile")) {
+			node = node.replaceAll("datafile", "data file")
 		}
-		WebElement nodeOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + node + "']"))
-		nodeOpt.click()
-		WebUI.delay(1)
-		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn"), 10)
-		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn"))
-		WebUI.delay(1)
-		WebElement sevOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + severity + "']"))
-		sevOpt.click()
-		WebUI.delay(1)
-		WebUI.waitForElementClickable(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn"), 10)
+		openFilterDropdownAndSelect(driver, "CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn", node)
 		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
-		WebUI.click(findTestObject("CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn"))
-		WebUI.delay(1)
-		WebElement issueOpt = driver.findElement(By.xpath("//li[normalize-space(text())='" + issueType + "']"))
-		issueOpt.click()
-		WebUI.delay(2)
+		openFilterDropdownAndSelect(driver, "CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn", severity)
+		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+		openFilterDropdownAndSelect(driver, "CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn", issueType)
 		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
 		WebUI.delay(1)
 		if (includeLogs) {
