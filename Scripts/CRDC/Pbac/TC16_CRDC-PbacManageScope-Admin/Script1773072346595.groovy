@@ -52,6 +52,8 @@ CustomKeywords.'utilities.Pbac.editPbacPermissions'('Admin', 'positive')
 //Verify admin is able to manage all studies, programs, institutions, and users as per DB
 CustomKeywords.'utilities.SubmissionRequest.clickAccountDropdown'()
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/NavBar/ManageStudies-Btn')
+// Default Status filter is Active; Mongo approvedStudies includes Inactive. Switch to All before comparing.
+CustomKeywords.'utilities.ManageStudies.applyManageStudiesFilters'([status: 'All'])
 int uiCountStudies = CustomKeywords.'utilities.WebUIUtils.getTableTotalEntryCount'()
 CustomKeywords.'utilities.DatabaseUtils.verifyTableCountMatchesMongoCollection'(uiCountStudies, "approvedStudies")
 
