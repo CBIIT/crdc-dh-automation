@@ -14,17 +14,23 @@ import internal.GlobalVariable
  *  6. waitForGetSubmissionNodesAfterDelete — poll until delete visible, then verifyAndUnpackGetSubmissionNodes
  *
  * GraphQLOperations.xlsx: getSubmissionNodes, deleteDataRecords.
+ *
+ * Prerequisites (execution profile): ApiUrl, SubmitterApiToken, ApiStudyId (CDS fixture study UUID).
  */
 
 
 // Step 1 — createSubmission (keyword fails if data.createSubmission is missing)
 String timestamp = new Date().format("yyyyMMdd_HHmmss")
 String submissionName = "auto-api_" + timestamp
+String apiStudyId = GlobalVariable.ApiStudyId?.toString()?.trim()
+if (!apiStudyId) {
+	KeywordUtil.markFailed('ApiStudyId is not set in the execution profile.')
+}
 
 KeywordUtil.logInfo("createSubmission name: ${submissionName}")
 
 Map subResp = CustomKeywords.'utilities.GraphQlApiClient.createSubmission'([
-	studyID    : 'bfe2cd9f-c703-4869-8712-f48f41880242',
+	studyID    : apiStudyId,
 	dataCommons: 'CDS',
 	name       : submissionName,
 	intention  : 'New/Update',

@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Project>
    <description></description>
-   <name>Commons_Automation</name>
+   <name>crdc-dh-automation</name>
    <tag></tag>
    <UUID>b488af2c-3901-412b-80d6-f3a5eca785be</UUID>
    <createdVersion>9.3.1</createdVersion>
    <freeLicense>false</freeLicense>
    <migratedVersion>5.9.0</migratedVersion>
    <modifiedEdition>ENTERPRISE</modifiedEdition>
-   <modifiedVersion>9.5.0</modifiedVersion>
+   <modifiedVersion>11.6.0</modifiedVersion>
    <pageLoadTimeout>0</pageLoadTimeout>
-   <projectFileLocation>/Users/sohilz2/Automation/02-02-2026/crdc-dh-automation/Commons_Automation.prj</projectFileLocation>
    <sourceContent>
       <sourceFolderList>
          <sourceFolderConfiguration>

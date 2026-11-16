@@ -17,7 +17,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions
 import java.util.ArrayList
 import java.util.List
 import java.util.Map
-import java.util.concurrent.TimeUnit
+import java.time.Duration
 
 /**
  * Submission Requests List: Keywords for navigating, filtering, and verifying the
@@ -141,7 +141,7 @@ class SubmissionRequestList extends TestRunner {
 					}
 					if (listbox != null) {
 						try {
-							driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS)
+							driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(0))
 							int maxDeselect = 20
 							while (maxDeselect-- > 0) {
 								List<WebElement> listboxCandidates = driver.findElements(By.xpath("//*[@role='listbox']"))
@@ -155,7 +155,7 @@ class SubmissionRequestList extends TestRunner {
 								((JavascriptExecutor) driver).executeScript("arguments[0].click();", toClick)
 							}
 						} finally {
-							driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS)
+							driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10))
 						}
 						int optionWaitSeconds = 5
 						List<String> statusOptionsNotFound = []
@@ -169,7 +169,7 @@ class SubmissionRequestList extends TestRunner {
 									break
 								}
 								WebElement listboxRef = listboxCandidates.get(0)
-								WebElement opt = new WebDriverWait(driver, optionWaitSeconds).until(ExpectedConditions.presenceOfNestedElementLocatedBy(listboxRef, By.xpath(".//li[normalize-space(text())='" + escaped + "']")))
+								WebElement opt = new WebDriverWait(driver, Duration.ofSeconds(optionWaitSeconds)).until(ExpectedConditions.presenceOfNestedElementLocatedBy(listboxRef, By.xpath(".//li[normalize-space(text())='" + escaped + "']")))
 								opt.click()
 								WebUI.delay(1)
 							} catch (Exception ex) {
@@ -247,12 +247,12 @@ class SubmissionRequestList extends TestRunner {
 			return result
 		}
 		try {
-			driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS)
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(0))
 			for (WebElement row : rows) {
 				result.add(rowCellTexts(row))
 			}
 		} finally {
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS)
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10))
 		}
 		return result
 	}

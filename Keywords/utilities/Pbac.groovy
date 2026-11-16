@@ -33,7 +33,7 @@ import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.ProfilesIni;
@@ -108,7 +108,7 @@ class Pbac extends TestRunner {
 	}
 
 	private static void waitForManageUsersTable(WebDriver driver) {
-		WebDriverWait wait = new WebDriverWait(driver, PBAC_MANAGE_USERS_TABLE_WAIT_SEC)
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(PBAC_MANAGE_USERS_TABLE_WAIT_SEC))
 		wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//table//tr[td]")))
 	}
 
@@ -731,7 +731,7 @@ class Pbac extends TestRunner {
 
 		//Select the Study
 		WebUI.click(findTestObject('CRDC/DataSubmissions/Create/Study-Ddn'))
-		WebDriverWait menuWait = new WebDriverWait(driver, 10)
+		WebDriverWait menuWait = new WebDriverWait(driver, Duration.ofSeconds(10))
 		menuWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(studyOptionXpath)))
 
 		List<WebElement> studyDropdownOptions = driver.findElements(By.xpath(studyOptionXpath))

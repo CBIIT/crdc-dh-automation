@@ -24,6 +24,7 @@ import internal.GlobalVariable
  * Prerequisites (execution profile):
  * - ApiUrl — GraphQL endpoint (e.g. .../api/graphql)
  * - SubmitterApiToken — JWT from Data Hub “API token” (sent as Authorization: Bearer ...)
+ * - ApiStudyId — Hub UUID of the CDS API fixture study (autoQA - AutomationQA_API_Tests)
  * - G_Urlname — Hub base URL for UI (e.g. https://…/bento) for step 7
  * - On disk: InputFiles/CRDC/API/program-stage.tsv, study-stage.tsv, participant-stage.tsv
  */
@@ -32,11 +33,15 @@ import internal.GlobalVariable
 // Step 1 - createSubmission
 String timestamp = new Date().format("yyyyMMdd_HHmmss")
 String submissionName = "auto-api_" + timestamp
+String apiStudyId = GlobalVariable.ApiStudyId?.toString()?.trim()
+if (!apiStudyId) {
+	KeywordUtil.markFailed('ApiStudyId is not set in the execution profile.')
+}
 
 KeywordUtil.logInfo("createSubmission name: ${submissionName} (length ${submissionName.length()})")
 
 Map subResp = CustomKeywords.'utilities.GraphQlApiClient.createSubmission'([
-	studyID    : 'bfe2cd9f-c703-4869-8712-f48f41880242',
+	studyID    : apiStudyId,
 	dataCommons: 'CDS',
 	name       : submissionName,
 	intention  : 'New/Update',
