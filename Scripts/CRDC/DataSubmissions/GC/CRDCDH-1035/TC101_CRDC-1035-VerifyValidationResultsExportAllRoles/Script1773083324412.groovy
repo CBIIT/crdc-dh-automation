@@ -57,6 +57,8 @@ CustomKeywords.'utilities.DataSubmissions.clickValidateButton'()
 //Verify Validation Results tab export button
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Validation/ValidationResults-Tab')
 CustomKeywords.'utilities.WebUIUtils.waitForElementClickableWithStaleRetry'(findTestObject('CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), 20)
+// The button can still be disabled right after the tab click (it re-renders while results load), so wait for enabled first.
+CustomKeywords.'utilities.WebUIUtils.waitUntilStableForButtonEnabledOrDisabled'(findTestObject('CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), 'enabled', 20)
 CustomKeywords.'utilities.WebUIUtils.verifyButtonEnabled'(findTestObject('CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), true)
 String dsName = WebUI.getText(findTestObject('CRDC/AILocators/DataSubmissions/Detail/Summary/SubmissionName-Lbl'))?.trim()
 CustomKeywords.'utilities.DataSubmissions.clickValidationResultsExportAndVerifyDownloadedFileName'(dsName)
@@ -75,6 +77,8 @@ CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Dcp')
 CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submissionId)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Validation/ValidationResults-Tab')
 CustomKeywords.'utilities.WebUIUtils.waitForElementClickableWithStaleRetry'(findTestObject('CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), 20)
+// The button can still be disabled right after the tab click (it re-renders while results load), so wait for enabled first.
+CustomKeywords.'utilities.WebUIUtils.waitUntilStableForButtonEnabledOrDisabled'(findTestObject('CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), 'enabled', 20)
 CustomKeywords.'utilities.WebUIUtils.verifyButtonEnabled'(findTestObject('CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), true)
 
 //Logout
@@ -90,6 +94,8 @@ CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Fedlead')
 CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submissionId)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Validation/ValidationResults-Tab')
 CustomKeywords.'utilities.WebUIUtils.waitForElementClickableWithStaleRetry'(findTestObject('CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), 20)
+// The button can still be disabled right after the tab click (it re-renders while results load), so wait for enabled first.
+CustomKeywords.'utilities.WebUIUtils.waitUntilStableForButtonEnabledOrDisabled'(findTestObject('CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), 'enabled', 20)
 CustomKeywords.'utilities.WebUIUtils.verifyButtonEnabled'(findTestObject('CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), true)
 
 //Logout
@@ -105,6 +111,8 @@ CustomKeywords.'utilities.SubmissionRequest.loginToCrdcOtp'('Admin')
 CustomKeywords.'utilities.WebUIUtils.navigateToSubmissionUploadActivity'(submissionId)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Validation/ValidationResults-Tab')
 CustomKeywords.'utilities.WebUIUtils.waitForElementClickableWithStaleRetry'(findTestObject('CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), 20)
+// The button can still be disabled right after the tab click (it re-renders while results load), so wait for enabled first.
+CustomKeywords.'utilities.WebUIUtils.waitUntilStableForButtonEnabledOrDisabled'(findTestObject('CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), 'enabled', 20)
 CustomKeywords.'utilities.WebUIUtils.verifyButtonEnabled'(findTestObject('CRDC/DataSubmissions/Validation/Download-Btn-ValidationResults'), true)
 
 //Generate HTML report
