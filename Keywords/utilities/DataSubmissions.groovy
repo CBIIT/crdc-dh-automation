@@ -1464,15 +1464,33 @@ class DataSubmissions extends TestRunner {
 			return
 		}
 		List<List<String>> expectedRows = loadExpectedValidationResultsTsv(tsvPath, submittedIdColumn, severity, issueType)
-		List<List<String>> actualRows = readValidationResultsTableFromUI(node, severity, issueType)
+		// The table is re-rendered after each filter change and can be empty or partial for a few seconds,
+		// so a single read can miss rows that exist. Re-read (which re-applies the filters) until every
+		// expected Submitted Identifier is present or the wait time is used up.
+		final int VALIDATION_RESULTS_MAX_WAIT_SECONDS = 45
+		final int VALIDATION_RESULTS_RETRY_DELAY_SECONDS = 5
+		long deadlineMs = System.currentTimeMillis() + VALIDATION_RESULTS_MAX_WAIT_SECONDS * 1000L
 		Map<String, List<String>> actualBySubmittedId = new LinkedHashMap<>()
-		for (List<String> row : actualRows) {
-			if (row.size() < 1 || row.get(0).isEmpty()) continue
-			String id = row.get(0).trim()
-			String actIssue = row.size() >= 2 ? row.get(1) : ""
-			if (!actualBySubmittedId.containsKey(id) || actIssue.equals(issueType)) {
-				actualBySubmittedId.put(id, row)
+		int readAttempt = 0
+		while (true) {
+			readAttempt++
+			List<List<String>> actualRows = readValidationResultsTableFromUI(node, severity, issueType)
+			actualBySubmittedId = new LinkedHashMap<>()
+			for (List<String> row : actualRows) {
+				if (row.size() < 1 || row.get(0).isEmpty()) continue
+				String id = row.get(0).trim()
+				String actIssue = row.size() >= 2 ? row.get(1) : ""
+				if (!actualBySubmittedId.containsKey(id) || actIssue.equals(issueType)) {
+					actualBySubmittedId.put(id, row)
+				}
 			}
+			List<String> missingIds = expectedRows.findAll { !actualBySubmittedId.containsKey(it.get(0)) }.collect { it.get(0) }
+			KeywordUtil.logInfo("verifyValidationResultsVsExpected: read " + readAttempt + " - UI rows=" + actualRows.size()
+					+ ", expected=" + expectedRows.size() + ", missing=" + missingIds.size())
+			if (missingIds.isEmpty() || System.currentTimeMillis() >= deadlineMs) break
+			KeywordUtil.logInfo("verifyValidationResultsVsExpected: expected row(s) not in UI yet " + missingIds + "; waiting "
+					+ VALIDATION_RESULTS_RETRY_DELAY_SECONDS + "s and re-reading")
+			WebUI.delay(VALIDATION_RESULTS_RETRY_DELAY_SECONDS)
 		}
 		List<String> errors = new ArrayList<>()
 		String sectionName = "Validation Results"
@@ -1573,7 +1591,14 @@ class DataSubmissions extends TestRunner {
 		KeywordUtil.logInfo("--- clickSeeDetailsForSubmittedId: " + submittedIdentifier + " ---")
 		String target = submittedIdentifier?.trim() ?: ""
 
+		// After filters are applied the table can still be empty while it re-renders. Wait for rows to appear.
 		List<WebElement> rows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
+		long rowsDeadlineMs = System.currentTimeMillis() + 30000L
+		while ((rows == null || rows.isEmpty()) && System.currentTimeMillis() < rowsDeadlineMs) {
+			KeywordUtil.logInfo("clickSeeDetailsForSubmittedId: no table rows yet, waiting...")
+			WebUI.delay(2)
+			rows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
+		}
 		if (rows == null || rows.isEmpty()) {
 			KeywordUtil.markFailed("clickSeeDetailsForSubmittedId: no table rows found")
 			return
