@@ -63,6 +63,8 @@ CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Submit-Btn'
 WebUI.delay(2) //race condition for Yes button
 CustomKeywords.'utilities.Utils.waitForElementToAppear'('CRDC/DataSubmissions/SubmitYes-Btn', 30)
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/SubmitYes-Btn')
+// Keep the session until Hub writes Submitted. clickTab returns after the JS click; logout/closeBrowser ~20ms later aborts a slow QA GraphQL submit (Dev can finish in time).
+CustomKeywords.'utilities.WebUIUtils.waitUntilElementTextEquals'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Submitted', 60)
 //Get Submission ID
 String submissionIdMetadataOnly = CustomKeywords.'utilities.DataSubmissions.getSubmissionIdFromUploadActivityUrl'()
 //Logout
@@ -107,6 +109,7 @@ WebUI.waitForElementClickable(findTestObject('CRDC/DataSubmissions/Submit-Btn'),
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/Submit-Btn')
 WebUI.delay(2) //race condition for Yes button
 CustomKeywords.'utilities.WebUIUtils.clickTab'('CRDC/DataSubmissions/SubmitYes-Btn')
+CustomKeywords.'utilities.WebUIUtils.waitUntilElementTextEquals'(findTestObject('CRDC/DataSubmissions/Validation/DSDashboard-Status-Lbl'), 'Submitted', 60)
 WebUI.delay(2)
 //Logout
 CustomKeywords.'utilities.SubmissionRequest.logoutFromCrdc'()
