@@ -1364,16 +1364,135 @@ class DataSubmissions extends TestRunner {
 		if (node.equals("datafile")) {
 			node = node.replaceAll("datafile", "data file")
 		}
-		openFilterDropdownAndSelect(driver, "CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn", node)
-		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
-		openFilterDropdownAndSelect(driver, "CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn", severity)
-		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
-		openFilterDropdownAndSelect(driver, "CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn", issueType)
-		Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
-		WebUI.delay(1)
+		// The table is re-rendered after each dropdown pick and the Loading-Icon is usually never seen, so a pick can
+		// be lost. After the last pick, read the three dropdowns back and select again if any differs from the request.
+		final int MAX_FILTER_ATTEMPTS = 3
+		for (int attempt = 1; attempt <= MAX_FILTER_ATTEMPTS; attempt++) {
+			openFilterDropdownAndSelect(driver, "CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn", node)
+			Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+			openFilterDropdownAndSelect(driver, "CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn", severity)
+			Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+			openFilterDropdownAndSelect(driver, "CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn", issueType)
+			Utils.waitForElementToDisappear('Object Repository/CRDC/DataSubmissions/Loading-Icon', 15)
+			WebUI.delay(1)
+			List<String> mismatches = getValidationResultsFilterMismatches(driver, node, severity, issueType)
+			if (mismatches.isEmpty()) break
+			KeywordUtil.logInfo("applyValidationResultsFilters: dropdown values differ from request after attempt " + attempt
+					+ " (" + mismatches.join("; ") + ")" + (attempt < MAX_FILTER_ATTEMPTS ? "; selecting again" : ""))
+		}
 		if (includeLogs) {
 			KeywordUtil.logInfo("applyValidationResultsFilters: completed")
 		}
+	}
+
+	/** Displayed value of a Validation Results filter dropdown (idSuffix is nodeType, severity or issueType); empty if unreadable. */
+	private String readValidationResultsFilterValue(WebDriver driver, String idSuffix) {
+		try {
+			List<WebElement> els = driver.findElements(By.xpath("//div[@id='mui-component-select-" + idSuffix + "']"))
+			return els.isEmpty() ? "" : (els.get(0).getText()?.trim() ?: "")
+		} catch (Exception e) {
+			return ""
+		}
+	}
+
+	/**
+	 * Compare the three Validation Results dropdowns with the requested values. Returns one text entry per dropdown
+	 * that shows a different value. A dropdown whose value cannot be read is not counted as a mismatch.
+	 */
+	private List<String> getValidationResultsFilterMismatches(WebDriver driver, String node, String severity, String issueType) {
+		List<String> mismatches = new ArrayList<>()
+		Map<String, String> requested = new LinkedHashMap<>()
+		requested.put("nodeType", node)
+		requested.put("severity", severity)
+		requested.put("issueType", issueType)
+		for (Map.Entry<String, String> e : requested.entrySet()) {
+			String actual = readValidationResultsFilterValue(driver, e.getKey())
+			String wanted = (e.getValue() ?: "").trim()
+			if (!actual.isEmpty() && !actual.equalsIgnoreCase(wanted)) {
+				mismatches.add(e.getKey() + " requested '" + wanted + "' but shows '" + actual + "'")
+			}
+		}
+		return mismatches
+	}
+
+	/** Compact text of the three dropdown values, for log lines. */
+	private String describeValidationResultsFilters(WebDriver driver) {
+		return "node='" + readValidationResultsFilterValue(driver, "nodeType") + "', severity='"
+				+ readValidationResultsFilterValue(driver, "severity") + "', issueType='"
+				+ readValidationResultsFilterValue(driver, "issueType") + "'"
+	}
+
+	/**
+	 * True if the filtered Validation Results table currently has a row whose Submitted Identifier equals submittedId.
+	 * Looks without the implicit wait so it returns immediately.
+	 */
+	private boolean isSubmittedIdInValidationResultsTable(String submittedId) {
+		String target = submittedId?.trim() ?: ""
+		WebDriver driver = DriverFactory.getWebDriver()
+		Duration priorImplicitWait = null
+		try {
+			priorImplicitWait = driver.manage().timeouts().getImplicitWaitTimeout()
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(0))
+			List<WebElement> rows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
+			if (rows == null || rows.isEmpty()) return false
+			List<WebElement> headerEls = Utils.getListWebElements("CRDC/DataSubmissions/Validation/Table-Headers")
+			List<String> headerNames = new ArrayList<>()
+			for (WebElement h : headerEls) headerNames.add(h.getText().trim())
+			int idxSubmitted = headerNames.findIndexOf { it.equalsIgnoreCase("Submitted Identifier") }
+			if (idxSubmitted < 0) return false
+			for (WebElement row : rows) {
+				List<WebElement> cells = row.findElements(By.tagName("td"))
+				if (idxSubmitted >= cells.size()) continue
+				String cellText = getCellText(cells, idxSubmitted, false)
+				if (cellText != null && cellText.trim().equalsIgnoreCase(target)) return true
+			}
+			return false
+		} catch (Exception e) {
+			// Stale elements while the table re-renders: treat as not there yet, the caller polls again
+			return false
+		} finally {
+			if (priorImplicitWait != null) {
+				driver.manage().timeouts().implicitlyWait(priorImplicitWait)
+			}
+		}
+	}
+
+	/**
+	 * Apply the Validation Results filters and make sure the row for submittedId is in the table. If the row is not
+	 * there after a short wait, apply all three filters again (up to 3 times in total). Stops the test with a screenshot
+	 * and the dropdown values in the log if the row never shows up.
+	 */
+	private void applyValidationResultsFiltersAndWaitForRow(String node, String severity, String issueType, String submittedId) {
+		final int MAX_ATTEMPTS = 3
+		final int WAIT_FOR_ROW_SECONDS = 10
+		WebDriver driver = DriverFactory.getWebDriver()
+		for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+			applyValidationResultsFilters(node, severity, issueType)
+			long deadlineMs = System.currentTimeMillis() + WAIT_FOR_ROW_SECONDS * 1000L
+			while (true) {
+				if (isSubmittedIdInValidationResultsTable(submittedId)) {
+					if (attempt > 1) {
+						KeywordUtil.logInfo("applyValidationResultsFiltersAndWaitForRow: row '" + submittedId + "' found on filter attempt " + attempt)
+					}
+					return
+				}
+				if (System.currentTimeMillis() >= deadlineMs) break
+				WebUI.delay(1)
+			}
+			int rowCount = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")?.size() ?: 0
+			KeywordUtil.logInfo("applyValidationResultsFiltersAndWaitForRow: row '" + submittedId + "' not in table after filter attempt "
+					+ attempt + " of " + MAX_ATTEMPTS + " (table rows=" + rowCount + ", " + describeValidationResultsFilters(driver) + ")")
+		}
+		try {
+			String ts = new java.text.SimpleDateFormat('yyyyMMdd-HHmmss').format(new Date())
+			File shotDir = new File(RunConfiguration.getProjectDir(), "OutputFiles")
+			shotDir.mkdirs()
+			WebUI.takeScreenshot(new File(shotDir, "ValidationResults_NoRow_" + submittedId.replaceAll("[^A-Za-z0-9_-]", "_") + "_" + ts + ".png").absolutePath)
+		} catch (Exception e) {
+			KeywordUtil.logInfo("applyValidationResultsFiltersAndWaitForRow: screenshot failed: " + e.getMessage())
+		}
+		KeywordUtil.markFailedAndStop("Submitted Identifier '" + submittedId + "' not found in Validation Results after " + MAX_ATTEMPTS
+				+ " filter attempts (" + node + " / " + severity + " / " + issueType + ")")
 	}
 
 	/**
@@ -1600,7 +1719,8 @@ class DataSubmissions extends TestRunner {
 			rows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
 		}
 		if (rows == null || rows.isEmpty()) {
-			KeywordUtil.markFailed("clickSeeDetailsForSubmittedId: no table rows found")
+			// Stop here: continuing would only run dialog checks that cannot pass
+			KeywordUtil.markFailedAndStop("clickSeeDetailsForSubmittedId: no table rows found")
 			return
 		}
 
@@ -1633,7 +1753,7 @@ class DataSubmissions extends TestRunner {
 		}
 
 		if (matchingRow == null) {
-			KeywordUtil.markFailed("clickSeeDetailsForSubmittedId: no row with Submitted Identifier '" + submittedIdentifier + "'")
+			KeywordUtil.markFailedAndStop("clickSeeDetailsForSubmittedId: no row with Submitted Identifier '" + submittedIdentifier + "'")
 			return
 		}
 
@@ -1795,7 +1915,7 @@ class DataSubmissions extends TestRunner {
 				String severity = row.get(1)
 				String issueType = row.get(2)
 				String message = row.get(3)
-				applyValidationResultsFilters(node, severity, issueType)
+				applyValidationResultsFiltersAndWaitForRow(node, severity, issueType, submittedId)
 				verifyErrorDetailsForSubmittedId(submittedId, [
 					[severity: severity, message: message]
 				])
