@@ -1377,7 +1377,7 @@ class DataSubmissions extends TestRunner {
 			WebUI.delay(1)
 			List<String> mismatches = getValidationResultsFilterMismatches(driver, node, severity, issueType)
 			if (mismatches.isEmpty()) break
-			KeywordUtil.logInfo("applyValidationResultsFilters: dropdown values differ from request after attempt " + attempt
+			KeywordUtil.logWarning("applyValidationResultsFilters: dropdown values differ from request after attempt " + attempt
 					+ " (" + mismatches.join("; ") + ")" + (attempt < MAX_FILTER_ATTEMPTS ? "; selecting again" : ""))
 		}
 		if (includeLogs) {
@@ -1480,7 +1480,7 @@ class DataSubmissions extends TestRunner {
 				WebUI.delay(1)
 			}
 			int rowCount = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")?.size() ?: 0
-			KeywordUtil.logInfo("applyValidationResultsFiltersAndWaitForRow: row '" + submittedId + "' not in table after filter attempt "
+			KeywordUtil.logWarning("applyValidationResultsFiltersAndWaitForRow: row '" + submittedId + "' not in table after filter attempt "
 					+ attempt + " of " + MAX_ATTEMPTS + " (table rows=" + rowCount + ", " + describeValidationResultsFilters(driver) + ")")
 		}
 		try {
@@ -1607,7 +1607,7 @@ class DataSubmissions extends TestRunner {
 			KeywordUtil.logInfo("verifyValidationResultsVsExpected: read " + readAttempt + " - UI rows=" + actualRows.size()
 					+ ", expected=" + expectedRows.size() + ", missing=" + missingIds.size())
 			if (missingIds.isEmpty() || System.currentTimeMillis() >= deadlineMs) break
-			KeywordUtil.logInfo("verifyValidationResultsVsExpected: expected row(s) not in UI yet " + missingIds + "; waiting "
+			KeywordUtil.logWarning("verifyValidationResultsVsExpected: expected row(s) not in UI yet " + missingIds + "; waiting "
 					+ VALIDATION_RESULTS_RETRY_DELAY_SECONDS + "s and re-reading")
 			WebUI.delay(VALIDATION_RESULTS_RETRY_DELAY_SECONDS)
 		}
