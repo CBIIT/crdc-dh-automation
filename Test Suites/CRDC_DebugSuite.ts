@@ -55,4 +55,18 @@
       <testCaseId>Test Cases/CRDC/DataSubmissions/CTDC/CRDCDH-699-CTDC/TC101_CRDC-699-VerifyValidationResultsLongFormErrorsCTDC</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>01ec7f29-7f68-4cc3-9ea1-eb5d4c674759</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/CTDC/CRDCDH-699-CTDC/TC101_CRDC-699-VerifyValidationResultsLongFormErrorsCTDC</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>cf035d09-6a4c-44cc-a089-d9eef61cd8ff</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CRDC/DataSubmissions/CTDC/CRDCDH-699-CTDC/TC101_CRDC-699-VerifyValidationResultsLongFormErrorsCTDC</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>
