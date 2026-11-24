@@ -1488,7 +1488,7 @@ class DataSubmissions extends TestRunner {
 			KeywordUtil.logInfo("verifyValidationResultsVsExpected: read " + readAttempt + " - UI rows=" + actualRows.size()
 					+ ", expected=" + expectedRows.size() + ", missing=" + missingIds.size())
 			if (missingIds.isEmpty() || System.currentTimeMillis() >= deadlineMs) break
-			KeywordUtil.logWarning("verifyValidationResultsVsExpected: expected row(s) not in UI yet " + missingIds + "; waiting "
+			KeywordUtil.markWarning("verifyValidationResultsVsExpected: expected row(s) not in UI yet " + missingIds + "; waiting "
 					+ VALIDATION_RESULTS_RETRY_DELAY_SECONDS + "s and re-reading")
 			WebUI.delay(VALIDATION_RESULTS_RETRY_DELAY_SECONDS)
 		}
@@ -1589,11 +1589,11 @@ class DataSubmissions extends TestRunner {
 	private void ensureValidationResultsFilterControls() {
 		final String switchLocator = "Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn"
 		if (validationResultsFilterControlsPresent(10)) return
-		KeywordUtil.logWarning("Validation Results filter dropdowns not shown after opening the Expanded view; clicking the view switch")
+		KeywordUtil.markWarning("Validation Results filter dropdowns not shown after opening the Expanded view; clicking the view switch")
 		TestRunner.clickTab(switchLocator)
 		WebUI.delay(2)
 		if (validationResultsFilterControlsPresent(10)) return
-		KeywordUtil.logWarning("Validation Results filter dropdowns still not shown; reopening the Validation Results tab and clicking the view switch")
+		KeywordUtil.markWarning("Validation Results filter dropdowns still not shown; reopening the Validation Results tab and clicking the view switch")
 		TestRunner.clickTab("CRDC/DataSubmissions/Validation/ValidationResults-Tab")
 		WebUI.delay(1)
 		TestRunner.clickTab(switchLocator)
@@ -1840,7 +1840,7 @@ class DataSubmissions extends TestRunner {
 				// If so, apply the filters once more before looking for the row.
 				List<WebElement> filteredRows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
 				if (filteredRows == null || filteredRows.isEmpty()) {
-					KeywordUtil.logWarning("verifyErrorDetailsForSubmittedIdForTC: table empty after filters (" + node + " / " + severity + " / " + issueType + "); applying filters once more")
+					KeywordUtil.markWarning("verifyErrorDetailsForSubmittedIdForTC: table empty after filters (" + node + " / " + severity + " / " + issueType + "); applying filters once more")
 					WebUI.delay(2)
 					applyValidationResultsFilters(node, severity, issueType)
 				}
