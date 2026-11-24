@@ -1464,15 +1464,33 @@ class DataSubmissions extends TestRunner {
 			return
 		}
 		List<List<String>> expectedRows = loadExpectedValidationResultsTsv(tsvPath, submittedIdColumn, severity, issueType)
-		List<List<String>> actualRows = readValidationResultsTableFromUI(node, severity, issueType)
+		// The table is re-rendered after each filter change and can be empty or partial for a few seconds,
+		// so a single read can miss rows that exist. Re-read (which re-applies the filters) until every
+		// expected Submitted Identifier is present or the wait time is used up.
+		final int VALIDATION_RESULTS_MAX_WAIT_SECONDS = 30
+		final int VALIDATION_RESULTS_RETRY_DELAY_SECONDS = 5
+		long deadlineMs = System.currentTimeMillis() + VALIDATION_RESULTS_MAX_WAIT_SECONDS * 1000L
 		Map<String, List<String>> actualBySubmittedId = new LinkedHashMap<>()
-		for (List<String> row : actualRows) {
-			if (row.size() < 1 || row.get(0).isEmpty()) continue
-			String id = row.get(0).trim()
-			String actIssue = row.size() >= 2 ? row.get(1) : ""
-			if (!actualBySubmittedId.containsKey(id) || actIssue.equals(issueType)) {
-				actualBySubmittedId.put(id, row)
+		int readAttempt = 0
+		while (true) {
+			readAttempt++
+			List<List<String>> actualRows = readValidationResultsTableFromUI(node, severity, issueType)
+			actualBySubmittedId = new LinkedHashMap<>()
+			for (List<String> row : actualRows) {
+				if (row.size() < 1 || row.get(0).isEmpty()) continue
+				String id = row.get(0).trim()
+				String actIssue = row.size() >= 2 ? row.get(1) : ""
+				if (!actualBySubmittedId.containsKey(id) || actIssue.equals(issueType)) {
+					actualBySubmittedId.put(id, row)
+				}
 			}
+			List<String> missingIds = expectedRows.findAll { !actualBySubmittedId.containsKey(it.get(0)) }.collect { it.get(0) }
+			KeywordUtil.logInfo("verifyValidationResultsVsExpected: read " + readAttempt + " - UI rows=" + actualRows.size()
+					+ ", expected=" + expectedRows.size() + ", missing=" + missingIds.size())
+			if (missingIds.isEmpty() || System.currentTimeMillis() >= deadlineMs) break
+			KeywordUtil.logWarning("verifyValidationResultsVsExpected: expected row(s) not in UI yet " + missingIds + "; waiting "
+					+ VALIDATION_RESULTS_RETRY_DELAY_SECONDS + "s and re-reading")
+			WebUI.delay(VALIDATION_RESULTS_RETRY_DELAY_SECONDS)
 		}
 		List<String> errors = new ArrayList<>()
 		String sectionName = "Validation Results"
@@ -1525,6 +1543,8 @@ class DataSubmissions extends TestRunner {
 	void verifyValidationResultsVsExpectedForTC(String tcName) {
 		TestRunner.clickTab("CRDC/DataSubmissions/Validation/ValidationResults-Tab")
 		TestRunner.clickTab("Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn")
+		WebUI.delay(2)
+		ensureValidationResultsFilterControls()
 		List<String> nodes = listNodesFromExpectedValidationResultsFolder(tcName)
 		if (nodes.isEmpty()) {
 			KeywordUtil.logInfo("verifyValidationResultsVsExpectedForTC: No expected Validation Results files for TC '" + tcName + "'; skipping.")
@@ -1543,6 +1563,43 @@ class DataSubmissions extends TestRunner {
 				verifyValidationResultsVsExpected(tcName, node, severity, issueType)
 			}
 		}
+	}
+
+	/** Locator keys of the three Validation Results filter dropdowns (Expanded view). */
+	private static final List<String> VALIDATION_RESULTS_FILTER_LOCATORS = [
+		"CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn",
+		"CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn",
+		"CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn"
+	]
+
+	/** True when the node, severity and issue type dropdowns are all displayed (waits up to timeoutSeconds for each). */
+	private boolean validationResultsFilterControlsPresent(int timeoutSeconds) {
+		for (String locator : VALIDATION_RESULTS_FILTER_LOCATORS) {
+			if (!WebUIUtils.fastElementPresent(locator, timeoutSeconds)) return false
+		}
+		return true
+	}
+
+	/**
+	 * Make sure the Validation Results page is showing the node, severity and issue type dropdowns before filtering.
+	 * Right after the Aggregated/Expanded switch is clicked the page can be in the wrong view or still re-rendering,
+	 * and the dropdowns are missing. If so: wait, then click the switch to change view, then reopen the tab and
+	 * click the switch again. Each step is followed by a check for the dropdowns. Stops the test if they never show up.
+	 */
+	private void ensureValidationResultsFilterControls() {
+		final String switchLocator = "Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn"
+		if (validationResultsFilterControlsPresent(10)) return
+		KeywordUtil.logWarning("Validation Results filter dropdowns not shown after opening the Expanded view; clicking the view switch")
+		TestRunner.clickTab(switchLocator)
+		WebUI.delay(2)
+		if (validationResultsFilterControlsPresent(10)) return
+		KeywordUtil.logWarning("Validation Results filter dropdowns still not shown; reopening the Validation Results tab and clicking the view switch")
+		TestRunner.clickTab("CRDC/DataSubmissions/Validation/ValidationResults-Tab")
+		WebUI.delay(1)
+		TestRunner.clickTab(switchLocator)
+		WebUI.delay(2)
+		if (validationResultsFilterControlsPresent(10)) return
+		KeywordUtil.markFailedAndStop("Validation Results filter dropdowns (node type, severity, issue type) were not shown after switching views")
 	}
 
 	/**
@@ -1573,7 +1630,14 @@ class DataSubmissions extends TestRunner {
 		KeywordUtil.logInfo("--- clickSeeDetailsForSubmittedId: " + submittedIdentifier + " ---")
 		String target = submittedIdentifier?.trim() ?: ""
 
+		// After filters are applied the table can still be empty while it re-renders. Wait for rows to appear.
 		List<WebElement> rows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
+		long rowsDeadlineMs = System.currentTimeMillis() + 30000L
+		while ((rows == null || rows.isEmpty()) && System.currentTimeMillis() < rowsDeadlineMs) {
+			KeywordUtil.logInfo("clickSeeDetailsForSubmittedId: no table rows yet, waiting...")
+			WebUI.delay(2)
+			rows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
+		}
 		if (rows == null || rows.isEmpty()) {
 			KeywordUtil.markFailed("clickSeeDetailsForSubmittedId: no table rows found")
 			return
@@ -1743,6 +1807,7 @@ class DataSubmissions extends TestRunner {
 		TestRunner.clickTab("CRDC/DataSubmissions/Validation/ValidationResults-Tab")
 		TestRunner.clickTab("Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn")
 		WebUI.delay(2)
+		ensureValidationResultsFilterControls()
 		List<String> nodes = listNodesFromExpectedValidationResultsFolder(tcName)
 		if (nodes.isEmpty()) {
 			KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: No expected Validation Results files for TC '" + tcName + "'; skipping.")
@@ -1771,6 +1836,14 @@ class DataSubmissions extends TestRunner {
 				String issueType = row.get(2)
 				String message = row.get(3)
 				applyValidationResultsFilters(node, severity, issueType)
+				// The table can come back empty after the filters (data is there, the UI just did not show it).
+				// If so, apply the filters once more before looking for the row.
+				List<WebElement> filteredRows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
+				if (filteredRows == null || filteredRows.isEmpty()) {
+					KeywordUtil.logWarning("verifyErrorDetailsForSubmittedIdForTC: table empty after filters (" + node + " / " + severity + " / " + issueType + "); applying filters once more")
+					WebUI.delay(2)
+					applyValidationResultsFilters(node, severity, issueType)
+				}
 				verifyErrorDetailsForSubmittedId(submittedId, [
 					[severity: severity, message: message]
 				])
