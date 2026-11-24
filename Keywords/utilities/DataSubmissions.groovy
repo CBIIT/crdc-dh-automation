@@ -1467,7 +1467,7 @@ class DataSubmissions extends TestRunner {
 		// The table is re-rendered after each filter change and can be empty or partial for a few seconds,
 		// so a single read can miss rows that exist. Re-read (which re-applies the filters) until every
 		// expected Submitted Identifier is present or the wait time is used up.
-		final int VALIDATION_RESULTS_MAX_WAIT_SECONDS = 45
+		final int VALIDATION_RESULTS_MAX_WAIT_SECONDS = 30
 		final int VALIDATION_RESULTS_RETRY_DELAY_SECONDS = 5
 		long deadlineMs = System.currentTimeMillis() + VALIDATION_RESULTS_MAX_WAIT_SECONDS * 1000L
 		Map<String, List<String>> actualBySubmittedId = new LinkedHashMap<>()
