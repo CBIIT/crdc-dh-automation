@@ -1488,7 +1488,7 @@ class DataSubmissions extends TestRunner {
 			KeywordUtil.logInfo("verifyValidationResultsVsExpected: read " + readAttempt + " - UI rows=" + actualRows.size()
 					+ ", expected=" + expectedRows.size() + ", missing=" + missingIds.size())
 			if (missingIds.isEmpty() || System.currentTimeMillis() >= deadlineMs) break
-			KeywordUtil.logInfo("verifyValidationResultsVsExpected: expected row(s) not in UI yet " + missingIds + "; waiting "
+			KeywordUtil.logWarning("verifyValidationResultsVsExpected: expected row(s) not in UI yet " + missingIds + "; waiting "
 					+ VALIDATION_RESULTS_RETRY_DELAY_SECONDS + "s and re-reading")
 			WebUI.delay(VALIDATION_RESULTS_RETRY_DELAY_SECONDS)
 		}
@@ -1800,7 +1800,7 @@ class DataSubmissions extends TestRunner {
 				// If so, apply the filters once more before looking for the row.
 				List<WebElement> filteredRows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
 				if (filteredRows == null || filteredRows.isEmpty()) {
-					KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: table empty after filters (" + node + " / " + severity + " / " + issueType + "); applying filters once more")
+					KeywordUtil.logWarning("verifyErrorDetailsForSubmittedIdForTC: table empty after filters (" + node + " / " + severity + " / " + issueType + "); applying filters once more")
 					WebUI.delay(2)
 					applyValidationResultsFilters(node, severity, issueType)
 				}
