@@ -1543,6 +1543,8 @@ class DataSubmissions extends TestRunner {
 	void verifyValidationResultsVsExpectedForTC(String tcName) {
 		TestRunner.clickTab("CRDC/DataSubmissions/Validation/ValidationResults-Tab")
 		TestRunner.clickTab("Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn")
+		WebUI.delay(2)
+		ensureValidationResultsFilterControls()
 		List<String> nodes = listNodesFromExpectedValidationResultsFolder(tcName)
 		if (nodes.isEmpty()) {
 			KeywordUtil.logInfo("verifyValidationResultsVsExpectedForTC: No expected Validation Results files for TC '" + tcName + "'; skipping.")
@@ -1561,6 +1563,43 @@ class DataSubmissions extends TestRunner {
 				verifyValidationResultsVsExpected(tcName, node, severity, issueType)
 			}
 		}
+	}
+
+	/** Locator keys of the three Validation Results filter dropdowns (Expanded view). */
+	private static final List<String> VALIDATION_RESULTS_FILTER_LOCATORS = [
+		"CRDC/DataSubmissions/Validation/ValidationResults_NodeType-Ddn",
+		"CRDC/DataSubmissions/Validation/ValidationResults_Severity-Ddn",
+		"CRDC/DataSubmissions/Validation/ValidationResults_IssueType-Ddn"
+	]
+
+	/** True when the node, severity and issue type dropdowns are all displayed (waits up to timeoutSeconds for each). */
+	private boolean validationResultsFilterControlsPresent(int timeoutSeconds) {
+		for (String locator : VALIDATION_RESULTS_FILTER_LOCATORS) {
+			if (!WebUIUtils.fastElementPresent(locator, timeoutSeconds)) return false
+		}
+		return true
+	}
+
+	/**
+	 * Make sure the Validation Results page is showing the node, severity and issue type dropdowns before filtering.
+	 * Right after the Aggregated/Expanded switch is clicked the page can be in the wrong view or still re-rendering,
+	 * and the dropdowns are missing. If so: wait, then click the switch to change view, then reopen the tab and
+	 * click the switch again. Each step is followed by a check for the dropdowns. Stops the test if they never show up.
+	 */
+	private void ensureValidationResultsFilterControls() {
+		final String switchLocator = "Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn"
+		if (validationResultsFilterControlsPresent(10)) return
+		KeywordUtil.logWarning("Validation Results filter dropdowns not shown after opening the Expanded view; clicking the view switch")
+		TestRunner.clickTab(switchLocator)
+		WebUI.delay(2)
+		if (validationResultsFilterControlsPresent(10)) return
+		KeywordUtil.logWarning("Validation Results filter dropdowns still not shown; reopening the Validation Results tab and clicking the view switch")
+		TestRunner.clickTab("CRDC/DataSubmissions/Validation/ValidationResults-Tab")
+		WebUI.delay(1)
+		TestRunner.clickTab(switchLocator)
+		WebUI.delay(2)
+		if (validationResultsFilterControlsPresent(10)) return
+		KeywordUtil.markFailedAndStop("Validation Results filter dropdowns (node type, severity, issue type) were not shown after switching views")
 	}
 
 	/**
@@ -1768,6 +1807,7 @@ class DataSubmissions extends TestRunner {
 		TestRunner.clickTab("CRDC/DataSubmissions/Validation/ValidationResults-Tab")
 		TestRunner.clickTab("Object Repository/CRDC/DataSubmissions/Validation/ValidationResults_AggregatedExpanded-Btn")
 		WebUI.delay(2)
+		ensureValidationResultsFilterControls()
 		List<String> nodes = listNodesFromExpectedValidationResultsFolder(tcName)
 		if (nodes.isEmpty()) {
 			KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: No expected Validation Results files for TC '" + tcName + "'; skipping.")
