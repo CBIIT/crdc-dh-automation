@@ -1796,6 +1796,14 @@ class DataSubmissions extends TestRunner {
 				String issueType = row.get(2)
 				String message = row.get(3)
 				applyValidationResultsFilters(node, severity, issueType)
+				// The table can come back empty after the filters (data is there, the UI just did not show it).
+				// If so, apply the filters once more before looking for the row.
+				List<WebElement> filteredRows = Utils.getListWebElements("CRDC/AILocators/GenericTable/TableRow")
+				if (filteredRows == null || filteredRows.isEmpty()) {
+					KeywordUtil.logInfo("verifyErrorDetailsForSubmittedIdForTC: table empty after filters (" + node + " / " + severity + " / " + issueType + "); applying filters once more")
+					WebUI.delay(2)
+					applyValidationResultsFilters(node, severity, issueType)
+				}
 				verifyErrorDetailsForSubmittedId(submittedId, [
 					[severity: severity, message: message]
 				])
